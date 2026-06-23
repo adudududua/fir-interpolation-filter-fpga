@@ -1,4 +1,0 @@
-Running: xsim.dir/interp4_top_behav/xsimk.exe -simmode gui -wdb interp4_top_behav.wdb -simrunnum 0 -socket 56050
-Design successfully loaded
-Design Loading Memory Usage: 8020 KB (Peak: 8020 KB)
-Design Loading CPU Usage: 62 ms
