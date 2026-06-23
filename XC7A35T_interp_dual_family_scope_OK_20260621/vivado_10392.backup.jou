@@ -1,0 +1,39 @@
+#-----------------------------------------------------------
+# Vivado v2018.3 (64-bit)
+# SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+# IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+# Start of session at: Sun Jun 21 15:27:59 2026
+# Process ID: 10392
+# Current directory: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp
+# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent7772 D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\XC7A35T_interp\XC7A35T_interp.xpr
+# Log file: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp/vivado.log
+# Journal file: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp\vivado.jou
+#-----------------------------------------------------------
+start_gui
+open_project D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp/XC7A35T_interp.xpr
+update_compile_order -fileset sources_1
+
+reset_run synth_1
+launch_runs synth_1 -jobs 19
+wait_on_run synth_1
+launch_runs impl_1 -jobs 19
+wait_on_run impl_1
+launch_runs impl_1 -to_step write_bitstream -jobs 19
+wait_on_run impl_1
+open_hw
+connect_hw_server
+open_hw_target
+set_property PROGRAM.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp/XC7A35T_interp.runs/impl_1/board_demo_competition_dac8_top.bit} [get_hw_devices xc7a35t_0]
+current_hw_device [get_hw_devices xc7a35t_0]
+refresh_hw_device -update_hw_probes false [lindex [get_hw_devices xc7a35t_0] 0]
+set_property PROBES.FILE {} [get_hw_devices xc7a35t_0]
+set_property FULL_PROBES.FILE {} [get_hw_devices xc7a35t_0]
+set_property PROGRAM.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp/XC7A35T_interp.runs/impl_1/board_demo_competition_dac8_top.bit} [get_hw_devices xc7a35t_0]
+program_hw_devices [get_hw_devices xc7a35t_0]
+refresh_hw_device [lindex [get_hw_devices xc7a35t_0] 0]
+reset_run impl_1
+launch_runs impl_1 -jobs 19
+wait_on_run impl_1
+reset_run synth_1
+launch_runs impl_1 -to_step write_bitstream -jobs 19
+wait_on_run impl_1

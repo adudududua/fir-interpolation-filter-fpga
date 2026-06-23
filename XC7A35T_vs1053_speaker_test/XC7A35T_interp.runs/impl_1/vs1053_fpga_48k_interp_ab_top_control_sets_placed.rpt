@@ -1,0 +1,127 @@
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+----------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date         : Tue Jun 23 21:36:54 2026
+| Host         : LAPTOP-476JT8H0 running 64-bit major release  (build 9200)
+| Command      : report_control_sets -verbose -file vs1053_fpga_48k_interp_ab_top_control_sets_placed.rpt
+| Design       : vs1053_fpga_48k_interp_ab_top
+| Device       : xc7a35t
+----------------------------------------------------------------------------------------------------------
+
+Control Set Information
+
+Table of Contents
+-----------------
+1. Summary
+2. Histogram
+3. Flip-Flop Distribution
+4. Detailed Control Set Information
+
+1. Summary
+----------
+
++----------------------------------------------------------+-------+
+|                          Status                          | Count |
++----------------------------------------------------------+-------+
+| Number of unique control sets                            |    56 |
+| Unused register locations in slices containing registers |   234 |
++----------------------------------------------------------+-------+
+
+
+2. Histogram
+------------
+
++--------+--------------+
+| Fanout | Control Sets |
++--------+--------------+
+|      1 |            4 |
+|      4 |            2 |
+|      6 |            3 |
+|      7 |            1 |
+|      8 |            3 |
+|     10 |            1 |
+|     15 |            1 |
+|    16+ |           41 |
++--------+--------------+
+
+
+3. Flip-Flop Distribution
+-------------------------
+
++--------------+-----------------------+------------------------+-----------------+--------------+
+| Clock Enable | Synchronous Set/Reset | Asynchronous Set/Reset | Total Registers | Total Slices |
++--------------+-----------------------+------------------------+-----------------+--------------+
+| No           | No                    | No                     |              18 |            9 |
+| No           | No                    | Yes                    |              59 |           15 |
+| No           | Yes                   | No                     |              41 |           12 |
+| Yes          | No                    | No                     |              93 |           32 |
+| Yes          | No                    | Yes                    |            3746 |         1332 |
+| Yes          | Yes                   | No                     |              89 |           25 |
++--------------+-----------------------+------------------------+-----------------+--------------+
+
+
+4. Detailed Control Set Information
+-----------------------------------
+
++----------------+-----------------------------------------------------------+--------------------------------------------------------------+------------------+----------------+
+|  Clock Signal  |                       Enable Signal                       |                       Set/Reset Signal                       | Slice Load Count | Bel Load Count |
++----------------+-----------------------------------------------------------+--------------------------------------------------------------+------------------+----------------+
+|  clk_IBUF_BUFG | post_sci_delay_cnt                                        |                                                              |                1 |              1 |
+|  clk_IBUF_BUFG | vs_xcs_n_i_1_n_0                                          |                                                              |                1 |              1 |
+|  clk_IBUF_BUFG | u_vs1053_spi_byte_master_48k_ab/mosi_i_1_n_0              |                                                              |                1 |              1 |
+|  clk_IBUF_BUFG | u_vs1053_spi_byte_master_48k_ab/state_reg[4]              |                                                              |                1 |              1 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/audio_run_reg[0]  | u_interp4_top_symm_ce/u_fir_core_symm/vs_rst_n_reg_2         |                1 |              4 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/audio_run_reg[0]  | u_interp4_top_symm_ce/u_fir_core_symm/vs_rst_n_reg_0         |                1 |              4 |
+|  clk_IBUF_BUFG | u_vs1053_spi_byte_master_48k_ab/state_reg[0][0]           |                                                              |                4 |              6 |
+|  clk_IBUF_BUFG | u_vs1053_spi_byte_master_48k_ab/state_reg[4]_0[0]         |                                                              |                3 |              6 |
+|  clk_IBUF_BUFG | u_vs1053_spi_byte_master_48k_ab/done_reg_0[0]             |                                                              |                2 |              6 |
+|  clk_IBUF_BUFG | send_mode                                                 |                                                              |                2 |              7 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/audio_run_reg[0]  | u_interp4_top_symm_ce/u_fir_core_symm/vs_rst_n_reg_1         |                1 |              8 |
+|  clk_IBUF_BUFG | u_vs1053_spi_byte_master_48k_ab/E[0]                      |                                                              |                4 |              8 |
+|  clk_IBUF_BUFG | u_vs1053_spi_byte_master_48k_ab/busy2_out                 |                                                              |                3 |              8 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/audio_run_reg[0]  | u_interp4_top_symm_ce/u_fir_core_symm/vs_rst_n_reg_3         |                2 |             10 |
+|  clk_IBUF_BUFG |                                                           | u_vs1053_spi_byte_master_48k_ab/div_cnt[15]_i_1_n_0          |                4 |             15 |
+|  clk_IBUF_BUFG | pending_sample16                                          |                                                              |                3 |             16 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/audio_run_reg_1   | hold_sample24[23]_i_1_n_0                                    |                4 |             16 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_fir_core_symm/fir_out_valid_reg_0 | hold_sample24[23]_i_1_n_0                                    |                2 |             16 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/vs_rst_n_reg           |                8 |             17 |
+|  clk_IBUF_BUFG |                                                           |                                                              |                9 |             18 |
+|  clk_IBUF_BUFG |                                                           | hold_sample24[23]_i_1_n_0                                    |                8 |             26 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/audio_run_reg[0]  | hold_sample24[23]_i_1_n_0                                    |               11 |             26 |
+|  clk_IBUF_BUFG | post_sci_delay_cnt                                        | post_sci_delay_cnt[31]_i_1_n_0                               |                8 |             31 |
+|  clk_IBUF_BUFG | delay_cnt[31]_i_1_n_0                                     |                                                              |                7 |             32 |
+|  clk_IBUF_BUFG |                                                           | u_interp4_top_symm_ce/u_fir_core_symm/vs_rst_n_reg           |               15 |             59 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/vs_rst_n_reg_3         |               30 |             92 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/vs_rst_n_reg_1         |               27 |             94 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/vs_rst_n_reg_0         |               30 |             98 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/vs_rst_n_reg_2         |               28 |             98 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[35][11]_i_1_n_0  |               43 |            123 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[28][5]_i_1_n_0   |               48 |            123 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[39][22]_i_1_n_0  |               41 |            123 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[55][2]_i_1_n_0   |               61 |            123 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[126][23]_i_1_n_0 |               45 |            123 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[63][23]_i_1_n_0  |               44 |            123 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[31][1]_i_1_n_0   |               42 |            123 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[11][10]_i_1_n_0  |               40 |            123 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[73][19]_i_1_n_0  |               41 |            123 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[8][23]_i_1_n_0   |               46 |            123 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[66][20]_i_1_n_0  |               45 |            123 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[84][23]_i_1_n_0  |               51 |            123 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[104][23]_i_1_n_0 |               45 |            123 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[116][23]_i_1_n_0 |               42 |            123 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[59][13]_i_1_n_0  |               48 |            123 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[45][7]_i_1_n_0   |               48 |            123 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[15][20]_i_1_n_0  |               36 |            123 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[18][14]_i_1_n_0  |               43 |            123 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[25][16]_i_1_n_0  |               39 |            123 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[136][23]_i_1_n_0 |               49 |            123 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[52][8]_i_1_n_0   |               45 |            123 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[42][17]_i_1_n_0  |               46 |            123 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[21][5]_i_1_n_0   |               39 |            123 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[69][8]_i_1_n_0   |               47 |            123 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[94][23]_i_1_n_0  |               50 |            123 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[49][17]_i_1_n_0  |               38 |            123 |
+|  clk_IBUF_BUFG | u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]              | u_interp4_top_symm_ce/u_fir_core_symm/x_reg[76][11]_i_1_n_0  |               42 |            123 |
++----------------+-----------------------------------------------------------+--------------------------------------------------------------+------------------+----------------+
+
+

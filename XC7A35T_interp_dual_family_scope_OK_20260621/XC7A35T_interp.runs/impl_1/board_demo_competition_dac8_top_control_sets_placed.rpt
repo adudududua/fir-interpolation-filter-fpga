@@ -1,0 +1,145 @@
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date         : Sun Jun 21 17:13:34 2026
+| Host         : LAPTOP-476JT8H0 running 64-bit major release  (build 9200)
+| Command      : report_control_sets -verbose -file board_demo_competition_dac8_top_control_sets_placed.rpt
+| Design       : board_demo_competition_dac8_top
+| Device       : xc7a35t
+------------------------------------------------------------------------------------------------------------
+
+Control Set Information
+
+Table of Contents
+-----------------
+1. Summary
+2. Histogram
+3. Flip-Flop Distribution
+4. Detailed Control Set Information
+
+1. Summary
+----------
+
++----------------------------------------------------------+-------+
+|                          Status                          | Count |
++----------------------------------------------------------+-------+
+| Number of unique control sets                            |    76 |
+| Unused register locations in slices containing registers |   250 |
++----------------------------------------------------------+-------+
+
+
+2. Histogram
+------------
+
++--------+--------------+
+| Fanout | Control Sets |
++--------+--------------+
+|      1 |           11 |
+|      2 |            9 |
+|      3 |            2 |
+|      5 |            1 |
+|      8 |            1 |
+|    16+ |           52 |
++--------+--------------+
+
+
+3. Flip-Flop Distribution
+-------------------------
+
++--------------+-----------------------+------------------------+-----------------+--------------+
+| Clock Enable | Synchronous Set/Reset | Asynchronous Set/Reset | Total Registers | Total Slices |
++--------------+-----------------------+------------------------+-----------------+--------------+
+| No           | No                    | No                     |               0 |            0 |
+| No           | No                    | Yes                    |             432 |          141 |
+| No           | Yes                   | No                     |              16 |            4 |
+| Yes          | No                    | No                     |               0 |            0 |
+| Yes          | No                    | Yes                    |            4070 |         1576 |
+| Yes          | Yes                   | No                     |               0 |            0 |
++--------------+-----------------------+------------------------+-----------------+--------------+
+
+
+4. Detailed Control Set Information
+-----------------------------------
+
++---------------------+----------------------------------------------------------------------------------------------------------------------+---------------------------------------+------------------+----------------+
+|     Clock Signal    |                                                     Enable Signal                                                    |            Set/Reset Signal           | Slice Load Count | Bel Load Count |
++---------------------+----------------------------------------------------------------------------------------------------------------------+---------------------------------------+------------------+----------------+
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_128x/u_interp2_ctrl_ce/E[0]                        | rst_audio_sync_reg[2]_inv_rep_n_0     |                1 |              1 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_16x/u_interp2_ctrl_ce/E[0]                         | rst_audio_sync_reg[2]_inv_rep_n_0     |                1 |              1 |
+|  clk_audio_128x_sel |                                                                                                                      | rst_audio_sync_reg[2]_inv_rep__13_n_0 |                1 |              1 |
+|  clk_audio_128x_sel |                                                                                                                      | rst_audio_sync_reg[2]_inv_rep__4_n_0  |                1 |              1 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_32x/u_interp2_ctrl_ce/fir_in_valid_reg_0[0]        | rst_audio_sync_reg[2]_inv_rep_n_0     |                1 |              1 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_interp4_ctrl_ce/ce4_out                  | rst_audio_sync_reg[2]_inv_rep__30_n_0 |                1 |              1 |
+|  clk_audio_128x_sel |                                                                                                                      | rst_audio_sync_reg[2]_inv_rep__12_n_0 |                1 |              1 |
+|  clk_audio_128x_sel |                                                                                                                      | rst_audio_sync_reg[2]_inv_rep__10_n_0 |                1 |              1 |
+|  clk_audio_128x_sel |                                                                                                                      | rst_audio_sync_reg[2]_inv_rep__6_n_0  |                1 |              1 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_32x/u_interp2_ctrl_ce/E[0]                         | rst_audio_sync_reg[2]_inv_rep_n_0     |                1 |              1 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_16x/u_interp2_ctrl_ce/fir_in_valid_reg_0[0]        | rst_audio_sync_reg[2]_inv_rep_n_0     |                1 |              1 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_32x/u_interp2_ctrl_ce/E[0]                         | rst_audio_sync_reg[2]_inv_rep__0_n_0  |                2 |              2 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]                     | rst_audio_sync_reg[2]_inv_rep_n_0     |                1 |              2 |
+|  clk_audio_128x_sel |                                                                                                                      | rst_audio_sync_reg[2]_inv_rep__7_n_0  |                1 |              2 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_16x/u_interp2_ctrl_ce/E[0]                         | rst_audio_sync_reg[2]_inv_rep__0_n_0  |                2 |              2 |
+|  clk_audio_128x_sel |                                                                                                                      | rst_audio_sync_reg[2]_inv_rep__1_n_0  |                2 |              2 |
+|  clk_audio_128x_sel |                                                                                                                      | rst_audio_sync_reg[2]_inv_rep__9_n_0  |                1 |              2 |
+|  clk_audio_128x_sel |                                                                                                                      | rst_audio_sync_reg[2]_inv_rep__16_n_0 |                2 |              2 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_64x/u_interp2_ctrl_ce/E[0]                         | rst_audio_sync_reg[2]_inv_rep__1_n_0  |                2 |              2 |
+|  clk_audio_128x_sel |                                                                                                                      | rst_audio_sync_reg[2]_inv_rep__28_n_0 |                1 |              2 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_64x/u_fir_core_symm_interp2/fir_out_valid_reg_0[0] | rst_audio_sync_reg[2]_inv_rep_n_0     |                2 |              3 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_16x/u_fir_core_symm_interp2/y_out_valid            | rst_audio_sync_reg[2]_inv_rep__1_n_0  |                2 |              3 |
+|  clk_audio_128x_sel |                                                                                                                      | rst_audio_sync_reg[2]_inv_rep__3_n_0  |                2 |              5 |
+| ~clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_fir_core_symm/fir_out_valid_reg_1[0]     | rst_audio_sync_reg[2]_inv_rep_n_0     |                4 |              8 |
+|  clk_sys_bufg       |                                                                                                                      | clear                                 |                4 |             16 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_interp4_ctrl_ce/ce4_out                  | rst_audio_sync_reg[2]_inv_rep__16_n_0 |                7 |             17 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/sel                                                                                 | rst_audio_sync_reg[2]_inv_rep__16_n_0 |                3 |             20 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_16x/u_fir_core_symm_interp2/y_out_valid            | rst_audio_sync_reg[2]_inv_rep__0_n_0  |                8 |             21 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_64x/u_fir_core_symm_interp2/fir_out_valid_reg_0[0] | rst_audio_sync_reg[2]_inv_rep__3_n_0  |                7 |             21 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_16x/u_interp2_ctrl_ce/E[0]                         | rst_audio_sync_reg[2]_inv_rep__6_n_0  |                7 |             23 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_32x/u_interp2_ctrl_ce/E[0]                         | rst_audio_sync_reg[2]_inv_rep__12_n_0 |               13 |             23 |
+|  clk_audio_128x_sel |                                                                                                                      | rst_audio_sync_reg[2]_inv_rep__15_n_0 |                7 |             24 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_fir_core_symm_interp2/fir_out_valid_reg_0[0]  | rst_audio_sync_reg[2]_inv_rep__0_n_0  |                6 |             24 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_fir_core_symm/fir_out_valid_reg_0[0]     | rst_audio_sync_reg[2]_inv_rep__7_n_0  |                7 |             24 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_64x/u_interp2_ctrl_ce/E[0]                         | rst_audio_sync_reg[2]_inv_rep__3_n_0  |               10 |             24 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_32x/u_fir_core_symm_interp2/fir_out_valid_reg_0[0] | rst_audio_sync_reg[2]_inv_rep__1_n_0  |               10 |             24 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_interp2_ctrl_ce/E[0]                          | rst_audio_sync_reg[2]_inv_rep__7_n_0  |               10 |             26 |
+|  clk_audio_128x_sel |                                                                                                                      | u_clk_wiz_audio_48k_i_1_n_0           |               22 |             40 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_interp2_ctrl_ce/fir_in_valid_reg_0[0]         | rst_audio_sync_reg[2]_inv_rep__7_n_0  |               19 |             54 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/ce_cnt_reg__0[0]                                                                    | rst_audio_sync_reg[2]_inv_rep__3_n_0  |               26 |             65 |
+|  clk_audio_128x_sel |                                                                                                                      | rst_audio_sync_reg[2]_inv_rep__0_n_0  |               22 |             66 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_16x/u_interp2_ctrl_ce/fir_in_valid_reg_0[0]        | rst_audio_sync_reg[2]_inv_rep__6_n_0  |               18 |             72 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_32x/u_interp2_ctrl_ce/fir_in_valid_reg_0[0]        | rst_audio_sync_reg[2]_inv_rep__12_n_0 |               24 |             72 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_128x/u_interp2_ctrl_ce/E[0]                        | rst_audio_sync_reg[2]_inv_rep__15_n_0 |               28 |             72 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/ce_cnt_reg__0[0]                                                                    | rst_audio_sync_reg[2]_inv_rep__1_n_0  |               28 |             84 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]                     | rst_audio_sync_reg[2]_inv_rep__16_n_0 |               38 |             87 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_32x/u_interp2_ctrl_ce/fir_in_valid_reg_0[0]        | rst_audio_sync_reg[2]_inv_rep__10_n_0 |               30 |             95 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_16x/u_interp2_ctrl_ce/fir_in_valid_reg_0[0]        | rst_audio_sync_reg[2]_inv_rep__4_n_0  |               18 |             95 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_128x/u_interp2_ctrl_ce/E[0]                        | rst_audio_sync_reg[2]_inv_rep__13_n_0 |               27 |             95 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_16x/u_interp2_ctrl_ce/fir_in_valid_reg_0[0]        | rst_audio_sync_reg[2]_inv_rep__5_n_0  |               21 |             96 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_128x/u_interp2_ctrl_ce/E[0]                        | rst_audio_sync_reg[2]_inv_rep__14_n_0 |               26 |             96 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_32x/u_interp2_ctrl_ce/fir_in_valid_reg_0[0]        | rst_audio_sync_reg[2]_inv_rep__11_n_0 |               25 |             96 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_interp2_ctrl_ce/fir_in_valid_reg_0[0]         | rst_audio_sync_reg[2]_inv_rep__9_n_0  |               30 |            104 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_interp2_ctrl_ce/fir_in_valid_reg_0[0]         | rst_audio_sync_reg[2]_inv_rep__8_n_0  |               38 |            106 |
+|  clk_audio_128x_sel |                                                                                                                      | rst_audio_sync_reg[2]_inv_rep_n_0     |               32 |            114 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/ce_cnt_reg__0[0]                                                                    | rst_audio_sync_reg[2]_inv_rep__2_n_0  |               41 |            115 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]                     | rst_audio_sync_reg[2]_inv_rep__28_n_0 |               57 |            124 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]                     | rst_audio_sync_reg[2]_inv_rep__30_n_0 |               64 |            125 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]                     | rst_audio_sync_reg[2]_inv_rep__33_n_0 |               56 |            126 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]                     | rst_audio_sync_reg[2]_inv_rep__35_n_0 |               51 |            126 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]                     | rst_audio_sync_reg[2]_inv_rep__26_n_0 |               43 |            126 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]                     | rst_audio_sync_reg[2]_inv_rep__17_n_0 |               55 |            126 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]                     | rst_audio_sync_reg[2]_inv_rep__27_n_0 |               46 |            126 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]                     | rst_audio_sync_reg[2]_inv_rep__22_n_0 |               49 |            126 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]                     | rst_audio_sync_reg[2]_inv_rep__20_n_0 |               46 |            126 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]                     | rst_audio_sync_reg[2]_inv_rep__23_n_0 |               56 |            126 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]                     | rst_audio_sync_reg[2]_inv_rep__24_n_0 |               59 |            126 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]                     | rst_audio_sync_reg[2]_inv_rep__29_n_0 |               55 |            126 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]                     | rst_audio_sync_reg[2]_inv_rep__21_n_0 |               53 |            126 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]                     | rst_audio_sync_reg[2]_inv_rep__34_n_0 |               56 |            126 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]                     | rst_audio_sync_reg[2]_inv_rep__25_n_0 |               50 |            126 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]                     | rst_audio_sync_reg[2]_inv_rep__31_n_0 |               61 |            126 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]                     | rst_audio_sync_reg[2]_inv_rep__18_n_0 |               60 |            126 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]                     | rst_audio_sync_reg[2]_inv_rep__19_n_0 |               55 |            126 |
+|  clk_audio_128x_sel | u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_interp4_ctrl_ce/E[0]                     | rst_audio_sync_reg[2]_inv_rep__32_n_0 |               58 |            126 |
+|  clk_audio_128x_sel |                                                                                                                      | rst_audio_sync_reg[2]_inv_n_0         |               44 |            168 |
++---------------------+----------------------------------------------------------------------------------------------------------------------+---------------------------------------+------------------+----------------+
+
+

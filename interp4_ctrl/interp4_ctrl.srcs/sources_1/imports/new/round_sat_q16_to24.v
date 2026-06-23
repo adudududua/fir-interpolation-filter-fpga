@@ -1,0 +1,72 @@
+`timescale 1ns / 1ps
+
+module round_sat_q16_to24 #(
+    parameter IN_W   = 56,   // 输入位宽：来自 fir_out_full
+    parameter OUT_W  = 24,   // 输出位宽：赛题要求 24 位
+    parameter FRAC_W = 16    // 小数位数：当前 FIR 系数是 Q16
+)(
+    input  wire signed [IN_W-1:0]   din_full,   // FIR 的全精度输出（Q16 格式）
+    output reg  signed [OUT_W-1:0]  dout_24     // 舍入并饱和后的 24 位输出
+);
+
+    //====================================================
+    // 1) 24 位有符号数的上下限
+    //
+    // 24 位有符号范围：
+    //   最小值 = -2^23      = -8388608
+    //   最大值 =  2^23 - 1  =  8388607
+    //====================================================
+    localparam signed [OUT_W-1:0] OUT_MAX = {1'b0, {(OUT_W-1){1'b1}}};
+    localparam signed [OUT_W-1:0] OUT_MIN = {1'b1, {(OUT_W-1){1'b0}}};
+
+    //====================================================
+    // 2) 四舍五入偏置
+    //
+    // 对 Q16 而言，1 LSB = 2^-16
+    // 半个 LSB 对应整数域里的 2^(FRAC_W-1) = 32768
+    //
+    // 正数舍入： +32768
+    // 负数舍入： +32767
+    //
+    // 注意：
+    // 负数这里不是减，而是加 32767，
+    // 这样配合算术右移，才能得到正确的"就近取整"
+    //====================================================
+    localparam signed [IN_W-1:0] ROUND_BIAS_POS =
+        {{(IN_W-FRAC_W){1'b0}}, 1'b1, {(FRAC_W-1){1'b0}}};   // +32768
+
+    localparam signed [IN_W-1:0] ROUND_BIAS_NEG =
+        ROUND_BIAS_POS - 1'b1;                               // +32767
+
+    //====================================================
+    // 3) 根据正负号加舍入偏置
+    //====================================================
+    wire signed [IN_W-1:0] din_round;
+
+    assign din_round = (din_full >= 0) ? (din_full + ROUND_BIAS_POS)
+                                       : (din_full + ROUND_BIAS_NEG);
+
+    //====================================================
+    // 4) 算术右移 16 位，把 Q16 恢复成整数幅值
+    //
+    // 必须使用 >>> 算术右移，这样负数会自动补符号位
+    //====================================================
+    wire signed [IN_W-1:0] dout_shift;
+    assign dout_shift = din_round >>> FRAC_W;
+
+    //====================================================
+    // 5) 饱和输出
+    //
+    // 如果超出 24 位有符号范围，就夹到最大/最小值
+    // 否则直接取低 24 位输出
+    //====================================================
+    always @(*) begin
+        if (dout_shift > $signed(OUT_MAX))
+            dout_24 = OUT_MAX;
+        else if (dout_shift < $signed(OUT_MIN))
+            dout_24 = OUT_MIN;
+        else
+            dout_24 = dout_shift[OUT_W-1:0];
+    end
+
+endmodule

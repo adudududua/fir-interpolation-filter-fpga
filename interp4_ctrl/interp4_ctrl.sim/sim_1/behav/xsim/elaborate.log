@@ -1,0 +1,34 @@
+Vivado Simulator 2018.3
+Copyright 1986-1999, 2001-2018 Xilinx, Inc. All Rights Reserved.
+Running: D:/Tools/Xilinx/Vivado/2018.3/bin/unwrapped/win64.o/xelab.exe -wto dff047394fa64cfc937594ea0d33988c --incr --debug typical --relax --mt 2 -L xil_defaultlib -L unisims_ver -L unimacro_ver -L secureip -L xpm --snapshot tb_board_demo_competition_dac8_top_behav xil_defaultlib.tb_board_demo_competition_dac8_top xil_defaultlib.glbl -log elaborate.log 
+Using 2 slave threads.
+Starting static elaboration
+Completed static elaboration
+Starting simulation data flow analysis
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling module unisims_ver.IBUF
+Compiling module unisims_ver.BUFG
+Compiling module unisims_ver.MMCME2_ADV(CLKFBOUT_MULT_F=44.37...
+Compiling module xil_defaultlib.clk_wiz_audio_48k_clk_wiz
+Compiling module xil_defaultlib.clk_wiz_audio_48k
+Compiling module unisims_ver.MMCME2_ADV(CLKFBOUT_MULT_F=62.37...
+Compiling module xil_defaultlib.clk_wiz_audio_44k1_clk_wiz
+Compiling module xil_defaultlib.clk_wiz_audio_44k1
+Compiling module unisims_ver.BUFGCTRL(PRESELECT_I0="TRUE")
+Compiling module unisims_ver.INV
+Compiling module unisims_ver.BUFGMUX(CLK_SEL_TYPE="ASYNC")
+Compiling module xil_defaultlib.interp4_ctrl_ce
+Compiling module xil_defaultlib.fir_core_symm_default
+Compiling module xil_defaultlib.round_sat_q16_to24_default
+Compiling module xil_defaultlib.interp4_top_symm_ce
+Compiling module xil_defaultlib.bridge_to_interp2_ce
+Compiling module xil_defaultlib.interp2_ctrl_ce
+Compiling module xil_defaultlib.fir_core_symm_interp2_v2_default
+Compiling module xil_defaultlib.interp2_top_symm_ce
+Compiling module xil_defaultlib.interp128_top_ce
+Compiling module xil_defaultlib.demo_interp_dac8_mmcm_common
+Compiling module xil_defaultlib.board_demo_competition_dac8_top
+Compiling module xil_defaultlib.tb_board_demo_competition_dac8_t...
+Compiling module xil_defaultlib.glbl
+Built simulation snapshot tb_board_demo_competition_dac8_top_behav

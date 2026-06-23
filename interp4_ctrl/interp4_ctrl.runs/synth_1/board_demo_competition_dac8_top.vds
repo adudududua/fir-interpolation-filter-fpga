@@ -1,0 +1,778 @@
+#-----------------------------------------------------------
+# Vivado v2018.3 (64-bit)
+# SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+# IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+# Start of session at: Sat Jun  6 01:08:57 2026
+# Process ID: 54156
+# Current directory: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/synth_1
+# Command line: vivado.exe -log board_demo_competition_dac8_top.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source board_demo_competition_dac8_top.tcl
+# Log file: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/synth_1/board_demo_competition_dac8_top.vds
+# Journal file: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/synth_1\vivado.jou
+#-----------------------------------------------------------
+source board_demo_competition_dac8_top.tcl -notrace
+Command: synth_design -top board_demo_competition_dac8_top -part xc7a35tfgg484-2
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xc7a35t'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7a35t'
+INFO: Launching helper process for spawning children vivado processes
+INFO: Helper process launched with PID 26756 
+---------------------------------------------------------------------------------
+Starting RTL Elaboration : Time (s): cpu = 00:00:01 ; elapsed = 00:00:01 . Memory (MB): peak = 422.613 ; gain = 100.777
+---------------------------------------------------------------------------------
+INFO: [Synth 8-6157] synthesizing module 'board_demo_competition_dac8_top' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/board_demo_competition_dac8_top.v:10]
+INFO: [Synth 8-6157] synthesizing module 'IBUF' [E:/app/Xilinx2018.3/Vivado/2018.3/scripts/rt/data/unisim_comp.v:20408]
+	Parameter CAPACITANCE bound to: DONT_CARE - type: string 
+	Parameter IBUF_DELAY_VALUE bound to: 0 - type: string 
+	Parameter IBUF_LOW_PWR bound to: TRUE - type: string 
+	Parameter IFD_DELAY_VALUE bound to: AUTO - type: string 
+	Parameter IOSTANDARD bound to: DEFAULT - type: string 
+INFO: [Synth 8-6155] done synthesizing module 'IBUF' (1#1) [E:/app/Xilinx2018.3/Vivado/2018.3/scripts/rt/data/unisim_comp.v:20408]
+INFO: [Synth 8-6157] synthesizing module 'BUFG' [E:/app/Xilinx2018.3/Vivado/2018.3/scripts/rt/data/unisim_comp.v:609]
+INFO: [Synth 8-6155] done synthesizing module 'BUFG' (2#1) [E:/app/Xilinx2018.3/Vivado/2018.3/scripts/rt/data/unisim_comp.v:609]
+INFO: [Synth 8-6157] synthesizing module 'clk_wiz_audio_48k' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/synth_1/.Xil/Vivado-54156-LAPTOP-476JT8H0/realtime/clk_wiz_audio_48k_stub.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'clk_wiz_audio_48k' (3#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/synth_1/.Xil/Vivado-54156-LAPTOP-476JT8H0/realtime/clk_wiz_audio_48k_stub.v:5]
+INFO: [Synth 8-6157] synthesizing module 'clk_wiz_audio_44k1' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/synth_1/.Xil/Vivado-54156-LAPTOP-476JT8H0/realtime/clk_wiz_audio_44k1_stub.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'clk_wiz_audio_44k1' (4#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/synth_1/.Xil/Vivado-54156-LAPTOP-476JT8H0/realtime/clk_wiz_audio_44k1_stub.v:5]
+INFO: [Synth 8-6157] synthesizing module 'BUFGMUX' [E:/app/Xilinx2018.3/Vivado/2018.3/scripts/rt/data/unisim_comp.v:703]
+	Parameter CLK_SEL_TYPE bound to: ASYNC - type: string 
+INFO: [Synth 8-6155] done synthesizing module 'BUFGMUX' (5#1) [E:/app/Xilinx2018.3/Vivado/2018.3/scripts/rt/data/unisim_comp.v:703]
+INFO: [Synth 8-6157] synthesizing module 'demo_interp_dac8_mmcm_common' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:19]
+	Parameter MODE_4X bound to: 2'b01 
+	Parameter MODE_8X bound to: 2'b10 
+	Parameter MODE_128X bound to: 2'b11 
+	Parameter ROM_ADDR_STEP bound to: 6'b000001 
+INFO: [Synth 8-5534] Detected attribute (* keep = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:69]
+INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:69]
+INFO: [Synth 8-5534] Detected attribute (* keep = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:70]
+INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:70]
+INFO: [Synth 8-5534] Detected attribute (* keep = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:137]
+INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:137]
+INFO: [Synth 8-5534] Detected attribute (* keep = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:171]
+INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:171]
+INFO: [Synth 8-5534] Detected attribute (* keep = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:172]
+INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:172]
+INFO: [Synth 8-5534] Detected attribute (* keep = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:173]
+INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:173]
+INFO: [Synth 8-5534] Detected attribute (* keep = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:277]
+INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:277]
+INFO: [Synth 8-5534] Detected attribute (* keep = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:278]
+INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:278]
+INFO: [Synth 8-5534] Detected attribute (* keep = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:279]
+INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:279]
+INFO: [Synth 8-5534] Detected attribute (* keep = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:280]
+INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:280]
+INFO: [Synth 8-5534] Detected attribute (* keep = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:337]
+INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:337]
+INFO: [Synth 8-5534] Detected attribute (* keep = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:338]
+INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:338]
+INFO: [Synth 8-5534] Detected attribute (* keep = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:385]
+INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:385]
+INFO: [Synth 8-5534] Detected attribute (* keep = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:444]
+INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:444]
+INFO: [Synth 8-6157] synthesizing module 'interp128_top_ce' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/interp128_top_ce.v:3]
+	Parameter DATA_W bound to: 24 - type: integer 
+	Parameter COEFF_W bound to: 18 - type: integer 
+	Parameter ACC_W bound to: 56 - type: integer 
+	Parameter NTAPS4X bound to: 155 - type: integer 
+	Parameter NTAPS2X bound to: 11 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'interp4_top_symm_ce' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/interp4_top_symm_ce.v:4]
+	Parameter DATA_W bound to: 24 - type: integer 
+	Parameter COEFF_W bound to: 18 - type: integer 
+	Parameter ACC_W bound to: 56 - type: integer 
+	Parameter NTAPS bound to: 155 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'interp4_ctrl_ce' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/interp4_ctrl_ce.v:3]
+INFO: [Synth 8-226] default block is never used [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/interp4_ctrl_ce.v:46]
+INFO: [Synth 8-6155] done synthesizing module 'interp4_ctrl_ce' (6#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/interp4_ctrl_ce.v:3]
+INFO: [Synth 8-6157] synthesizing module 'fir_core_symm' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/fir_core_synm.v:3]
+	Parameter DATA_W bound to: 24 - type: integer 
+	Parameter COEFF_W bound to: 18 - type: integer 
+	Parameter ACC_W bound to: 56 - type: integer 
+	Parameter NTAPS bound to: 155 - type: integer 
+	Parameter HALF_TAPS bound to: 77 - type: integer 
+	Parameter HALF_COEFF bound to: 78 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'fir_core_symm' (7#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/fir_core_synm.v:3]
+INFO: [Synth 8-6157] synthesizing module 'round_sat_q16_to24' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/round_sat_q16_to24.v:3]
+	Parameter IN_W bound to: 56 - type: integer 
+	Parameter OUT_W bound to: 24 - type: integer 
+	Parameter FRAC_W bound to: 16 - type: integer 
+	Parameter OUT_MAX bound to: 24'sb011111111111111111111111 
+	Parameter OUT_MIN bound to: 24'sb100000000000000000000000 
+	Parameter ROUND_BIAS_POS bound to: 56'sb00000000000000000000000000000000000000001000000000000000 
+	Parameter ROUND_BIAS_NEG bound to: 56'sb00000000000000000000000000000000000000000111111111111111 
+INFO: [Synth 8-6155] done synthesizing module 'round_sat_q16_to24' (8#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/round_sat_q16_to24.v:3]
+INFO: [Synth 8-6155] done synthesizing module 'interp4_top_symm_ce' (9#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/interp4_top_symm_ce.v:4]
+INFO: [Synth 8-6157] synthesizing module 'bridge_to_interp2_ce' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/bridge_to_interp2_ce.v:3]
+	Parameter DATA_W bound to: 24 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'bridge_to_interp2_ce' (10#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/bridge_to_interp2_ce.v:3]
+INFO: [Synth 8-6157] synthesizing module 'interp2_top_symm_ce' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/interp2_top_symm_ce.v:3]
+	Parameter DATA_W bound to: 24 - type: integer 
+	Parameter COEFF_W bound to: 18 - type: integer 
+	Parameter ACC_W bound to: 56 - type: integer 
+	Parameter NTAPS bound to: 11 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'interp2_ctrl_ce' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/interp2_ctrl_ce.v:3]
+INFO: [Synth 8-226] default block is never used [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/interp2_ctrl_ce.v:46]
+INFO: [Synth 8-6155] done synthesizing module 'interp2_ctrl_ce' (11#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/interp2_ctrl_ce.v:3]
+INFO: [Synth 8-6157] synthesizing module 'fir_core_symm_interp2_v2' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/fir_core_symm_interp2.v:3]
+	Parameter DATA_W bound to: 24 - type: integer 
+	Parameter COEFF_W bound to: 18 - type: integer 
+	Parameter ACC_W bound to: 56 - type: integer 
+	Parameter NTAPS bound to: 11 - type: integer 
+	Parameter HALF_TAPS bound to: 5 - type: integer 
+	Parameter HALF_COEFF bound to: 6 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'fir_core_symm_interp2_v2' (12#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/fir_core_symm_interp2.v:3]
+INFO: [Synth 8-6155] done synthesizing module 'interp2_top_symm_ce' (13#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/interp2_top_symm_ce.v:3]
+INFO: [Synth 8-6155] done synthesizing module 'interp128_top_ce' (14#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/interp128_top_ce.v:3]
+INFO: [Synth 8-6071] Mark debug on the nets applies keep_hierarchy on instance 'u_interp128_top_ce'. This will prevent further optimization [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:292]
+INFO: [Synth 8-6155] done synthesizing module 'demo_interp_dac8_mmcm_common' (15#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/demo_interp_dac8_mmcm_common.v:19]
+INFO: [Synth 8-6155] done synthesizing module 'board_demo_competition_dac8_top' (16#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/new/board_demo_competition_dac8_top.v:10]
+---------------------------------------------------------------------------------
+Finished RTL Elaboration : Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 488.238 ; gain = 166.402
+---------------------------------------------------------------------------------
+
+Report Check Netlist: 
++------+------------------+-------+---------+-------+------------------+
+|      |Item              |Errors |Warnings |Status |Description       |
++------+------------------+-------+---------+-------+------------------+
+|1     |multi_driven_nets |      0|        0|Passed |Multi driven nets |
++------+------------------+-------+---------+-------+------------------+
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 488.238 ; gain = 166.402
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 488.238 ; gain = 166.402
+---------------------------------------------------------------------------------
+INFO: [Netlist 29-17] Analyzing 1 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Device 21-403] Loading part xc7a35tfgg484-2
+INFO: [Project 1-570] Preparing netlist for logic optimization
+
+Processing XDC Constraints
+Initializing timing engine
+Parsing XDC File [d:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/ip/clk_wiz_audio_44k1/clk_wiz_audio_44k1/clk_wiz_audio_44k1_in_context.xdc] for cell 'u_clk_wiz_audio_44k1'
+Finished Parsing XDC File [d:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/ip/clk_wiz_audio_44k1/clk_wiz_audio_44k1/clk_wiz_audio_44k1_in_context.xdc] for cell 'u_clk_wiz_audio_44k1'
+Parsing XDC File [d:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/ip/clk_wiz_audio_48k/clk_wiz_audio_48k/clk_wiz_audio_48k_in_context.xdc] for cell 'u_clk_wiz_audio_48k'
+Finished Parsing XDC File [d:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/ip/clk_wiz_audio_48k/clk_wiz_audio_48k/clk_wiz_audio_48k_in_context.xdc] for cell 'u_clk_wiz_audio_48k'
+Parsing XDC File [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/constrs_1/new/board_demo_competition_dac8_top.xdc]
+WARNING: [Vivado 12-508] No pins matched 'u_clk_wiz_audio_44k1/inst/mmcm_adv_inst/CLKOUT0'. [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/constrs_1/new/board_demo_competition_dac8_top.xdc:97]
+WARNING: [Vivado 12-508] No pins matched 'u_clk_wiz_audio_48k/inst/mmcm_adv_inst/CLKOUT0'. [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/constrs_1/new/board_demo_competition_dac8_top.xdc:97]
+WARNING: [Vivado 12-646] clock '' not found. [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/constrs_1/new/board_demo_competition_dac8_top.xdc:97]
+WARNING: [Vivado 12-646] clock '' not found. [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/constrs_1/new/board_demo_competition_dac8_top.xdc:97]
+CRITICAL WARNING: [Vivado 12-4739] set_clock_groups:No valid object(s) found for '-group '. [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/constrs_1/new/board_demo_competition_dac8_top.xdc:97]
+Resolution: Check if the specified object(s) exists in the current design. If it does, ensure that the correct design hierarchy was specified for the object. If you are working with clocks, make sure create_clock was used to create the clock object before it is referenced.
+CRITICAL WARNING: [Vivado 12-4739] set_clock_groups:No valid object(s) found for '-group '. [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/constrs_1/new/board_demo_competition_dac8_top.xdc:97]
+Resolution: Check if the specified object(s) exists in the current design. If it does, ensure that the correct design hierarchy was specified for the object. If you are working with clocks, make sure create_clock was used to create the clock object before it is referenced.
+Finished Parsing XDC File [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/constrs_1/new/board_demo_competition_dac8_top.xdc]
+WARNING: [Project 1-498] One or more constraints failed evaluation while reading constraint file [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/constrs_1/new/board_demo_competition_dac8_top.xdc] and the design contains unresolved black boxes. These constraints will be read post-synthesis (as long as their source constraint file is marked as used_in_implementation) and should be applied correctly then. You should review the constraints listed in the file [.Xil/board_demo_competition_dac8_top_propImpl.xdc] and check the run log file to verify that these constraints were correctly applied.
+INFO: [Project 1-236] Implementation specific constraints were found while reading constraint file [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/constrs_1/new/board_demo_competition_dac8_top.xdc]. These constraints will be ignored for synthesis but will be used in implementation. Impacted constraints are listed in the file [.Xil/board_demo_competition_dac8_top_propImpl.xdc].
+Resolution: To avoid this warning, move constraints listed in [.Xil/board_demo_competition_dac8_top_propImpl.xdc] to another XDC file and exclude this new file from synthesis with the used_in_synthesis property (File Properties dialog in GUI) and re-run elaboration/synthesis.
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.001 . Memory (MB): peak = 846.484 ; gain = 0.000
+Completed Processing XDC Constraints
+
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.001 . Memory (MB): peak = 846.492 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 1 instances were transformed.
+  BUFGMUX => BUFGCTRL (inverted pins: CE0): 1 instances
+
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.001 . Memory (MB): peak = 846.492 ; gain = 0.000
+Constraint Validation Runtime : Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.012 . Memory (MB): peak = 846.492 ; gain = 0.000
+---------------------------------------------------------------------------------
+Finished Constraint Validation : Time (s): cpu = 00:00:07 ; elapsed = 00:00:09 . Memory (MB): peak = 846.492 ; gain = 524.656
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Loading Part and Timing Information
+---------------------------------------------------------------------------------
+Loading part: xc7a35tfgg484-2
+---------------------------------------------------------------------------------
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:07 ; elapsed = 00:00:09 . Memory (MB): peak = 846.492 ; gain = 524.656
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying 'set_property' XDC Constraints
+---------------------------------------------------------------------------------
+Applied set_property DONT_TOUCH = true for u_clk_wiz_audio_44k1. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for u_clk_wiz_audio_48k. (constraint file  auto generated constraint, line ).
+---------------------------------------------------------------------------------
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:07 ; elapsed = 00:00:09 . Memory (MB): peak = 846.492 ; gain = 524.656
+---------------------------------------------------------------------------------
+INFO: [Synth 8-5818] HDL ADVISOR - The operator resource <adder> is shared. To prevent sharing consider applying a KEEP on the output of the operator [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/round_sat_q16_to24.v:46]
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:08 ; elapsed = 00:00:09 . Memory (MB): peak = 846.492 ; gain = 524.656
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++------+-------------------------------------+------------+----------+
+|      |RTL Partition                        |Replication |Instances |
++------+-------------------------------------+------------+----------+
+|1     |fir_core_symm__GB0                   |           1|     21191|
+|2     |fir_core_symm__GB1                   |           1|      5279|
+|3     |fir_core_symm__GB2                   |           1|      4866|
+|4     |fir_core_symm__GB3                   |           1|      6376|
+|5     |interp4_top_symm_ce__GC0             |           1|      1245|
+|6     |interp128_top_ce__GC0                |           1|     19580|
+|7     |demo_interp_dac8_mmcm_common__GC0    |           1|       998|
+|8     |board_demo_competition_dac8_top__GC0 |           1|        18|
++------+-------------------------------------+------------+----------+
+---------------------------------------------------------------------------------
+Start RTL Component Statistics 
+---------------------------------------------------------------------------------
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input     56 Bit       Adders := 108   
+	  78 Input     56 Bit       Adders := 1     
+	   6 Input     56 Bit       Adders := 5     
+	   2 Input      9 Bit       Adders := 1     
+	   2 Input      7 Bit       Adders := 1     
+	   2 Input      6 Bit       Adders := 1     
+	   2 Input      2 Bit       Adders := 1     
++---Registers : 
+	               56 Bit    Registers := 6     
+	               24 Bit    Registers := 228   
+	                8 Bit    Registers := 1     
+	                7 Bit    Registers := 1     
+	                6 Bit    Registers := 1     
+	                3 Bit    Registers := 1     
+	                2 Bit    Registers := 2     
+	                1 Bit    Registers := 39    
++---Multipliers : 
+	                18x56  Multipliers := 102   
++---Muxes : 
+	   3 Input     32 Bit        Muxes := 1     
+	   2 Input     32 Bit        Muxes := 1     
+	   2 Input     24 Bit        Muxes := 27    
+	   3 Input     24 Bit        Muxes := 1     
+	   2 Input     17 Bit        Muxes := 6     
+	   2 Input      8 Bit        Muxes := 1     
+	   2 Input      3 Bit        Muxes := 1     
+	   2 Input      2 Bit        Muxes := 1     
+	   4 Input      2 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 14    
+	   3 Input      1 Bit        Muxes := 2     
+---------------------------------------------------------------------------------
+Finished RTL Component Statistics 
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start RTL Hierarchical Component Statistics 
+---------------------------------------------------------------------------------
+Hierarchical RTL Component report 
+Module board_demo_competition_dac8_top 
+Detailed RTL Component Info : 
++---Registers : 
+	                3 Bit    Registers := 1     
++---Muxes : 
+	   2 Input      3 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 1     
+Module fir_core_symm 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input     56 Bit       Adders := 77    
+	  78 Input     56 Bit       Adders := 1     
++---Registers : 
+	               56 Bit    Registers := 1     
+	               24 Bit    Registers := 155   
+	                1 Bit    Registers := 2     
++---Multipliers : 
+	                18x56  Multipliers := 77    
+Module interp4_ctrl_ce 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      2 Bit       Adders := 1     
++---Registers : 
+	               24 Bit    Registers := 2     
+	                2 Bit    Registers := 2     
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   2 Input     24 Bit        Muxes := 2     
+	   2 Input      2 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 1     
+Module round_sat_q16_to24__1 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input     56 Bit       Adders := 1     
++---Muxes : 
+	   2 Input     24 Bit        Muxes := 2     
+	   2 Input     17 Bit        Muxes := 1     
+Module bridge_to_interp2_ce__1 
+Detailed RTL Component Info : 
++---Registers : 
+	               24 Bit    Registers := 1     
+	                1 Bit    Registers := 2     
++---Muxes : 
+	   2 Input      1 Bit        Muxes := 1     
+Module interp2_ctrl_ce__1 
+Detailed RTL Component Info : 
++---Registers : 
+	               24 Bit    Registers := 2     
+	                1 Bit    Registers := 3     
++---Muxes : 
+	   2 Input     24 Bit        Muxes := 2     
+	   2 Input      1 Bit        Muxes := 1     
+Module fir_core_symm_interp2_v2__1 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input     56 Bit       Adders := 5     
+	   6 Input     56 Bit       Adders := 1     
++---Registers : 
+	               56 Bit    Registers := 1     
+	               24 Bit    Registers := 11    
+	                1 Bit    Registers := 2     
++---Multipliers : 
+	                18x56  Multipliers := 5     
+Module round_sat_q16_to24__2 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input     56 Bit       Adders := 1     
++---Muxes : 
+	   2 Input     24 Bit        Muxes := 2     
+	   2 Input     17 Bit        Muxes := 1     
+Module bridge_to_interp2_ce__2 
+Detailed RTL Component Info : 
++---Registers : 
+	               24 Bit    Registers := 1     
+	                1 Bit    Registers := 2     
++---Muxes : 
+	   2 Input      1 Bit        Muxes := 1     
+Module interp2_ctrl_ce__2 
+Detailed RTL Component Info : 
++---Registers : 
+	               24 Bit    Registers := 2     
+	                1 Bit    Registers := 3     
++---Muxes : 
+	   2 Input     24 Bit        Muxes := 2     
+	   2 Input      1 Bit        Muxes := 1     
+Module fir_core_symm_interp2_v2__2 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input     56 Bit       Adders := 5     
+	   6 Input     56 Bit       Adders := 1     
++---Registers : 
+	               56 Bit    Registers := 1     
+	               24 Bit    Registers := 11    
+	                1 Bit    Registers := 2     
++---Multipliers : 
+	                18x56  Multipliers := 5     
+Module round_sat_q16_to24__3 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input     56 Bit       Adders := 1     
++---Muxes : 
+	   2 Input     24 Bit        Muxes := 2     
+	   2 Input     17 Bit        Muxes := 1     
+Module bridge_to_interp2_ce__3 
+Detailed RTL Component Info : 
++---Registers : 
+	               24 Bit    Registers := 1     
+	                1 Bit    Registers := 2     
++---Muxes : 
+	   2 Input      1 Bit        Muxes := 1     
+Module interp2_ctrl_ce__3 
+Detailed RTL Component Info : 
++---Registers : 
+	               24 Bit    Registers := 2     
+	                1 Bit    Registers := 3     
++---Muxes : 
+	   2 Input     24 Bit        Muxes := 2     
+	   2 Input      1 Bit        Muxes := 1     
+Module fir_core_symm_interp2_v2__3 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input     56 Bit       Adders := 5     
+	   6 Input     56 Bit       Adders := 1     
++---Registers : 
+	               56 Bit    Registers := 1     
+	               24 Bit    Registers := 11    
+	                1 Bit    Registers := 2     
++---Multipliers : 
+	                18x56  Multipliers := 5     
+Module round_sat_q16_to24__4 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input     56 Bit       Adders := 1     
++---Muxes : 
+	   2 Input     24 Bit        Muxes := 2     
+	   2 Input     17 Bit        Muxes := 1     
+Module bridge_to_interp2_ce__4 
+Detailed RTL Component Info : 
++---Registers : 
+	               24 Bit    Registers := 1     
+	                1 Bit    Registers := 2     
++---Muxes : 
+	   2 Input      1 Bit        Muxes := 1     
+Module interp2_ctrl_ce__4 
+Detailed RTL Component Info : 
++---Registers : 
+	               24 Bit    Registers := 2     
+	                1 Bit    Registers := 3     
++---Muxes : 
+	   2 Input     24 Bit        Muxes := 2     
+	   2 Input      1 Bit        Muxes := 1     
+Module fir_core_symm_interp2_v2__4 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input     56 Bit       Adders := 5     
+	   6 Input     56 Bit       Adders := 1     
++---Registers : 
+	               56 Bit    Registers := 1     
+	               24 Bit    Registers := 11    
+	                1 Bit    Registers := 2     
++---Multipliers : 
+	                18x56  Multipliers := 5     
+Module round_sat_q16_to24__5 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input     56 Bit       Adders := 1     
++---Muxes : 
+	   2 Input     24 Bit        Muxes := 2     
+	   2 Input     17 Bit        Muxes := 1     
+Module bridge_to_interp2_ce 
+Detailed RTL Component Info : 
++---Registers : 
+	               24 Bit    Registers := 1     
+	                1 Bit    Registers := 2     
++---Muxes : 
+	   2 Input      1 Bit        Muxes := 1     
+Module interp2_ctrl_ce 
+Detailed RTL Component Info : 
++---Registers : 
+	               24 Bit    Registers := 2     
+	                1 Bit    Registers := 3     
++---Muxes : 
+	   2 Input     24 Bit        Muxes := 2     
+	   2 Input      1 Bit        Muxes := 1     
+Module fir_core_symm_interp2_v2 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input     56 Bit       Adders := 5     
+	   6 Input     56 Bit       Adders := 1     
++---Registers : 
+	               56 Bit    Registers := 1     
+	               24 Bit    Registers := 11    
+	                1 Bit    Registers := 2     
++---Multipliers : 
+	                18x56  Multipliers := 5     
+Module round_sat_q16_to24 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input     56 Bit       Adders := 1     
++---Muxes : 
+	   2 Input     24 Bit        Muxes := 2     
+	   2 Input     17 Bit        Muxes := 1     
+Module demo_interp_dac8_mmcm_common 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      9 Bit       Adders := 1     
+	   2 Input      7 Bit       Adders := 1     
+	   2 Input      6 Bit       Adders := 1     
++---Registers : 
+	               24 Bit    Registers := 1     
+	                8 Bit    Registers := 1     
+	                7 Bit    Registers := 1     
+	                6 Bit    Registers := 1     
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   3 Input     32 Bit        Muxes := 1     
+	   2 Input     32 Bit        Muxes := 1     
+	   2 Input     24 Bit        Muxes := 3     
+	   3 Input     24 Bit        Muxes := 1     
+	   2 Input      8 Bit        Muxes := 1     
+	   4 Input      2 Bit        Muxes := 1     
+	   3 Input      1 Bit        Muxes := 2     
+	   2 Input      1 Bit        Muxes := 2     
+---------------------------------------------------------------------------------
+Finished RTL Hierarchical Component Statistics
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Part Resource Summary
+---------------------------------------------------------------------------------
+Part Resources:
+DSPs: 90 (col length:60)
+BRAMs: 100 (col length: RAMB18 60 RAMB36 30)
+---------------------------------------------------------------------------------
+Finished Part Resource Summary
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Cross Boundary and Area Optimization
+---------------------------------------------------------------------------------
+Warning: Parallel synthesis criteria is not met 
+DSP Report: Generating DSP fir_out_full1, operation Mode is: A*(B:0x3f5f).
+DSP Report: operator fir_out_full1 is absorbed into DSP fir_out_full1.
+DSP Report: Generating DSP u_fir_core_symm_interp2/fir_out_full1, operation Mode is: A*(B:0x7ed6).
+DSP Report: operator u_fir_core_symm_interp2/fir_out_full1 is absorbed into DSP u_fir_core_symm_interp2/fir_out_full1.
+DSP Report: Generating DSP u_fir_core_symm_interp2/fir_out_full1, operation Mode is: A*(B:0x7ed6).
+DSP Report: operator u_fir_core_symm_interp2/fir_out_full1 is absorbed into DSP u_fir_core_symm_interp2/fir_out_full1.
+DSP Report: Generating DSP u_fir_core_symm_interp2/fir_out_full1, operation Mode is: A*(B:0x7ed6).
+DSP Report: operator u_fir_core_symm_interp2/fir_out_full1 is absorbed into DSP u_fir_core_symm_interp2/fir_out_full1.
+DSP Report: Generating DSP u_fir_core_symm_interp2/fir_out_full1, operation Mode is: A*(B:0x7ed6).
+DSP Report: operator u_fir_core_symm_interp2/fir_out_full1 is absorbed into DSP u_fir_core_symm_interp2/fir_out_full1.
+DSP Report: Generating DSP u_fir_core_symm_interp2/fir_out_full1, operation Mode is: A*(B:0x7ed6).
+DSP Report: operator u_fir_core_symm_interp2/fir_out_full1 is absorbed into DSP u_fir_core_symm_interp2/fir_out_full1.
+---------------------------------------------------------------------------------
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:29 ; elapsed = 00:00:31 . Memory (MB): peak = 846.492 ; gain = 524.656
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start ROM, RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+
+ROM:
++-----------------------------+------------+---------------+----------------+
+|Module Name                  | RTL Object | Depth x Width | Implemented As | 
++-----------------------------+------------+---------------+----------------+
+|demo_interp_dac8_mmcm_common | p_0_out    | 64x24         | LUT            | 
+|demo_interp_dac8_mmcm_common | p_0_out    | 64x24         | LUT            | 
++-----------------------------+------------+---------------+----------------+
+
+
+DSP: Preliminary Mapping  Report (see note below)
++-------------------------+--------------+--------+--------+--------+--------+--------+------+------+------+------+-------+------+------+
+|Module Name              | DSP Mapping  | A Size | B Size | C Size | D Size | P Size | AREG | BREG | CREG | DREG | ADREG | MREG | PREG | 
++-------------------------+--------------+--------+--------+--------+--------+--------+------+------+------+------+-------+------+------+
+|fir_core_symm            | A*(B:0x3f5f) | 24     | 15     | -      | -      | 39     | 0    | 0    | -    | -    | -     | 0    | 0    | 
+|fir_core_symm_interp2_v2 | A*(B:0x7ed6) | 24     | 16     | -      | -      | 40     | 0    | 0    | -    | -    | -     | 0    | 0    | 
+|fir_core_symm_interp2_v2 | A*(B:0x7ed6) | 24     | 16     | -      | -      | 40     | 0    | 0    | -    | -    | -     | 0    | 0    | 
+|fir_core_symm_interp2_v2 | A*(B:0x7ed6) | 24     | 16     | -      | -      | 40     | 0    | 0    | -    | -    | -     | 0    | 0    | 
+|fir_core_symm_interp2_v2 | A*(B:0x7ed6) | 24     | 16     | -      | -      | 40     | 0    | 0    | -    | -    | -     | 0    | 0    | 
+|fir_core_symm_interp2_v2 | A*(B:0x7ed6) | 24     | 16     | -      | -      | 40     | 0    | 0    | -    | -    | -     | 0    | 0    | 
++-------------------------+--------------+--------+--------+--------+--------+--------+------+------+------+------+-------+------+------+
+
+Note: The table above is a preliminary report that shows the DSPs inferred at the current stage of the synthesis flow. Some DSP may be reimplemented as non DSP primitives later in the synthesis flow. Multiple instantiated DSPs are reported only once.
+---------------------------------------------------------------------------------
+Finished ROM, RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+INFO: [Synth 8-5844] Detected registers with asynchronous reset at DSP/BRAM block boundary. Consider using synchronous reset for optimal packing [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/fir_core_synm.v:187]
+INFO: [Synth 8-5844] Detected registers with asynchronous reset at DSP/BRAM block boundary. Consider using synchronous reset for optimal packing [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/fir_core_symm_interp2.v:77]
+INFO: [Synth 8-5844] Detected registers with asynchronous reset at DSP/BRAM block boundary. Consider using synchronous reset for optimal packing [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/fir_core_symm_interp2.v:77]
+INFO: [Synth 8-5844] Detected registers with asynchronous reset at DSP/BRAM block boundary. Consider using synchronous reset for optimal packing [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/fir_core_symm_interp2.v:77]
+INFO: [Synth 8-5844] Detected registers with asynchronous reset at DSP/BRAM block boundary. Consider using synchronous reset for optimal packing [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/fir_core_symm_interp2.v:77]
+INFO: [Synth 8-5844] Detected registers with asynchronous reset at DSP/BRAM block boundary. Consider using synchronous reset for optimal packing [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/fir_core_symm_interp2.v:77]
+
+Report RTL Partitions: 
++------+-------------------------------------+------------+----------+
+|      |RTL Partition                        |Replication |Instances |
++------+-------------------------------------+------------+----------+
+|1     |fir_core_symm__GB0                   |           1|     27651|
+|2     |fir_core_symm__GB1                   |           1|     19096|
+|3     |fir_core_symm__GB2                   |           1|      1507|
+|4     |fir_core_symm__GB3                   |           1|      1953|
+|5     |interp4_top_symm_ce__GC0             |           1|       414|
+|6     |interp128_top_ce__GC0                |           1|     20456|
+|7     |demo_interp_dac8_mmcm_common__GC0    |           1|       436|
+|8     |board_demo_competition_dac8_top__GC0 |           1|        15|
++------+-------------------------------------+------------+----------+
+---------------------------------------------------------------------------------
+Start Applying XDC Timing Constraints
+---------------------------------------------------------------------------------
+INFO: [Synth 8-5578] Moved timing constraint from pin 'u_clk_wiz_audio_44k1/clk_out1' to pin 'u_clk_wiz_audio_44k1/bbstub_clk_out1/O'
+INFO: [Synth 8-5783] Moving clock source from hierarchical pin 'u_clk_wiz_audio_44k1/clk_in1' to 'u_bufg_sys_clk/O'
+INFO: [Synth 8-5578] Moved timing constraint from pin 'u_clk_wiz_audio_44k1/clkfb_out' to pin 'u_clk_wiz_audio_44k1/bbstub_clkfb_out/O'
+INFO: [Synth 8-5783] Moving clock source from hierarchical pin 'u_clk_wiz_audio_44k1/clk_in1' to 'u_bufg_sys_clk/O'
+INFO: [Synth 8-5578] Moved timing constraint from pin 'u_clk_wiz_audio_48k/clk_out1' to pin 'u_clk_wiz_audio_48k/bbstub_clk_out1/O'
+INFO: [Synth 8-5783] Moving clock source from hierarchical pin 'u_clk_wiz_audio_48k/clk_in1' to 'u_bufg_sys_clk/O'
+INFO: [Synth 8-5578] Moved timing constraint from pin 'u_clk_wiz_audio_48k/clkfb_out' to pin 'u_clk_wiz_audio_48k/bbstub_clkfb_out/O'
+INFO: [Synth 8-5783] Moving clock source from hierarchical pin 'u_clk_wiz_audio_48k/clk_in1' to 'u_bufg_sys_clk/O'
+INFO: [Synth 8-5819] Moved 6 constraints on hierarchical pins to their respective driving/loading pins
+---------------------------------------------------------------------------------
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:00:36 ; elapsed = 00:00:38 . Memory (MB): peak = 933.336 ; gain = 611.500
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Timing Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Timing Optimization : Time (s): cpu = 00:01:19 ; elapsed = 00:01:24 . Memory (MB): peak = 1048.891 ; gain = 727.055
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++------+-------------------------------------+------------+----------+
+|      |RTL Partition                        |Replication |Instances |
++------+-------------------------------------+------------+----------+
+|1     |fir_core_symm__GB1                   |           1|     19096|
+|2     |fir_core_symm__GB2                   |           1|      1507|
+|3     |interp4_top_symm_ce__GC0             |           1|       414|
+|4     |interp128_top_ce__GC0                |           1|     20456|
+|5     |demo_interp_dac8_mmcm_common__GC0    |           1|       436|
+|6     |board_demo_competition_dac8_top__GC0 |           1|        15|
+|7     |interp128_top_ce_GT0                 |           1|     23432|
+|8     |interp128_top_ce_GT1                 |           1|      6172|
++------+-------------------------------------+------------+----------+
+---------------------------------------------------------------------------------
+Start Technology Mapping
+---------------------------------------------------------------------------------
+INFO: [Synth 8-5844] Detected registers with asynchronous reset at DSP/BRAM block boundary. Consider using synchronous reset for optimal packing [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/fir_core_synm.v:187]
+INFO: [Synth 8-5844] Detected registers with asynchronous reset at DSP/BRAM block boundary. Consider using synchronous reset for optimal packing [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/fir_core_symm_interp2.v:77]
+INFO: [Synth 8-5844] Detected registers with asynchronous reset at DSP/BRAM block boundary. Consider using synchronous reset for optimal packing [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/fir_core_symm_interp2.v:77]
+INFO: [Synth 8-5844] Detected registers with asynchronous reset at DSP/BRAM block boundary. Consider using synchronous reset for optimal packing [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/fir_core_symm_interp2.v:77]
+INFO: [Synth 8-5844] Detected registers with asynchronous reset at DSP/BRAM block boundary. Consider using synchronous reset for optimal packing [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/fir_core_symm_interp2.v:77]
+INFO: [Synth 8-5844] Detected registers with asynchronous reset at DSP/BRAM block boundary. Consider using synchronous reset for optimal packing [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.srcs/sources_1/imports/new/fir_core_symm_interp2.v:77]
+---------------------------------------------------------------------------------
+Finished Technology Mapping : Time (s): cpu = 00:01:33 ; elapsed = 00:01:39 . Memory (MB): peak = 1069.746 ; gain = 747.910
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+---------------------------------------------------------------------------------
+Start IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished IO Insertion : Time (s): cpu = 00:01:34 ; elapsed = 00:01:40 . Memory (MB): peak = 1069.746 ; gain = 747.910
+---------------------------------------------------------------------------------
+
+Report Check Netlist: 
++------+------------------+-------+---------+-------+------------------+
+|      |Item              |Errors |Warnings |Status |Description       |
++------+------------------+-------+---------+-------+------------------+
+|1     |multi_driven_nets |      0|        0|Passed |Multi driven nets |
++------+------------------+-------+---------+-------+------------------+
+---------------------------------------------------------------------------------
+Start Renaming Generated Instances
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Instances : Time (s): cpu = 00:01:34 ; elapsed = 00:01:40 . Memory (MB): peak = 1069.746 ; gain = 747.910
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+---------------------------------------------------------------------------------
+Start Rebuilding User Hierarchy
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:01:37 ; elapsed = 00:01:42 . Memory (MB): peak = 1069.746 ; gain = 747.910
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Ports
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Ports : Time (s): cpu = 00:01:37 ; elapsed = 00:01:42 . Memory (MB): peak = 1069.746 ; gain = 747.910
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:01:37 ; elapsed = 00:01:42 . Memory (MB): peak = 1069.746 ; gain = 747.910
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Nets
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Nets : Time (s): cpu = 00:01:37 ; elapsed = 00:01:43 . Memory (MB): peak = 1069.746 ; gain = 747.910
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Writing Synthesis Report
+---------------------------------------------------------------------------------
+
+Report BlackBoxes: 
++------+-------------------+----------+
+|      |BlackBox name      |Instances |
++------+-------------------+----------+
+|1     |clk_wiz_audio_48k  |         1|
+|2     |clk_wiz_audio_44k1 |         1|
++------+-------------------+----------+
+
+Report Cell Usage: 
++------+-------------------+------+
+|      |Cell               |Count |
++------+-------------------+------+
+|1     |clk_wiz_audio_44k1 |     1|
+|2     |clk_wiz_audio_48k  |     1|
+|3     |BUFG               |     1|
+|4     |BUFGMUX            |     1|
+|5     |CARRY4             |  4039|
+|6     |DSP48E1            |     6|
+|7     |LUT1               |  1615|
+|8     |LUT2               |  9027|
+|9     |LUT3               |  5070|
+|10    |LUT4               |  4835|
+|11    |LUT5               |   924|
+|12    |LUT6               |  1642|
+|13    |FDCE               |  5706|
+|14    |FDCE_1             |     7|
+|15    |FDPE               |    10|
+|16    |FDPE_1             |     1|
+|17    |IBUF               |     5|
+|18    |OBUF               |     9|
++------+-------------------+------+
+
+Report Instance Areas: 
++------+---------------------------------+-----------------------------+------+
+|      |Instance                         |Module                       |Cells |
++------+---------------------------------+-----------------------------+------+
+|1     |top                              |                             | 32904|
+|2     |  u_demo_interp_dac8_mmcm_common |demo_interp_dac8_mmcm_common | 32875|
+|3     |    u_interp128_top_ce           |interp128_top_ce             | 32694|
+|4     |      u_bridge_16_to_32          |bridge_to_interp2_ce         |    52|
+|5     |      u_bridge_32_to_64          |bridge_to_interp2_ce_0       |    52|
+|6     |      u_bridge_4_to_8            |bridge_to_interp2_ce_1       |    52|
+|7     |      u_bridge_64_to_128         |bridge_to_interp2_ce_2       |    52|
+|8     |      u_bridge_8_to_16           |bridge_to_interp2_ce_3       |    52|
+|9     |      u_interp2_top_128x         |interp2_top_symm_ce          |  1788|
+|10    |        u_fir_core_symm_interp2  |fir_core_symm_interp2_v2_18  |  1656|
+|11    |        u_interp2_ctrl_ce        |interp2_ctrl_ce_19           |    27|
+|12    |        u_round_sat_q16_to24     |round_sat_q16_to24_20        |   105|
+|13    |      u_interp2_top_16x          |interp2_top_symm_ce_4        |  1788|
+|14    |        u_fir_core_symm_interp2  |fir_core_symm_interp2_v2_15  |  1656|
+|15    |        u_interp2_ctrl_ce        |interp2_ctrl_ce_16           |    27|
+|16    |        u_round_sat_q16_to24     |round_sat_q16_to24_17        |   105|
+|17    |      u_interp2_top_32x          |interp2_top_symm_ce_5        |  1788|
+|18    |        u_fir_core_symm_interp2  |fir_core_symm_interp2_v2_12  |  1656|
+|19    |        u_interp2_ctrl_ce        |interp2_ctrl_ce_13           |    27|
+|20    |        u_round_sat_q16_to24     |round_sat_q16_to24_14        |   105|
+|21    |      u_interp2_top_64x          |interp2_top_symm_ce_6        |  1788|
+|22    |        u_fir_core_symm_interp2  |fir_core_symm_interp2_v2_9   |  1656|
+|23    |        u_interp2_ctrl_ce        |interp2_ctrl_ce_10           |    27|
+|24    |        u_round_sat_q16_to24     |round_sat_q16_to24_11        |   105|
+|25    |      u_interp2_top_8x           |interp2_top_symm_ce_7        |  1788|
+|26    |        u_fir_core_symm_interp2  |fir_core_symm_interp2_v2     |  1656|
+|27    |        u_interp2_ctrl_ce        |interp2_ctrl_ce              |    27|
+|28    |        u_round_sat_q16_to24     |round_sat_q16_to24_8         |   105|
+|29    |      u_interp4_top_symm_ce      |interp4_top_symm_ce          | 21696|
+|30    |        u_fir_core_symm          |fir_core_symm                | 21538|
+|31    |        u_interp4_ctrl_ce        |interp4_ctrl_ce              |    53|
+|32    |        u_round_sat_q16_to24     |round_sat_q16_to24           |   105|
++------+---------------------------------+-----------------------------+------+
+---------------------------------------------------------------------------------
+Finished Writing Synthesis Report : Time (s): cpu = 00:01:37 ; elapsed = 00:01:43 . Memory (MB): peak = 1069.746 ; gain = 747.910
+---------------------------------------------------------------------------------
+Synthesis finished with 0 errors, 0 critical warnings and 0 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:01:31 ; elapsed = 00:01:38 . Memory (MB): peak = 1069.746 ; gain = 389.656
+Synthesis Optimization Complete : Time (s): cpu = 00:01:37 ; elapsed = 00:01:43 . Memory (MB): peak = 1069.746 ; gain = 747.910
+INFO: [Project 1-571] Translating synthesized netlist
+INFO: [Netlist 29-17] Analyzing 4054 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Project 1-570] Preparing netlist for logic optimization
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.005 . Memory (MB): peak = 1069.746 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 9 instances were transformed.
+  BUFGMUX => BUFGCTRL (inverted pins: CE0): 1 instances
+  FDCE_1 => FDCE (inverted pins: C): 7 instances
+  FDPE_1 => FDPE (inverted pins: C): 1 instances
+
+INFO: [Common 17-83] Releasing license: Synthesis
+99 Infos, 5 Warnings, 2 Critical Warnings and 0 Errors encountered.
+synth_design completed successfully
+synth_design: Time (s): cpu = 00:01:41 ; elapsed = 00:01:47 . Memory (MB): peak = 1069.746 ; gain = 759.430
+INFO: [Common 17-600] The following parameters have non-default value.
+tcl.collectionResultDisplayLimit
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.006 . Memory (MB): peak = 1069.746 ; gain = 0.000
+WARNING: [Constraints 18-5210] No constraints selected for write.
+Resolution: This message can indicate that there are no constraints for the design, or it can indicate that the used_in flags are set such that the constraints are ignored. This later case is used when running synth_design to not write synthesis constraints to the resulting checkpoint. Instead, project constraints are read when the synthesized design is opened.
+INFO: [Common 17-1381] The checkpoint 'D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/synth_1/board_demo_competition_dac8_top.dcp' has been generated.
+INFO: [runtcl-4] Executing : report_utilization -file board_demo_competition_dac8_top_utilization_synth.rpt -pb board_demo_competition_dac8_top_utilization_synth.pb
+INFO: [Common 17-206] Exiting Vivado at Sat Jun  6 01:10:53 2026...

@@ -1,0 +1,316 @@
+#-----------------------------------------------------------
+# Vivado v2018.3 (64-bit)
+# SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+# IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+# Start of session at: Fri Jun  5 21:37:45 2026
+# Process ID: 54956
+# Current directory: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl
+# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent28472 D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\interp4_ctrl\interp4_ctrl.xpr
+# Log file: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/vivado.log
+# Journal file: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl\vivado.jou
+#-----------------------------------------------------------
+start_gui
+open_project D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.xpr
+update_compile_order -fileset sources_1
+reset_run synth_1
+launch_runs synth_1 -jobs 19
+wait_on_run synth_1
+launch_runs impl_1 -jobs 19
+wait_on_run impl_1
+launch_runs impl_1 -to_step write_bitstream -jobs 19
+wait_on_run impl_1
+open_hw
+connect_hw_server
+open_hw_target
+set_property PROGRAM.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.bit} [get_hw_devices xc7a35t_0]
+current_hw_device [get_hw_devices xc7a35t_0]
+refresh_hw_device -update_hw_probes false [lindex [get_hw_devices xc7a35t_0] 0]
+create_hw_cfgmem -hw_device [get_hw_devices xc7a35t_0] -mem_dev [lindex [get_cfgmem_parts {mx25u12835f-spi-x1_x2_x4}] 0]
+set_property PROBES.FILE {} [get_hw_devices xc7a35t_0]
+set_property FULL_PROBES.FILE {} [get_hw_devices xc7a35t_0]
+set_property PROGRAM.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.bit} [get_hw_devices xc7a35t_0]
+program_hw_devices [get_hw_devices xc7a35t_0]
+refresh_hw_device [lindex [get_hw_devices xc7a35t_0] 0]
+close_hw
+reset_run synth_1
+launch_runs synth_1 -jobs 19
+wait_on_run synth_1
+open_run synth_1 -name synth_1
+create_debug_core u_ila_0 ila
+set_property C_DATA_DEPTH 4096 [get_debug_cores u_ila_0]
+set_property C_TRIGIN_EN false [get_debug_cores u_ila_0]
+set_property C_TRIGOUT_EN false [get_debug_cores u_ila_0]
+set_property C_ADV_TRIGGER false [get_debug_cores u_ila_0]
+set_property C_INPUT_PIPE_STAGES 0 [get_debug_cores u_ila_0]
+set_property C_EN_STRG_QUAL false [get_debug_cores u_ila_0]
+set_property ALL_PROBE_SAME_MU true [get_debug_cores u_ila_0]
+set_property ALL_PROBE_SAME_MU_CNT 1 [get_debug_cores u_ila_0]
+set_property port_width 1 [get_debug_ports u_ila_0/clk]
+connect_debug_port u_ila_0/clk [get_nets [list clk_audio_128x_sel ]]
+set_property port_width 8 [get_debug_ports u_ila_0/probe0]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe0]
+connect_debug_port u_ila_0/probe0 [get_nets [list {u_demo_interp_dac8_mmcm_common/dac_data_r[0]} {u_demo_interp_dac8_mmcm_common/dac_data_r[1]} {u_demo_interp_dac8_mmcm_common/dac_data_r[2]} {u_demo_interp_dac8_mmcm_common/dac_data_r[3]} {u_demo_interp_dac8_mmcm_common/dac_data_r[4]} {u_demo_interp_dac8_mmcm_common/dac_data_r[5]} {u_demo_interp_dac8_mmcm_common/dac_data_r[6]} {u_demo_interp_dac8_mmcm_common/dac_data_r[7]} ]]
+create_debug_port u_ila_0 probe
+set_property port_width 7 [get_debug_ports u_ila_0/probe1]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe1]
+connect_debug_port u_ila_0/probe1 [get_nets [list {u_demo_interp_dac8_mmcm_common/ce_cnt[0]} {u_demo_interp_dac8_mmcm_common/ce_cnt[1]} {u_demo_interp_dac8_mmcm_common/ce_cnt[2]} {u_demo_interp_dac8_mmcm_common/ce_cnt[3]} {u_demo_interp_dac8_mmcm_common/ce_cnt[4]} {u_demo_interp_dac8_mmcm_common/ce_cnt[5]} {u_demo_interp_dac8_mmcm_common/ce_cnt[6]} ]]
+create_debug_port u_ila_0 probe
+set_property port_width 24 [get_debug_ports u_ila_0/probe2]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe2]
+connect_debug_port u_ila_0/probe2 [get_nets [list {u_demo_interp_dac8_mmcm_common/dbg_y4_w[0]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[1]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[2]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[3]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[4]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[5]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[6]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[7]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[8]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[9]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[10]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[11]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[12]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[13]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[14]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[15]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[16]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[17]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[18]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[19]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[20]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[21]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[22]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[23]} ]]
+create_debug_port u_ila_0 probe
+set_property port_width 24 [get_debug_ports u_ila_0/probe3]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe3]
+connect_debug_port u_ila_0/probe3 [get_nets [list {u_demo_interp_dac8_mmcm_common/dbg_y8_w[0]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[1]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[2]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[3]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[4]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[5]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[6]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[7]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[8]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[9]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[10]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[11]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[12]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[13]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[14]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[15]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[16]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[17]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[18]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[19]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[20]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[21]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[22]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[23]} ]]
+create_debug_port u_ila_0 probe
+set_property port_width 24 [get_debug_ports u_ila_0/probe4]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe4]
+connect_debug_port u_ila_0/probe4 [get_nets [list {u_demo_interp_dac8_mmcm_common/display_sample_sat[0]} {u_demo_interp_dac8_mmcm_common/display_sample_sat[1]} {u_demo_interp_dac8_mmcm_common/display_sample_sat[2]} {u_demo_interp_dac8_mmcm_common/display_sample_sat[3]} {u_demo_interp_dac8_mmcm_common/display_sample_sat[4]} {u_demo_interp_dac8_mmcm_common/display_sample_sat[5]} {u_demo_interp_dac8_mmcm_common/display_sample_sat[6]} {u_demo_interp_dac8_mmcm_common/display_sample_sat[7]} {u_demo_interp_dac8_mmcm_common/display_sample_sat[8]} {u_demo_interp_dac8_mmcm_common/display_sample_sat[9]} {u_demo_interp_dac8_mmcm_common/display_sample_sat[10]} {u_demo_interp_dac8_mmcm_common/display_sample_sat[11]} {u_demo_interp_dac8_mmcm_common/display_sample_sat[12]} {u_demo_interp_dac8_mmcm_common/display_sample_sat[13]} {u_demo_interp_dac8_mmcm_common/display_sample_sat[14]} {u_demo_interp_dac8_mmcm_common/display_sample_sat[15]} {u_demo_interp_dac8_mmcm_common/display_sample_sat[16]} {u_demo_interp_dac8_mmcm_common/display_sample_sat[17]} {u_demo_interp_dac8_mmcm_common/display_sample_sat[18]} {u_demo_interp_dac8_mmcm_common/display_sample_sat[19]} {u_demo_interp_dac8_mmcm_common/display_sample_sat[20]} {u_demo_interp_dac8_mmcm_common/display_sample_sat[21]} {u_demo_interp_dac8_mmcm_common/display_sample_sat[22]} {u_demo_interp_dac8_mmcm_common/display_sample_sat[23]} ]]
+create_debug_port u_ila_0 probe
+set_property port_width 24 [get_debug_ports u_ila_0/probe5]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe5]
+connect_debug_port u_ila_0/probe5 [get_nets [list {u_demo_interp_dac8_mmcm_common/x_in[0]} {u_demo_interp_dac8_mmcm_common/x_in[1]} {u_demo_interp_dac8_mmcm_common/x_in[2]} {u_demo_interp_dac8_mmcm_common/x_in[3]} {u_demo_interp_dac8_mmcm_common/x_in[4]} {u_demo_interp_dac8_mmcm_common/x_in[5]} {u_demo_interp_dac8_mmcm_common/x_in[6]} {u_demo_interp_dac8_mmcm_common/x_in[7]} {u_demo_interp_dac8_mmcm_common/x_in[8]} {u_demo_interp_dac8_mmcm_common/x_in[9]} {u_demo_interp_dac8_mmcm_common/x_in[10]} {u_demo_interp_dac8_mmcm_common/x_in[11]} {u_demo_interp_dac8_mmcm_common/x_in[12]} {u_demo_interp_dac8_mmcm_common/x_in[13]} {u_demo_interp_dac8_mmcm_common/x_in[14]} {u_demo_interp_dac8_mmcm_common/x_in[15]} {u_demo_interp_dac8_mmcm_common/x_in[16]} {u_demo_interp_dac8_mmcm_common/x_in[17]} {u_demo_interp_dac8_mmcm_common/x_in[18]} {u_demo_interp_dac8_mmcm_common/x_in[19]} {u_demo_interp_dac8_mmcm_common/x_in[20]} {u_demo_interp_dac8_mmcm_common/x_in[21]} {u_demo_interp_dac8_mmcm_common/x_in[22]} {u_demo_interp_dac8_mmcm_common/x_in[23]} ]]
+create_debug_port u_ila_0 probe
+set_property port_width 24 [get_debug_ports u_ila_0/probe6]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe6]
+connect_debug_port u_ila_0/probe6 [get_nets [list {u_demo_interp_dac8_mmcm_common/selected_sample[0]} {u_demo_interp_dac8_mmcm_common/selected_sample[1]} {u_demo_interp_dac8_mmcm_common/selected_sample[2]} {u_demo_interp_dac8_mmcm_common/selected_sample[3]} {u_demo_interp_dac8_mmcm_common/selected_sample[4]} {u_demo_interp_dac8_mmcm_common/selected_sample[5]} {u_demo_interp_dac8_mmcm_common/selected_sample[6]} {u_demo_interp_dac8_mmcm_common/selected_sample[7]} {u_demo_interp_dac8_mmcm_common/selected_sample[8]} {u_demo_interp_dac8_mmcm_common/selected_sample[9]} {u_demo_interp_dac8_mmcm_common/selected_sample[10]} {u_demo_interp_dac8_mmcm_common/selected_sample[11]} {u_demo_interp_dac8_mmcm_common/selected_sample[12]} {u_demo_interp_dac8_mmcm_common/selected_sample[13]} {u_demo_interp_dac8_mmcm_common/selected_sample[14]} {u_demo_interp_dac8_mmcm_common/selected_sample[15]} {u_demo_interp_dac8_mmcm_common/selected_sample[16]} {u_demo_interp_dac8_mmcm_common/selected_sample[17]} {u_demo_interp_dac8_mmcm_common/selected_sample[18]} {u_demo_interp_dac8_mmcm_common/selected_sample[19]} {u_demo_interp_dac8_mmcm_common/selected_sample[20]} {u_demo_interp_dac8_mmcm_common/selected_sample[21]} {u_demo_interp_dac8_mmcm_common/selected_sample[22]} {u_demo_interp_dac8_mmcm_common/selected_sample[23]} ]]
+create_debug_port u_ila_0 probe
+set_property port_width 2 [get_debug_ports u_ila_0/probe7]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe7]
+connect_debug_port u_ila_0/probe7 [get_nets [list {u_demo_interp_dac8_mmcm_common/mode_state[0]} {u_demo_interp_dac8_mmcm_common/mode_state[1]} ]]
+create_debug_port u_ila_0 probe
+set_property port_width 8 [get_debug_ports u_ila_0/probe8]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe8]
+connect_debug_port u_ila_0/probe8 [get_nets [list {u_demo_interp_dac8_mmcm_common/sample_u8_w[0]} {u_demo_interp_dac8_mmcm_common/sample_u8_w[1]} {u_demo_interp_dac8_mmcm_common/sample_u8_w[2]} {u_demo_interp_dac8_mmcm_common/sample_u8_w[3]} {u_demo_interp_dac8_mmcm_common/sample_u8_w[4]} {u_demo_interp_dac8_mmcm_common/sample_u8_w[5]} {u_demo_interp_dac8_mmcm_common/sample_u8_w[6]} {u_demo_interp_dac8_mmcm_common/sample_u8_w[7]} ]]
+create_debug_port u_ila_0 probe
+set_property port_width 6 [get_debug_ports u_ila_0/probe9]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe9]
+connect_debug_port u_ila_0/probe9 [get_nets [list {u_demo_interp_dac8_mmcm_common/rom_addr[0]} {u_demo_interp_dac8_mmcm_common/rom_addr[1]} {u_demo_interp_dac8_mmcm_common/rom_addr[2]} {u_demo_interp_dac8_mmcm_common/rom_addr[3]} {u_demo_interp_dac8_mmcm_common/rom_addr[4]} {u_demo_interp_dac8_mmcm_common/rom_addr[5]} ]]
+create_debug_port u_ila_0 probe
+set_property port_width 2 [get_debug_ports u_ila_0/probe10]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe10]
+connect_debug_port u_ila_0/probe10 [get_nets [list {u_demo_interp_dac8_mmcm_common/ila_mode_sel_w[0]} {u_demo_interp_dac8_mmcm_common/ila_mode_sel_w[1]} ]]
+create_debug_port u_ila_0 probe
+set_property port_width 24 [get_debug_ports u_ila_0/probe11]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe11]
+connect_debug_port u_ila_0/probe11 [get_nets [list {u_demo_interp_dac8_mmcm_common/y_out_w[0]} {u_demo_interp_dac8_mmcm_common/y_out_w[1]} {u_demo_interp_dac8_mmcm_common/y_out_w[2]} {u_demo_interp_dac8_mmcm_common/y_out_w[3]} {u_demo_interp_dac8_mmcm_common/y_out_w[4]} {u_demo_interp_dac8_mmcm_common/y_out_w[5]} {u_demo_interp_dac8_mmcm_common/y_out_w[6]} {u_demo_interp_dac8_mmcm_common/y_out_w[7]} {u_demo_interp_dac8_mmcm_common/y_out_w[8]} {u_demo_interp_dac8_mmcm_common/y_out_w[9]} {u_demo_interp_dac8_mmcm_common/y_out_w[10]} {u_demo_interp_dac8_mmcm_common/y_out_w[11]} {u_demo_interp_dac8_mmcm_common/y_out_w[12]} {u_demo_interp_dac8_mmcm_common/y_out_w[13]} {u_demo_interp_dac8_mmcm_common/y_out_w[14]} {u_demo_interp_dac8_mmcm_common/y_out_w[15]} {u_demo_interp_dac8_mmcm_common/y_out_w[16]} {u_demo_interp_dac8_mmcm_common/y_out_w[17]} {u_demo_interp_dac8_mmcm_common/y_out_w[18]} {u_demo_interp_dac8_mmcm_common/y_out_w[19]} {u_demo_interp_dac8_mmcm_common/y_out_w[20]} {u_demo_interp_dac8_mmcm_common/y_out_w[21]} {u_demo_interp_dac8_mmcm_common/y_out_w[22]} {u_demo_interp_dac8_mmcm_common/y_out_w[23]} ]]
+create_debug_port u_ila_0 probe
+set_property port_width 1 [get_debug_ports u_ila_0/probe12]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe12]
+connect_debug_port u_ila_0/probe12 [get_nets [list u_demo_interp_dac8_mmcm_common/ce4_out ]]
+create_debug_port u_ila_0 probe
+set_property port_width 1 [get_debug_ports u_ila_0/probe13]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe13]
+connect_debug_port u_ila_0/probe13 [get_nets [list u_demo_interp_dac8_mmcm_common/ce8_out ]]
+create_debug_port u_ila_0 probe
+set_property port_width 1 [get_debug_ports u_ila_0/probe14]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe14]
+connect_debug_port u_ila_0/probe14 [get_nets [list u_demo_interp_dac8_mmcm_common/ce128_out ]]
+create_debug_port u_ila_0 probe
+set_property port_width 1 [get_debug_ports u_ila_0/probe15]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe15]
+connect_debug_port u_ila_0/probe15 [get_nets [list u_demo_interp_dac8_mmcm_common/dbg_y4_valid_w ]]
+create_debug_port u_ila_0 probe
+set_property port_width 1 [get_debug_ports u_ila_0/probe16]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe16]
+connect_debug_port u_ila_0/probe16 [get_nets [list u_demo_interp_dac8_mmcm_common/dbg_y8_valid_w ]]
+create_debug_port u_ila_0 probe
+set_property port_width 1 [get_debug_ports u_ila_0/probe17]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe17]
+connect_debug_port u_ila_0/probe17 [get_nets [list u_demo_interp_dac8_mmcm_common/selected_valid ]]
+create_debug_port u_ila_0 probe
+set_property port_width 1 [get_debug_ports u_ila_0/probe18]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe18]
+connect_debug_port u_ila_0/probe18 [get_nets [list u_demo_interp_dac8_mmcm_common/x_in_update_ce ]]
+create_debug_port u_ila_0 probe
+set_property port_width 1 [get_debug_ports u_ila_0/probe19]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe19]
+connect_debug_port u_ila_0/probe19 [get_nets [list u_demo_interp_dac8_mmcm_common/x_in_valid ]]
+create_debug_port u_ila_0 probe
+set_property port_width 1 [get_debug_ports u_ila_0/probe20]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe20]
+connect_debug_port u_ila_0/probe20 [get_nets [list u_demo_interp_dac8_mmcm_common/y_out_valid_w ]]
+save_constraints -force
+launch_runs impl_1 -jobs 19
+wait_on_run impl_1
+launch_runs impl_1 -to_step write_bitstream -jobs 19
+wait_on_run impl_1
+open_hw
+connect_hw_server
+open_hw_target
+set_property PROGRAM.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.bit} [get_hw_devices xc7a35t_0]
+set_property PROBES.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.ltx} [get_hw_devices xc7a35t_0]
+set_property FULL_PROBES.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.ltx} [get_hw_devices xc7a35t_0]
+current_hw_device [get_hw_devices xc7a35t_0]
+refresh_hw_device [lindex [get_hw_devices xc7a35t_0] 0]
+create_hw_cfgmem -hw_device [get_hw_devices xc7a35t_0] -mem_dev [lindex [get_cfgmem_parts {mx25u12835f-spi-x1_x2_x4}] 0]
+set_property PROBES.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.ltx} [get_hw_devices xc7a35t_0]
+set_property FULL_PROBES.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.ltx} [get_hw_devices xc7a35t_0]
+set_property PROGRAM.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.bit} [get_hw_devices xc7a35t_0]
+program_hw_devices [get_hw_devices xc7a35t_0]
+refresh_hw_device [lindex [get_hw_devices xc7a35t_0] 0]
+display_hw_ila_data [ get_hw_ila_data hw_ila_data_1 -of_objects [get_hw_ilas -of_objects [get_hw_devices xc7a35t_0] -filter {CELL_NAME=~"u_ila_0"}]]
+set_property TRIGGER_COMPARE_VALUE eq1'b1 [get_hw_probes u_demo_interp_dac8_mmcm_common/x_in_update_ce -of_objects [get_hw_ilas -of_objects [get_hw_devices xc7a35t_0] -filter {CELL_NAME=~"u_ila_0"}]]
+run_hw_ila [get_hw_ilas -of_objects [get_hw_devices xc7a35t_0] -filter {CELL_NAME=~"u_ila_0"}]
+run_hw_ila [get_hw_ilas -of_objects [get_hw_devices xc7a35t_0] -filter {CELL_NAME=~"u_ila_0"}]
+save_wave_config {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.hw/hw_1/wave/hw_ila_data_1/hw_ila_data_1.wcfg}
+close_hw
+reset_run synth_1
+launch_runs synth_1 -jobs 19
+wait_on_run synth_1
+reset_run synth_1
+launch_runs synth_1 -jobs 19
+wait_on_run synth_1
+close_design
+open_run synth_1 -name synth_1
+reset_run synth_1
+launch_runs synth_1 -jobs 19
+wait_on_run synth_1
+close_design
+open_run synth_1 -name synth_1
+reset_run synth_1
+launch_runs synth_1 -jobs 19
+wait_on_run synth_1
+close_design
+open_run synth_1 -name synth_1
+create_debug_core u_ila_0 ila
+set_property C_DATA_DEPTH 4096 [get_debug_cores u_ila_0]
+set_property C_TRIGIN_EN false [get_debug_cores u_ila_0]
+set_property C_TRIGOUT_EN false [get_debug_cores u_ila_0]
+set_property C_ADV_TRIGGER false [get_debug_cores u_ila_0]
+set_property C_INPUT_PIPE_STAGES 0 [get_debug_cores u_ila_0]
+set_property C_EN_STRG_QUAL false [get_debug_cores u_ila_0]
+set_property ALL_PROBE_SAME_MU true [get_debug_cores u_ila_0]
+set_property ALL_PROBE_SAME_MU_CNT 1 [get_debug_cores u_ila_0]
+set_property port_width 1 [get_debug_ports u_ila_0/clk]
+connect_debug_port u_ila_0/clk [get_nets [list clk_audio_128x_sel ]]
+set_property port_width 24 [get_debug_ports u_ila_0/probe0]
+set_property PROBE_TYPE DATA [get_debug_ports u_ila_0/probe0]
+connect_debug_port u_ila_0/probe0 [get_nets [list {u_demo_interp_dac8_mmcm_common/dbg_y4_w[0]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[1]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[2]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[3]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[4]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[5]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[6]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[7]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[8]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[9]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[10]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[11]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[12]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[13]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[14]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[15]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[16]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[17]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[18]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[19]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[20]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[21]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[22]} {u_demo_interp_dac8_mmcm_common/dbg_y4_w[23]} ]]
+create_debug_port u_ila_0 probe
+set_property port_width 6 [get_debug_ports u_ila_0/probe1]
+set_property PROBE_TYPE DATA [get_debug_ports u_ila_0/probe1]
+connect_debug_port u_ila_0/probe1 [get_nets [list {u_demo_interp_dac8_mmcm_common/rom_addr[0]} {u_demo_interp_dac8_mmcm_common/rom_addr[1]} {u_demo_interp_dac8_mmcm_common/rom_addr[2]} {u_demo_interp_dac8_mmcm_common/rom_addr[3]} {u_demo_interp_dac8_mmcm_common/rom_addr[4]} {u_demo_interp_dac8_mmcm_common/rom_addr[5]} ]]
+create_debug_port u_ila_0 probe
+set_property port_width 24 [get_debug_ports u_ila_0/probe2]
+set_property PROBE_TYPE DATA [get_debug_ports u_ila_0/probe2]
+connect_debug_port u_ila_0/probe2 [get_nets [list {u_demo_interp_dac8_mmcm_common/dbg_y8_w[0]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[1]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[2]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[3]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[4]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[5]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[6]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[7]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[8]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[9]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[10]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[11]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[12]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[13]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[14]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[15]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[16]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[17]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[18]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[19]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[20]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[21]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[22]} {u_demo_interp_dac8_mmcm_common/dbg_y8_w[23]} ]]
+create_debug_port u_ila_0 probe
+set_property port_width 2 [get_debug_ports u_ila_0/probe3]
+set_property PROBE_TYPE DATA [get_debug_ports u_ila_0/probe3]
+connect_debug_port u_ila_0/probe3 [get_nets [list {u_demo_interp_dac8_mmcm_common/mode_state[0]} {u_demo_interp_dac8_mmcm_common/mode_state[1]} ]]
+create_debug_port u_ila_0 probe
+set_property port_width 24 [get_debug_ports u_ila_0/probe4]
+set_property PROBE_TYPE DATA [get_debug_ports u_ila_0/probe4]
+connect_debug_port u_ila_0/probe4 [get_nets [list {u_demo_interp_dac8_mmcm_common/selected_sample[0]} {u_demo_interp_dac8_mmcm_common/selected_sample[1]} {u_demo_interp_dac8_mmcm_common/selected_sample[2]} {u_demo_interp_dac8_mmcm_common/selected_sample[3]} {u_demo_interp_dac8_mmcm_common/selected_sample[4]} {u_demo_interp_dac8_mmcm_common/selected_sample[5]} {u_demo_interp_dac8_mmcm_common/selected_sample[6]} {u_demo_interp_dac8_mmcm_common/selected_sample[7]} {u_demo_interp_dac8_mmcm_common/selected_sample[8]} {u_demo_interp_dac8_mmcm_common/selected_sample[9]} {u_demo_interp_dac8_mmcm_common/selected_sample[10]} {u_demo_interp_dac8_mmcm_common/selected_sample[11]} {u_demo_interp_dac8_mmcm_common/selected_sample[12]} {u_demo_interp_dac8_mmcm_common/selected_sample[13]} {u_demo_interp_dac8_mmcm_common/selected_sample[14]} {u_demo_interp_dac8_mmcm_common/selected_sample[15]} {u_demo_interp_dac8_mmcm_common/selected_sample[16]} {u_demo_interp_dac8_mmcm_common/selected_sample[17]} {u_demo_interp_dac8_mmcm_common/selected_sample[18]} {u_demo_interp_dac8_mmcm_common/selected_sample[19]} {u_demo_interp_dac8_mmcm_common/selected_sample[20]} {u_demo_interp_dac8_mmcm_common/selected_sample[21]} {u_demo_interp_dac8_mmcm_common/selected_sample[22]} {u_demo_interp_dac8_mmcm_common/selected_sample[23]} ]]
+create_debug_port u_ila_0 probe
+set_property port_width 24 [get_debug_ports u_ila_0/probe5]
+set_property PROBE_TYPE DATA [get_debug_ports u_ila_0/probe5]
+connect_debug_port u_ila_0/probe5 [get_nets [list {u_demo_interp_dac8_mmcm_common/x_in[0]} {u_demo_interp_dac8_mmcm_common/x_in[1]} {u_demo_interp_dac8_mmcm_common/x_in[2]} {u_demo_interp_dac8_mmcm_common/x_in[3]} {u_demo_interp_dac8_mmcm_common/x_in[4]} {u_demo_interp_dac8_mmcm_common/x_in[5]} {u_demo_interp_dac8_mmcm_common/x_in[6]} {u_demo_interp_dac8_mmcm_common/x_in[7]} {u_demo_interp_dac8_mmcm_common/x_in[8]} {u_demo_interp_dac8_mmcm_common/x_in[9]} {u_demo_interp_dac8_mmcm_common/x_in[10]} {u_demo_interp_dac8_mmcm_common/x_in[11]} {u_demo_interp_dac8_mmcm_common/x_in[12]} {u_demo_interp_dac8_mmcm_common/x_in[13]} {u_demo_interp_dac8_mmcm_common/x_in[14]} {u_demo_interp_dac8_mmcm_common/x_in[15]} {u_demo_interp_dac8_mmcm_common/x_in[16]} {u_demo_interp_dac8_mmcm_common/x_in[17]} {u_demo_interp_dac8_mmcm_common/x_in[18]} {u_demo_interp_dac8_mmcm_common/x_in[19]} {u_demo_interp_dac8_mmcm_common/x_in[20]} {u_demo_interp_dac8_mmcm_common/x_in[21]} {u_demo_interp_dac8_mmcm_common/x_in[22]} {u_demo_interp_dac8_mmcm_common/x_in[23]} ]]
+create_debug_port u_ila_0 probe
+set_property port_width 8 [get_debug_ports u_ila_0/probe6]
+set_property PROBE_TYPE DATA [get_debug_ports u_ila_0/probe6]
+connect_debug_port u_ila_0/probe6 [get_nets [list {u_demo_interp_dac8_mmcm_common/dac_data_r[0]} {u_demo_interp_dac8_mmcm_common/dac_data_r[1]} {u_demo_interp_dac8_mmcm_common/dac_data_r[2]} {u_demo_interp_dac8_mmcm_common/dac_data_r[3]} {u_demo_interp_dac8_mmcm_common/dac_data_r[4]} {u_demo_interp_dac8_mmcm_common/dac_data_r[5]} {u_demo_interp_dac8_mmcm_common/dac_data_r[6]} {u_demo_interp_dac8_mmcm_common/dac_data_r[7]} ]]
+create_debug_port u_ila_0 probe
+set_property port_width 2 [get_debug_ports u_ila_0/probe7]
+set_property PROBE_TYPE DATA [get_debug_ports u_ila_0/probe7]
+connect_debug_port u_ila_0/probe7 [get_nets [list {u_demo_interp_dac8_mmcm_common/ila_mode_sel_w[0]} {u_demo_interp_dac8_mmcm_common/ila_mode_sel_w[1]} ]]
+create_debug_port u_ila_0 probe
+set_property port_width 8 [get_debug_ports u_ila_0/probe8]
+set_property PROBE_TYPE DATA [get_debug_ports u_ila_0/probe8]
+connect_debug_port u_ila_0/probe8 [get_nets [list {u_demo_interp_dac8_mmcm_common/sample_u8_w[0]} {u_demo_interp_dac8_mmcm_common/sample_u8_w[1]} {u_demo_interp_dac8_mmcm_common/sample_u8_w[2]} {u_demo_interp_dac8_mmcm_common/sample_u8_w[3]} {u_demo_interp_dac8_mmcm_common/sample_u8_w[4]} {u_demo_interp_dac8_mmcm_common/sample_u8_w[5]} {u_demo_interp_dac8_mmcm_common/sample_u8_w[6]} {u_demo_interp_dac8_mmcm_common/sample_u8_w[7]} ]]
+create_debug_port u_ila_0 probe
+set_property port_width 1 [get_debug_ports u_ila_0/probe9]
+set_property PROBE_TYPE DATA [get_debug_ports u_ila_0/probe9]
+connect_debug_port u_ila_0/probe9 [get_nets [list u_demo_interp_dac8_mmcm_common/dbg_y4_valid_w ]]
+create_debug_port u_ila_0 probe
+set_property port_width 1 [get_debug_ports u_ila_0/probe10]
+set_property PROBE_TYPE DATA [get_debug_ports u_ila_0/probe10]
+connect_debug_port u_ila_0/probe10 [get_nets [list u_demo_interp_dac8_mmcm_common/dbg_y8_valid_w ]]
+create_debug_port u_ila_0 probe
+set_property port_width 1 [get_debug_ports u_ila_0/probe11]
+set_property PROBE_TYPE DATA [get_debug_ports u_ila_0/probe11]
+connect_debug_port u_ila_0/probe11 [get_nets [list u_demo_interp_dac8_mmcm_common/selected_valid ]]
+create_debug_port u_ila_0 probe
+set_property port_width 1 [get_debug_ports u_ila_0/probe12]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe12]
+connect_debug_port u_ila_0/probe12 [get_nets [list u_demo_interp_dac8_mmcm_common/x_in_update_ce ]]
+create_debug_port u_ila_0 probe
+set_property port_width 1 [get_debug_ports u_ila_0/probe13]
+set_property PROBE_TYPE DATA [get_debug_ports u_ila_0/probe13]
+connect_debug_port u_ila_0/probe13 [get_nets [list u_demo_interp_dac8_mmcm_common/x_in_valid ]]
+save_constraints
+launch_runs impl_1 -jobs 19
+wait_on_run impl_1
+launch_runs impl_1 -to_step write_bitstream -jobs 19
+wait_on_run impl_1
+open_hw
+connect_hw_server
+open_hw_target
+set_property PROGRAM.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.bit} [get_hw_devices xc7a35t_0]
+set_property PROBES.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.ltx} [get_hw_devices xc7a35t_0]
+set_property FULL_PROBES.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.ltx} [get_hw_devices xc7a35t_0]
+current_hw_device [get_hw_devices xc7a35t_0]
+refresh_hw_device [lindex [get_hw_devices xc7a35t_0] 0]
+create_hw_cfgmem -hw_device [get_hw_devices xc7a35t_0] -mem_dev [lindex [get_cfgmem_parts {mx25u12835f-spi-x1_x2_x4}] 0]
+set_property PROBES.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.ltx} [get_hw_devices xc7a35t_0]
+set_property FULL_PROBES.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.ltx} [get_hw_devices xc7a35t_0]
+set_property PROGRAM.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.bit} [get_hw_devices xc7a35t_0]
+program_hw_devices [get_hw_devices xc7a35t_0]
+refresh_hw_device [lindex [get_hw_devices xc7a35t_0] 0]
+close_hw_target
+open_hw_target
+set_property PARAM.FREQUENCY 1000000 [current_hw_target]
+disconnect_hw_server localhost:3121
+connect_hw_server
+open_hw_target
+set_property PROGRAM.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.bit} [get_hw_devices xc7a35t_0]
+set_property PROBES.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.ltx} [get_hw_devices xc7a35t_0]
+set_property FULL_PROBES.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.ltx} [get_hw_devices xc7a35t_0]
+current_hw_device [get_hw_devices xc7a35t_0]
+refresh_hw_device [lindex [get_hw_devices xc7a35t_0] 0]
+create_hw_cfgmem -hw_device [get_hw_devices xc7a35t_0] -mem_dev [lindex [get_cfgmem_parts {mx25u12835f-spi-x1_x2_x4}] 0]
+close_hw_target
+open_hw_target
+set_property PARAM.FREQUENCY 1000000 [current_hw_target]
+set_property PROBES.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.ltx} [get_hw_devices xc7a35t_0]
+set_property FULL_PROBES.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.ltx} [get_hw_devices xc7a35t_0]
+set_property PROGRAM.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.bit} [get_hw_devices xc7a35t_0]
+program_hw_devices [get_hw_devices xc7a35t_0]
+refresh_hw_device [lindex [get_hw_devices xc7a35t_0] 0]
+refresh_hw_device [lindex [get_hw_devices xc7a35t_0] 0]
+refresh_hw_device [lindex [get_hw_devices xc7a35t_0] 0]
+set dev [lindex [get_hw_devices xc7a35t_0] 0]
+current_hw_device $dev
+puts [get_property PROGRAM.FILE $dev]
+puts [get_property PROBES.FILE $dev]
+puts [get_property PROBES.FILE $dev]
+set_property PROBES.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.ltx} $dev
+refresh_hw_device $dev
+puts [get_property PROBES.FILE $dev]
+get_hw_ilas
+get_hw_probes
+reset_run synth_1
+launch_runs impl_1 -jobs 19
+wait_on_run impl_1
+launch_runs impl_1 -to_step write_bitstream -jobs 19
+wait_on_run impl_1
+open_run impl_1
+set_property PROBES.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.ltx} [get_hw_devices xc7a35t_0]
+set_property FULL_PROBES.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.ltx} [get_hw_devices xc7a35t_0]
+set_property PROGRAM.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.bit} [get_hw_devices xc7a35t_0]
+program_hw_devices [get_hw_devices xc7a35t_0]
+refresh_hw_device [lindex [get_hw_devices xc7a35t_0] 0]
+display_hw_ila_data [ get_hw_ila_data hw_ila_data_1 -of_objects [get_hw_ilas -of_objects [get_hw_devices xc7a35t_0] -filter {CELL_NAME=~"u_ila_0"}]]
+set_property PROBES.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.ltx} [get_hw_devices xc7a35t_0]
+set_property FULL_PROBES.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.ltx} [get_hw_devices xc7a35t_0]
+set_property PROGRAM.FILE {D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/interp4_ctrl/interp4_ctrl.runs/impl_1/board_demo_competition_dac8_top.bit} [get_hw_devices xc7a35t_0]
+program_hw_devices [get_hw_devices xc7a35t_0]
+refresh_hw_device [lindex [get_hw_devices xc7a35t_0] 0]
+run_hw_ila [get_hw_ilas -of_objects [get_hw_devices xc7a35t_0] -filter {CELL_NAME=~"u_ila_0"}]
+wait_on_hw_ila [get_hw_ilas -of_objects [get_hw_devices xc7a35t_0] -filter {CELL_NAME=~"u_ila_0"}]
+display_hw_ila_data [upload_hw_ila_data [get_hw_ilas -of_objects [get_hw_devices xc7a35t_0] -filter {CELL_NAME=~"u_ila_0"}]]
+run_hw_ila [get_hw_ilas -of_objects [get_hw_devices xc7a35t_0] -filter {CELL_NAME=~"u_ila_0"}]
+run_hw_ila [get_hw_ilas -of_objects [get_hw_devices xc7a35t_0] -filter {CELL_NAME=~"u_ila_0"}]
+run_hw_ila [get_hw_ilas -of_objects [get_hw_devices xc7a35t_0] -filter {CELL_NAME=~"u_ila_0"}]
+run_hw_ila [get_hw_ilas -of_objects [get_hw_devices xc7a35t_0] -filter {CELL_NAME=~"u_ila_0"}]

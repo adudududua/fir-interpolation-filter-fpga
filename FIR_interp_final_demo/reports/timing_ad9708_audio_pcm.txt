@@ -1,0 +1,1182 @@
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date         : Tue Jun 23 21:56:58 2026
+| Host         : LAPTOP-476JT8H0 running 64-bit major release  (build 9200)
+| Command      : report_timing_summary -file D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/FIR_interp_final_demo/reports/timing_ad9708_audio_pcm.txt
+| Design       : board_demo_competition_dac8_top
+| Device       : 7a35t-fgg484
+| Speed File   : -2  PRODUCTION 1.23 2018-06-13
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Timing Summary Report
+
+------------------------------------------------------------------------------------------------
+| Timer Settings
+| --------------
+------------------------------------------------------------------------------------------------
+
+  Enable Multi Corner Analysis               :  Yes
+  Enable Pessimism Removal                   :  Yes
+  Pessimism Removal Resolution               :  Nearest Common Node
+  Enable Input Delay Default Clock           :  No
+  Enable Preset / Clear Arcs                 :  No
+  Disable Flight Delays                      :  No
+  Ignore I/O Paths                           :  No
+  Timing Early Launch at Borrowing Latches   :  false
+
+  Corner  Analyze    Analyze    
+  Name    Max Paths  Min Paths  
+  ------  ---------  ---------  
+  Slow    Yes        Yes        
+  Fast    Yes        Yes        
+
+
+
+check_timing report
+
+Table of Contents
+-----------------
+1. checking no_clock
+2. checking constant_clock
+3. checking pulse_width_clock
+4. checking unconstrained_internal_endpoints
+5. checking no_input_delay
+6. checking no_output_delay
+7. checking multiple_clock
+8. checking generated_clocks
+9. checking loops
+10. checking partial_input_delay
+11. checking partial_output_delay
+12. checking latch_loops
+
+1. checking no_clock
+--------------------
+ There are 0 register/latch pins with no clock.
+
+
+2. checking constant_clock
+--------------------------
+ There are 0 register/latch pins with constant_clock.
+
+
+3. checking pulse_width_clock
+-----------------------------
+ There are 0 register/latch pins which need pulse_width check
+
+
+4. checking unconstrained_internal_endpoints
+--------------------------------------------
+ There are 0 pins that are not constrained for maximum delay.
+
+ There are 0 pins that are not constrained for maximum delay due to constant clock.
+
+
+5. checking no_input_delay
+--------------------------
+ There are 0 input ports with no input delay specified.
+
+ There are 3 input ports with no input delay but user has a false path constraint. (MEDIUM)
+
+
+6. checking no_output_delay
+---------------------------
+ There are 8 ports with no output delay specified. (HIGH)
+
+ There are 0 ports with no output delay but user has a false path constraint
+
+ There is 1 port with no output delay but with a timing clock defined on it or propagating through it (LOW)
+
+
+7. checking multiple_clock
+--------------------------
+ There are 0 register/latch pins with multiple clocks.
+
+
+8. checking generated_clocks
+----------------------------
+ There are 0 generated clocks that are not connected to a clock source.
+
+
+9. checking loops
+-----------------
+ There are 0 combinational loops in the design.
+
+
+10. checking partial_input_delay
+--------------------------------
+ There are 0 input ports with partial input delay specified.
+
+
+11. checking partial_output_delay
+---------------------------------
+ There are 0 ports with partial output delay specified.
+
+
+12. checking latch_loops
+------------------------
+ There are 0 combinational latch loops in the design through latch input
+
+
+
+------------------------------------------------------------------------------------------------
+| Design Timing Summary
+| ---------------------
+------------------------------------------------------------------------------------------------
+
+    WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
+    -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
+     16.959        0.000                      0                13064        0.084        0.000                      0                13064        0.000        0.000                       0                  4529  
+
+
+All user specified timing constraints are met.
+
+
+------------------------------------------------------------------------------------------------
+| Clock Summary
+| -------------
+------------------------------------------------------------------------------------------------
+
+Clock                  Waveform(ns)         Period(ns)      Frequency(MHz)
+-----                  ------------         ----------      --------------
+clk_50M                {0.000 10.000}       20.000          50.000          
+  clk_audio_128x_44k1  {0.000 88.577}       177.154         5.645           
+  clk_audio_128x_48k   {0.000 81.380}       162.761         6.144           
+  clkfb_44k1           {0.000 50.000}       100.000         10.000          
+  clkfb_48k            {0.000 30.000}       60.000          16.667          
+
+
+------------------------------------------------------------------------------------------------
+| Intra Clock Table
+| -----------------
+------------------------------------------------------------------------------------------------
+
+Clock                      WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
+-----                      -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
+clk_50M                     16.959        0.000                      0                   32        0.259        0.000                      0                   32        7.000        0.000                       0                    19  
+  clk_audio_128x_44k1       71.487        0.000                      0                 8570        0.084        0.000                      0                 8570       36.206        0.000                       0                  4504  
+  clk_audio_128x_48k        64.475        0.000                      0                 8570        0.084        0.000                      0                 8570       50.599        0.000                       0                  4504  
+  clkfb_44k1                                                                                                                                                             0.000        0.000                       0                     2  
+  clkfb_48k                                                                                                                                                             40.000        0.000                       0                     2  
+
+
+------------------------------------------------------------------------------------------------
+| Inter Clock Table
+| -----------------
+------------------------------------------------------------------------------------------------
+
+From Clock    To Clock          WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints  
+----------    --------          -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------  
+
+
+------------------------------------------------------------------------------------------------
+| Other Path Groups Table
+| -----------------------
+------------------------------------------------------------------------------------------------
+
+Path Group           From Clock           To Clock                 WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints  
+----------           ----------           --------                 -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------  
+**async_default**    clk_audio_128x_44k1  clk_audio_128x_44k1       83.812        0.000                      0                 4462        0.213        0.000                      0                 4462  
+**async_default**    clk_audio_128x_48k   clk_audio_128x_48k        76.801        0.000                      0                 4462        0.213        0.000                      0                 4462  
+
+
+------------------------------------------------------------------------------------------------
+| Timing Details
+| --------------
+------------------------------------------------------------------------------------------------
+
+
+---------------------------------------------------------------------------------------------------
+From Clock:  clk_50M
+  To Clock:  clk_50M
+
+Setup :            0  Failing Endpoints,  Worst Slack       16.959ns,  Total Violation        0.000ns
+Hold  :            0  Failing Endpoints,  Worst Slack        0.259ns,  Total Violation        0.000ns
+PW    :            0  Failing Endpoints,  Worst Slack        7.000ns,  Total Violation        0.000ns
+---------------------------------------------------------------------------------------------------
+
+
+Max Delay Paths
+--------------------------------------------------------------------------------------
+Slack (MET) :             16.959ns  (required time - arrival time)
+  Source:                 pwr_rst_cnt_reg[5]/C
+                            (rising edge-triggered cell FDSE clocked by clk_50M  {rise@0.000ns fall@10.000ns period=20.000ns})
+  Destination:            pwr_rst_cnt_reg[4]/S
+                            (rising edge-triggered cell FDSE clocked by clk_50M  {rise@0.000ns fall@10.000ns period=20.000ns})
+  Path Group:             clk_50M
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            20.000ns  (clk_50M rise@20.000ns - clk_50M rise@0.000ns)
+  Data Path Delay:        2.653ns  (logic 0.694ns (26.157%)  route 1.959ns (73.843%))
+  Logic Levels:           3  (LUT6=3)
+  Clock Path Skew:        0.000ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.349ns = ( 24.349 - 20.000 ) 
+    Source Clock Delay      (SCD):    4.616ns
+    Clock Pessimism Removal (CPR):    0.267ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_50M rise edge)    0.000     0.000 r  
+    R4                                                0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    R4                   IBUF (Prop_ibuf_I_O)         1.432     1.432 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           1.689     3.121    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.081     3.202 r  u_bufg_sys_clk/O
+                         net (fo=18, routed)          1.414     4.616    clk_sys_bufg
+    SLICE_X1Y69          FDSE                                         r  pwr_rst_cnt_reg[5]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X1Y69          FDSE (Prop_fdse_C_Q)         0.379     4.995 r  pwr_rst_cnt_reg[5]/Q
+                         net (fo=2, routed)           0.708     5.703    pwr_rst_cnt_reg[5]
+    SLICE_X0Y68          LUT6 (Prop_lut6_I0_O)        0.105     5.808 r  u_clk_wiz_audio_48k_i_3/O
+                         net (fo=1, routed)           0.450     6.258    u_clk_wiz_audio_48k_i_3_n_0
+    SLICE_X0Y70          LUT6 (Prop_lut6_I2_O)        0.105     6.363 r  u_clk_wiz_audio_48k_i_2/O
+                         net (fo=2, routed)           0.132     6.494    u_clk_wiz_audio_48k_i_2_n_0
+    SLICE_X0Y70          LUT6 (Prop_lut6_I2_O)        0.105     6.599 r  pwr_rst_cnt[0]_i_1/O
+                         net (fo=16, routed)          0.670     7.269    clear
+    SLICE_X1Y69          FDSE                                         r  pwr_rst_cnt_reg[4]/S
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_50M rise edge)   20.000    20.000 r  
+    R4                                                0.000    20.000 r  clk (IN)
+                         net (fo=0)                   0.000    20.000    clk
+    R4                   IBUF (Prop_ibuf_I_O)         1.366    21.366 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           1.599    22.965    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.077    23.042 r  u_bufg_sys_clk/O
+                         net (fo=18, routed)          1.307    24.349    clk_sys_bufg
+    SLICE_X1Y69          FDSE                                         r  pwr_rst_cnt_reg[4]/C
+                         clock pessimism              0.267    24.616    
+                         clock uncertainty           -0.035    24.581    
+    SLICE_X1Y69          FDSE (Setup_fdse_C_S)       -0.352    24.229    pwr_rst_cnt_reg[4]
+  -------------------------------------------------------------------
+                         required time                         24.229    
+                         arrival time                          -7.269    
+  -------------------------------------------------------------------
+                         slack                                 16.959    
+
+
+
+
+
+Min Delay Paths
+--------------------------------------------------------------------------------------
+Slack (MET) :             0.259ns  (arrival time - required time)
+  Source:                 pwr_rst_cnt_reg[3]/C
+                            (rising edge-triggered cell FDSE clocked by clk_50M  {rise@0.000ns fall@10.000ns period=20.000ns})
+  Destination:            pwr_rst_cnt_reg[3]/D
+                            (rising edge-triggered cell FDSE clocked by clk_50M  {rise@0.000ns fall@10.000ns period=20.000ns})
+  Path Group:             clk_50M
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_50M rise@0.000ns - clk_50M rise@0.000ns)
+  Data Path Delay:        0.364ns  (logic 0.249ns (68.491%)  route 0.115ns (31.509%))
+  Logic Levels:           1  (CARRY4=1)
+  Clock Path Skew:        0.000ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    2.025ns
+    Source Clock Delay      (SCD):    1.511ns
+    Clock Pessimism Removal (CPR):    0.513ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_50M rise edge)    0.000     0.000 r  
+    R4                                                0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    R4                   IBUF (Prop_ibuf_I_O)         0.269     0.269 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           0.631     0.900    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.026     0.926 r  u_bufg_sys_clk/O
+                         net (fo=18, routed)          0.586     1.511    clk_sys_bufg
+    SLICE_X1Y68          FDSE                                         r  pwr_rst_cnt_reg[3]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X1Y68          FDSE (Prop_fdse_C_Q)         0.141     1.652 r  pwr_rst_cnt_reg[3]/Q
+                         net (fo=2, routed)           0.115     1.767    pwr_rst_cnt_reg[3]
+    SLICE_X1Y68          CARRY4 (Prop_carry4_S[3]_O[3])
+                                                      0.108     1.875 r  pwr_rst_cnt_reg[0]_i_2/O[3]
+                         net (fo=1, routed)           0.000     1.875    pwr_rst_cnt_reg[0]_i_2_n_4
+    SLICE_X1Y68          FDSE                                         r  pwr_rst_cnt_reg[3]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_50M rise edge)    0.000     0.000 r  
+    R4                                                0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    R4                   IBUF (Prop_ibuf_I_O)         0.457     0.457 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           0.685     1.141    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.029     1.170 r  u_bufg_sys_clk/O
+                         net (fo=18, routed)          0.854     2.025    clk_sys_bufg
+    SLICE_X1Y68          FDSE                                         r  pwr_rst_cnt_reg[3]/C
+                         clock pessimism             -0.513     1.511    
+    SLICE_X1Y68          FDSE (Hold_fdse_C_D)         0.105     1.616    pwr_rst_cnt_reg[3]
+  -------------------------------------------------------------------
+                         required time                         -1.616    
+                         arrival time                           1.875    
+  -------------------------------------------------------------------
+                         slack                                  0.259    
+
+
+
+
+
+Pulse Width Checks
+--------------------------------------------------------------------------------------
+Clock Name:         clk_50M
+Waveform(ns):       { 0.000 10.000 }
+Period(ns):         20.000
+Sources:            { clk }
+
+Check Type        Corner  Lib Pin            Reference Pin  Required(ns)  Actual(ns)  Slack(ns)  Location         Pin
+Min Period        n/a     BUFG/I             n/a            1.592         20.000      18.408     BUFGCTRL_X0Y0    u_bufg_sys_clk/I
+Max Period        n/a     MMCME2_ADV/CLKIN1  n/a            100.000       20.000      80.000     MMCME2_ADV_X0Y2  u_clk_wiz_audio_44k1/inst/mmcm_adv_inst/CLKIN1
+Low Pulse Width   Fast    MMCME2_ADV/CLKIN1  n/a            3.000         10.000      7.000      MMCME2_ADV_X0Y2  u_clk_wiz_audio_44k1/inst/mmcm_adv_inst/CLKIN1
+High Pulse Width  Fast    MMCME2_ADV/CLKIN1  n/a            3.000         10.000      7.000      MMCME2_ADV_X0Y2  u_clk_wiz_audio_44k1/inst/mmcm_adv_inst/CLKIN1
+
+
+
+---------------------------------------------------------------------------------------------------
+From Clock:  clk_audio_128x_44k1
+  To Clock:  clk_audio_128x_44k1
+
+Setup :            0  Failing Endpoints,  Worst Slack       71.487ns,  Total Violation        0.000ns
+Hold  :            0  Failing Endpoints,  Worst Slack        0.084ns,  Total Violation        0.000ns
+PW    :            0  Failing Endpoints,  Worst Slack       36.206ns,  Total Violation        0.000ns
+---------------------------------------------------------------------------------------------------
+
+
+Max Delay Paths
+--------------------------------------------------------------------------------------
+Slack (MET) :             71.487ns  (required time - arrival time)
+  Source:                 u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_fir_core_symm_interp2/fir_out_full_reg[1]/C
+                            (rising edge-triggered cell FDCE clocked by clk_audio_128x_44k1  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Destination:            u_demo_interp_dac8_mmcm48_common/dac_data_r_reg[1]/D
+                            (falling edge-triggered cell FDCE clocked by clk_audio_128x_44k1  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Path Group:             clk_audio_128x_44k1
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            88.577ns  (clk_audio_128x_44k1 fall@88.577ns - clk_audio_128x_44k1 rise@0.000ns)
+  Data Path Delay:        16.575ns  (logic 5.897ns (35.578%)  route 10.678ns (64.422%))
+  Logic Levels:           31  (CARRY4=26 LUT2=2 LUT3=2 LUT6=1)
+  Clock Path Skew:        -0.093ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    7.482ns = ( 96.059 - 88.577 ) 
+    Source Clock Delay      (SCD):    8.001ns
+    Clock Pessimism Removal (CPR):    0.426ns
+  Clock Uncertainty:      0.458ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.913ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x_44k1 rise edge)
+                                                      0.000     0.000 r  
+    R4                                                0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    R4                   IBUF (Prop_ibuf_I_O)         1.432     1.432 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           1.689     3.121    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.081     3.202 r  u_bufg_sys_clk/O
+                         net (fo=18, routed)          1.538     4.740    u_clk_wiz_audio_44k1/inst/clk_in1
+    MMCME2_ADV_X0Y2      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.077     4.817 r  u_clk_wiz_audio_44k1/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.698     6.515    lopt_3
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I0_O)
+                                                      0.081     6.596 r  u_bufgmux_audio_clk/O
+                         net (fo=4503, routed)        1.405     8.001    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_fir_core_symm_interp2/clk_audio_128x_sel
+    SLICE_X63Y74         FDCE                                         r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_fir_core_symm_interp2/fir_out_full_reg[1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X63Y74         FDCE (Prop_fdce_C_Q)         0.348     8.349 f  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_fir_core_symm_interp2/fir_out_full_reg[1]/Q
+                         net (fo=4, routed)           1.052     9.400    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_fir_core_symm_interp2/Q[1]
+    SLICE_X59Y83         LUT2 (Prop_lut2_I1_O)        0.242     9.642 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_fir_core_symm_interp2/din_round1_carry_i_8__0/O
+                         net (fo=1, routed)           0.000     9.642    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry__0_1[0]
+    SLICE_X59Y83         CARRY4 (Prop_carry4_S[0]_CO[3])
+                                                      0.440    10.082 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry/CO[3]
+                         net (fo=1, routed)           0.000    10.082    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry_n_0
+    SLICE_X59Y84         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    10.180 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry__0/CO[3]
+                         net (fo=1, routed)           0.000    10.180    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry__0_n_0
+    SLICE_X59Y85         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    10.278 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry__1/CO[3]
+                         net (fo=1, routed)           0.000    10.278    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry__1_n_0
+    SLICE_X59Y86         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    10.376 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry__2/CO[3]
+                         net (fo=1, routed)           0.000    10.376    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry__2_n_0
+    SLICE_X59Y87         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    10.474 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry__3/CO[3]
+                         net (fo=1, routed)           0.000    10.474    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry__3_n_0
+    SLICE_X59Y88         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    10.572 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry__4/CO[3]
+                         net (fo=1, routed)           0.000    10.572    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry__4_n_0
+    SLICE_X59Y89         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    10.670 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry__5/CO[3]
+                         net (fo=4, routed)           1.520    12.190    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_fir_core_symm_interp2/CO[0]
+    SLICE_X60Y75         LUT2 (Prop_lut2_I1_O)        0.105    12.295 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_fir_core_symm_interp2/_carry_i_4__0/O
+                         net (fo=1, routed)           0.000    12.295    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__0_0[0]
+    SLICE_X60Y75         CARRY4 (Prop_carry4_S[0]_CO[3])
+                                                      0.423    12.718 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry/CO[3]
+                         net (fo=1, routed)           0.000    12.718    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry_n_0
+    SLICE_X60Y76         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.100    12.818 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__0/CO[3]
+                         net (fo=1, routed)           0.000    12.818    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__0_n_0
+    SLICE_X60Y77         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.100    12.918 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__1/CO[3]
+                         net (fo=1, routed)           0.000    12.918    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__1_n_0
+    SLICE_X60Y78         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.100    13.018 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__2/CO[3]
+                         net (fo=1, routed)           0.000    13.018    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__2_n_0
+    SLICE_X60Y79         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.100    13.118 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__3/CO[3]
+                         net (fo=1, routed)           0.000    13.118    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__3_n_0
+    SLICE_X60Y80         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.100    13.218 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__4/CO[3]
+                         net (fo=1, routed)           0.000    13.218    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__4_n_0
+    SLICE_X60Y81         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.100    13.318 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__5/CO[3]
+                         net (fo=1, routed)           0.000    13.318    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__5_n_0
+    SLICE_X60Y82         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.100    13.418 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__6/CO[3]
+                         net (fo=1, routed)           0.000    13.418    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__6_n_0
+    SLICE_X60Y83         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.100    13.518 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__7/CO[3]
+                         net (fo=1, routed)           0.000    13.518    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__7_n_0
+    SLICE_X60Y84         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.100    13.618 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__8/CO[3]
+                         net (fo=1, routed)           0.000    13.618    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__8_n_0
+    SLICE_X60Y85         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.100    13.718 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__9/CO[3]
+                         net (fo=1, routed)           0.000    13.718    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__9_n_0
+    SLICE_X60Y86         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.100    13.818 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__10/CO[3]
+                         net (fo=1, routed)           0.000    13.818    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__10_n_0
+    SLICE_X60Y87         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.100    13.918 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__11/CO[3]
+                         net (fo=1, routed)           0.000    13.918    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__11_n_0
+    SLICE_X60Y88         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.262    14.180 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__12/O[3]
+                         net (fo=34, routed)          1.250    15.430    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/p_0_in0
+    SLICE_X55Y82         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.707    16.137 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/dout_241_carry__1/CO[3]
+                         net (fo=1, routed)           0.000    16.137    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/dout_241_carry__1_n_0
+    SLICE_X55Y83         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    16.235 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/dout_241_carry__2/CO[3]
+                         net (fo=1, routed)           0.000    16.235    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/dout_241_carry__2_n_0
+    SLICE_X55Y84         CARRY4 (Prop_carry4_CI_CO[0])
+                                                      0.216    16.451 f  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/dout_241_carry__3/CO[0]
+                         net (fo=24, routed)          1.571    18.022    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/dout_241
+    SLICE_X62Y66         LUT3 (Prop_lut3_I1_O)        0.309    18.331 f  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/data_buf[23]_i_1__0/O
+                         net (fo=15, routed)          2.811    21.143    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_128x/u_round_sat_q16_to24/dbg_y8_w[0]
+    SLICE_X6Y66          LUT6 (Prop_lut6_I5_O)        0.105    21.248 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_128x/u_round_sat_q16_to24/dac_data_r[7]_i_20/O
+                         net (fo=1, routed)           0.485    21.733    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_128x/u_round_sat_q16_to24/dac_data_r[7]_i_20_n_0
+    SLICE_X7Y66          CARRY4 (Prop_carry4_DI[2]_CO[3])
+                                                      0.329    22.062 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_128x/u_round_sat_q16_to24/dac_data_r_reg[7]_i_9/CO[3]
+                         net (fo=1, routed)           0.000    22.062    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_128x/u_round_sat_q16_to24/dac_data_r_reg[7]_i_9_n_0
+    SLICE_X7Y67          CARRY4 (Prop_carry4_CI_CO[0])
+                                                      0.216    22.278 f  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_128x/u_round_sat_q16_to24/dac_data_r_reg[7]_i_5/CO[0]
+                         net (fo=8, routed)           1.988    24.267    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_round_sat_q16_to24/dac_data_r_reg[7]_0[0]
+    SLICE_X48Y57         LUT3 (Prop_lut3_I2_O)        0.309    24.576 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_round_sat_q16_to24/dac_data_r[1]_i_1/O
+                         net (fo=1, routed)           0.000    24.576    u_demo_interp_dac8_mmcm48_common/p_0_in[1]
+    SLICE_X48Y57         FDCE                                         r  u_demo_interp_dac8_mmcm48_common/dac_data_r_reg[1]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x_44k1 fall edge)
+                                                     88.577    88.577 f  
+    R4                                                0.000    88.577 f  clk (IN)
+                         net (fo=0)                   0.000    88.577    clk
+    R4                   IBUF (Prop_ibuf_I_O)         1.366    89.943 f  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           1.599    91.542    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.077    91.619 f  u_bufg_sys_clk/O
+                         net (fo=18, routed)          1.426    93.045    u_clk_wiz_audio_44k1/inst/clk_in1
+    MMCME2_ADV_X0Y2      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.073    93.118 f  u_clk_wiz_audio_44k1/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.617    94.735    lopt_3
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I0_O)
+                                                      0.077    94.812 f  u_bufgmux_audio_clk/O
+                         net (fo=4503, routed)        1.247    96.059    u_demo_interp_dac8_mmcm48_common/clk_audio_128x_sel
+    SLICE_X48Y57         FDCE                                         r  u_demo_interp_dac8_mmcm48_common/dac_data_r_reg[1]/C  (IS_INVERTED)
+                         clock pessimism              0.426    96.485    
+                         clock uncertainty           -0.458    96.027    
+    SLICE_X48Y57         FDCE (Setup_fdce_C_D)        0.036    96.063    u_demo_interp_dac8_mmcm48_common/dac_data_r_reg[1]
+  -------------------------------------------------------------------
+                         required time                         96.063    
+                         arrival time                         -24.576    
+  -------------------------------------------------------------------
+                         slack                                 71.487    
+
+
+
+
+
+Min Delay Paths
+--------------------------------------------------------------------------------------
+Slack (MET) :             0.084ns  (arrival time - required time)
+  Source:                 u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_fir_core_symm/x_reg_reg[89][2]/C
+                            (rising edge-triggered cell FDCE clocked by clk_audio_128x_44k1  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Destination:            u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_fir_core_symm/x_reg_reg[90][2]/D
+                            (rising edge-triggered cell FDCE clocked by clk_audio_128x_44k1  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Path Group:             clk_audio_128x_44k1
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_audio_128x_44k1 rise@0.000ns - clk_audio_128x_44k1 rise@0.000ns)
+  Data Path Delay:        0.420ns  (logic 0.164ns (39.020%)  route 0.256ns (60.980%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.266ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    3.775ns
+    Source Clock Delay      (SCD):    2.924ns
+    Clock Pessimism Removal (CPR):    0.585ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x_44k1 rise edge)
+                                                      0.000     0.000 r  
+    R4                                                0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    R4                   IBUF (Prop_ibuf_I_O)         0.269     0.269 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           0.631     0.900    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.026     0.926 r  u_bufg_sys_clk/O
+                         net (fo=18, routed)          0.629     1.555    u_clk_wiz_audio_44k1/inst/clk_in1
+    MMCME2_ADV_X0Y2      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.050     1.605 r  u_clk_wiz_audio_44k1/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           0.656     2.261    lopt_3
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I0_O)
+                                                      0.026     2.287 r  u_bufgmux_audio_clk/O
+                         net (fo=4503, routed)        0.637     2.924    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_fir_core_symm/clk_audio_128x_sel
+    SLICE_X30Y136        FDCE                                         r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_fir_core_symm/x_reg_reg[89][2]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X30Y136        FDCE (Prop_fdce_C_Q)         0.164     3.088 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_fir_core_symm/x_reg_reg[89][2]/Q
+                         net (fo=2, routed)           0.256     3.345    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_fir_core_symm/x_reg_reg[89]__0[2]
+    SLICE_X43Y139        FDCE                                         r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_fir_core_symm/x_reg_reg[90][2]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x_44k1 rise edge)
+                                                      0.000     0.000 r  
+    R4                                                0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    R4                   IBUF (Prop_ibuf_I_O)         0.457     0.457 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           0.685     1.141    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.029     1.170 r  u_bufg_sys_clk/O
+                         net (fo=18, routed)          0.901     2.071    u_clk_wiz_audio_44k1/inst/clk_in1
+    MMCME2_ADV_X0Y2      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.053     2.124 r  u_clk_wiz_audio_44k1/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           0.710     2.834    lopt_3
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I0_O)
+                                                      0.029     2.863 r  u_bufgmux_audio_clk/O
+                         net (fo=4503, routed)        0.912     3.775    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_fir_core_symm/clk_audio_128x_sel
+    SLICE_X43Y139        FDCE                                         r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_fir_core_symm/x_reg_reg[90][2]/C
+                         clock pessimism             -0.585     3.190    
+    SLICE_X43Y139        FDCE (Hold_fdce_C_D)         0.070     3.260    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_fir_core_symm/x_reg_reg[90][2]
+  -------------------------------------------------------------------
+                         required time                         -3.260    
+                         arrival time                           3.345    
+  -------------------------------------------------------------------
+                         slack                                  0.084    
+
+
+
+
+
+Pulse Width Checks
+--------------------------------------------------------------------------------------
+Clock Name:         clk_audio_128x_44k1
+Waveform(ns):       { 0.000 88.577 }
+Period(ns):         177.154
+Sources:            { u_clk_wiz_audio_44k1/inst/mmcm_adv_inst/CLKOUT0 }
+
+Check Type        Corner  Lib Pin             Reference Pin  Required(ns)  Actual(ns)  Slack(ns)  Location         Pin
+Min Period        n/a     BUFGCTRL/I0         n/a            1.592         177.154     175.562    BUFGCTRL_X0Y16   u_bufgmux_audio_clk/I0
+Max Period        n/a     MMCME2_ADV/CLKOUT0  n/a            213.360       177.154     36.206     MMCME2_ADV_X0Y2  u_clk_wiz_audio_44k1/inst/mmcm_adv_inst/CLKOUT0
+Low Pulse Width   Slow    FDCE/C              n/a            0.500         88.577      88.077     SLICE_X3Y130     u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_64x/u_fir_core_symm_interp2/fir_out_full_reg[0]/C
+High Pulse Width  Fast    FDCE/C              n/a            0.500         88.577      88.077     SLICE_X47Y70     u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_fir_core_symm/fir_out_full_reg[36]/C
+
+
+
+---------------------------------------------------------------------------------------------------
+From Clock:  clk_audio_128x_48k
+  To Clock:  clk_audio_128x_48k
+
+Setup :            0  Failing Endpoints,  Worst Slack       64.475ns,  Total Violation        0.000ns
+Hold  :            0  Failing Endpoints,  Worst Slack        0.084ns,  Total Violation        0.000ns
+PW    :            0  Failing Endpoints,  Worst Slack       50.599ns,  Total Violation        0.000ns
+---------------------------------------------------------------------------------------------------
+
+
+Max Delay Paths
+--------------------------------------------------------------------------------------
+Slack (MET) :             64.475ns  (required time - arrival time)
+  Source:                 u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_fir_core_symm_interp2/fir_out_full_reg[1]/C
+                            (rising edge-triggered cell FDCE clocked by clk_audio_128x_48k  {rise@0.000ns fall@81.380ns period=162.761ns})
+  Destination:            u_demo_interp_dac8_mmcm48_common/dac_data_r_reg[1]/D
+                            (falling edge-triggered cell FDCE clocked by clk_audio_128x_48k  {rise@0.000ns fall@81.380ns period=162.761ns})
+  Path Group:             clk_audio_128x_48k
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            81.380ns  (clk_audio_128x_48k fall@81.380ns - clk_audio_128x_48k rise@0.000ns)
+  Data Path Delay:        16.575ns  (logic 5.897ns (35.578%)  route 10.678ns (64.422%))
+  Logic Levels:           31  (CARRY4=26 LUT2=2 LUT3=2 LUT6=1)
+  Clock Path Skew:        -0.093ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    7.067ns = ( 88.447 - 81.380 ) 
+    Source Clock Delay      (SCD):    7.564ns
+    Clock Pessimism Removal (CPR):    0.404ns
+  Clock Uncertainty:      0.273ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.541ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x_48k rise edge)
+                                                      0.000     0.000 r  
+    R4                                                0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    R4                   IBUF (Prop_ibuf_I_O)         1.432     1.432 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           1.689     3.121    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.081     3.202 r  u_bufg_sys_clk/O
+                         net (fo=18, routed)          1.374     4.576    u_clk_wiz_audio_48k/inst/clk_in1
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.077     4.653 r  u_clk_wiz_audio_48k/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.425     6.078    lopt_4
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I1_O)
+                                                      0.081     6.159 r  u_bufgmux_audio_clk/O
+                         net (fo=4503, routed)        1.405     7.564    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_fir_core_symm_interp2/clk_audio_128x_sel
+    SLICE_X63Y74         FDCE                                         r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_fir_core_symm_interp2/fir_out_full_reg[1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X63Y74         FDCE (Prop_fdce_C_Q)         0.348     7.912 f  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_fir_core_symm_interp2/fir_out_full_reg[1]/Q
+                         net (fo=4, routed)           1.052     8.964    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_fir_core_symm_interp2/Q[1]
+    SLICE_X59Y83         LUT2 (Prop_lut2_I1_O)        0.242     9.206 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_fir_core_symm_interp2/din_round1_carry_i_8__0/O
+                         net (fo=1, routed)           0.000     9.206    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry__0_1[0]
+    SLICE_X59Y83         CARRY4 (Prop_carry4_S[0]_CO[3])
+                                                      0.440     9.646 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry/CO[3]
+                         net (fo=1, routed)           0.000     9.646    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry_n_0
+    SLICE_X59Y84         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     9.744 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry__0/CO[3]
+                         net (fo=1, routed)           0.000     9.744    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry__0_n_0
+    SLICE_X59Y85         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     9.842 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry__1/CO[3]
+                         net (fo=1, routed)           0.000     9.842    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry__1_n_0
+    SLICE_X59Y86         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     9.940 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry__2/CO[3]
+                         net (fo=1, routed)           0.000     9.940    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry__2_n_0
+    SLICE_X59Y87         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    10.038 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry__3/CO[3]
+                         net (fo=1, routed)           0.000    10.038    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry__3_n_0
+    SLICE_X59Y88         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    10.136 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry__4/CO[3]
+                         net (fo=1, routed)           0.000    10.136    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry__4_n_0
+    SLICE_X59Y89         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    10.234 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/din_round1_carry__5/CO[3]
+                         net (fo=4, routed)           1.520    11.753    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_fir_core_symm_interp2/CO[0]
+    SLICE_X60Y75         LUT2 (Prop_lut2_I1_O)        0.105    11.858 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_fir_core_symm_interp2/_carry_i_4__0/O
+                         net (fo=1, routed)           0.000    11.858    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__0_0[0]
+    SLICE_X60Y75         CARRY4 (Prop_carry4_S[0]_CO[3])
+                                                      0.423    12.281 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry/CO[3]
+                         net (fo=1, routed)           0.000    12.281    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry_n_0
+    SLICE_X60Y76         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.100    12.381 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__0/CO[3]
+                         net (fo=1, routed)           0.000    12.381    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__0_n_0
+    SLICE_X60Y77         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.100    12.481 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__1/CO[3]
+                         net (fo=1, routed)           0.000    12.481    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__1_n_0
+    SLICE_X60Y78         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.100    12.581 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__2/CO[3]
+                         net (fo=1, routed)           0.000    12.581    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__2_n_0
+    SLICE_X60Y79         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.100    12.681 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__3/CO[3]
+                         net (fo=1, routed)           0.000    12.681    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__3_n_0
+    SLICE_X60Y80         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.100    12.781 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__4/CO[3]
+                         net (fo=1, routed)           0.000    12.781    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__4_n_0
+    SLICE_X60Y81         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.100    12.881 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__5/CO[3]
+                         net (fo=1, routed)           0.000    12.881    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__5_n_0
+    SLICE_X60Y82         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.100    12.981 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__6/CO[3]
+                         net (fo=1, routed)           0.000    12.981    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__6_n_0
+    SLICE_X60Y83         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.100    13.081 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__7/CO[3]
+                         net (fo=1, routed)           0.000    13.081    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__7_n_0
+    SLICE_X60Y84         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.100    13.181 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__8/CO[3]
+                         net (fo=1, routed)           0.000    13.181    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__8_n_0
+    SLICE_X60Y85         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.100    13.281 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__9/CO[3]
+                         net (fo=1, routed)           0.000    13.281    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__9_n_0
+    SLICE_X60Y86         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.100    13.381 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__10/CO[3]
+                         net (fo=1, routed)           0.000    13.381    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__10_n_0
+    SLICE_X60Y87         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.100    13.481 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__11/CO[3]
+                         net (fo=1, routed)           0.000    13.481    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__11_n_0
+    SLICE_X60Y88         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.262    13.743 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/_carry__12/O[3]
+                         net (fo=34, routed)          1.250    14.993    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/p_0_in0
+    SLICE_X55Y82         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.707    15.700 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/dout_241_carry__1/CO[3]
+                         net (fo=1, routed)           0.000    15.700    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/dout_241_carry__1_n_0
+    SLICE_X55Y83         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    15.798 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/dout_241_carry__2/CO[3]
+                         net (fo=1, routed)           0.000    15.798    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/dout_241_carry__2_n_0
+    SLICE_X55Y84         CARRY4 (Prop_carry4_CI_CO[0])
+                                                      0.216    16.014 f  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/dout_241_carry__3/CO[0]
+                         net (fo=24, routed)          1.571    17.586    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/dout_241
+    SLICE_X62Y66         LUT3 (Prop_lut3_I1_O)        0.309    17.895 f  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_8x/u_round_sat_q16_to24/data_buf[23]_i_1__0/O
+                         net (fo=15, routed)          2.811    20.706    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_128x/u_round_sat_q16_to24/dbg_y8_w[0]
+    SLICE_X6Y66          LUT6 (Prop_lut6_I5_O)        0.105    20.811 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_128x/u_round_sat_q16_to24/dac_data_r[7]_i_20/O
+                         net (fo=1, routed)           0.485    21.297    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_128x/u_round_sat_q16_to24/dac_data_r[7]_i_20_n_0
+    SLICE_X7Y66          CARRY4 (Prop_carry4_DI[2]_CO[3])
+                                                      0.329    21.626 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_128x/u_round_sat_q16_to24/dac_data_r_reg[7]_i_9/CO[3]
+                         net (fo=1, routed)           0.000    21.626    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_128x/u_round_sat_q16_to24/dac_data_r_reg[7]_i_9_n_0
+    SLICE_X7Y67          CARRY4 (Prop_carry4_CI_CO[0])
+                                                      0.216    21.842 f  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_128x/u_round_sat_q16_to24/dac_data_r_reg[7]_i_5/CO[0]
+                         net (fo=8, routed)           1.988    23.830    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_round_sat_q16_to24/dac_data_r_reg[7]_0[0]
+    SLICE_X48Y57         LUT3 (Prop_lut3_I2_O)        0.309    24.139 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_round_sat_q16_to24/dac_data_r[1]_i_1/O
+                         net (fo=1, routed)           0.000    24.139    u_demo_interp_dac8_mmcm48_common/p_0_in[1]
+    SLICE_X48Y57         FDCE                                         r  u_demo_interp_dac8_mmcm48_common/dac_data_r_reg[1]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x_48k fall edge)
+                                                     81.380    81.380 f  
+    R4                                                0.000    81.380 f  clk (IN)
+                         net (fo=0)                   0.000    81.380    clk
+    R4                   IBUF (Prop_ibuf_I_O)         1.366    82.746 f  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           1.599    84.345    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.077    84.422 f  u_bufg_sys_clk/O
+                         net (fo=18, routed)          1.270    85.692    u_clk_wiz_audio_48k/inst/clk_in1
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.073    85.765 f  u_clk_wiz_audio_48k/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.357    87.123    lopt_4
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I1_O)
+                                                      0.077    87.200 f  u_bufgmux_audio_clk/O
+                         net (fo=4503, routed)        1.247    88.447    u_demo_interp_dac8_mmcm48_common/clk_audio_128x_sel
+    SLICE_X48Y57         FDCE                                         r  u_demo_interp_dac8_mmcm48_common/dac_data_r_reg[1]/C  (IS_INVERTED)
+                         clock pessimism              0.404    88.851    
+                         clock uncertainty           -0.273    88.578    
+    SLICE_X48Y57         FDCE (Setup_fdce_C_D)        0.036    88.614    u_demo_interp_dac8_mmcm48_common/dac_data_r_reg[1]
+  -------------------------------------------------------------------
+                         required time                         88.614    
+                         arrival time                         -24.139    
+  -------------------------------------------------------------------
+                         slack                                 64.475    
+
+
+
+
+
+Min Delay Paths
+--------------------------------------------------------------------------------------
+Slack (MET) :             0.084ns  (arrival time - required time)
+  Source:                 u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_fir_core_symm/x_reg_reg[89][2]/C
+                            (rising edge-triggered cell FDCE clocked by clk_audio_128x_48k  {rise@0.000ns fall@81.380ns period=162.761ns})
+  Destination:            u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_fir_core_symm/x_reg_reg[90][2]/D
+                            (rising edge-triggered cell FDCE clocked by clk_audio_128x_48k  {rise@0.000ns fall@81.380ns period=162.761ns})
+  Path Group:             clk_audio_128x_48k
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_audio_128x_48k rise@0.000ns - clk_audio_128x_48k rise@0.000ns)
+  Data Path Delay:        0.420ns  (logic 0.164ns (39.020%)  route 0.256ns (60.980%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.266ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    3.512ns
+    Source Clock Delay      (SCD):    2.674ns
+    Clock Pessimism Removal (CPR):    0.571ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x_48k rise edge)
+                                                      0.000     0.000 r  
+    R4                                                0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    R4                   IBUF (Prop_ibuf_I_O)         0.269     0.269 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           0.631     0.900    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.026     0.926 r  u_bufg_sys_clk/O
+                         net (fo=18, routed)          0.547     1.472    u_clk_wiz_audio_48k/inst/clk_in1
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.050     1.522 r  u_clk_wiz_audio_48k/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           0.489     2.011    lopt_4
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I1_O)
+                                                      0.026     2.037 r  u_bufgmux_audio_clk/O
+                         net (fo=4503, routed)        0.637     2.674    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_fir_core_symm/clk_audio_128x_sel
+    SLICE_X30Y136        FDCE                                         r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_fir_core_symm/x_reg_reg[89][2]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X30Y136        FDCE (Prop_fdce_C_Q)         0.164     2.838 r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_fir_core_symm/x_reg_reg[89][2]/Q
+                         net (fo=2, routed)           0.256     3.095    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_fir_core_symm/x_reg_reg[89]__0[2]
+    SLICE_X43Y139        FDCE                                         r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_fir_core_symm/x_reg_reg[90][2]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x_48k rise edge)
+                                                      0.000     0.000 r  
+    R4                                                0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    R4                   IBUF (Prop_ibuf_I_O)         0.457     0.457 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           0.685     1.141    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.029     1.170 r  u_bufg_sys_clk/O
+                         net (fo=18, routed)          0.813     1.984    u_clk_wiz_audio_48k/inst/clk_in1
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.053     2.037 r  u_clk_wiz_audio_48k/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           0.534     2.570    lopt_4
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I1_O)
+                                                      0.029     2.599 r  u_bufgmux_audio_clk/O
+                         net (fo=4503, routed)        0.912     3.512    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_fir_core_symm/clk_audio_128x_sel
+    SLICE_X43Y139        FDCE                                         r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_fir_core_symm/x_reg_reg[90][2]/C
+                         clock pessimism             -0.571     2.940    
+    SLICE_X43Y139        FDCE (Hold_fdce_C_D)         0.070     3.010    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp4_top_symm_ce/u_fir_core_symm/x_reg_reg[90][2]
+  -------------------------------------------------------------------
+                         required time                         -3.010    
+                         arrival time                           3.095    
+  -------------------------------------------------------------------
+                         slack                                  0.084    
+
+
+
+
+
+Pulse Width Checks
+--------------------------------------------------------------------------------------
+Clock Name:         clk_audio_128x_48k
+Waveform(ns):       { 0.000 81.380 }
+Period(ns):         162.761
+Sources:            { u_clk_wiz_audio_48k/inst/mmcm_adv_inst/CLKOUT0 }
+
+Check Type        Corner  Lib Pin             Reference Pin  Required(ns)  Actual(ns)  Slack(ns)  Location         Pin
+Min Period        n/a     BUFGCTRL/I1         n/a            1.592         162.761     161.168    BUFGCTRL_X0Y16   u_bufgmux_audio_clk/I1
+Max Period        n/a     MMCME2_ADV/CLKOUT0  n/a            213.360       162.761     50.599     MMCME2_ADV_X0Y1  u_clk_wiz_audio_48k/inst/mmcm_adv_inst/CLKOUT0
+Low Pulse Width   Slow    FDCE/C              n/a            0.500         81.380      80.880     SLICE_X12Y49     u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_32x/u_fir_core_symm_interp2/fir_out_full_reg[0]/C
+High Pulse Width  Slow    FDCE/C              n/a            0.500         81.380      80.880     SLICE_X13Y67     u_demo_interp_dac8_mmcm48_common/dac_data_r_reg[6]/C
+
+
+
+---------------------------------------------------------------------------------------------------
+From Clock:  clkfb_44k1
+  To Clock:  clkfb_44k1
+
+Setup :           NA  Failing Endpoints,  Worst Slack           NA  ,  Total Violation           NA
+Hold  :           NA  Failing Endpoints,  Worst Slack           NA  ,  Total Violation           NA
+PW    :            0  Failing Endpoints,  Worst Slack        0.000ns,  Total Violation        0.000ns
+---------------------------------------------------------------------------------------------------
+
+
+Pulse Width Checks
+--------------------------------------------------------------------------------------
+Clock Name:         clkfb_44k1
+Waveform(ns):       { 0.000 50.000 }
+Period(ns):         100.000
+Sources:            { u_clk_wiz_audio_44k1/inst/mmcm_adv_inst/CLKFBOUT }
+
+Check Type  Corner  Lib Pin              Reference Pin  Required(ns)  Actual(ns)  Slack(ns)  Location         Pin
+Min Period  n/a     MMCME2_ADV/CLKFBOUT  n/a            1.249         100.000     98.751     MMCME2_ADV_X0Y2  u_clk_wiz_audio_44k1/inst/mmcm_adv_inst/CLKFBOUT
+Max Period  n/a     MMCME2_ADV/CLKFBIN   n/a            100.000       100.000     0.000      MMCME2_ADV_X0Y2  u_clk_wiz_audio_44k1/inst/mmcm_adv_inst/CLKFBIN
+
+
+
+---------------------------------------------------------------------------------------------------
+From Clock:  clkfb_48k
+  To Clock:  clkfb_48k
+
+Setup :           NA  Failing Endpoints,  Worst Slack           NA  ,  Total Violation           NA
+Hold  :           NA  Failing Endpoints,  Worst Slack           NA  ,  Total Violation           NA
+PW    :            0  Failing Endpoints,  Worst Slack       40.000ns,  Total Violation        0.000ns
+---------------------------------------------------------------------------------------------------
+
+
+Pulse Width Checks
+--------------------------------------------------------------------------------------
+Clock Name:         clkfb_48k
+Waveform(ns):       { 0.000 30.000 }
+Period(ns):         60.000
+Sources:            { u_clk_wiz_audio_48k/inst/mmcm_adv_inst/CLKFBOUT }
+
+Check Type  Corner  Lib Pin              Reference Pin  Required(ns)  Actual(ns)  Slack(ns)  Location         Pin
+Min Period  n/a     MMCME2_ADV/CLKFBOUT  n/a            1.249         60.000      58.751     MMCME2_ADV_X0Y1  u_clk_wiz_audio_48k/inst/mmcm_adv_inst/CLKFBOUT
+Max Period  n/a     MMCME2_ADV/CLKFBIN   n/a            100.000       60.000      40.000     MMCME2_ADV_X0Y1  u_clk_wiz_audio_48k/inst/mmcm_adv_inst/CLKFBIN
+
+
+
+---------------------------------------------------------------------------------------------------
+Path Group:  **async_default**
+From Clock:  clk_audio_128x_44k1
+  To Clock:  clk_audio_128x_44k1
+
+Setup :            0  Failing Endpoints,  Worst Slack       83.812ns,  Total Violation        0.000ns
+Hold  :            0  Failing Endpoints,  Worst Slack        0.213ns,  Total Violation        0.000ns
+---------------------------------------------------------------------------------------------------
+
+
+Max Delay Paths
+--------------------------------------------------------------------------------------
+Slack (MET) :             83.812ns  (required time - arrival time)
+  Source:                 rst_audio_sync_reg[2]_inv_rep/C
+                            (rising edge-triggered cell FDPE clocked by clk_audio_128x_44k1  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Destination:            u_demo_interp_dac8_mmcm48_common/dac_data_r_reg[2]/CLR
+                            (recovery check against rising-edge clock clk_audio_128x_44k1  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Path Group:             **async_default**
+  Path Type:              Recovery (Max at Slow Process Corner)
+  Requirement:            88.577ns  (clk_audio_128x_44k1 fall@88.577ns - clk_audio_128x_44k1 rise@0.000ns)
+  Data Path Delay:        3.891ns  (logic 0.379ns (9.741%)  route 3.512ns (90.259%))
+  Logic Levels:           0  
+  Clock Path Skew:        -0.089ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    7.481ns = ( 96.058 - 88.577 ) 
+    Source Clock Delay      (SCD):    7.937ns
+    Clock Pessimism Removal (CPR):    0.366ns
+  Clock Uncertainty:      0.458ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.913ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x_44k1 rise edge)
+                                                      0.000     0.000 r  
+    R4                                                0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    R4                   IBUF (Prop_ibuf_I_O)         1.432     1.432 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           1.689     3.121    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.081     3.202 r  u_bufg_sys_clk/O
+                         net (fo=18, routed)          1.538     4.740    u_clk_wiz_audio_44k1/inst/clk_in1
+    MMCME2_ADV_X0Y2      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.077     4.817 r  u_clk_wiz_audio_44k1/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.698     6.515    lopt_3
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I0_O)
+                                                      0.081     6.596 r  u_bufgmux_audio_clk/O
+                         net (fo=4503, routed)        1.341     7.937    clk_audio_128x_sel
+    SLICE_X13Y78         FDPE                                         r  rst_audio_sync_reg[2]_inv_rep/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X13Y78         FDPE (Prop_fdpe_C_Q)         0.379     8.316 f  rst_audio_sync_reg[2]_inv_rep/Q
+                         net (fo=132, routed)         3.512    11.827    u_demo_interp_dac8_mmcm48_common/x_reg_reg[76][7]
+    SLICE_X48Y58         FDCE                                         f  u_demo_interp_dac8_mmcm48_common/dac_data_r_reg[2]/CLR
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x_44k1 fall edge)
+                                                     88.577    88.577 f  
+    R4                                                0.000    88.577 f  clk (IN)
+                         net (fo=0)                   0.000    88.577    clk
+    R4                   IBUF (Prop_ibuf_I_O)         1.366    89.943 f  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           1.599    91.542    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.077    91.619 f  u_bufg_sys_clk/O
+                         net (fo=18, routed)          1.426    93.045    u_clk_wiz_audio_44k1/inst/clk_in1
+    MMCME2_ADV_X0Y2      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.073    93.118 f  u_clk_wiz_audio_44k1/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.617    94.735    lopt_3
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I0_O)
+                                                      0.077    94.812 f  u_bufgmux_audio_clk/O
+                         net (fo=4503, routed)        1.246    96.058    u_demo_interp_dac8_mmcm48_common/clk_audio_128x_sel
+    SLICE_X48Y58         FDCE                                         r  u_demo_interp_dac8_mmcm48_common/dac_data_r_reg[2]/C  (IS_INVERTED)
+                         clock pessimism              0.366    96.425    
+                         clock uncertainty           -0.458    95.967    
+    SLICE_X48Y58         FDCE (Recov_fdce_C_CLR)     -0.327    95.640    u_demo_interp_dac8_mmcm48_common/dac_data_r_reg[2]
+  -------------------------------------------------------------------
+                         required time                         95.640    
+                         arrival time                         -11.827    
+  -------------------------------------------------------------------
+                         slack                                 83.812    
+
+
+
+
+
+Min Delay Paths
+--------------------------------------------------------------------------------------
+Slack (MET) :             0.213ns  (arrival time - required time)
+  Source:                 rst_audio_sync_reg[2]_inv_rep__10/C
+                            (rising edge-triggered cell FDPE clocked by clk_audio_128x_44k1  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Destination:            u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_32x/u_fir_core_symm_interp2/x_reg_reg[10][13]/CLR
+                            (removal check against rising-edge clock clk_audio_128x_44k1  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Path Group:             **async_default**
+  Path Type:              Removal (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_audio_128x_44k1 rise@0.000ns - clk_audio_128x_44k1 rise@0.000ns)
+  Data Path Delay:        0.410ns  (logic 0.141ns (34.370%)  route 0.269ns (65.630%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.264ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    3.696ns
+    Source Clock Delay      (SCD):    2.856ns
+    Clock Pessimism Removal (CPR):    0.576ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x_44k1 rise edge)
+                                                      0.000     0.000 r  
+    R4                                                0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    R4                   IBUF (Prop_ibuf_I_O)         0.269     0.269 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           0.631     0.900    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.026     0.926 r  u_bufg_sys_clk/O
+                         net (fo=18, routed)          0.629     1.555    u_clk_wiz_audio_44k1/inst/clk_in1
+    MMCME2_ADV_X0Y2      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.050     1.605 r  u_clk_wiz_audio_44k1/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           0.656     2.261    lopt_3
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I0_O)
+                                                      0.026     2.287 r  u_bufgmux_audio_clk/O
+                         net (fo=4503, routed)        0.569     2.856    clk_audio_128x_sel
+    SLICE_X9Y48          FDPE                                         r  rst_audio_sync_reg[2]_inv_rep__10/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X9Y48          FDPE (Prop_fdpe_C_Q)         0.141     2.997 f  rst_audio_sync_reg[2]_inv_rep__10/Q
+                         net (fo=96, routed)          0.269     3.266    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_32x/u_fir_core_symm_interp2/x_reg_reg[10][23]_0
+    SLICE_X10Y51         FDCE                                         f  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_32x/u_fir_core_symm_interp2/x_reg_reg[10][13]/CLR
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x_44k1 rise edge)
+                                                      0.000     0.000 r  
+    R4                                                0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    R4                   IBUF (Prop_ibuf_I_O)         0.457     0.457 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           0.685     1.141    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.029     1.170 r  u_bufg_sys_clk/O
+                         net (fo=18, routed)          0.901     2.071    u_clk_wiz_audio_44k1/inst/clk_in1
+    MMCME2_ADV_X0Y2      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.053     2.124 r  u_clk_wiz_audio_44k1/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           0.710     2.834    lopt_3
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I0_O)
+                                                      0.029     2.863 r  u_bufgmux_audio_clk/O
+                         net (fo=4503, routed)        0.833     3.696    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_32x/u_fir_core_symm_interp2/clk_audio_128x_sel
+    SLICE_X10Y51         FDCE                                         r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_32x/u_fir_core_symm_interp2/x_reg_reg[10][13]/C
+                         clock pessimism             -0.576     3.120    
+    SLICE_X10Y51         FDCE (Remov_fdce_C_CLR)     -0.067     3.053    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_32x/u_fir_core_symm_interp2/x_reg_reg[10][13]
+  -------------------------------------------------------------------
+                         required time                         -3.053    
+                         arrival time                           3.266    
+  -------------------------------------------------------------------
+                         slack                                  0.213    
+
+
+
+
+
+---------------------------------------------------------------------------------------------------
+Path Group:  **async_default**
+From Clock:  clk_audio_128x_48k
+  To Clock:  clk_audio_128x_48k
+
+Setup :            0  Failing Endpoints,  Worst Slack       76.801ns,  Total Violation        0.000ns
+Hold  :            0  Failing Endpoints,  Worst Slack        0.213ns,  Total Violation        0.000ns
+---------------------------------------------------------------------------------------------------
+
+
+Max Delay Paths
+--------------------------------------------------------------------------------------
+Slack (MET) :             76.801ns  (required time - arrival time)
+  Source:                 rst_audio_sync_reg[2]_inv_rep/C
+                            (rising edge-triggered cell FDPE clocked by clk_audio_128x_48k  {rise@0.000ns fall@81.380ns period=162.761ns})
+  Destination:            u_demo_interp_dac8_mmcm48_common/dac_data_r_reg[2]/CLR
+                            (recovery check against rising-edge clock clk_audio_128x_48k  {rise@0.000ns fall@81.380ns period=162.761ns})
+  Path Group:             **async_default**
+  Path Type:              Recovery (Max at Slow Process Corner)
+  Requirement:            81.380ns  (clk_audio_128x_48k fall@81.380ns - clk_audio_128x_48k rise@0.000ns)
+  Data Path Delay:        3.891ns  (logic 0.379ns (9.741%)  route 3.512ns (90.259%))
+  Logic Levels:           0  
+  Clock Path Skew:        -0.089ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    7.066ns = ( 88.446 - 81.380 ) 
+    Source Clock Delay      (SCD):    7.500ns
+    Clock Pessimism Removal (CPR):    0.345ns
+  Clock Uncertainty:      0.273ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.541ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x_48k rise edge)
+                                                      0.000     0.000 r  
+    R4                                                0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    R4                   IBUF (Prop_ibuf_I_O)         1.432     1.432 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           1.689     3.121    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.081     3.202 r  u_bufg_sys_clk/O
+                         net (fo=18, routed)          1.374     4.576    u_clk_wiz_audio_48k/inst/clk_in1
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.077     4.653 r  u_clk_wiz_audio_48k/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.425     6.078    lopt_4
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I1_O)
+                                                      0.081     6.159 r  u_bufgmux_audio_clk/O
+                         net (fo=4503, routed)        1.341     7.500    clk_audio_128x_sel
+    SLICE_X13Y78         FDPE                                         r  rst_audio_sync_reg[2]_inv_rep/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X13Y78         FDPE (Prop_fdpe_C_Q)         0.379     7.879 f  rst_audio_sync_reg[2]_inv_rep/Q
+                         net (fo=132, routed)         3.512    11.391    u_demo_interp_dac8_mmcm48_common/x_reg_reg[76][7]
+    SLICE_X48Y58         FDCE                                         f  u_demo_interp_dac8_mmcm48_common/dac_data_r_reg[2]/CLR
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x_48k fall edge)
+                                                     81.380    81.380 f  
+    R4                                                0.000    81.380 f  clk (IN)
+                         net (fo=0)                   0.000    81.380    clk
+    R4                   IBUF (Prop_ibuf_I_O)         1.366    82.746 f  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           1.599    84.345    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.077    84.422 f  u_bufg_sys_clk/O
+                         net (fo=18, routed)          1.270    85.692    u_clk_wiz_audio_48k/inst/clk_in1
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.073    85.765 f  u_clk_wiz_audio_48k/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.357    87.123    lopt_4
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I1_O)
+                                                      0.077    87.200 f  u_bufgmux_audio_clk/O
+                         net (fo=4503, routed)        1.246    88.446    u_demo_interp_dac8_mmcm48_common/clk_audio_128x_sel
+    SLICE_X48Y58         FDCE                                         r  u_demo_interp_dac8_mmcm48_common/dac_data_r_reg[2]/C  (IS_INVERTED)
+                         clock pessimism              0.345    88.791    
+                         clock uncertainty           -0.273    88.518    
+    SLICE_X48Y58         FDCE (Recov_fdce_C_CLR)     -0.327    88.191    u_demo_interp_dac8_mmcm48_common/dac_data_r_reg[2]
+  -------------------------------------------------------------------
+                         required time                         88.191    
+                         arrival time                         -11.391    
+  -------------------------------------------------------------------
+                         slack                                 76.801    
+
+
+
+
+
+Min Delay Paths
+--------------------------------------------------------------------------------------
+Slack (MET) :             0.213ns  (arrival time - required time)
+  Source:                 rst_audio_sync_reg[2]_inv_rep__10/C
+                            (rising edge-triggered cell FDPE clocked by clk_audio_128x_48k  {rise@0.000ns fall@81.380ns period=162.761ns})
+  Destination:            u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_32x/u_fir_core_symm_interp2/x_reg_reg[10][13]/CLR
+                            (removal check against rising-edge clock clk_audio_128x_48k  {rise@0.000ns fall@81.380ns period=162.761ns})
+  Path Group:             **async_default**
+  Path Type:              Removal (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_audio_128x_48k rise@0.000ns - clk_audio_128x_48k rise@0.000ns)
+  Data Path Delay:        0.410ns  (logic 0.141ns (34.370%)  route 0.269ns (65.630%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.264ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    3.432ns
+    Source Clock Delay      (SCD):    2.606ns
+    Clock Pessimism Removal (CPR):    0.562ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x_48k rise edge)
+                                                      0.000     0.000 r  
+    R4                                                0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    R4                   IBUF (Prop_ibuf_I_O)         0.269     0.269 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           0.631     0.900    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.026     0.926 r  u_bufg_sys_clk/O
+                         net (fo=18, routed)          0.547     1.472    u_clk_wiz_audio_48k/inst/clk_in1
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.050     1.522 r  u_clk_wiz_audio_48k/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           0.489     2.011    lopt_4
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I1_O)
+                                                      0.026     2.037 r  u_bufgmux_audio_clk/O
+                         net (fo=4503, routed)        0.569     2.606    clk_audio_128x_sel
+    SLICE_X9Y48          FDPE                                         r  rst_audio_sync_reg[2]_inv_rep__10/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X9Y48          FDPE (Prop_fdpe_C_Q)         0.141     2.747 f  rst_audio_sync_reg[2]_inv_rep__10/Q
+                         net (fo=96, routed)          0.269     3.016    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_32x/u_fir_core_symm_interp2/x_reg_reg[10][23]_0
+    SLICE_X10Y51         FDCE                                         f  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_32x/u_fir_core_symm_interp2/x_reg_reg[10][13]/CLR
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x_48k rise edge)
+                                                      0.000     0.000 r  
+    R4                                                0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    R4                   IBUF (Prop_ibuf_I_O)         0.457     0.457 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           0.685     1.141    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.029     1.170 r  u_bufg_sys_clk/O
+                         net (fo=18, routed)          0.813     1.984    u_clk_wiz_audio_48k/inst/clk_in1
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.053     2.037 r  u_clk_wiz_audio_48k/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           0.534     2.570    lopt_4
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I1_O)
+                                                      0.029     2.599 r  u_bufgmux_audio_clk/O
+                         net (fo=4503, routed)        0.833     3.432    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_32x/u_fir_core_symm_interp2/clk_audio_128x_sel
+    SLICE_X10Y51         FDCE                                         r  u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_32x/u_fir_core_symm_interp2/x_reg_reg[10][13]/C
+                         clock pessimism             -0.562     2.870    
+    SLICE_X10Y51         FDCE (Remov_fdce_C_CLR)     -0.067     2.803    u_demo_interp_dac8_mmcm48_common/u_interp128_top_ce/u_interp2_top_32x/u_fir_core_symm_interp2/x_reg_reg[10][13]
+  -------------------------------------------------------------------
+                         required time                         -2.803    
+                         arrival time                           3.016    
+  -------------------------------------------------------------------
+                         slack                                  0.213    
+
+
+
+
+
