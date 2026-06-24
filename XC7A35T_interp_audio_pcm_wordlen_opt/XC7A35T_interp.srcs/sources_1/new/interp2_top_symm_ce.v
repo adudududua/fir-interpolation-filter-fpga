@@ -6,11 +6,11 @@ module interp2_top_symm_ce #(
     // parameter ACC_W   = 56,
     // parameter NTAPS   = 11
 
-    //字长优化后：
+    // halfband13 实验版参数：
     parameter DATA_W  = 24,
     parameter COEFF_W = 14,
-    parameter ACC_W   = 48,
-    parameter NTAPS   = 29,
+    parameter ACC_W   = 45,
+    parameter NTAPS   = 13,
     parameter FRAC_W  = 12
 )(
     input  wire                         clk,
@@ -77,7 +77,7 @@ module interp2_top_symm_ce #(
     );
 
     //====================================================
-    // 3) Q16 -> 24 位输出
+    // 3) Q12 -> 24 位输出
     //====================================================
     round_sat_q16_to24 #(
         .IN_W   (ACC_W),

@@ -9,13 +9,13 @@
 //                字长优化说明：
 //                1. 4x 前级 FIR 过渡带较窄，仍保持原始高精度参数：
 //                     COEFF_W = 18
-//                     ACC_W   = 56
+//                     ACC_W   = 52
 //                     NTAPS4X = 155
 //                2. 后级多个 2x FIR 过渡带较宽，采用字长优化参数：
 //                     COEFF_W_2X = 14
-//                     ACC_W_2X   = 48
+//                     ACC_W_2X   = 45
 //                     FRAC_W_2X  = 12
-//                     NTAPS2X    = 29
+//                     NTAPS2X    = 13
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-04-24
@@ -35,8 +35,8 @@ parameter DATA_W      = 24,
 //   4x 前级负责最窄过渡带滤波，仍保持原始高精度设计。
 //=========================================================
 parameter COEFF_W     = 18,
-// parameter ACC_W       = 56,
-parameter ACC_W       = 52, // 2026-06-23：后级优化后，前级累加器位宽可适当降低
+// parameter ACC_W       = 52, // halfband13 实验版：4x 前级累加器位宽
+parameter ACC_W       = 52, // halfband13 实验版：4x 前级累加器位宽 // 2026-06-23：后级优化后，前级累加器位宽可适当降低
 parameter NTAPS4X     = 155,
 
 //=========================================================
@@ -45,10 +45,11 @@ parameter NTAPS4X     = 155,
 //   后续多个 2x 级过渡带较宽，因此采用优化后的低字长系数。
 //=========================================================
 parameter COEFF_W_2X  = 14,
-// parameter ACC_W_2X    = 48,
-parameter ACC_W_2X    = 45, // 2026-06-23：后级优化后，累加器位宽可适当降低
+// parameter ACC_W_2X    = 45, // halfband13 实验版：2x 后级累加器位宽
+parameter ACC_W_2X    = 45, // halfband13 实验版：2x 后级累加器位宽 // 2026-06-23：后级优化后，累加器位宽可适当降低
 parameter FRAC_W_2X   = 12,
-parameter NTAPS2X     = 29
+// parameter NTAPS2X     = 13  // halfband13 实验版：后级 2x FIR tap 数
+parameter NTAPS2X     = 13  // halfband13 实验版：后级 2x FIR tap 数
 
 
 )(

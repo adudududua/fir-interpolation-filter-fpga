@@ -4,16 +4,21 @@
 // 模块名       : demo_interp_dac8_audio_pcm_common
 // 功能简述     : 音频 PCM 输入版 FIR 插值 DAC 演示公共模块。
 //                本模块使用 audio_pcm_rom_source 读取 24bit
-//                signed 音频 PCM 采样点，并送入现有 128x
-//                插值滤波器链路。
+//                signed 音频 PCM 采样点，并送入 128x
+//                多级 FIR 插值滤波器链路。
 //                
 //                与正弦 ROM 版本相比，本模块的区别是：
 //                  原输入：内部 64 点正弦 ROM
-//                  新输入：8192 点音频 PCM ROM
+//                  新输入：1024 点音频 PCM ROM
 //
 //                输出仍然通过 AD9708 并行 DAC 送到示波器，
 //                用于验证真实音频采样经过 FIR 插值链后的
 //                板级输出情况。
+//
+//                当前版本为 halfband13 实验版：
+//                  4x FIR：18bit Q16, ACC_W=52, NTAPS=155
+//                  2x FIR：13 tap halfband, 14bit Q12, ACC_W=45
+//                  halfband 非零完整系数：7 / 13
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-06-20
@@ -21,6 +26,7 @@
 // 开发工具     : Vivado
 // 修订记录     :
 //                2026-06-21：新增音频 PCM 输入版本。
+//                2026-06-24：更新为后级 2x FIR halfband13 实验参数。
 //=============================================================
 
 module demo_interp_dac8_audio_pcm_common (
@@ -173,6 +179,18 @@ module demo_interp_dac8_audio_pcm_common (
     //   第一级：4x 插值 FIR
     //   后五级：2x 插值 FIR 级联
     //
+    // halfband13 实验参数：
+    //   4x FIR:
+    //     COEFF_W = 18
+    //     ACC_W   = 52
+    //     NTAPS4X = 155
+    //
+    //   2x FIR:
+    //     COEFF_W_2X = 14
+    //     ACC_W_2X   = 45
+    //     FRAC_W_2X  = 12
+    //     NTAPS2X    = 13
+    //
     // 输出节点：
     //   dbg_y4 ：4x 输出
     //   dbg_y8 ：8x 输出
@@ -194,11 +212,24 @@ module demo_interp_dac8_audio_pcm_common (
     wire               dbg_y64_valid_w;
 
     interp128_top_ce #(
-        .DATA_W   (24),
-        .COEFF_W  (18),
-        .ACC_W    (56),
-        .NTAPS4X  (155),
-        .NTAPS2X  (11)
+        .DATA_W      (24),
+
+        // 4x 前级 FIR：保持 18bit Q16 高精度系数，累加器采用 acc_opt 的 52bit
+        .COEFF_W     (18),
+        .ACC_W       (52),
+        .NTAPS4X     (155),
+
+        // 后级 2x FIR：halfband13 实验版
+        // MATLAB 搜索结果：
+        //   NTAPS = 13
+        //   COEFF_W = 14
+        //   FRAC_W = 12
+        //   ACC_W = 45
+        //   非零完整系数 = 7 / 13
+        .COEFF_W_2X  (14),
+        .ACC_W_2X    (45),
+        .FRAC_W_2X   (12),
+        .NTAPS2X     (13)
     ) u_interp128_top_ce (
         .clk            (clk_audio_128x),
         .rst_n          (rst_n),
