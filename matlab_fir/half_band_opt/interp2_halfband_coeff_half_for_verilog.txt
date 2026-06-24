@@ -1,0 +1,16 @@
+//=============================================================
+// Halfband 2x FIR coefficient table
+// NTAPS   = 13
+// COEFF_W = 14
+// FRAC_W  = 12
+// beta    = 5.0000
+// Note    = left side to center coefficients
+//=============================================================
+
+coeff_half[ 0] = 14'sd0;
+coeff_half[ 1] = 14'sd39;
+coeff_half[ 2] = 14'sd0;
+coeff_half[ 3] = 14'sd-240;
+coeff_half[ 4] = 14'sd0;
+coeff_half[ 5] = 14'sd1225;
+coeff_half[ 6] = 14'sd2048;

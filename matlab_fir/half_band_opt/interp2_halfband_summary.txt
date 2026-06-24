@@ -1,0 +1,29 @@
+2x Halfband FIR Search Summary
+========================================
+COEFF_W = 14
+FRAC_W  = 12
+Best NTAPS = 13
+Best beta  = 5.0000
+Full nonzero coeff = 7 / 13
+Half nonzero coeff = 4 / 7
+Zero coeff error = 0
+Symmetry error = 0
+Worst pass ripple ± = 0.0018596189 dB
+Worst stop attenuation = 73.3056438416 dB
+
+Mode: 176.4k_to_352.8k
+  Fs_out = 352800.0 Hz
+  f_stop = 156400.0 Hz
+  pass ripple pp = 0.0037192378 dB
+  pass ripple pm = 0.0018596189 dB
+  stop attenuation = 73.3056438416 dB
+  ok = 1
+
+Mode: 192k_to_384k
+  Fs_out = 384000.0 Hz
+  f_stop = 172000.0 Hz
+  pass ripple pp = 0.0022736671 dB
+  pass ripple pm = 0.0011368336 dB
+  stop attenuation = 73.4707196306 dB
+  ok = 1
+
