@@ -3,13 +3,13 @@
 module interp2_top_symm_ce #(
     // parameter DATA_W  = 24,
     // parameter COEFF_W = 18,
-    // parameter ACC_W   = 45,
+    // parameter ACC_W   = 56,
     // parameter NTAPS   = 11
 
-    // acc_opt 稳定版参数：
+    //字长优化后：
     parameter DATA_W  = 24,
     parameter COEFF_W = 14,
-    parameter ACC_W   = 45,
+    parameter ACC_W   = 48,
     parameter NTAPS   = 29,
     parameter FRAC_W  = 12
 )(
@@ -77,7 +77,7 @@ module interp2_top_symm_ce #(
     );
 
     //====================================================
-    // 3) Q12 -> 24 位输出
+    // 3) Q16 -> 24 位输出
     //====================================================
     round_sat_q16_to24 #(
         .IN_W   (ACC_W),

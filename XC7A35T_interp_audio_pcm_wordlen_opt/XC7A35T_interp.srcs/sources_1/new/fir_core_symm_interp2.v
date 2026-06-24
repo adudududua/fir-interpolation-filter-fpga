@@ -3,13 +3,13 @@
 module fir_core_symm_interp2_v2 #(
     // parameter DATA_W  = 24,   // 输入数据位宽
     // parameter COEFF_W = 18,   // 系数位宽
-    // parameter ACC_W   = 45,   // 累加器位宽
-    // parameter NTAPS   = 29    // 2x 后级当前为 11 tap
+    // parameter ACC_W   = 56,   // 累加器位宽
+    // parameter NTAPS   = 11    // 2x 后级当前为 11 tap
 
-    // acc_opt 稳定版参数：
+    // 字长优化后：
     parameter DATA_W  = 24,
     parameter COEFF_W = 14,
-    parameter ACC_W   = 45,
+    parameter ACC_W   = 48,
     parameter NTAPS   = 29
 )(
     input  wire                         clk,
@@ -23,14 +23,14 @@ module fir_core_symm_interp2_v2 #(
 );
 
     //====================================================
-    // 对于 29 tap acc_opt 后级 2x FIR：
-    //   HALF_TAPS  = (29-1)/2 = 14
-    //   HALF_COEFF = 15
+    // 对于 11 tap：
+    // HALF_TAPS  = (11-1)/2 = 5
+    // HALF_COEFF = 6
     //
-    // 对称项：
-    //   k = 0 ~ HALF_TAPS-1
+    // 对称对：
+    //   k = 0~4
     // 中心项：
-    //   k = HALF_TAPS
+    //   k = 5
     //====================================================
     localparam integer HALF_TAPS  = (NTAPS - 1) / 2;   // 5
     localparam integer HALF_COEFF = HALF_TAPS + 1;     // 6
@@ -55,14 +55,14 @@ module fir_core_symm_interp2_v2 #(
     //
     // 请把 MATLAB 生成文件：
     //   interp2_coeff_half_for_verilog.txt
-    // 中的 15 行 coeff_half[...] 赋值语句
+    // 中的 6 行 coeff_half[...] 赋值语句
     // 直接粘贴到下面 initial begin ... end 里
     //
     // 你最后应看到：
     //   coeff_half[0] = ...
     //   coeff_half[1] = ...
     //   ...
-    //   coeff_half[14] = ...
+    //   coeff_half[5] = ...
     //====================================================
     initial begin
         // coeff_half[0] = 18'sd420;
@@ -122,7 +122,7 @@ module fir_core_symm_interp2_v2 #(
     always @(*) begin
         acc_comb = {ACC_W{1'b0}};
 
-        // HALF_TAPS 对对称项
+        // 5 对对称项
         for (k = 0; k < HALF_TAPS; k = k + 1) begin
             acc_comb = acc_comb
                      + (

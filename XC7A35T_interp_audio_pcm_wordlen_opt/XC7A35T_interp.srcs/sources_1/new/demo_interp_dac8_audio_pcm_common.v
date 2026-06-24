@@ -4,12 +4,12 @@
 // 模块名       : demo_interp_dac8_audio_pcm_common
 // 功能简述     : 音频 PCM 输入版 FIR 插值 DAC 演示公共模块。
 //                本模块使用 audio_pcm_rom_source 读取 24bit
-//                signed 音频 PCM 采样点，并送入 128x
+//                signed 音频 PCM 采样点，并送入现有 128x
 //                插值滤波器链路。
 //                
 //                与正弦 ROM 版本相比，本模块的区别是：
 //                  原输入：内部 64 点正弦 ROM
-//                  新输入：1024 点音频 PCM ROM
+//                  新输入：8192 点音频 PCM ROM
 //
 //                输出仍然通过 AD9708 并行 DAC 送到示波器，
 //                用于验证真实音频采样经过 FIR 插值链后的
@@ -21,7 +21,6 @@
 // 开发工具     : Vivado
 // 修订记录     :
 //                2026-06-21：新增音频 PCM 输入版本。
-//                2026-06-24：恢复为 acc_opt 稳定参数版本。
 //=============================================================
 
 module demo_interp_dac8_audio_pcm_common (
@@ -195,18 +194,11 @@ module demo_interp_dac8_audio_pcm_common (
     wire               dbg_y64_valid_w;
 
     interp128_top_ce #(
-        .DATA_W      (24),
-
-        // 4x 前级 FIR：acc_opt 稳定版
-        .COEFF_W     (18),
-        .ACC_W       (52),
-        .NTAPS4X     (155),
-
-        // 后级 2x FIR：字长优化 + 累加器位宽优化
-        .COEFF_W_2X  (14),
-        .ACC_W_2X    (45),
-        .FRAC_W_2X   (12),
-        .NTAPS2X     (29)
+        .DATA_W   (24),
+        .COEFF_W  (18),
+        .ACC_W    (56),
+        .NTAPS4X  (155),
+        .NTAPS2X  (11)
     ) u_interp128_top_ce (
         .clk            (clk_audio_128x),
         .rst_n          (rst_n),

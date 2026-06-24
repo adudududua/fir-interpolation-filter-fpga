@@ -9,11 +9,11 @@
 //                字长优化说明：
 //                1. 4x 前级 FIR 过渡带较窄，仍保持原始高精度参数：
 //                     COEFF_W = 18
-//                     ACC_W   = 52
+//                     ACC_W   = 56
 //                     NTAPS4X = 155
 //                2. 后级多个 2x FIR 过渡带较宽，采用字长优化参数：
 //                     COEFF_W_2X = 14
-//                     ACC_W_2X   = 45
+//                     ACC_W_2X   = 48
 //                     FRAC_W_2X  = 12
 //                     NTAPS2X    = 29
 //
@@ -24,7 +24,6 @@
 // 修订记录     :
 //                2026-04-24：初始版本。
 //                2026-06-23：加入后级 2x FIR 字长优化参数。
-//                2026-06-23：加入累加器位宽优化参数，形成 acc_opt 稳定版。
 //=============================================================
 
 module interp128_top_ce #(
@@ -37,7 +36,7 @@ parameter DATA_W      = 24,
 //=========================================================
 parameter COEFF_W     = 18,
 // parameter ACC_W       = 56,
-parameter ACC_W       = 52, // acc_opt：4x 前级累加器位宽
+parameter ACC_W       = 52, // 2026-06-23：后级优化后，前级累加器位宽可适当降低
 parameter NTAPS4X     = 155,
 
 //=========================================================
@@ -47,9 +46,12 @@ parameter NTAPS4X     = 155,
 //=========================================================
 parameter COEFF_W_2X  = 14,
 // parameter ACC_W_2X    = 48,
-parameter ACC_W_2X    = 45, // acc_opt：2x 后级累加器位宽
+parameter ACC_W_2X    = 45, // 2026-06-23：后级优化后，累加器位宽可适当降低
 parameter FRAC_W_2X   = 12,
-parameter NTAPS2X     = 29)(
+parameter NTAPS2X     = 29
+
+
+)(
 input  wire                         clk,
 input  wire                         rst_n,
 
