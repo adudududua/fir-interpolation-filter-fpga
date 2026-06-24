@@ -1,0 +1,24 @@
+// =====================================================
+// 2x FIR word-length optimized half coefficients
+// 阶数 n     : 28
+// tap 数     : 29
+// 系数位宽   : 14 bit
+// 小数位宽   : 12 bit
+// 裁剪阈值   : 0
+// 半系数总数 : 15
+// =====================================================
+        coeff_half[0] = 14'sd0;
+        coeff_half[1] = 14'sd0;
+        coeff_half[2] = 14'sd0;
+        coeff_half[3] = -14'sd1;
+        coeff_half[4] = 14'sd2;
+        coeff_half[5] = 14'sd8;
+        coeff_half[6] = -14'sd8;
+        coeff_half[7] = -14'sd34;
+        coeff_half[8] = 14'sd20;
+        coeff_half[9] = 14'sd111;
+        coeff_half[10] = -14'sd38;
+        coeff_half[11] = -14'sd321;
+        coeff_half[12] = 14'sd55;
+        coeff_half[13] = 14'sd1261;
+        coeff_half[14] = 14'sd1986;

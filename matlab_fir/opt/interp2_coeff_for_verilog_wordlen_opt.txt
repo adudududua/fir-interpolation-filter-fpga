@@ -1,0 +1,38 @@
+// =====================================================
+// 2x FIR word-length optimized full coefficients
+// 阶数 n   : 28
+// tap 数   : 29
+// 系数位宽 : 14 bit
+// 小数位宽 : 12 bit
+// 裁剪阈值 : 0
+// 系数总数 : 29
+// =====================================================
+        coeff[0] = 14'sd0;
+        coeff[1] = 14'sd0;
+        coeff[2] = 14'sd0;
+        coeff[3] = -14'sd1;
+        coeff[4] = 14'sd2;
+        coeff[5] = 14'sd8;
+        coeff[6] = -14'sd8;
+        coeff[7] = -14'sd34;
+        coeff[8] = 14'sd20;
+        coeff[9] = 14'sd111;
+        coeff[10] = -14'sd38;
+        coeff[11] = -14'sd321;
+        coeff[12] = 14'sd55;
+        coeff[13] = 14'sd1261;
+        coeff[14] = 14'sd1986;
+        coeff[15] = 14'sd1261;
+        coeff[16] = 14'sd55;
+        coeff[17] = -14'sd321;
+        coeff[18] = -14'sd38;
+        coeff[19] = 14'sd111;
+        coeff[20] = 14'sd20;
+        coeff[21] = -14'sd34;
+        coeff[22] = -14'sd8;
+        coeff[23] = 14'sd8;
+        coeff[24] = 14'sd2;
+        coeff[25] = -14'sd1;
+        coeff[26] = 14'sd0;
+        coeff[27] = 14'sd0;
+        coeff[28] = 14'sd0;

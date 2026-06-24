@@ -1,0 +1,19 @@
+4x FIR fixed-155-tap sparse pruning summary
+===========================================
+Order n                    = 154
+Taps                       = 155
+COEFF_W                    = 18
+FRAC_W                     = 16
+Best prune threshold       = 0
+Nonzero full coefficients  = 155 / 155
+Pruned full coefficients   = 0 / 155
+Nonzero half coefficients  = 78 / 78
+Pruned half coefficients   = 0 / 78
+
+Mode 176.4k:
+Ripple_pm_db = 0.01620230
+Stop_attn_db = 70.23625475
+
+Mode 192k:
+Ripple_pm_db = 0.01620252
+Stop_attn_db = 70.23625475

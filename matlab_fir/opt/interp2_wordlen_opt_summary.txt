@@ -1,0 +1,17 @@
+2x FIR word-length optimization summary
+=======================================
+Best order n              = 28
+Best taps                 = 29
+Best COEFF_W              = 14
+Best FRAC_W               = 12
+Best prune threshold      = 0
+Nonzero full coefficients = 23 / 29
+Nonzero half coefficients = 12 / 15
+
+Mode 352.8k:
+Ripple_pm_db = 0.00100876
+Stop_attn_db = 80.42743153
+
+Mode 384k:
+Ripple_pm_db = 0.00066393
+Stop_attn_db = 83.21212199
