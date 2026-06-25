@@ -196,7 +196,8 @@ module demo_interp_dac8_audio_pcm_common (
     interp128_top_ce #(
         .DATA_W   (24),
         .COEFF_W  (18),
-        .ACC_W    (56),
+        // .ACC_W    (56),
+        .ACC_W    (49), // 24bit 输入 + 18bit 系数 + 3bit 进位 + 1bit 符号 = 46bit，向上取整为 45bit
         .NTAPS4X  (155),
         .NTAPS2X  (11)
     ) u_interp128_top_ce (
