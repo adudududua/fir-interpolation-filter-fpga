@@ -199,7 +199,7 @@ module demo_interp_dac8_audio_pcm_common (
         // .ACC_W    (56),
         .ACC_W    (49), // 24bit 输入 + 18bit 系数 + 3bit 进位 + 1bit 符号 = 46bit，向上取整为 45bit
         .NTAPS4X  (155),
-        .NTAPS2X  (11)
+        .NTAPS2X  (29)
     ) u_interp128_top_ce (
         .clk            (clk_audio_128x),
         .rst_n          (rst_n),
@@ -284,6 +284,21 @@ module demo_interp_dac8_audio_pcm_common (
     wire signed [8:0] sample_bias_w;
     reg        [7:0]  sample_u8_w;
 
+    // always @(*) begin
+    //     case (mode_state)
+    //         MODE_4X: begin
+    //             display_sample_ext = {{8{selected_sample[23]}}, selected_sample};
+    //         end
+
+    //         MODE_8X: begin
+    //             display_sample_ext = ({{8{selected_sample[23]}}, selected_sample} <<< 1);
+    //         end
+
+    //         default: begin
+    //             display_sample_ext = ({{8{selected_sample[23]}}, selected_sample} <<< 4);
+    //         end
+    //     endcase
+    // end
     always @(*) begin
         case (mode_state)
             MODE_4X: begin
@@ -291,10 +306,13 @@ module demo_interp_dac8_audio_pcm_common (
             end
 
             MODE_8X: begin
-                display_sample_ext = ({{8{selected_sample[23]}}, selected_sample} <<< 1);
+                // polyphase_mac2_v2b 测试：先不做显示放大，避免削顶成方波
+                display_sample_ext = {{8{selected_sample[23]}}, selected_sample};
             end
 
             default: begin
+                // 128x DAC 显示补偿：5 级 2x FIR 每级幅度约减半，
+                // 这里临时左移 3 位做显示放大，只影响 DAC 显示。
                 display_sample_ext = ({{8{selected_sample[23]}}, selected_sample} <<< 4);
             end
         endcase

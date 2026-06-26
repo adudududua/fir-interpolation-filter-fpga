@@ -1,5 +1,12 @@
 `timescale 1ns / 1ps
 
+//=============================================================
+// 2x 后级 FIR：No-DSP 版本
+// 修改目的：NTAPS2X=29 后，5 个 2x FIR 容易被 Vivado 映射成大量 DSP。
+// 本版本保持算法、系数、模块名、端口不变，只用 use_dsp="no" 强制
+// 后级 2x FIR 的乘法用 LUT 实现，从而把 DSP 留给 4x MAC2 前级。
+//=============================================================
+(* use_dsp = "no" *)
 module fir_core_symm_interp2_v2 #(
     // parameter DATA_W  = 24,   // 输入数据位宽
     // parameter COEFF_W = 18,   // 系数位宽

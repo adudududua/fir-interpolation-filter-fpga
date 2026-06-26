@@ -3,7 +3,7 @@
 <!--                                                         -->
 <!-- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="39" Path="D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp/XC7A35T_interp.xpr">
+<Project Version="7" Minor="39" Path="D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_version/XC7A35T_interp.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="ca7ccd920b3d479a9bcd5af58e600779"/>
