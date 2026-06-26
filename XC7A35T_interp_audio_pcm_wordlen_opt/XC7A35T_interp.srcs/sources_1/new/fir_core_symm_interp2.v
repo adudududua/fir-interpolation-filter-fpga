@@ -16,7 +16,7 @@ module fir_core_symm_interp2_v2 #(
     // 字长优化后：
     parameter DATA_W  = 24,
     parameter COEFF_W = 14,
-    parameter ACC_W   = 48,
+    parameter ACC_W   = 45,
     parameter NTAPS   = 29
 )(
     input  wire                         clk,
@@ -57,37 +57,8 @@ module fir_core_symm_interp2_v2 #(
     integer i;
     integer k;
 
-    //====================================================
-    // 系数初始化
-    //
-    // 请把 MATLAB 生成文件：
-    //   interp2_coeff_half_for_verilog.txt
-    // 中的 6 行 coeff_half[...] 赋值语句
-    // 直接粘贴到下面 initial begin ... end 里
-    //
-    // 你最后应看到：
-    //   coeff_half[0] = ...
-    //   coeff_half[1] = ...
-    //   ...
-    //   coeff_half[5] = ...
-    //====================================================
-    initial begin
-        // coeff_half[0] = 18'sd420;
-        // coeff_half[1] = -18'sd59;
-        // coeff_half[2] = -18'sd3310;
-        // coeff_half[3] = 18'sd208;
-        // coeff_half[4] = 18'sd19273;
-        // coeff_half[5] = 18'sd32470;
 
-        // =====================================================
-        // 2x FIR word-length optimized half coefficients
-        // 阶数 n     : 28
-        // tap 数     : 29
-        // 系数位宽   : 14 bit
-        // 小数位宽   : 12 bit
-        // 裁剪阈值   : 0
-        // 半系数总数 : 15
-        // =====================================================
+    initial begin
         coeff_half[0] = 14'sd0;
         coeff_half[1] = 14'sd0;
         coeff_half[2] = 14'sd0;

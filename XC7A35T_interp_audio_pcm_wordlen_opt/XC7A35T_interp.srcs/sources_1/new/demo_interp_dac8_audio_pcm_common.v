@@ -312,7 +312,7 @@ module demo_interp_dac8_audio_pcm_common (
 
             default: begin
                 // 128x DAC 显示补偿：5 级 2x FIR 每级幅度约减半，
-                // 这里临时左移 3 位做显示放大，只影响 DAC 显示。
+                // 这里临时左移 4 位做显示放大，只影响 DAC 显示。
                 display_sample_ext = ({{8{selected_sample[23]}}, selected_sample} <<< 4);
             end
         endcase
