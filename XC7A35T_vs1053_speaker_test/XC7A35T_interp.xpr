@@ -282,21 +282,19 @@
       <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2018"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>
-    <Run Id="clk_wiz_audio_44k1_synth_1" Type="Ft3:Synth" SrcSet="clk_wiz_audio_44k1" Part="xc7a35tfgg484-2" ConstrsSet="clk_wiz_audio_44k1" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/clk_wiz_audio_44k1_synth_1" IncludeInArchive="true">
+    <Run Id="clk_wiz_audio_44k1_synth_1" Type="Ft3:Synth" SrcSet="clk_wiz_audio_44k1" Part="xc7a35tfgg484-2" ConstrsSet="clk_wiz_audio_44k1" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018"/>
         <Step Id="synth_design"/>
       </Strategy>
-      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
       <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2018"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>
-    <Run Id="clk_wiz_audio_48k_synth_1" Type="Ft3:Synth" SrcSet="clk_wiz_audio_48k" Part="xc7a35tfgg484-2" ConstrsSet="clk_wiz_audio_48k" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/clk_wiz_audio_48k_synth_1" IncludeInArchive="true">
+    <Run Id="clk_wiz_audio_48k_synth_1" Type="Ft3:Synth" SrcSet="clk_wiz_audio_48k" Part="xc7a35tfgg484-2" ConstrsSet="clk_wiz_audio_48k" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018"/>
         <Step Id="synth_design"/>
       </Strategy>
-      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
       <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2018"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>

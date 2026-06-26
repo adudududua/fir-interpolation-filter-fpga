@@ -1,10 +1,10 @@
 -- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
--- Date        : Fri Jun 19 15:44:46 2026
+-- Date        : Fri Jun 26 14:47:05 2026
 -- Host        : LAPTOP-476JT8H0 running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode funcsim
---               d:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp/XC7A35T_interp.srcs/sources_1/ip/clk_wiz_audio_48k/clk_wiz_audio_48k_sim_netlist.vhdl
+--               D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_version/XC7A35T_interp.srcs/sources_1/ip/clk_wiz_audio_48k/clk_wiz_audio_48k_sim_netlist.vhdl
 -- Design      : clk_wiz_audio_48k
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
