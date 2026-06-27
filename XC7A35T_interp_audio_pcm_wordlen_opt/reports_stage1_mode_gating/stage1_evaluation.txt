@@ -1,1 +1,9 @@
+| 指标              |    Stage 1 mode gating |
+| --------------- | ---------------------: |
+| Slice LUTs      | 10204 / 20800 = 49.06% |
+| Slice Registers |  4641 / 41600 = 11.16% |
+| DSP             |         2 / 90 = 2.22% |
+| CARRY4          |                   2112 |
+| MMCM            |         2 / 5 = 40.00% |
+
 Stage 1 mode-aware FIR stage gating 已通过板级验证。该版本在 4× 模式下关闭未使用的 2× 后级插值链，在 8× 模式下只保留第一级 2× FIR，128× 模式下保持完整链路运行。实现后资源仅增加 7 个 LUT 和 1 个 FF，DSP 保持为 2，时序仍满足约束。由于 Vivado 默认功耗估算未导入分模式活动文件，总功耗仍为 0.272 W，但该优化减少了低倍率模式下后级 FIR 的无效翻转，属于 mode-aware computation gating。
