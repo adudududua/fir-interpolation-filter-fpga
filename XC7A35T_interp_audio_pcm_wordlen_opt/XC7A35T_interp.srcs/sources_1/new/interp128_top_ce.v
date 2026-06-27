@@ -4,7 +4,7 @@
 // 模块名       : interp128_top_ce
 // 功能简述     : 负责128倍插值的顶层模块（支持多级CE时钟使能）。
 //                主要包含 x4，以及连续多个 x2 滤波器的级联，
-//                并支持调试信号引出。
+//                并引出 4x / 8x 观察节点供 DAC 低倍率模式使用。
 //
 //                字长优化说明：
 //                1. 4x 前级 FIR 过渡带较窄，仍保持原始高精度参数：
@@ -25,6 +25,7 @@
 //                2026-04-24：初始版本。
 //                2026-06-23：加入后级 2x FIR 字长优化参数。
 //                2026-06-27：加入 mode-aware 后级 FIR gating，低倍率模式关闭未使用后级。
+//                2026-06-27：清理未使用的 32x / 64x 外部调试端口。
 //=============================================================
 
 module interp128_top_ce #(
@@ -74,15 +75,11 @@ input  wire                         x_in_valid,
 output wire signed [23:0]           y_out,
 output wire                         y_out_valid,
 
-// 调试输出：观察 128x 级联内部各关键级
+// 观察输出：4x / 8x 档 DAC 直接使用这两个中间节点。
 output wire signed [23:0]           dbg_y4,
 output wire                         dbg_y4_valid,
 output wire signed [23:0]           dbg_y8,
-output wire                         dbg_y8_valid,
-output wire signed [23:0]           dbg_y32,
-output wire                         dbg_y32_valid,
-output wire signed [23:0]           dbg_y64,
-output wire                         dbg_y64_valid
+output wire                         dbg_y8_valid
 
 
 );
@@ -360,18 +357,12 @@ assign y_out       = y128_w;
 assign y_out_valid = y128_valid_w;
 
 //====================================================
-// 调试引出
+// 4x / 8x 观察节点
 //====================================================
 assign dbg_y4       = y4_w;
 assign dbg_y4_valid = y4_valid_w;
 
 assign dbg_y8       = y8_w;
 assign dbg_y8_valid = y8_valid_w;
-
-assign dbg_y32       = y32_w;
-assign dbg_y32_valid = y32_valid_w;
-
-assign dbg_y64       = y64_w;
-assign dbg_y64_valid = y64_valid_w;
 
 endmodule

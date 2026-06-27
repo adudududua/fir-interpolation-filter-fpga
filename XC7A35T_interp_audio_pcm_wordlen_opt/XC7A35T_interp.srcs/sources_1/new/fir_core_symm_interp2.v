@@ -8,12 +8,16 @@
 //=============================================================
 (* use_dsp = "no" *)
 module fir_core_symm_interp2_v2 #(
-    // parameter DATA_W  = 24,   // 输入数据位宽
-    // parameter COEFF_W = 18,   // 系数位宽
-    // parameter ACC_W   = 56,   // 累加器位宽
-    // parameter NTAPS   = 11    // 2x 后级当前为 11 tap
-
-    // 字长优化后：
+    // 后级 2x FIR 最终竞赛版本：
+    //   DATA_W  = 24
+    //   COEFF_W = 14
+    //   ACC_W   = 45
+    //   NTAPS   = 29
+    //
+    // 说明：
+    //   后级 2x FIR 过渡带相对宽，因此采用 Q12 系数和更低累加位宽；
+    //   同时通过 (* use_dsp = "no" *) 将乘法映射到 LUT，
+    //   把 DSP48 资源留给 4x polyphase MAC2 前级。
     parameter DATA_W  = 24,
     parameter COEFF_W = 14,
     parameter ACC_W   = 45,
@@ -30,17 +34,17 @@ module fir_core_symm_interp2_v2 #(
 );
 
     //====================================================
-    // 对于 11 tap：
-    // HALF_TAPS  = (11-1)/2 = 5
-    // HALF_COEFF = 6
+    // 对称 FIR 参数：
+    //   HALF_TAPS  = (NTAPS - 1) / 2
+    //   HALF_COEFF = HALF_TAPS + 1
     //
-    // 对称对：
-    //   k = 0~4
-    // 中心项：
-    //   k = 5
+    // 当 NTAPS = 29 时：
+    //   对称对数量 = 14
+    //   中心抽头数量 = 1
+    //   半系数数量 = 15
     //====================================================
-    localparam integer HALF_TAPS  = (NTAPS - 1) / 2;   // 5
-    localparam integer HALF_COEFF = HALF_TAPS + 1;     // 6
+    localparam integer HALF_TAPS  = (NTAPS - 1) / 2;
+    localparam integer HALF_COEFF = HALF_TAPS + 1;
 
     // 延时线
     reg signed [DATA_W-1:0] x_reg [0:NTAPS-1];

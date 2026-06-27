@@ -4,8 +4,8 @@
 // 模块名       : board_demo_competition_dac8_top
 // 功能简述     : Artix-7 XC7A35T 赛方板 AD9708 DAC 双频率家族
 //                插值演示顶层。
-//                本版本恢复原先已验证可运行的双 MMCM + BUFGMUX
-//                结构：
+//                本版本采用已验证的双 MMCM + BUFGMUX 结构，
+//                并加入采样率家族感知的 MMCM reset gating：
 //                50MHz -> clk_wiz_audio_44k1 -> 5.6448MHz
 //                50MHz -> clk_wiz_audio_48k  -> 6.144MHz
 //                sw2 通过 BUFGMUX 选择当前音频 128x 时钟，
@@ -47,13 +47,11 @@ module board_demo_competition_dac8_top (
     //=========================================================
     // 1）系统时钟输入缓冲
     //
-    // 这里恢复你原来验证通过的结构：
+    // 系统时钟路径：
     //   外部 50MHz -> IBUF -> BUFG -> 两个 Clock Wizard
     //
-    // 不再使用：
-    //   clk_ibuf 直接进两个 MMCM
-    //
-    // 这样和你之前能跑通的版本保持一致。
+    // 两个 Clock Wizard 分别产生 44.1kHz 家族和 48kHz 家族
+    // 所需的 128x 音频时钟。
     //=========================================================
     wire clk_ibuf;
     wire clk_sys_bufg;
@@ -105,7 +103,7 @@ module board_demo_competition_dac8_top (
     // 对 MMCM reset / BUFGMUX select 的异步影响。
     //
     // 注意：
-    //   机械拨码仍可能存在抖动。板级测试时建议先拨好 sw2，
+    //   机械拨码仍可能存在抖动。板级验证时先拨好 sw2，
     //   等待约 1 秒后再观察输出频率和波形。
     //=========================================================
     reg sw2_meta = 1'b0;
@@ -157,7 +155,7 @@ module board_demo_competition_dac8_top (
     //   clk_audio_128x_48k = 6.144MHz
     //
     // 注意：
-    //   这里恢复你原来已验证的写法：
+    //   这里恢原来已验证的写法：
     //   clkfb_in 和 clkfb_out 直接通过同一个 wire 相连。
     //   不再额外插入外部 BUFG。
     //=========================================================
@@ -221,8 +219,8 @@ module board_demo_competition_dac8_top (
     // sw2_ibuf = 1：
     //   选择 I1，即 48kHz 家族 6.144MHz。
     //
-    // 建议：
-    //   最好在下载 bitstream 前先拨好 sw2。
+    // 注：
+    //   在下载 bitstream 前先拨好 sw2。
     //   如果运行中切换 sw2，可能会有短暂过渡。
     //=========================================================
     wire clk_audio_128x_sel;
@@ -280,7 +278,7 @@ module board_demo_competition_dac8_top (
     //     demo_interp_dac8_mmcm48_common
     //   就使用下面这个实例。
     //
-    //   如果你的工程里模块名仍然叫：
+    //   如果工程里模块名仍然叫：
     //     demo_interp_dac8_mmcm_common
     //   那只需要把实例化模块名改成 demo_interp_dac8_mmcm_common。
     //=========================================================

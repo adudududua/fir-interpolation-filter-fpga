@@ -22,6 +22,7 @@
 // 修订记录     :
 //                2026-06-21：新增音频 PCM 输入版本。
 //                2026-06-27：向插值链传入 mode_sel，支持低倍率模式后级 gating。
+//                2026-06-27：清理未使用的中间级调试端口连接和历史显示补偿注释。
 //=============================================================
 
 module demo_interp_dac8_audio_pcm_common (
@@ -119,11 +120,11 @@ module demo_interp_dac8_audio_pcm_common (
     //   PCM 音频采样点。
     //
     // 注意：
-    //   这个 .mem 文件本身是 48kHz 生成的测试数据。
+    //   这个 .mem 文件本身是 48kHz 生成的 PCM 示例数据。
     //   当 sw2=1 时，按照 48kHz 正常速度播放；
     //   当 sw2=0 时，按照 44.1kHz 速度播放，会稍微变慢。
     //
-    //   这不影响我们用示波器验证“真实音频采样可以进入
+    //   这不影响用示波器验证“真实音频采样可以进入
     //   FIR 插值链并输出”。
     //=========================================================
     wire signed [23:0] audio_sample_w;
@@ -188,12 +189,6 @@ module demo_interp_dac8_audio_pcm_common (
     wire signed [23:0] dbg_y8_w;
     wire               dbg_y8_valid_w;
 
-    wire signed [23:0] dbg_y32_w;
-    wire               dbg_y32_valid_w;
-
-    wire signed [23:0] dbg_y64_w;
-    wire               dbg_y64_valid_w;
-
     interp128_top_ce #(
         .DATA_W   (24),
         .COEFF_W  (18),
@@ -224,13 +219,7 @@ module demo_interp_dac8_audio_pcm_common (
         .dbg_y4_valid   (dbg_y4_valid_w),
 
         .dbg_y8         (dbg_y8_w),
-        .dbg_y8_valid   (dbg_y8_valid_w),
-
-        .dbg_y32        (dbg_y32_w),
-        .dbg_y32_valid  (dbg_y32_valid_w),
-
-        .dbg_y64        (dbg_y64_w),
-        .dbg_y64_valid  (dbg_y64_valid_w)
+        .dbg_y8_valid   (dbg_y8_valid_w)
     );
 
     //=========================================================
@@ -274,11 +263,10 @@ module demo_interp_dac8_audio_pcm_common (
     //
     // 当前补偿：
     //   4x   ：不补偿
-    //   8x   ：左移 1 位
+    //   8x   ：不补偿
     //   128x ：左移 4 位
     //
-    // 如果示波器上 128x 音频波形幅度太小，可以改成 <<< 5。
-    // 如果削顶明显，则保持 <<< 4 或进一步减小。
+    // 该补偿只影响 AD9708 示波器显示幅度，不改变 FIR 内部计算结果。
     //=========================================================
     reg  signed [31:0] display_sample_ext;
     reg  signed [23:0] display_sample_sat;
@@ -286,22 +274,6 @@ module demo_interp_dac8_audio_pcm_common (
     wire signed [7:0] sample_s8_w;
     wire signed [8:0] sample_bias_w;
     reg        [7:0]  sample_u8_w;
-
-    // always @(*) begin
-    //     case (mode_state)
-    //         MODE_4X: begin
-    //             display_sample_ext = {{8{selected_sample[23]}}, selected_sample};
-    //         end
-
-    //         MODE_8X: begin
-    //             display_sample_ext = ({{8{selected_sample[23]}}, selected_sample} <<< 1);
-    //         end
-
-    //         default: begin
-    //             display_sample_ext = ({{8{selected_sample[23]}}, selected_sample} <<< 4);
-    //         end
-    //     endcase
-    // end
     always @(*) begin
         case (mode_state)
             MODE_4X: begin
