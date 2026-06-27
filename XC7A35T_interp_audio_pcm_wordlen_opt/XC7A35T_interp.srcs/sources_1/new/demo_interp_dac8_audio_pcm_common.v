@@ -21,6 +21,7 @@
 // 开发工具     : Vivado
 // 修订记录     :
 //                2026-06-21：新增音频 PCM 输入版本。
+//                2026-06-27：向插值链传入 mode_sel，支持低倍率模式后级 gating。
 //=============================================================
 
 module demo_interp_dac8_audio_pcm_common (
@@ -211,6 +212,8 @@ module demo_interp_dac8_audio_pcm_common (
         .ce64_out       (ce64_out),
         .ce128_out      (ce128_out),
 
+        .mode_sel       (mode_sel),
+
         .x_in           (x_in),
         .x_in_valid     (x_in_valid),
 
@@ -306,13 +309,13 @@ module demo_interp_dac8_audio_pcm_common (
             end
 
             MODE_8X: begin
-                // polyphase_mac2_v2b 测试：先不做显示放大，避免削顶成方波
+                // 8x 当前幅度已适合 AD9708 显示，不额外放大。
                 display_sample_ext = {{8{selected_sample[23]}}, selected_sample};
             end
 
             default: begin
                 // 128x DAC 显示补偿：5 级 2x FIR 每级幅度约减半，
-                // 这里临时左移 4 位做显示放大，只影响 DAC 显示。
+                // 这里左移 4 位做显示放大，只影响 DAC 显示。
                 display_sample_ext = ({{8{selected_sample[23]}}, selected_sample} <<< 4);
             end
         endcase

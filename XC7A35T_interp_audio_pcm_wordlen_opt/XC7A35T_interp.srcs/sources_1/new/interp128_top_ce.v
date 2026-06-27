@@ -24,6 +24,7 @@
 // 修订记录     :
 //                2026-04-24：初始版本。
 //                2026-06-23：加入后级 2x FIR 字长优化参数。
+//                2026-06-27：加入 mode-aware 后级 FIR gating，低倍率模式关闭未使用后级。
 //=============================================================
 
 module interp128_top_ce #(
@@ -63,6 +64,10 @@ input  wire                         ce32_out,
 input  wire                         ce64_out,
 input  wire                         ce128_out,
 
+// 当前输出倍率选择：00=4x，01=8x，10/11=128x
+// 用于低倍率模式下关闭未使用的后级 2x FIR，减少无效翻转。
+input  wire [1:0]                   mode_sel,
+
 input  wire signed [DATA_W-1:0]     x_in,
 input  wire                         x_in_valid,
 
@@ -82,6 +87,32 @@ output wire                         dbg_y64_valid
 
 );
 
+
+//====================================================
+// Mode-aware 后级运行控制
+//====================================================
+// mode_sel 来自拨码：
+//   00：只需要 4x 输出，关闭所有 2x 后级；
+//   01：需要 8x 输出，只运行第一级 2x；
+//   10/11：需要 128x 输出，完整链路运行。
+//
+// 该优化只门控后级 ce / valid，降低低倍率模式下无效翻转，
+// 不改变 FIR 系数、数据格式和输出采样率。
+//====================================================
+wire mode_8x_selected   = (mode_sel == 2'b01);
+wire mode_128x_selected =  mode_sel[1];
+
+wire run_8x_stage   = mode_8x_selected | mode_128x_selected;
+wire run_16x_stage  = mode_128x_selected;
+wire run_32x_stage  = mode_128x_selected;
+wire run_64x_stage  = mode_128x_selected;
+wire run_128x_stage = mode_128x_selected;
+
+wire ce8_use   = ce8_out   & run_8x_stage;
+wire ce16_use  = ce16_out  & run_16x_stage;
+wire ce32_use  = ce32_out  & run_32x_stage;
+wire ce64_use  = ce64_out  & run_64x_stage;
+wire ce128_use = ce128_out & run_128x_stage;
 
 //====================================================
 // Stage 1 : 4x
@@ -119,8 +150,8 @@ bridge_to_interp2_ce #(
     .clk         (clk),
     .rst_n       (rst_n),
     .in_data     (y4_w),
-    .in_valid    (y4_valid_w),
-    .ce_out_next (ce8_out),
+    .in_valid    (y4_valid_w & run_8x_stage),
+    .ce_out_next (ce8_use),
     .out_data    (y4_to_8_data),
     .out_valid   (y4_to_8_valid)
 );
@@ -140,7 +171,7 @@ interp2_top_symm_ce #(
 ) u_interp2_top_8x (
     .clk              (clk),
     .rst_n            (rst_n),
-    .ce_out           (ce8_out),
+    .ce_out           (ce8_use),
     .x_in             (y4_to_8_data),
     .x_in_valid       (y4_to_8_valid),
     .y_out            (y8_w),
@@ -162,8 +193,8 @@ bridge_to_interp2_ce #(
     .clk         (clk),
     .rst_n       (rst_n),
     .in_data     (y8_w),
-    .in_valid    (y8_valid_w),
-    .ce_out_next (ce16_out),
+    .in_valid    (y8_valid_w & run_16x_stage),
+    .ce_out_next (ce16_use),
     .out_data    (y8_to_16_data),
     .out_valid   (y8_to_16_valid)
 );
@@ -183,7 +214,7 @@ interp2_top_symm_ce #(
 ) u_interp2_top_16x (
     .clk              (clk),
     .rst_n            (rst_n),
-    .ce_out           (ce16_out),
+    .ce_out           (ce16_use),
     .x_in             (y8_to_16_data),
     .x_in_valid       (y8_to_16_valid),
     .y_out            (y16_w),
@@ -205,8 +236,8 @@ bridge_to_interp2_ce #(
     .clk         (clk),
     .rst_n       (rst_n),
     .in_data     (y16_w),
-    .in_valid    (y16_valid_w),
-    .ce_out_next (ce32_out),
+    .in_valid    (y16_valid_w & run_32x_stage),
+    .ce_out_next (ce32_use),
     .out_data    (y16_to_32_data),
     .out_valid   (y16_to_32_valid)
 );
@@ -226,7 +257,7 @@ interp2_top_symm_ce #(
 ) u_interp2_top_32x (
     .clk              (clk),
     .rst_n            (rst_n),
-    .ce_out           (ce32_out),
+    .ce_out           (ce32_use),
     .x_in             (y16_to_32_data),
     .x_in_valid       (y16_to_32_valid),
     .y_out            (y32_w),
@@ -248,8 +279,8 @@ bridge_to_interp2_ce #(
     .clk         (clk),
     .rst_n       (rst_n),
     .in_data     (y32_w),
-    .in_valid    (y32_valid_w),
-    .ce_out_next (ce64_out),
+    .in_valid    (y32_valid_w & run_64x_stage),
+    .ce_out_next (ce64_use),
     .out_data    (y32_to_64_data),
     .out_valid   (y32_to_64_valid)
 );
@@ -269,7 +300,7 @@ interp2_top_symm_ce #(
 ) u_interp2_top_64x (
     .clk              (clk),
     .rst_n            (rst_n),
-    .ce_out           (ce64_out),
+    .ce_out           (ce64_use),
     .x_in             (y32_to_64_data),
     .x_in_valid       (y32_to_64_valid),
     .y_out            (y64_w),
@@ -291,8 +322,8 @@ bridge_to_interp2_ce #(
     .clk         (clk),
     .rst_n       (rst_n),
     .in_data     (y64_w),
-    .in_valid    (y64_valid_w),
-    .ce_out_next (ce128_out),
+    .in_valid    (y64_valid_w & run_128x_stage),
+    .ce_out_next (ce128_use),
     .out_data    (y64_to_128_data),
     .out_valid   (y64_to_128_valid)
 );
@@ -312,7 +343,7 @@ interp2_top_symm_ce #(
 ) u_interp2_top_128x (
     .clk              (clk),
     .rst_n            (rst_n),
-    .ce_out           (ce128_out),
+    .ce_out           (ce128_use),
     .x_in             (y64_to_128_data),
     .x_in_valid       (y64_to_128_valid),
     .y_out            (y128_w),
