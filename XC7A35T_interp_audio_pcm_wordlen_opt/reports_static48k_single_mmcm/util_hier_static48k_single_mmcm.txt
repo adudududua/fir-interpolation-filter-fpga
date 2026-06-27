@@ -1,0 +1,68 @@
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+-----------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date         : Sat Jun 27 17:51:04 2026
+| Host         : LAPTOP-476JT8H0 running 64-bit major release  (build 9200)
+| Command      : report_utilization -hierarchical -file util_hier_polyphase_mac2_v2b.txt
+| Design       : board_demo_competition_dac8_top
+| Device       : 7a35tfgg484-2
+| Design State : Routed
+-----------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++-------------------------------------------+---------------------------------------------+------------+------------+---------+------+------+--------+--------+--------------+
+|                  Instance                 |                    Module                   | Total LUTs | Logic LUTs | LUTRAMs | SRLs |  FFs | RAMB36 | RAMB18 | DSP48 Blocks |
++-------------------------------------------+---------------------------------------------+------------+------------+---------+------+------+--------+--------+--------------+
+| board_demo_competition_dac8_top           |                                       (top) |       9489 |       9369 |       0 |  120 | 4604 |      0 |      0 |            2 |
+|   (board_demo_competition_dac8_top)       |                                       (top) |       1008 |       1008 |       0 |    0 |   19 |      0 |      0 |            0 |
+|   u_clk_wiz_audio_48k                     |                           clk_wiz_audio_48k |          0 |          0 |       0 |    0 |    0 |      0 |      0 |            0 |
+|     inst                                  | clk_wiz_audio_48k_clk_wiz_audio_48k_clk_wiz |          0 |          0 |       0 |    0 |    0 |      0 |      0 |            0 |
+|   u_demo_interp_dac8_audio_pcm_common     |           demo_interp_dac8_audio_pcm_common |       8536 |       8416 |       0 |  120 | 4585 |      0 |      0 |            2 |
+|     (u_demo_interp_dac8_audio_pcm_common) |           demo_interp_dac8_audio_pcm_common |          6 |          6 |       0 |    0 |   16 |      0 |      0 |            0 |
+|     u_audio_pcm_rom_source                |                        audio_pcm_rom_source |        417 |        417 |       0 |    0 |   81 |      0 |      0 |            0 |
+|     u_interp128_top_ce                    |                            interp128_top_ce |       8113 |       7993 |       0 |  120 | 4488 |      0 |      0 |            2 |
+|       u_bridge_16_to_32                   |                        bridge_to_interp2_ce |         14 |         14 |       0 |    0 |   26 |      0 |      0 |            0 |
+|       u_bridge_32_to_64                   |                      bridge_to_interp2_ce_0 |         14 |         14 |       0 |    0 |   26 |      0 |      0 |            0 |
+|       u_bridge_4_to_8                     |                      bridge_to_interp2_ce_1 |         14 |         14 |       0 |    0 |   26 |      0 |      0 |            0 |
+|       u_bridge_64_to_128                  |                      bridge_to_interp2_ce_2 |         14 |         14 |       0 |    0 |   26 |      0 |      0 |            0 |
+|       u_bridge_8_to_16                    |                      bridge_to_interp2_ce_3 |         14 |         14 |       0 |    0 |   26 |      0 |      0 |            0 |
+|       u_interp2_top_128x                  |                         interp2_top_symm_ce |       1469 |       1445 |       0 |   24 |  652 |      0 |      0 |            0 |
+|         (u_interp2_top_128x)              |                         interp2_top_symm_ce |        482 |        482 |       0 |    0 |    0 |      0 |      0 |            0 |
+|         u_fir_core_symm_interp2           |                 fir_core_symm_interp2_v2_17 |       1047 |       1023 |       0 |   24 |  626 |      0 |      0 |            0 |
+|         u_interp2_ctrl_ce                 |                          interp2_ctrl_ce_18 |          1 |          1 |       0 |    0 |   26 |      0 |      0 |            0 |
+|         u_round_sat_q16_to24              |       round_sat_q16_to24__parameterized0_19 |         38 |         38 |       0 |    0 |    0 |      0 |      0 |            0 |
+|       u_interp2_top_16x                   |                       interp2_top_symm_ce_4 |       1468 |       1444 |       0 |   24 |  652 |      0 |      0 |            0 |
+|         (u_interp2_top_16x)               |                       interp2_top_symm_ce_4 |        482 |        482 |       0 |    0 |    0 |      0 |      0 |            0 |
+|         u_fir_core_symm_interp2           |                 fir_core_symm_interp2_v2_14 |       1048 |       1024 |       0 |   24 |  626 |      0 |      0 |            0 |
+|         u_interp2_ctrl_ce                 |                          interp2_ctrl_ce_15 |          2 |          2 |       0 |    0 |   26 |      0 |      0 |            0 |
+|         u_round_sat_q16_to24              |       round_sat_q16_to24__parameterized0_16 |         35 |         35 |       0 |    0 |    0 |      0 |      0 |            0 |
+|       u_interp2_top_32x                   |                       interp2_top_symm_ce_5 |       1468 |       1444 |       0 |   24 |  652 |      0 |      0 |            0 |
+|         (u_interp2_top_32x)               |                       interp2_top_symm_ce_5 |        482 |        482 |       0 |    0 |    0 |      0 |      0 |            0 |
+|         u_fir_core_symm_interp2           |                 fir_core_symm_interp2_v2_11 |       1048 |       1024 |       0 |   24 |  626 |      0 |      0 |            0 |
+|         u_interp2_ctrl_ce                 |                          interp2_ctrl_ce_12 |          2 |          2 |       0 |    0 |   26 |      0 |      0 |            0 |
+|         u_round_sat_q16_to24              |       round_sat_q16_to24__parameterized0_13 |         35 |         35 |       0 |    0 |    0 |      0 |      0 |            0 |
+|       u_interp2_top_64x                   |                       interp2_top_symm_ce_6 |       1468 |       1444 |       0 |   24 |  652 |      0 |      0 |            0 |
+|         (u_interp2_top_64x)               |                       interp2_top_symm_ce_6 |        482 |        482 |       0 |    0 |    0 |      0 |      0 |            0 |
+|         u_fir_core_symm_interp2           |                  fir_core_symm_interp2_v2_8 |       1048 |       1024 |       0 |   24 |  626 |      0 |      0 |            0 |
+|         u_interp2_ctrl_ce                 |                           interp2_ctrl_ce_9 |          2 |          2 |       0 |    0 |   26 |      0 |      0 |            0 |
+|         u_round_sat_q16_to24              |       round_sat_q16_to24__parameterized0_10 |         35 |         35 |       0 |    0 |    0 |      0 |      0 |            0 |
+|       u_interp2_top_8x                    |                       interp2_top_symm_ce_7 |       1517 |       1493 |       0 |   24 |  652 |      0 |      0 |            0 |
+|         (u_interp2_top_8x)                |                       interp2_top_symm_ce_7 |        521 |        521 |       0 |    0 |    0 |      0 |      0 |            0 |
+|         u_fir_core_symm_interp2           |                    fir_core_symm_interp2_v2 |       1048 |       1024 |       0 |   24 |  626 |      0 |      0 |            0 |
+|         u_interp2_ctrl_ce                 |                             interp2_ctrl_ce |          2 |          2 |       0 |    0 |   26 |      0 |      0 |            0 |
+|         u_round_sat_q16_to24              |          round_sat_q16_to24__parameterized0 |         46 |         46 |       0 |    0 |    0 |      0 |      0 |            0 |
+|       u_interp4_top_symm_ce               |                         interp4_top_symm_ce |        657 |        657 |       0 |    0 | 1098 |      0 |      0 |            2 |
+|         (u_interp4_top_symm_ce)           |                         interp4_top_symm_ce |        527 |        527 |       0 |    0 | 1098 |      0 |      0 |            2 |
+|         u_round_sat_q16_to24              |                          round_sat_q16_to24 |        130 |        130 |       0 |    0 |    0 |      0 |      0 |            0 |
++-------------------------------------------+---------------------------------------------+------------+------------+---------+------+------+--------+--------+--------------+
+* Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
+
+

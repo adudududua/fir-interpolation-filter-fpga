@@ -2,11 +2,11 @@
 //=============================================================
 // 文件名       : board_demo_competition_dac8_top.v
 // 模块名       : board_demo_competition_dac8_top
-// 功能简述     : Artix-7 XC7A35T 赛方板 AD9708 DAC 静态 44.1kHz
+// 功能简述     : Artix-7 XC7A35T 赛方板 AD9708 DAC 静态 48kHz
 //                采样率家族单 MMCM 探索顶层。
 //                本版本仅保留：
-//                  50MHz -> clk_wiz_audio_44k1 -> 5.6448MHz
-//                不再实例化 48kHz 家族 Clock Wizard。
+//                  50MHz -> clk_wiz_audio_48k -> 6.144MHz
+//                不再实例化 44.1kHz 家族 Clock Wizard。
 //                sw1 sw0 仍选择 4x、8x、128x 插值输出。
 //                sw2 端口保留用于兼容原 XDC，但本探索版本不使用。
 //
@@ -20,15 +20,15 @@
 //                2026-06-20：不使用外部反馈 BUFG。
 //                2026-06-20：不使用 CLOCK_DEDICATED_ROUTE FALSE。
 //                2026-06-27：加入采样率家族 mode-aware MMCM reset gating。
-//                2026-06-27：Stage 2b 静态单采样率家族探索，
-//                            仅保留 44.1kHz 家族 Clock Wizard，
+//                2026-06-27：Stage 2c 静态单采样率家族探索，
+//                            仅保留 48kHz 家族 Clock Wizard，
 //                            用于评估单 MMCM 结构的资源和功耗报告变化。
 // 其他描述     :
-//                1. 本版本固定为 44.1kHz 家族。
-//                   128x 时钟约为 5.6448MHz。
-//                2. sw1 sw0 = 00：4x 插值输出，约 176.4kHz。
-//                3. sw1 sw0 = 01：8x 插值输出，约 352.8kHz。
-//                4. sw1 sw0 = 10/11：128x 插值输出，约 5.6448MHz。
+//                1. 本版本固定为 48kHz 家族。
+//                   128x 时钟约为 6.144MHz。
+//                2. sw1 sw0 = 00：4x 插值输出，约 192kHz。
+//                3. sw1 sw0 = 01：8x 插值输出，约 384kHz。
+//                4. sw1 sw0 = 10/11：128x 插值输出，约 6.144MHz。
 //                5. sw2 在本探索版本中不参与逻辑，仅保留顶层端口。
 //=============================================================
 
@@ -47,9 +47,9 @@ module board_demo_competition_dac8_top (
     // 1）系统时钟输入缓冲
     //
     // 系统时钟路径：
-    //   外部 50MHz -> IBUF -> BUFG -> clk_wiz_audio_44k1
+    //   外部 50MHz -> IBUF -> BUFG -> clk_wiz_audio_48k
     //
-    // 本探索版本只保留 44.1kHz 家族 Clock Wizard。
+    // 本探索版本只保留 48kHz 家族 Clock Wizard。
     //=========================================================
     wire clk_ibuf;
     wire clk_sys_bufg;
@@ -107,28 +107,28 @@ module board_demo_competition_dac8_top (
     assign rst_n_int = (pwr_rst_cnt == 16'hFFFF);
 
     //=========================================================
-    // 4）Clock Wizard：44.1kHz 家族
+    // 4）Clock Wizard：48kHz 家族
     //
     // 输入：
     //   clk_sys_bufg = 50MHz
     //
     // 输出：
-    //   clk_audio_128x_44k1 = 5.6448MHz
+    //   clk_audio_128x_48k = 6.144MHz
     //
-    // 本探索版本不实例化 48kHz 家族 Clock Wizard，
+    // 本探索版本不实例化 44.1kHz 家族 Clock Wizard，
     // 用于观察单 MMCM 结构下资源和默认功耗报告的变化。
     //=========================================================
-    wire clk_audio_128x_44k1;
-    wire mmcm_locked_44k1;
-    wire clkfb_44k1;
+    wire clk_audio_128x_48k;
+    wire mmcm_locked_48k;
+    wire clkfb_48k;
 
-    clk_wiz_audio_44k1 u_clk_wiz_audio_44k1 (
-        .clk_out1  (clk_audio_128x_44k1),
+    clk_wiz_audio_48k u_clk_wiz_audio_48k (
+        .clk_out1  (clk_audio_128x_48k),
         .reset     (~rst_n_int),
-        .locked    (mmcm_locked_44k1),
+        .locked    (mmcm_locked_48k),
         .clk_in1   (clk_sys_bufg),
-        .clkfb_in  (clkfb_44k1),
-        .clkfb_out (clkfb_44k1)
+        .clkfb_in  (clkfb_48k),
+        .clkfb_out (clkfb_48k)
     );
 
     //=========================================================
@@ -140,21 +140,21 @@ module board_demo_competition_dac8_top (
     wire clk_audio_128x_sel;
 
     BUFG u_bufg_audio_clk (
-        .I(clk_audio_128x_44k1),
+        .I(clk_audio_128x_48k),
         .O(clk_audio_128x_sel)
     );
 
     //=========================================================
     // 6）音频时钟域复位同步
     //
-    // 44.1kHz 家族 MMCM 未 locked 前，后级音频逻辑保持复位；
+    // 48kHz 家族 MMCM 未 locked 前，后级音频逻辑保持复位；
     // MMCM locked 后，在当前音频时钟域内同步释放复位。
     //=========================================================
     reg [2:0] rst_audio_sync;
 
     wire rst_audio_async_n;
 
-    assign rst_audio_async_n = rst_n_int & mmcm_locked_44k1;
+    assign rst_audio_async_n = rst_n_int & mmcm_locked_48k;
 
     always @(posedge clk_audio_128x_sel or negedge rst_audio_async_n) begin
         if (!rst_audio_async_n) begin
@@ -173,7 +173,7 @@ module board_demo_competition_dac8_top (
     // 7）实例化正式插值 DAC 公共模块
     //
     // 该公共模块内部仍支持 4x / 8x / 128x 三档输出。
-    // 本顶层固定提供 44.1kHz 家族的 128x 音频时钟。
+    // 本顶层固定提供 48kHz 家族的 128x 音频时钟。
     //=========================================================
     wire [1:0] mode_led_unused;
 
