@@ -17,7 +17,7 @@
 #                2026-06-20：不使用 CLOCK_DEDICATED_ROUTE FALSE。
 #                2026-06-20：当前顶层无外部 rst_n 端口，因此不约束 rst_n。
 # 其他描述     :
-#                1. 当前 IO 表确认 clk_50M 管脚为 R4。
+#                1. 当前 IO 表确认 clk_50M 管脚为 Y18。
 #                2. 当前 IO 表确认 SW0、SW1、SW2 分别为
 #                   W19、AA21、AA19。
 #                3. 当前 IO 表确认 AD9708 接口：
@@ -46,7 +46,7 @@
 #     clk -> IBUF -> BUFG -> clk_sys_bufg
 #   然后 clk_sys_bufg 同时送入两个 Clock Wizard。
 #=============================================================
-set_property PACKAGE_PIN R4 [get_ports clk]
+set_property PACKAGE_PIN Y18 [get_ports clk]
 set_property IOSTANDARD LVCMOS33 [get_ports clk]
 
 create_clock -period 20.000 -name clk_50M [get_ports clk]
