@@ -1,7 +1,9 @@
-cat > .gitignore <<'EOF'
 #============================================================
 # Vivado generated folders
 #============================================================
+
+.agents/
+.codex_xvlog_check/
 
 .Xil/
 **/.Xil/
@@ -78,4 +80,3 @@ Desktop.ini
 !**/*.png
 !**/*.jpg
 !**/*.jpeg
-EOF

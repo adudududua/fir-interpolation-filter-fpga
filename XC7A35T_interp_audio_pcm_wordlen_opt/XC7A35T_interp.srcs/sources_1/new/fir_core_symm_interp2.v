@@ -30,14 +30,14 @@ module fir_core_symm_interp2_v2 #(
 );
 
     //====================================================
-    // 对于 11 tap：
-    // HALF_TAPS  = (11-1)/2 = 5
-    // HALF_COEFF = 6
+    // 对于 29 tap：
+    // HALF_TAPS  = (29-1)/2 = 14
+    // HALF_COEFF = 15
     //
     // 对称对：
-    //   k = 0~4
+    //   k = 0~13
     // 中心项：
-    //   k = 5
+    //   k = 14
     //====================================================
     localparam integer HALF_TAPS  = (NTAPS - 1) / 2;   // 5
     localparam integer HALF_COEFF = HALF_TAPS + 1;     // 6

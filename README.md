@@ -38,6 +38,7 @@
 | 输入数据格式 | 24 bit signed |
 | 输入采样率 | 44.1 kHz / 48 kHz |
 | 输入类型 | 正弦 ROM / 音频 PCM ROM |
+| 当前主工程 PCM ROM | `audio_48k_24bit_1024.mem`，1024 点循环播放 |
 
 ### 2.2 输出规格
 
@@ -96,6 +97,8 @@ VS1053 播放 48 kHz / 16 bit PCM
 
 其中，**AD9708 + 示波器**是 4× / 8× / 128× 高采样率插值输出的主验证证据；**VS1053**仅作为辅助听感展示，不作为高采样率输出的主验证证据。
 
+说明：`XC7A35T_interp_audio_pcm_wordlen_opt/` 是当前 AD9708 主验证优化工程；VS1053 A/B 听感展示位于 `XC7A35T_vs1053_speaker_test/` 独立工程中。
+
 ---
 
 ## 4. FIR 插值链路
@@ -132,7 +135,7 @@ AD9708 DAC 输出
     NTAPS2X = 29
     COEFF_W = 14
     FRAC_W  = 12
-    ACC_W   = 48
+    ACC_W   = 45
     no-DSP 映射
     DSP48E1 = 0 / 每级
 
@@ -231,6 +234,8 @@ fir_interpolation/
 
 VS1053 只负责播放 FPGA 输出的 48 kHz / 16 bit PCM 音频流，A/B 差异由 FPGA 内部实时产生。
 
+该 VS1053 版本属于 `XC7A35T_vs1053_speaker_test/` 辅助工程，不包含在当前 `XC7A35T_interp_audio_pcm_wordlen_opt/` 主验证 XPR 中。
+
 ---
 
 ## 7. 主要 RTL 模块
@@ -239,7 +244,7 @@ VS1053 只负责播放 FPGA 输出的 48 kHz / 16 bit PCM 音频流，A/B 差异
 |---|---|
 | `board_demo_competition_dac8_top.v` | AD9708 主验证顶层 |
 | `demo_interp_dac8_audio_pcm_common.v` | 音频 PCM 输入、模式选择和 DAC 显示控制 |
-| `audio_pcm_rom_source.v` | 24 bit signed 音频 PCM ROM 输入源 |
+| `audio_pcm_rom_source.v` | 24 bit signed 音频 PCM ROM 输入源，当前主工程默认 1024 点 |
 | `interp128_top_ce.v` | 128× 多级插值顶层，包含 4× 与多个 2× 级 |
 | `interp4_top_symm_ce.v` | 当前最终版为 4-phase polyphase + 2-lane MAC 结构 |
 | `interp4_ctrl_ce.v` | 4× 插值插零控制模块 |
@@ -248,13 +253,14 @@ VS1053 只负责播放 FPGA 输出的 48 kHz / 16 bit PCM 音频流，A/B 差异
 | `interp2_ctrl_ce.v` | 2× 插值控制，产生真实样本 / 插零序列 |
 | `fir_core_symm_interp2.v` | 2× FIR 核心，最终版添加 no-DSP 映射 |
 | `bridge_to_interp2_ce.v` | 级间 CE 桥接模块 |
+| `board_demo_competition_dac8_top.v` 内嵌 `matrix_keypad_mode_ctrl` | 4×4 矩阵按键扫描与模式锁存 |
 | `round_sat_q16_to24.v` | 大位宽累加结果舍入饱和到 24 bit |
 | `vs1053_fpga_48k_interp_ab_top.v` | VS1053 A/B 听感辅助展示顶层 |
 | `vs1053_spi_byte_master_48k_ab.v` | VS1053 SPI 单字节发送模块 |
 
 ---
 
-## 8. 板级连接与拨码说明
+## 8. 板级连接与控制说明
 
 ### 8.1 AD9708 主验证线路
 
@@ -264,20 +270,22 @@ AD9708 主要接口：
 |---|---|
 | `dac_clk` | AD9708 采样时钟输出 |
 | `dac_data[7:0]` | AD9708 8 bit 并行数据输出 |
-| `sw0` | 插值倍率选择位 0 |
-| `sw1` | 插值倍率选择位 1 |
-| `sw2` | 44.1 kHz / 48 kHz 采样率家族选择 |
+| `beep_io` | 蜂鸣器控制输出，约束到 AB18，固定高电平关闭 |
+| `key_kr[3:0]` | 矩阵按键 KR0~KR3 扫描输出 |
+| `key_kc[3:0]` | 矩阵按键 KC0~KC3 输入，板上 10 kΩ 上拉 |
 
-拨码说明：
+矩阵按键说明：
 
 ```text
-sw2 = 0：44.1 kHz 家族
-sw2 = 1：48 kHz 家族
+SW1：44.1 kHz 家族，4× 插值输出
+SW2：44.1 kHz 家族，8× 插值输出
+SW3：44.1 kHz 家族，128× 插值输出
+SW4：44.1 kHz 家族，128× 插值输出
 
-sw1 sw0 = 00：4× 插值输出
-sw1 sw0 = 01：8× 插值输出
-sw1 sw0 = 10：128× 插值输出
-sw1 sw0 = 11：128× 插值输出
+SW5：48 kHz 家族，4× 插值输出
+SW6：48 kHz 家族，8× 插值输出
+SW7：48 kHz 家族，128× 插值输出
+SW8：48 kHz 家族，128× 插值输出
 ```
 
 ### 8.2 VS1053 辅助听感线路
@@ -328,7 +336,7 @@ sw0 = 1：B 路，FPGA FIR 插值重构
 ```text
 COEFF_W = 14
 FRAC_W  = 12
-ACC_W   = 48
+ACC_W   = 45
 NTAPS   = 29
 ```
 
@@ -436,6 +444,7 @@ y[4n+p] = Σ h[p+4j] · x[n-j], p = 0,1,2,3
 
 后级 2× FIR：
     NTAPS2X = 29
+    ACC_W_2X = 45
     fir_core_symm_interp2.v = no-DSP 版本
 
 DAC 显示：
@@ -515,19 +524,19 @@ DAC 显示：
 
 ### 11.1 44.1 kHz 家族
 
-| 开关状态 | 理论输出采样率 | 实测输出频率 |
+| 按键 | 理论输出采样率 | 实测输出频率 |
 |---|---:|---:|
-| `sw2=0, sw1 sw0=00` | 176.4 kHz | 176.3 kHz |
-| `sw2=0, sw1 sw0=01` | 352.8 kHz | 352.61 kHz |
-| `sw2=0, sw1 sw0=10/11` | 5.6448 MHz | 5.65 MHz |
+| `SW1` | 176.4 kHz | 176.3 kHz |
+| `SW2` | 352.8 kHz | 352.61 kHz |
+| `SW3/SW4` | 5.6448 MHz | 5.65 MHz |
 
 ### 11.2 48 kHz 家族
 
-| 开关状态 | 理论输出采样率 | 实测输出频率 |
+| 按键 | 理论输出采样率 | 实测输出频率 |
 |---|---:|---:|
-| `sw2=1, sw1 sw0=00` | 192 kHz | 192.01 kHz |
-| `sw2=1, sw1 sw0=01` | 384 kHz | 384.02 kHz |
-| `sw2=1, sw1 sw0=10/11` | 6.144 MHz | 6.15 MHz |
+| `SW5` | 192 kHz | 192.01 kHz |
+| `SW6` | 384 kHz | 384.02 kHz |
+| `SW7/SW8` | 6.144 MHz | 6.15 MHz |
 
 实测结果表明，最终版本在两类采样率家族和三档输出倍率下均能够产生正确的输出采样时钟，说明 polyphase MAC2、后级 29 tap no-DSP FIR 以及 DAC 显示补偿没有破坏系统板级运行功能。
 
@@ -568,8 +577,8 @@ CARRY4：4043 → 2112，减少 1931，约下降 47.76%
 1. 下载正弦 ROM 主验证 bit 文件。
 2. 示波器 CH1 接 AD9708 模拟输出。
 3. 示波器 CH2 接 `dac_clk`。
-4. 切换 `sw2` 选择 44.1 kHz / 48 kHz 家族。
-5. 切换 `sw1 sw0` 选择 4× / 8× / 128× 插值倍率。
+4. 按矩阵键盘 `SW1`~`SW8` 选择采样率家族与插值倍率。
+5. `SW1/SW2/SW3` 对应 44.1 kHz 家族 4×/8×/128×，`SW5/SW6/SW7` 对应 48 kHz 家族 4×/8×/128×。
 6. 观察 `dac_clk` 是否对应理论输出采样率。
 
 ### 13.2 主验证：音频 PCM ROM + AD9708
@@ -624,6 +633,6 @@ CARRY4：4043 → 2112，减少 1931，约下降 47.76%
 
 本项目已完成高阶数字插值滤波器的 MATLAB 建模、RTL 实现、功能仿真、FPGA 板级验证和实现后资源 / 功耗 / 时序评估。系统能够处理 24 bit signed、44.1 kHz / 48 kHz 音频采样输入，并输出 4×、8×、128× 三档插值结果。
 
-在结构优化方面，项目从基准多级 FIR 结构出发，依次完成后级 2× FIR 字长优化、累加器位宽优化、4× 前级 ACC_W=49 优化、halfband13 可行性分析以及 4× polyphase MAC2 时分复用结构探索。最终验证通过版本采用 **4× polyphase + 2-lane MAC** 作为前级，并将后级 2× FIR 固定为 **29 tap Q12 no-DSP** 结构，在保证功能、时序和板级输出正常的前提下，将 Slice LUTs 从基准版本的 17572 降低到 10197，将 DSP48E1 从 6 个降低到 2 个，将 CARRY4 从 4043 降低到 2112。
+在结构优化方面，项目从基准多级 FIR 结构出发，依次完成后级 2× FIR 字长优化、累加器位宽优化、4× 前级 ACC_W=49 优化、halfband13 可行性分析以及 4× polyphase MAC2 时分复用结构探索。最终验证通过版本采用 **4× polyphase + 2-lane MAC** 作为前级，并将后级 2× FIR 固定为 **29 tap Q12、ACC_W=45、no-DSP** 结构，在保证功能、时序和板级输出正常的前提下，将 Slice LUTs 从基准版本的 17572 降低到 10197，将 DSP48E1 从 6 个降低到 2 个，将 CARRY4 从 4043 降低到 2112。
 
 最终版本在 44.1 kHz 与 48 kHz 两类采样率家族下，4×、8×、128× 三档输出频率均与理论值一致，AD9708 DAC 输出波形正常，Vivado 实现后时序满足约束，证明该多级插值结构与资源优化策略能够有效降低 FPGA 资源消耗并保持稳定的板级运行能力。

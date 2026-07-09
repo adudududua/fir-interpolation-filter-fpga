@@ -9,7 +9,7 @@ module interp2_top_symm_ce #(
     //字长优化后：
     parameter DATA_W  = 24,
     parameter COEFF_W = 14,
-    parameter ACC_W   = 48,
+    parameter ACC_W   = 45,
     parameter NTAPS   = 29,
     parameter FRAC_W  = 12
 )(

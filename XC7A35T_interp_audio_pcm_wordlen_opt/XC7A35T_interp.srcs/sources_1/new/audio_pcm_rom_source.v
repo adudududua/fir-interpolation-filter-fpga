@@ -10,9 +10,9 @@
 //                24bit signed 音频采样点。
 //                
 //                当前默认配置：
-//                  采样点数：8192 点
+//                  采样点数：1024 点
 //                  数据位宽：24bit signed
-//                  数据文件：audio_48k_24bit_8192.mem
+//                  数据文件：audio_48k_24bit_1024.mem
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-06-20
@@ -54,7 +54,7 @@ module audio_pcm_rom_source #(
     //   提示 Vivado 尽量使用 Block RAM 存储音频采样点。
     //
     // pcm_rom：
-    //   存储 8192 个 24bit signed PCM 采样点。
+    //   存储 DEPTH 个 24bit signed PCM 采样点。
     //=========================================================
     (* rom_style = "block" *)
     reg signed [DATA_W-1:0] pcm_rom [0:DEPTH-1];
@@ -89,7 +89,7 @@ module audio_pcm_rom_source #(
     //   F54321
     //
     // 注意：
-    //   后续需要把 audio_48k_24bit_8192.mem 添加进 Vivado 工程。
+    //   MEM_FILE 对应的 .mem 文件需要添加进 Vivado 工程。
     //=========================================================
     initial begin
         // 先清零，避免仿真时未初始化位置出现 X

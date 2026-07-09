@@ -9,7 +9,7 @@
 //                
 //                与正弦 ROM 版本相比，本模块的区别是：
 //                  原输入：内部 64 点正弦 ROM
-//                  新输入：8192 点音频 PCM ROM
+//                  新输入：1024 点音频 PCM ROM
 //
 //                输出仍然通过 AD9708 并行 DAC 送到示波器，
 //                用于验证真实音频采样经过 FIR 插值链后的
@@ -114,7 +114,7 @@ module demo_interp_dac8_audio_pcm_common (
     // 3）音频 PCM ROM 输入源
     //
     // audio_pcm_rom_source:
-    //   从 audio_48k_24bit_8192.mem 中读取 24bit signed
+    //   从 audio_48k_24bit_1024.mem 中读取 24bit signed
     //   PCM 音频采样点。
     //
     // 注意：
@@ -197,7 +197,7 @@ module demo_interp_dac8_audio_pcm_common (
         .DATA_W   (24),
         .COEFF_W  (18),
         // .ACC_W    (56),
-        .ACC_W    (49), // 24bit 输入 + 18bit 系数 + 3bit 进位 + 1bit 符号 = 46bit，向上取整为 45bit
+        .ACC_W    (49), // 4x 前级 ACC_W 扫描后选择的资源/精度折中点
         .NTAPS4X  (155),
         .NTAPS2X  (29)
     ) u_interp128_top_ce (
@@ -271,7 +271,7 @@ module demo_interp_dac8_audio_pcm_common (
     //
     // 当前补偿：
     //   4x   ：不补偿
-    //   8x   ：左移 1 位
+    //   8x   ：不补偿
     //   128x ：左移 4 位
     //
     // 如果示波器上 128x 音频波形幅度太小，可以改成 <<< 5。
@@ -312,7 +312,7 @@ module demo_interp_dac8_audio_pcm_common (
 
             default: begin
                 // 128x DAC 显示补偿：5 级 2x FIR 每级幅度约减半，
-                // 这里临时左移 4 位做显示放大，只影响 DAC 显示。
+                // 这里左移 4 位做显示放大，只影响 DAC 显示。
                 display_sample_ext = ({{8{selected_sample[23]}}, selected_sample} <<< 4);
             end
         endcase

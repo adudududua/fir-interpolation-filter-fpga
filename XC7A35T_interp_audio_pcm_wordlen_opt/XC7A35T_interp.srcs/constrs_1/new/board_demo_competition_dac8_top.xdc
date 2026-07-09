@@ -3,7 +3,7 @@
 # 对应顶层     : board_demo_competition_dac8_top
 # 功能简述     : Artix-7 XC7A35T 赛方板 AD9708 DAC 双频率家族
 #                插值演示约束文件。
-#                本文件用于约束板上 50MHz 系统时钟、拨码开关
+#                本文件用于约束板上 20MHz 系统时钟、矩阵按键
 #                以及 AD9708 8bit 并行 DAC 接口。
 #
 # 设计作者     : kafeizizi
@@ -16,10 +16,13 @@
 #                2026-06-20：修正为双频率家族正式演示版本说明。
 #                2026-06-20：不使用 CLOCK_DEDICATED_ROUTE FALSE。
 #                2026-06-20：当前顶层无外部 rst_n 端口，因此不约束 rst_n。
+#                2026-07-08：补充配置电压属性，并按 MMCM 输出管脚
+#                            引用自动派生音频时钟。
 # 其他描述     :
-#                1. 当前 IO 表确认 clk_50M 管脚为 Y18。
-#                2. 当前 IO 表确认 SW0、SW1、SW2 分别为
-#                   W19、AA21、AA19。
+#                1. 当前 IO 表确认 clk_20M 管脚为 Y18。
+#                2. 当前 IO 表确认矩阵按键：
+#                   KR0~KR3 = W21、R19、T20、P19；
+#                   KC0~KC3 = T21、U21、V22、W22。
 #                3. 当前 IO 表确认 AD9708 接口：
 #                   DA_CLK = G16；
 #                   DA_D0  = H19；
@@ -30,8 +33,10 @@
 #                   DA_D5  = G17；
 #                   DA_D6  = E17；
 #                   DA_D7  = C17。
-#                4. sw2 = 0 时选择 44.1kHz 家族；
-#                   sw2 = 1 时选择 48kHz 家族。
+#                4. BEEP-IO = AB18，低电平响，高电平关闭。
+#                5. SW1/SW2/SW3 选择 44.1kHz 家族
+#                   4x/8x/128x；SW5/SW6/SW7 选择
+#                   48kHz 家族 4x/8x/128x。
 #=============================================================
 
 
@@ -39,7 +44,7 @@
 # 1）系统时钟约束
 #
 # clk：
-#   板载 50MHz 系统时钟。
+#   板载 20MHz 系统时钟。
 #
 # 说明：
 #   顶层内部结构为：
@@ -49,30 +54,47 @@
 set_property PACKAGE_PIN Y18 [get_ports clk]
 set_property IOSTANDARD LVCMOS33 [get_ports clk]
 
-create_clock -period 20.000 -name clk_50M [get_ports clk]
+create_clock -period 50.000 -name clk_20M [get_ports clk]
 
 
 #=============================================================
-# 2）拨码开关约束
+# 1.1）配置 Bank 电压属性
 #
-# sw0：
-#   插值倍率选择低位。
-#
-# sw1：
-#   插值倍率选择高位。
-#
-# sw2：
-#   频率家族选择。
-#   sw2 = 0：选择 44.1kHz 家族；
-#   sw2 = 1：选择 48kHz 家族。
+# 当前板级 IO 约束均采用 LVCMOS33，因此配置电压按 3.3V
+# 工程属性给出，用于消除 Vivado CFGBVS/CONFIG_VOLTAGE
+# DRC 提示。
 #=============================================================
-set_property PACKAGE_PIN W19  [get_ports sw0]
-set_property PACKAGE_PIN AA21 [get_ports sw1]
-set_property PACKAGE_PIN AA19 [get_ports sw2]
+set_property CFGBVS VCCO [current_design]
+set_property CONFIG_VOLTAGE 3.3 [current_design]
 
-set_property IOSTANDARD LVCMOS33 [get_ports sw0]
-set_property IOSTANDARD LVCMOS33 [get_ports sw1]
-set_property IOSTANDARD LVCMOS33 [get_ports sw2]
+
+#=============================================================
+# 2）矩阵按键约束
+#
+# key_kr[3:0]：
+#   KR0~KR3，扫描输出。顶层只主动拉低当前扫描列，
+#   其他列保持高阻。
+#
+# key_kc[3:0]：
+#   KC0~KC3，按键输入。原理图上每路已有 10k 上拉，
+#   这里再使能 FPGA 弱上拉，避免连线悬空时漂移。
+#=============================================================
+set_property PACKAGE_PIN W21 [get_ports {key_kr[0]}]
+set_property PACKAGE_PIN R19 [get_ports {key_kr[1]}]
+set_property PACKAGE_PIN T20 [get_ports {key_kr[2]}]
+set_property PACKAGE_PIN P19 [get_ports {key_kr[3]}]
+
+set_property PACKAGE_PIN T21 [get_ports {key_kc[0]}]
+set_property PACKAGE_PIN U21 [get_ports {key_kc[1]}]
+set_property PACKAGE_PIN V22 [get_ports {key_kc[2]}]
+set_property PACKAGE_PIN W22 [get_ports {key_kc[3]}]
+
+set_property IOSTANDARD LVCMOS33 [get_ports {key_kr[*]}]
+set_property DRIVE 8 [get_ports {key_kr[*]}]
+set_property SLEW SLOW [get_ports {key_kr[*]}]
+
+set_property IOSTANDARD LVCMOS33 [get_ports {key_kc[*]}]
+set_property PULLUP true [get_ports {key_kc[*]}]
 
 
 #=============================================================
@@ -130,51 +152,36 @@ set_property SLEW SLOW [get_ports {dac_data[*]}]
 
 
 #=============================================================
-# 5）人工输入 false path 约束
+# 5）蜂鸣器静音输出约束
 #
-# sw0、sw1、sw2 来自拨码开关，属于人工慢速输入。
-#
-# sw0 / sw1：
-#   只用于选择 4x、8x、128x 输出模式。
-#
-# sw2：
-#   用于 BUFGMUX 选择 44.1kHz / 48kHz 家族。
-#
-# 这些信号不是高速同步数据输入，因此这里设置 false path。
+# BEEP-IO：
+#   对应板卡蜂鸣器控制脚 AB18。
+#   原理图为 PNP 高边驱动，BEEP-IO 拉低时蜂鸣器导通，
+#   因此顶层固定输出高电平用于关闭蜂鸣器。
 #=============================================================
-set_false_path -from [get_ports {sw0 sw1 sw2}]
+set_property PACKAGE_PIN AB18 [get_ports beep_io]
+set_property IOSTANDARD LVCMOS33 [get_ports beep_io]
+set_property DRIVE 8 [get_ports beep_io]
+set_property SLEW SLOW [get_ports beep_io]
+set_property PULLUP true [get_ports beep_io]
 
-
-# #=============================================================
-# # 6）系统时钟与两个音频时钟的时钟组约束
-# #
-# # 目的：
-# #   当前顶层同时存在：
-# #     clk_50M 系统时钟；
-# #     clk_wiz_audio_44k1 输出的 5.6448MHz；
-# #     clk_wiz_audio_48k  输出的 6.144MHz。
-# #
-# #   两个音频时钟通过 BUFGMUX 选择后送入同一套 FIR 插值链。
-# #   sw2 选择其中一路工作，硬件上不会同时使用两路音频时钟。
-# #
-# #   如果不显式告诉 Vivado 这些时钟关系，route 阶段容易出现
-# #   大量不真实的 hold violation，导致布线时间极长甚至拥塞。
-# #
-# # 说明：
-# #   这里直接写 set_clock_groups，不使用 if，因为 Vivado 2018.3
-# #   的 XDC 文件不支持 if 控制语句。
-# #=============================================================
-
-# set_clock_groups -asynchronous \
-#     -group [get_clocks -quiet clk_50M] \
-#     -group [get_clocks -quiet -of_objects [get_pins u_clk_wiz_audio_44k1/inst/mmcm_adv_inst/CLKOUT0]] \
-#     -group [get_clocks -quiet -of_objects [get_pins u_clk_wiz_audio_48k/inst/mmcm_adv_inst/CLKOUT0]]
 
 #=============================================================
-# 6）双 MMCM + BUFGMUX 音频时钟组约束
+# 6）人工输入 false path 约束
+#
+# key_kc[3:0] 来自矩阵按键，属于人工慢速输入。
+#
+# 这些信号不是高速同步数据输入，顶层会在 20MHz 时钟域内
+# 进行同步和消抖，因此这里设置 false path。
+#=============================================================
+set_false_path -from [get_ports {key_kc[*]}]
+
+
+#=============================================================
+# 7）双 MMCM + BUFGMUX 音频时钟组约束
 #
 # 当前设计中：
-#   clk_50M               ：板载 50MHz 系统输入时钟
+#   clk_20M               ：板载 20MHz 系统输入时钟
 #   clk_audio_128x_44k1   ：44.1kHz 家族 128x 音频时钟，5.6448MHz
 #   clk_audio_128x_48k    ：48kHz 家族 128x 音频时钟，6.144MHz
 #
@@ -184,6 +191,6 @@ set_false_path -from [get_ports {sw0 sw1 sw2}]
 #=============================================================
 
 set_clock_groups -asynchronous \
-    -group [get_clocks clk_50M] \
-    -group [get_clocks clk_audio_128x_44k1] \
-    -group [get_clocks clk_audio_128x_48k]
+    -group [get_clocks clk_20M] \
+    -group [get_clocks -of_objects [get_pins u_clk_wiz_audio_44k1/inst/mmcm_adv_inst/CLKOUT0]] \
+    -group [get_clocks -of_objects [get_pins u_clk_wiz_audio_48k/inst/mmcm_adv_inst/CLKOUT0]]

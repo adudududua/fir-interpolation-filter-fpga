@@ -1,4 +1,5 @@
 `timescale 1ns / 1ps
+// 文件名       : fir_core_symm.v
 
 module fir_core_symm #(
     parameter DATA_W  = 24,   // 输入数据位宽：24 位有符号
