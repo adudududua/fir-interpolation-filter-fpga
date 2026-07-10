@@ -1,0 +1,60 @@
+// =====================================================
+// All-2x Stage 1 FIR half coefficients
+// 阶数 n       : 100
+// tap 数       : 101
+// 系数位宽     : 18 bit
+// 小数位宽     : 16 bit
+// 裁剪阈值     : 0
+// 半系数总数   : 51
+// =====================================================
+        coeff_half[0] = 18'sd4;
+        coeff_half[1] = 18'sd7;
+        coeff_half[2] = -18'sd4;
+        coeff_half[3] = -18'sd9;
+        coeff_half[4] = 18'sd6;
+        coeff_half[5] = 18'sd16;
+        coeff_half[6] = -18'sd8;
+        coeff_half[7] = -18'sd24;
+        coeff_half[8] = 18'sd11;
+        coeff_half[9] = 18'sd36;
+        coeff_half[10] = -18'sd14;
+        coeff_half[11] = -18'sd52;
+        coeff_half[12] = 18'sd18;
+        coeff_half[13] = 18'sd72;
+        coeff_half[14] = -18'sd23;
+        coeff_half[15] = -18'sd98;
+        coeff_half[16] = 18'sd28;
+        coeff_half[17] = 18'sd131;
+        coeff_half[18] = -18'sd34;
+        coeff_half[19] = -18'sd171;
+        coeff_half[20] = 18'sd41;
+        coeff_half[21] = 18'sd221;
+        coeff_half[22] = -18'sd47;
+        coeff_half[23] = -18'sd281;
+        coeff_half[24] = 18'sd55;
+        coeff_half[25] = 18'sd354;
+        coeff_half[26] = -18'sd62;
+        coeff_half[27] = -18'sd442;
+        coeff_half[28] = 18'sd70;
+        coeff_half[29] = 18'sd548;
+        coeff_half[30] = -18'sd77;
+        coeff_half[31] = -18'sd677;
+        coeff_half[32] = 18'sd85;
+        coeff_half[33] = 18'sd836;
+        coeff_half[34] = -18'sd92;
+        coeff_half[35] = -18'sd1033;
+        coeff_half[36] = 18'sd99;
+        coeff_half[37] = 18'sd1285;
+        coeff_half[38] = -18'sd106;
+        coeff_half[39] = -18'sd1619;
+        coeff_half[40] = 18'sd111;
+        coeff_half[41] = 18'sd2086;
+        coeff_half[42] = -18'sd116;
+        coeff_half[43] = -18'sd2796;
+        coeff_half[44] = 18'sd120;
+        coeff_half[45] = 18'sd4039;
+        coeff_half[46] = -18'sd123;
+        coeff_half[47] = -18'sd6873;
+        coeff_half[48] = 18'sd124;
+        coeff_half[49] = 18'sd20834;
+        coeff_half[50] = 18'sd32643;

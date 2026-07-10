@@ -2,6 +2,16 @@
 
 本文件夹只保留当前 FPGA 工程最终插值滤波器设计需要的 MATLAB 文件，用于复现系数设计、查看优化结果、检查系统级频响指标。
 
+## 全 2x 方案与对比报告
+
+- `alt_all2x/design_all2x_interp128_compare.m`
+  - 用于设计和检查 44.1kHz 专用的全 2x 七级 128 倍插值方案。
+  - 输出结果保存在 `alt_all2x/` 目录，包括每级系数、总链路 summary 和频响图。
+
+- `interp128_scheme_analysis_report.md`
+  - 记录 `4x + 5级2x` 与 `全2x七级` 的方案对比。
+  - 包含 MATLAB 频响图、资源复杂度估算、等波纹法说明，以及当前全 2x RTL 进度。
+
 ## 最终设计文件
 
 - `acc_opt/interp4_fixed155_sparse_prune.m`

@@ -1,0 +1,29 @@
+All-2x 128x interpolation FIR summary
+=====================================
+Input sample rate              = 44100.0 Hz
+Output sample rate             = 5644800.0 Hz
+Number of 2x stages            = 7
+Total impulse response taps    = 7163
+Total nonzero half coefficients= 81
+Total ripple_pm_db             = 0.00649371
+Total ripple_pp_db             = 0.00997160
+Total pass_gain_db             = 0.00069376
+Total stop_attn_db             = 77.67448610
+Total gd_mean                  = 3581.00000000
+Total gd_pp                    = 0.000000000007
+Total symmetry error           = 2.60208521397e-18
+Pass ripple                    = 1
+Pass gain                      = 1
+Pass stop                      = 1
+Pass linear phase              = 1
+Pass all                       = 1
+
+Stage detail
+------------
+Stage 1: Fs 44100.0 -> 88200.0 Hz, f_stop=24100.0 Hz, order=100, taps=101, COEFF_W=18, FRAC_W=16, prune=0, nz_half=51, target_ripple=0.0080 dB, target_stop=76.0 dB, gain=0.00004845 dB, ripple_pm=0.00228815 dB, stop=77.32065971 dB
+Stage 2: Fs 88200.0 -> 176400.0 Hz, f_stop=64100.0 Hz, order=16, taps=17, COEFF_W=18, FRAC_W=16, prune=0, nz_half=9, target_ripple=0.0060 dB, target_stop=80.0 dB, gain=0.00017899 dB, ripple_pm=0.00202951 dB, stop=80.08972545 dB
+Stage 3: Fs 176400.0 -> 352800.0 Hz, f_stop=152300.0 Hz, order=10, taps=11, COEFF_W=17, FRAC_W=15, prune=0, nz_half=6, target_ripple=0.0050 dB, target_stop=82.0 dB, gain=-0.00009154 dB, ripple_pm=0.00094842 dB, stop=86.14152444 dB
+Stage 4: Fs 352800.0 -> 705600.0 Hz, f_stop=328700.0 Hz, order=6, taps=7, COEFF_W=18, FRAC_W=16, prune=0, nz_half=4, target_ripple=0.0040 dB, target_stop=84.0 dB, gain=0.00062676 dB, ripple_pm=0.00156668 dB, stop=85.59695318 dB
+Stage 5: Fs 705600.0 -> 1411200.0 Hz, f_stop=681500.0 Hz, order=6, taps=7, COEFF_W=14, FRAC_W=12, prune=0, nz_half=4, target_ripple=0.0040 dB, target_stop=84.0 dB, gain=-0.00006525 dB, ripple_pm=0.00011813 dB, stop=105.88710212 dB
+Stage 6: Fs 1411200.0 -> 2822400.0 Hz, f_stop=1387100.0 Hz, order=6, taps=7, COEFF_W=15, FRAC_W=13, prune=0, nz_half=4, target_ripple=0.0040 dB, target_stop=84.0 dB, gain=-0.00000408 dB, ripple_pm=0.00000739 dB, stop=129.95819486 dB
+Stage 7: Fs 2822400.0 -> 5644800.0 Hz, f_stop=2798300.0 Hz, order=6, taps=7, COEFF_W=14, FRAC_W=12, prune=0, nz_half=3, target_ripple=0.0040 dB, target_stop=84.0 dB, gain=-0.00000008 dB, ripple_pm=0.00000020 dB, stop=140.26445465 dB

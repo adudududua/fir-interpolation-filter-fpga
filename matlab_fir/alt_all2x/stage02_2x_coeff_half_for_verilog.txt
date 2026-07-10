@@ -1,0 +1,18 @@
+// =====================================================
+// All-2x Stage 2 FIR half coefficients
+// 阶数 n       : 16
+// tap 数       : 17
+// 系数位宽     : 18 bit
+// 小数位宽     : 16 bit
+// 裁剪阈值     : 0
+// 半系数总数   : 9
+// =====================================================
+        coeff_half[0] = -18'sd115;
+        coeff_half[1] = -18'sd203;
+        coeff_half[2] = 18'sd534;
+        coeff_half[3] = 18'sd1233;
+        coeff_half[4] = -18'sd1302;
+        coeff_half[5] = -18'sd4595;
+        coeff_half[6] = 18'sd2116;
+        coeff_half[7] = 18'sd19945;
+        coeff_half[8] = 18'sd30298;
