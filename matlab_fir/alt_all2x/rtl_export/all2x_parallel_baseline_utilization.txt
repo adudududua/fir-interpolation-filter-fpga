@@ -1,0 +1,62 @@
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date         : Fri Jul 10 21:05:54 2026
+| Host         : LAPTOP-476JT8H0 running 64-bit major release  (build 9200)
+| Command      : report_utilization -hierarchical -file D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/alt_all2x/rtl_export/all2x_parallel_utilization.txt
+| Design       : interp128_all2x_top_ce
+| Device       : 7a35tfgg484-2
+| Design State : Synthesized
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++-----------------------------------+---------------------------------------------+------------+------------+---------+------+------+--------+--------+--------------+
+|              Instance             |                    Module                   | Total LUTs | Logic LUTs | LUTRAMs | SRLs |  FFs | RAMB36 | RAMB18 | DSP48 Blocks |
++-----------------------------------+---------------------------------------------+------------+------------+---------+------+------+--------+--------+--------------+
+| interp128_all2x_top_ce            |                                       (top) |       9376 |       9376 |       0 |    0 | 4118 |      0 |      0 |           38 |
+|   (interp128_all2x_top_ce)        |                                       (top) |       1598 |       1598 |       0 |    0 |    2 |      0 |      0 |            0 |
+|   u_bridge_16_to_32               |                        bridge_to_interp2_ce |         14 |         14 |       0 |    0 |   26 |      0 |      0 |            0 |
+|   u_bridge_2_to_4                 |                      bridge_to_interp2_ce_0 |         14 |         14 |       0 |    0 |   26 |      0 |      0 |            0 |
+|   u_bridge_32_to_64               |                      bridge_to_interp2_ce_1 |         14 |         14 |       0 |    0 |   26 |      0 |      0 |            0 |
+|   u_bridge_4_to_8                 |                      bridge_to_interp2_ce_2 |         14 |         14 |       0 |    0 |   26 |      0 |      0 |            0 |
+|   u_bridge_64_to_128              |                      bridge_to_interp2_ce_3 |         14 |         14 |       0 |    0 |   26 |      0 |      0 |            0 |
+|   u_bridge_8_to_16                |                      bridge_to_interp2_ce_4 |         14 |         14 |       0 |    0 |   26 |      0 |      0 |            0 |
+|   u_interp2_all2x_stage1          |                   interp2_top_symm_ce_all2x |       4222 |       4222 |       0 |    0 | 2260 |      0 |      0 |           24 |
+|     u_fir_core_symm_interp2_all2x |                 fir_core_symm_interp2_all2x |       4176 |       4176 |       0 |    0 | 2234 |      0 |      0 |           24 |
+|     u_interp2_ctrl_ce             |                          interp2_ctrl_ce_12 |         13 |         13 |       0 |    0 |   26 |      0 |      0 |            0 |
+|     u_round_sat_q16_to24          |                          round_sat_q16_to24 |         34 |         34 |       0 |    0 |    0 |      0 |      0 |            0 |
+|   u_interp2_all2x_stage2          |   interp2_top_symm_ce_all2x__parameterized0 |       1184 |       1184 |       0 |    0 |  436 |      0 |      0 |            5 |
+|     u_fir_core_symm_interp2_all2x | fir_core_symm_interp2_all2x__parameterized0 |       1152 |       1152 |       0 |    0 |  410 |      0 |      0 |            5 |
+|     u_interp2_ctrl_ce             |                          interp2_ctrl_ce_10 |          1 |          1 |       0 |    0 |   26 |      0 |      0 |            0 |
+|     u_round_sat_q16_to24          |       round_sat_q16_to24__parameterized0_11 |         32 |         32 |       0 |    0 |    0 |      0 |      0 |            0 |
+|   u_interp2_all2x_stage3          |   interp2_top_symm_ce_all2x__parameterized1 |        808 |        808 |       0 |    0 |  332 |      0 |      0 |            3 |
+|     u_fir_core_symm_interp2_all2x | fir_core_symm_interp2_all2x__parameterized1 |        778 |        778 |       0 |    0 |  306 |      0 |      0 |            3 |
+|     u_interp2_ctrl_ce             |                           interp2_ctrl_ce_9 |          1 |          1 |       0 |    0 |   26 |      0 |      0 |            0 |
+|     u_round_sat_q16_to24          |          round_sat_q16_to24__parameterized1 |         29 |         29 |       0 |    0 |    0 |      0 |      0 |            0 |
+|   u_interp2_all2x_stage4          |   interp2_top_symm_ce_all2x__parameterized2 |        583 |        583 |       0 |    0 |  237 |      0 |      0 |            2 |
+|     u_fir_core_symm_interp2_all2x | fir_core_symm_interp2_all2x__parameterized2 |        551 |        551 |       0 |    0 |  211 |      0 |      0 |            2 |
+|     u_interp2_ctrl_ce             |                           interp2_ctrl_ce_8 |          1 |          1 |       0 |    0 |   26 |      0 |      0 |            0 |
+|     u_round_sat_q16_to24          |          round_sat_q16_to24__parameterized0 |         32 |         32 |       0 |    0 |    0 |      0 |      0 |            0 |
+|   u_interp2_all2x_stage5          |   interp2_top_symm_ce_all2x__parameterized3 |        451 |        451 |       0 |    0 |  235 |      0 |      0 |            2 |
+|     u_fir_core_symm_interp2_all2x | fir_core_symm_interp2_all2x__parameterized3 |        421 |        421 |       0 |    0 |  209 |      0 |      0 |            2 |
+|     u_interp2_ctrl_ce             |                           interp2_ctrl_ce_7 |          1 |          1 |       0 |    0 |   26 |      0 |      0 |            0 |
+|     u_round_sat_q16_to24          |          round_sat_q16_to24__parameterized2 |         29 |         29 |       0 |    0 |    0 |      0 |      0 |            0 |
+|   u_interp2_all2x_stage6          |   interp2_top_symm_ce_all2x__parameterized4 |        247 |        247 |       0 |    0 |  234 |      0 |      0 |            2 |
+|     u_fir_core_symm_interp2_all2x | fir_core_symm_interp2_all2x__parameterized4 |        219 |        219 |       0 |    0 |  208 |      0 |      0 |            2 |
+|     u_interp2_ctrl_ce             |                           interp2_ctrl_ce_5 |          1 |          1 |       0 |    0 |   26 |      0 |      0 |            0 |
+|     u_round_sat_q16_to24          |        round_sat_q16_to24__parameterized3_6 |         28 |         28 |       0 |    0 |    0 |      0 |      0 |            0 |
+|   u_interp2_all2x_stage7          |   interp2_top_symm_ce_all2x__parameterized5 |        205 |        205 |       0 |    0 |  226 |      0 |      0 |            0 |
+|     u_fir_core_symm_interp2_all2x | fir_core_symm_interp2_all2x__parameterized5 |        177 |        177 |       0 |    0 |  200 |      0 |      0 |            0 |
+|     u_interp2_ctrl_ce             |                             interp2_ctrl_ce |          1 |          1 |       0 |    0 |   26 |      0 |      0 |            0 |
+|     u_round_sat_q16_to24          |          round_sat_q16_to24__parameterized3 |         28 |         28 |       0 |    0 |    0 |      0 |      0 |            0 |
++-----------------------------------+---------------------------------------------+------------+------------+---------+------+------+--------+--------+--------------+
+
+

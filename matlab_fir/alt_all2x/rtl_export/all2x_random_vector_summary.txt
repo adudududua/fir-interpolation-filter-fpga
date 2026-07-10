@@ -1,0 +1,12 @@
+All-2x RTL random test vector summary
+=====================================
+Random seed             = 20260710
+Input samples           = 128
+Golden output samples   = 22907
+Input minimum           = -1019885
+Input maximum           = 1034092
+Golden output minimum   = -1319071
+Golden output maximum   = 1580450
+Accumulator overflows   = 0
+Output saturations      = 0
+Pass all                = 1

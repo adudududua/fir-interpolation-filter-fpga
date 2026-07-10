@@ -12,13 +12,14 @@
 //                优化资源，可在通过功能验证后改为时分复用 MAC 结构。
 //
 //                当前默认配置：
-//                  STAGE_ID=1：101 tap，COEFF_W=18，FRAC_W=16
-//                  STAGE_ID=2： 17 tap，COEFF_W=18，FRAC_W=16
-//                  STAGE_ID=3： 11 tap，COEFF_W=17，FRAC_W=15
-//                  STAGE_ID=4：  7 tap，COEFF_W=18，FRAC_W=16
-//                  STAGE_ID=5：  7 tap，COEFF_W=14，FRAC_W=12
-//                  STAGE_ID=6：  7 tap，COEFF_W=15，FRAC_W=13
+//                  STAGE_ID=1： 93 tap，COEFF_W=17，FRAC_W=16
+//                  STAGE_ID=2： 17 tap，COEFF_W=16，FRAC_W=15
+//                  STAGE_ID=3： 11 tap，COEFF_W=15，FRAC_W=14
+//                  STAGE_ID=4：  7 tap，COEFF_W=16，FRAC_W=15
+//                  STAGE_ID=5：  7 tap，COEFF_W=14，FRAC_W=13
+//                  STAGE_ID=6：  7 tap，COEFF_W=13，FRAC_W=12
 //                  STAGE_ID=7：  7 tap，COEFF_W=14，FRAC_W=12
+//                  所有系数均已包含 2 倍插值增益。
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-10
@@ -26,8 +27,12 @@
 // 开发工具     : Vivado
 // 修订记录     :
 //                2026-07-10：新增全 2x 专用对称 FIR 核。
+//                2026-07-10：同步 MATLAB bit-true 验证通过的新系数。
+//                2026-07-10：Stage 2～7 常数乘法映射到 LUT，DSP 仅保留
+//                            给 Stage 1 时分复用 MAC 使用。
 //=============================================================
 
+(* use_dsp = "no" *)
 module fir_core_symm_interp2_all2x #(
     parameter integer STAGE_ID = 1,
     parameter integer DATA_W   = 24,
@@ -63,100 +68,96 @@ module fir_core_symm_interp2_all2x #(
         end
 
         if (STAGE_ID == 1) begin
-            coeff_half[0] = 18'sd4;
-            coeff_half[1] = 18'sd7;
-            coeff_half[2] = -18'sd4;
-            coeff_half[3] = -18'sd9;
-            coeff_half[4] = 18'sd6;
-            coeff_half[5] = 18'sd16;
-            coeff_half[6] = -18'sd8;
-            coeff_half[7] = -18'sd24;
-            coeff_half[8] = 18'sd11;
-            coeff_half[9] = 18'sd36;
-            coeff_half[10] = -18'sd14;
-            coeff_half[11] = -18'sd52;
-            coeff_half[12] = 18'sd18;
-            coeff_half[13] = 18'sd72;
-            coeff_half[14] = -18'sd23;
-            coeff_half[15] = -18'sd98;
-            coeff_half[16] = 18'sd28;
-            coeff_half[17] = 18'sd131;
-            coeff_half[18] = -18'sd34;
-            coeff_half[19] = -18'sd171;
-            coeff_half[20] = 18'sd41;
-            coeff_half[21] = 18'sd221;
-            coeff_half[22] = -18'sd47;
-            coeff_half[23] = -18'sd281;
-            coeff_half[24] = 18'sd55;
-            coeff_half[25] = 18'sd354;
-            coeff_half[26] = -18'sd62;
-            coeff_half[27] = -18'sd442;
-            coeff_half[28] = 18'sd70;
-            coeff_half[29] = 18'sd548;
-            coeff_half[30] = -18'sd77;
-            coeff_half[31] = -18'sd677;
-            coeff_half[32] = 18'sd85;
-            coeff_half[33] = 18'sd836;
-            coeff_half[34] = -18'sd92;
-            coeff_half[35] = -18'sd1033;
-            coeff_half[36] = 18'sd99;
-            coeff_half[37] = 18'sd1285;
-            coeff_half[38] = -18'sd106;
-            coeff_half[39] = -18'sd1619;
-            coeff_half[40] = 18'sd111;
-            coeff_half[41] = 18'sd2086;
-            coeff_half[42] = -18'sd116;
-            coeff_half[43] = -18'sd2796;
-            coeff_half[44] = 18'sd120;
-            coeff_half[45] = 18'sd4039;
-            coeff_half[46] = -18'sd123;
-            coeff_half[47] = -18'sd6873;
-            coeff_half[48] = 18'sd124;
-            coeff_half[49] = 18'sd20834;
-            coeff_half[50] = 18'sd32643;
+            coeff_half[0] = 17'sd14;
+            coeff_half[1] = 17'sd24;
+            coeff_half[2] = -17'sd14;
+            coeff_half[3] = -17'sd31;
+            coeff_half[4] = 17'sd18;
+            coeff_half[5] = 17'sd52;
+            coeff_half[6] = -17'sd25;
+            coeff_half[7] = -17'sd79;
+            coeff_half[8] = 17'sd33;
+            coeff_half[9] = 17'sd115;
+            coeff_half[10] = -17'sd43;
+            coeff_half[11] = -17'sd163;
+            coeff_half[12] = 17'sd54;
+            coeff_half[13] = 17'sd224;
+            coeff_half[14] = -17'sd67;
+            coeff_half[15] = -17'sd301;
+            coeff_half[16] = 17'sd81;
+            coeff_half[17] = 17'sd396;
+            coeff_half[18] = -17'sd96;
+            coeff_half[19] = -17'sd513;
+            coeff_half[20] = 17'sd111;
+            coeff_half[21] = 17'sd657;
+            coeff_half[22] = -17'sd128;
+            coeff_half[23] = -17'sd831;
+            coeff_half[24] = 17'sd145;
+            coeff_half[25] = 17'sd1044;
+            coeff_half[26] = -17'sd163;
+            coeff_half[27] = -17'sd1303;
+            coeff_half[28] = 17'sd180;
+            coeff_half[29] = 17'sd1621;
+            coeff_half[30] = -17'sd196;
+            coeff_half[31] = -17'sd2018;
+            coeff_half[32] = 17'sd212;
+            coeff_half[33] = 17'sd2526;
+            coeff_half[34] = -17'sd227;
+            coeff_half[35] = -17'sd3198;
+            coeff_half[36] = 17'sd239;
+            coeff_half[37] = 17'sd4137;
+            coeff_half[38] = -17'sd250;
+            coeff_half[39] = -17'sd5565;
+            coeff_half[40] = 17'sd259;
+            coeff_half[41] = 17'sd8058;
+            coeff_half[42] = -17'sd266;
+            coeff_half[43] = -17'sd13734;
+            coeff_half[44] = 17'sd270;
+            coeff_half[45] = 17'sd41663;
+            coeff_half[46] = 17'sd65265;
         end
         else if (STAGE_ID == 2) begin
-            coeff_half[0] = -18'sd115;
-            coeff_half[1] = -18'sd203;
-            coeff_half[2] = 18'sd534;
-            coeff_half[3] = 18'sd1233;
-            coeff_half[4] = -18'sd1302;
-            coeff_half[5] = -18'sd4595;
-            coeff_half[6] = 18'sd2116;
-            coeff_half[7] = 18'sd19945;
-            coeff_half[8] = 18'sd30298;
+            coeff_half[0] = -16'sd115;
+            coeff_half[1] = -16'sd203;
+            coeff_half[2] = 16'sd534;
+            coeff_half[3] = 16'sd1233;
+            coeff_half[4] = -16'sd1302;
+            coeff_half[5] = -16'sd4595;
+            coeff_half[6] = 16'sd2116;
+            coeff_half[7] = 16'sd19945;
+            coeff_half[8] = 16'sd30298;
         end
         else if (STAGE_ID == 3) begin
-            coeff_half[0] = 17'sd202;
-            coeff_half[1] = -17'sd74;
-            coeff_half[2] = -17'sd1636;
-            coeff_half[3] = 17'sd261;
-            coeff_half[4] = 17'sd9625;
-            coeff_half[5] = 17'sd16008;
+            coeff_half[0] = 15'sd202;
+            coeff_half[1] = -15'sd74;
+            coeff_half[2] = -15'sd1636;
+            coeff_half[3] = 15'sd261;
+            coeff_half[4] = 15'sd9625;
+            coeff_half[5] = 15'sd16008;
         end
         else if (STAGE_ID == 4) begin
-            coeff_half[0] = -18'sd2061;
-            coeff_half[1] = 18'sd116;
-            coeff_half[2] = 18'sd18447;
-            coeff_half[3] = 18'sd32543;
+            coeff_half[0] = -16'sd2061;
+            coeff_half[1] = 16'sd116;
+            coeff_half[2] = 16'sd18447;
+            coeff_half[3] = 16'sd32543;
         end
         else if (STAGE_ID == 5) begin
-            coeff_half[0] = -14'sd128;
-            coeff_half[1] = 14'sd2;
-            coeff_half[2] = 14'sd1152;
-            coeff_half[3] = 14'sd2044;
+            coeff_half[0] = -14'sd513;
+            coeff_half[1] = 14'sd7;
+            coeff_half[2] = 14'sd4609;
+            coeff_half[3] = 14'sd8178;
         end
         else if (STAGE_ID == 6) begin
-            coeff_half[0] = -15'sd256;
-            coeff_half[1] = 15'sd1;
-            coeff_half[2] = 15'sd2304;
-            coeff_half[3] = 15'sd4094;
+            coeff_half[0] = -13'sd256;
+            coeff_half[1] = 13'sd1;
+            coeff_half[2] = 13'sd2304;
+            coeff_half[3] = 13'sd4094;
         end
         else if (STAGE_ID == 7) begin
-            coeff_half[0] = -14'sd128;
+            coeff_half[0] = -14'sd256;
             coeff_half[1] = 14'sd0;
-            coeff_half[2] = 14'sd1152;
-            coeff_half[3] = 14'sd2048;
+            coeff_half[2] = 14'sd2304;
+            coeff_half[3] = 14'sd4096;
         end
     end
 

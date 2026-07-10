@@ -1,8 +1,8 @@
 #=============================================================
 # 文件名       : board_demo_competition_dac8_top.xdc
 # 对应顶层     : board_demo_competition_dac8_top
-# 功能简述     : Artix-7 XC7A35T 赛方板 AD9708 DAC 双频率家族
-#                插值演示约束文件。
+# 功能简述     : Artix-7 XC7A35T 赛方板 AD9708 DAC 的 44.1kHz
+#                专用全 2x 插值演示约束文件。
 #                本文件用于约束板上 20MHz 系统时钟、矩阵按键
 #                以及 AD9708 8bit 并行 DAC 接口。
 #
@@ -18,6 +18,8 @@
 #                2026-06-20：当前顶层无外部 rst_n 端口，因此不约束 rst_n。
 #                2026-07-08：补充配置电压属性，并按 MMCM 输出管脚
 #                            引用自动派生音频时钟。
+#                2026-07-10：删除 48kHz MMCM 后同步移除双音频
+#                            时钟组约束，保留单 44.1kHz 时钟家族。
 # 其他描述     :
 #                1. 当前 IO 表确认 clk_20M 管脚为 Y18。
 #                2. 当前 IO 表确认矩阵按键：
@@ -34,9 +36,8 @@
 #                   DA_D6  = E17；
 #                   DA_D7  = C17。
 #                4. BEEP-IO = AB18，低电平响，高电平关闭。
-#                5. SW1/SW2/SW3 选择 44.1kHz 家族
-#                   4x/8x/128x；SW5/SW6/SW7 选择
-#                   48kHz 家族 4x/8x/128x。
+#                5. SW1/SW2/SW3 和 SW5/SW6/SW7 均映射为
+#                   44.1kHz 家族 4x/8x/128x 模式选择。
 #=============================================================
 
 
@@ -49,7 +50,7 @@
 # 说明：
 #   顶层内部结构为：
 #     clk -> IBUF -> BUFG -> clk_sys_bufg
-#   然后 clk_sys_bufg 同时送入两个 Clock Wizard。
+#   然后 clk_sys_bufg 送入 44.1kHz Clock Wizard。
 #=============================================================
 set_property PACKAGE_PIN Y18 [get_ports clk]
 set_property IOSTANDARD LVCMOS33 [get_ports clk]
@@ -178,19 +179,14 @@ set_false_path -from [get_ports {key_kc[*]}]
 
 
 #=============================================================
-# 7）双 MMCM + BUFGMUX 音频时钟组约束
+# 7）控制域与音频域异步时钟组
 #
-# 当前设计中：
-#   clk_20M               ：板载 20MHz 系统输入时钟
-#   clk_audio_128x_44k1   ：44.1kHz 家族 128x 音频时钟，5.6448MHz
-#   clk_audio_128x_48k    ：48kHz 家族 128x 音频时钟，6.144MHz
-#
-# 两个音频时钟经过 BUFGMUX 选择后进入同一套 FIR 插值链。
-# 硬件上同一时刻只选择其中一路，因此不应该让 Vivado
-# 对 44.1kHz 家族和 48kHz 家族之间做跨时钟时序分析。
+# 当前只保留由 20MHz 输入经 clk_wiz_audio_44k1 派生的
+# 5.6448MHz 音频时钟。模式控制使用两级同步器跨入音频域，
+# 上电复位使用异步置位、同步释放结构，因此两个逻辑时钟域
+# 之间不做同步时序收敛。
 #=============================================================
 
 set_clock_groups -asynchronous \
     -group [get_clocks clk_20M] \
-    -group [get_clocks -of_objects [get_pins u_clk_wiz_audio_44k1/inst/mmcm_adv_inst/CLKOUT0]] \
-    -group [get_clocks -of_objects [get_pins u_clk_wiz_audio_48k/inst/mmcm_adv_inst/CLKOUT0]]
+    -group [get_clocks clk_audio_128x_44k1]

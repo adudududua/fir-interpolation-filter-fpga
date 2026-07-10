@@ -1,0 +1,62 @@
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date         : Fri Jul 10 21:22:49 2026
+| Host         : LAPTOP-476JT8H0 running 64-bit major release  (build 9200)
+| Command      : report_utilization -hierarchical -file D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/alt_all2x/rtl_export/all2x_stage1_mac_utilization.txt
+| Design       : interp128_all2x_top_ce
+| Device       : 7a35tfgg484-2
+| Design State : Synthesized
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++--------------------------------------------------------------+---------------------------------------------+------------+------------+---------+------+------+--------+--------+--------------+
+|                           Instance                           |                    Module                   | Total LUTs | Logic LUTs | LUTRAMs | SRLs |  FFs | RAMB36 | RAMB18 | DSP48 Blocks |
++--------------------------------------------------------------+---------------------------------------------+------------+------------+---------+------+------+--------+--------+--------------+
+| interp128_all2x_top_ce                                       |                                       (top) |       4604 |       4604 |       0 |    0 | 4178 |      0 |      0 |           15 |
+|   (interp128_all2x_top_ce)                                   |                                       (top) |         21 |         21 |       0 |    0 |    1 |      0 |      0 |            0 |
+|   u_bridge_16_to_32                                          |                        bridge_to_interp2_ce |         14 |         14 |       0 |    0 |   26 |      0 |      0 |            0 |
+|   u_bridge_2_to_4                                            |                      bridge_to_interp2_ce_0 |         14 |         14 |       0 |    0 |   26 |      0 |      0 |            0 |
+|   u_bridge_32_to_64                                          |                      bridge_to_interp2_ce_1 |         14 |         14 |       0 |    0 |   26 |      0 |      0 |            0 |
+|   u_bridge_4_to_8                                            |                      bridge_to_interp2_ce_2 |         14 |         14 |       0 |    0 |   26 |      0 |      0 |            0 |
+|   u_bridge_64_to_128                                         |                      bridge_to_interp2_ce_3 |         14 |         14 |       0 |    0 |   26 |      0 |      0 |            0 |
+|   u_bridge_8_to_16                                           |                      bridge_to_interp2_ce_4 |         14 |         14 |       0 |    0 |   26 |      0 |      0 |            0 |
+|   u_interp2_all2x_stage1                                     |                   interp2_top_symm_ce_all2x |       1019 |       1019 |       0 |    0 | 2321 |      0 |      0 |            1 |
+|     gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac |            fir_core_symm_interp2_stage1_mac |        971 |        971 |       0 |    0 | 2295 |      0 |      0 |            1 |
+|     u_interp2_ctrl_ce                                        |                          interp2_ctrl_ce_12 |         15 |         15 |       0 |    0 |   26 |      0 |      0 |            0 |
+|     u_round_sat_q16_to24                                     |                          round_sat_q16_to24 |         34 |         34 |       0 |    0 |    0 |      0 |      0 |            0 |
+|   u_interp2_all2x_stage2                                     |   interp2_top_symm_ce_all2x__parameterized0 |       1202 |       1202 |       0 |    0 |  436 |      0 |      0 |            5 |
+|     gen_parallel_fir.u_fir_core_symm_interp2_all2x           |                 fir_core_symm_interp2_all2x |       1170 |       1170 |       0 |    0 |  410 |      0 |      0 |            5 |
+|     u_interp2_ctrl_ce                                        |                          interp2_ctrl_ce_10 |          1 |          1 |       0 |    0 |   26 |      0 |      0 |            0 |
+|     u_round_sat_q16_to24                                     |       round_sat_q16_to24__parameterized0_11 |         32 |         32 |       0 |    0 |    0 |      0 |      0 |            0 |
+|   u_interp2_all2x_stage3                                     |   interp2_top_symm_ce_all2x__parameterized1 |        804 |        804 |       0 |    0 |  332 |      0 |      0 |            3 |
+|     gen_parallel_fir.u_fir_core_symm_interp2_all2x           | fir_core_symm_interp2_all2x__parameterized0 |        774 |        774 |       0 |    0 |  306 |      0 |      0 |            3 |
+|     u_interp2_ctrl_ce                                        |                           interp2_ctrl_ce_9 |          1 |          1 |       0 |    0 |   26 |      0 |      0 |            0 |
+|     u_round_sat_q16_to24                                     |          round_sat_q16_to24__parameterized1 |         29 |         29 |       0 |    0 |    0 |      0 |      0 |            0 |
+|   u_interp2_all2x_stage4                                     |   interp2_top_symm_ce_all2x__parameterized2 |        580 |        580 |       0 |    0 |  237 |      0 |      0 |            2 |
+|     gen_parallel_fir.u_fir_core_symm_interp2_all2x           | fir_core_symm_interp2_all2x__parameterized1 |        548 |        548 |       0 |    0 |  211 |      0 |      0 |            2 |
+|     u_interp2_ctrl_ce                                        |                           interp2_ctrl_ce_8 |          1 |          1 |       0 |    0 |   26 |      0 |      0 |            0 |
+|     u_round_sat_q16_to24                                     |          round_sat_q16_to24__parameterized0 |         32 |         32 |       0 |    0 |    0 |      0 |      0 |            0 |
+|   u_interp2_all2x_stage5                                     |   interp2_top_symm_ce_all2x__parameterized3 |        448 |        448 |       0 |    0 |  235 |      0 |      0 |            2 |
+|     gen_parallel_fir.u_fir_core_symm_interp2_all2x           | fir_core_symm_interp2_all2x__parameterized2 |        418 |        418 |       0 |    0 |  209 |      0 |      0 |            2 |
+|     u_interp2_ctrl_ce                                        |                           interp2_ctrl_ce_7 |          1 |          1 |       0 |    0 |   26 |      0 |      0 |            0 |
+|     u_round_sat_q16_to24                                     |          round_sat_q16_to24__parameterized2 |         29 |         29 |       0 |    0 |    0 |      0 |      0 |            0 |
+|   u_interp2_all2x_stage6                                     |   interp2_top_symm_ce_all2x__parameterized4 |        244 |        244 |       0 |    0 |  234 |      0 |      0 |            2 |
+|     gen_parallel_fir.u_fir_core_symm_interp2_all2x           | fir_core_symm_interp2_all2x__parameterized3 |        216 |        216 |       0 |    0 |  208 |      0 |      0 |            2 |
+|     u_interp2_ctrl_ce                                        |                           interp2_ctrl_ce_5 |          1 |          1 |       0 |    0 |   26 |      0 |      0 |            0 |
+|     u_round_sat_q16_to24                                     |        round_sat_q16_to24__parameterized3_6 |         28 |         28 |       0 |    0 |    0 |      0 |      0 |            0 |
+|   u_interp2_all2x_stage7                                     |   interp2_top_symm_ce_all2x__parameterized5 |        202 |        202 |       0 |    0 |  226 |      0 |      0 |            0 |
+|     gen_parallel_fir.u_fir_core_symm_interp2_all2x           | fir_core_symm_interp2_all2x__parameterized4 |        174 |        174 |       0 |    0 |  200 |      0 |      0 |            0 |
+|     u_interp2_ctrl_ce                                        |                             interp2_ctrl_ce |          1 |          1 |       0 |    0 |   26 |      0 |      0 |            0 |
+|     u_round_sat_q16_to24                                     |          round_sat_q16_to24__parameterized3 |         28 |         28 |       0 |    0 |    0 |      0 |      0 |            0 |
++--------------------------------------------------------------+---------------------------------------------+------------+------------+---------+------+------+--------+--------+--------------+
+
+

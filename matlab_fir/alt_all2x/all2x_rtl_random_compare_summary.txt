@@ -1,0 +1,9 @@
+All-2x RTL random PCM comparison summary
+========================================
+RTL CSV samples       = 29997
+Golden samples        = 22907
+Best shift            = 327
+Max abs error LSB     = 0
+RMS error LSB         = 0.000000
+Mismatch samples      = 0 / 22907
+Pass all              = 1

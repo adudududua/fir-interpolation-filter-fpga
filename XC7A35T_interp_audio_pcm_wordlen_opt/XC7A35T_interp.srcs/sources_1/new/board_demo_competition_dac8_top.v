@@ -2,13 +2,11 @@
 //=============================================================
 // 文件名       : board_demo_competition_dac8_top.v
 // 模块名       : board_demo_competition_dac8_top
-// 功能简述     : Artix-7 XC7A35T 赛方板 AD9708 DAC 双频率家族
-//                插值演示顶层。
-//                本版本恢复原先已验证可运行的双 MMCM + BUFGMUX
-//                结构：
+// 功能简述     : Artix-7 XC7A35T 赛方板 AD9708 DAC 的 44.1kHz
+//                专用全 2x 插值演示顶层。
+//                当前展示版本只保留：
 //                20MHz -> clk_wiz_audio_44k1 -> 5.6448MHz
-//                20MHz -> clk_wiz_audio_48k  -> 6.144MHz
-//                矩阵按键选择当前音频 128x 时钟家族和插值倍率。
+//                矩阵按键用于选择 4x、8x 和 128x 输出节点。
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-06-20
@@ -19,9 +17,13 @@
 //                2026-06-20：去掉外部 rst_n 端口，改为内部上电复位。
 //                2026-06-20：不使用外部反馈 BUFG。
 //                2026-06-20：不使用 CLOCK_DEDICATED_ROUTE FALSE。
+//                2026-07-10：删除 48kHz MMCM 与 BUFGMUX，固定使用
+//                            44.1kHz / 5.6448MHz 时钟家族。
+//                2026-07-10：板级公共模块切换为全 2x 插值链路。
+//                2026-07-10：增加 mode_sel 的音频时钟域两级同步器。
 // 其他描述     :
-//                1. SW1/SW2/SW3：44.1kHz 家族 4x/8x/128x。
-//                2. SW5/SW6/SW7：48kHz 家族 4x/8x/128x。
+//                1. SW1/SW2/SW3：4x/8x/128x。
+//                2. SW5/SW6/SW7：同样映射为 4x/8x/128x。
 //=============================================================
 
 module board_demo_competition_dac8_top (
@@ -94,7 +96,7 @@ module board_demo_competition_dac8_top (
     // KC 由板上 10k 电阻上拉，按下时被当前 KR 拉低。
     //=========================================================
     wire [3:0] key_kr_drive_low;
-    wire       key_family_sel;
+    wire       key_family_sel_unused;
     wire [1:0] key_mode_sel;
     wire       key_strobe_unused;
     wire [3:0] key_code_unused;
@@ -109,41 +111,14 @@ module board_demo_competition_dac8_top (
         .rst_n        (rst_n_int),
         .kc           (key_kc),
         .kr_drive_low (key_kr_drive_low),
-        .family_sel   (key_family_sel),
+        .family_sel   (key_family_sel_unused),
         .mode_sel     (key_mode_sel),
         .key_strobe   (key_strobe_unused),
         .key_code     (key_code_unused)
     );
 
     //=========================================================
-    // 4）Clock Wizard：48kHz 家族
-    //
-    // 输入：
-    //   clk_sys_bufg = 20MHz
-    //
-    // 输出：
-    //   clk_audio_128x_48k = 6.144MHz
-    //
-    // 注意：
-    //   这里恢复你原来已验证的写法：
-    //   clkfb_in 和 clkfb_out 直接通过同一个 wire 相连。
-    //   不再额外插入外部 BUFG。
-    //=========================================================
-    wire clk_audio_128x_48k;
-    wire mmcm_locked_48k;
-    wire clkfb_48k;
-
-    clk_wiz_audio_48k u_clk_wiz_audio_48k (
-        .clk_out1  (clk_audio_128x_48k),
-        .reset     (~rst_n_int),
-        .locked    (mmcm_locked_48k),
-        .clk_in1   (clk_sys_bufg),
-        .clkfb_in  (clkfb_48k),
-        .clkfb_out (clkfb_48k)
-    );
-
-    //=========================================================
-    // 5）Clock Wizard：44.1kHz 家族
+    // 4）Clock Wizard：44.1kHz 家族
     //
     // 输入：
     //   clk_sys_bufg = 20MHz
@@ -167,36 +142,7 @@ module board_demo_competition_dac8_top (
     );
 
     //=========================================================
-    // 6）BUFGMUX 选择两个频率家族
-    //
-    // key_family_sel = 0：
-    //   选择 I0，即 44.1kHz 家族 5.6448MHz。
-    //
-    // key_family_sel = 1：
-    //   选择 I1，即 48kHz 家族 6.144MHz。
-    //
-    // 建议：
-    //   切换频率家族时，BUFGMUX 会异步切换到另一只 MMCM。
-    //   板级测试时建议先按目标频率家族，再测 DA_CLK。
-    //=========================================================
-    wire clk_audio_128x_sel;
-
-    BUFGMUX #(
-        .CLK_SEL_TYPE("ASYNC")
-    ) u_bufgmux_audio_clk (
-        .O  (clk_audio_128x_sel),
-        .I0 (clk_audio_128x_44k1),
-        .I1 (clk_audio_128x_48k),
-        .S  (key_family_sel)
-    );
-
-    // 当前被选择的 MMCM locked 信号
-    wire mmcm_locked_sel;
-
-    assign mmcm_locked_sel = key_family_sel ? mmcm_locked_48k : mmcm_locked_44k1;
-
-    //=========================================================
-    // 7）音频时钟域复位同步
+    // 5）音频时钟域复位同步
     //
     // rst_audio_sync：
     //   在当前选择的音频时钟域内释放复位。
@@ -206,11 +152,11 @@ module board_demo_competition_dac8_top (
     //=========================================================
     (* ASYNC_REG = "TRUE" *) reg [2:0] rst_audio_sync = 3'b000;
 
-    always @(posedge clk_audio_128x_sel or negedge rst_n_int) begin
+    always @(posedge clk_audio_128x_44k1 or negedge rst_n_int) begin
         if (!rst_n_int) begin
             rst_audio_sync <= 3'b000;
         end
-        else if (!mmcm_locked_sel) begin
+        else if (!mmcm_locked_44k1) begin
             rst_audio_sync <= 3'b000;
         end
         else begin
@@ -223,24 +169,35 @@ module board_demo_competition_dac8_top (
     assign rst_audio_n = rst_audio_sync[2];
 
     //=========================================================
-    // 8）实例化正式插值 DAC 公共模块
+    // 6）模式控制跨时钟域同步
     //
-    // 注意：
-    //   如果你当前正式公共模块名字是：
-    //     demo_interp_dac8_mmcm48_common
-    //   就使用下面这个实例。
-    //
-    //   如果你的工程里模块名仍然叫：
-    //     demo_interp_dac8_mmcm_common
-    //   那只需要把实例化模块名改成 demo_interp_dac8_mmcm_common。
+    // key_mode_sel 在 20MHz 按键扫描时钟域产生，送入 5.6448MHz
+    // 音频域前使用两级同步器。按键模式在消抖后长时间保持稳定，
+    // 因此逐位同步不会影响实际模式切换。
+    //=========================================================
+    (* ASYNC_REG = "TRUE" *) reg [1:0] mode_audio_meta = 2'b10;
+    (* ASYNC_REG = "TRUE" *) reg [1:0] mode_audio_sync = 2'b10;
+
+    always @(posedge clk_audio_128x_44k1 or negedge rst_audio_n) begin
+        if (!rst_audio_n) begin
+            mode_audio_meta <= 2'b10;
+            mode_audio_sync <= 2'b10;
+        end
+        else begin
+            mode_audio_meta <= key_mode_sel;
+            mode_audio_sync <= mode_audio_meta;
+        end
+    end
+
+    //=========================================================
+    // 7）实例化 44.1kHz 专用全 2x 插值 DAC 公共模块
     //=========================================================
     wire [1:0] mode_led_unused;
 
-    // demo_interp_dac8_mmcm48_common u_demo_interp_dac8_mmcm48_common (
     demo_interp_dac8_audio_pcm_common u_demo_interp_dac8_audio_pcm_common (
-        .clk_audio_128x (clk_audio_128x_sel),
+        .clk_audio_128x (clk_audio_128x_44k1),
         .rst_n          (rst_audio_n),
-        .mode_sel       (key_mode_sel),
+        .mode_sel       (mode_audio_sync),
 
         .dac_clk        (dac_clk),
         .dac_data       (dac_data),
@@ -266,9 +223,11 @@ endmodule
 //   SW1  = KC0 + KR0：44.1kHz，4x
 //   SW2  = KC0 + KR1：44.1kHz，8x
 //   SW3/4= KC0 + KR2/3：44.1kHz，128x
-//   SW5  = KC1 + KR0：48kHz，4x
-//   SW6  = KC1 + KR1：48kHz，8x
-//   SW7/8= KC1 + KR2/3：48kHz，128x
+//   SW5  = KC1 + KR0：44.1kHz，4x
+//   SW6  = KC1 + KR1：44.1kHz，8x
+//   SW7/8= KC1 + KR2/3：44.1kHz，128x
+//
+// family_sel 为兼容原接口保留，当前板级顶层不再使用。
 //=============================================================
 module matrix_keypad_mode_ctrl #(
     parameter integer SCAN_DIV       = 20000,  // 20MHz 下每个 KR 扫描约 1ms
@@ -280,7 +239,7 @@ module matrix_keypad_mode_ctrl #(
     input  wire [3:0] kc,
     output reg  [3:0] kr_drive_low,
 
-    output reg        family_sel,    // 0=44.1kHz 家族，1=48kHz 家族
+    output reg        family_sel,    // 兼容保留；当前板级顶层忽略
     output reg  [1:0] mode_sel,      // 00=4x，01=8x，10/11=128x
     output reg        key_strobe,    // 消抖后的新按键脉冲，调试用
     output reg  [3:0] key_code       // 0=SW1, 1=SW2, ... 15=SW16
@@ -358,7 +317,7 @@ module matrix_keypad_mode_ctrl #(
             stable_cnt        <= 4'd0;
 
             family_sel        <= 1'b0;
-            mode_sel          <= 2'b00;
+            mode_sel          <= 2'b10;  // 上电默认 128x，DA_CLK=5.6448MHz
             key_strobe        <= 1'b0;
             key_code          <= 4'd0;
         end

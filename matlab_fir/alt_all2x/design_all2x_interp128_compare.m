@@ -41,6 +41,9 @@ clc; clear; close all;
 % 开发工具     : MATLAB
 % 修订记录     :
 %                2026-07-10：新增全 2x 级联 128 倍插值结构探索脚本。
+%                2026-07-10：加入每级 2 倍插值增益、两相直流增益及
+%                            绝对通带误差检查；保留覆盖过渡带镜像的
+%                            保守逐级阻带入口，保证最终全阻带指标。
 %=============================================================
 
 %% 1) 基本设计目标参数
@@ -53,7 +56,9 @@ FS_OUT_FINAL = FS_IN_BASE * L_STAGE^NUM_STAGE;
 
 f_pass_low  = 10;
 f_pass_high = 20000;
-f_stop_base = FS_IN_BASE - f_pass_high;  % 44.1k - 20k = 24.1kHz
+f_stop_base = FS_IN_BASE - f_pass_high;
+INTERP_GAIN = 2;
+EXPECTED_TOTAL_GAIN = INTERP_GAIN^NUM_STAGE;
 
 total_ripple_target_db = 0.05;
 total_stop_target_db   = 70;
@@ -92,6 +97,8 @@ fprintf('全 2x 级联 128 倍插值 FIR 结构探索开始\n');
 fprintf('输入采样率 Fs_in        = %.1f Hz\n', FS_IN_BASE);
 fprintf('输出采样率 Fs_out       = %.1f Hz\n', FS_OUT_FINAL);
 fprintf('级联结构                = %d 级 2x\n', NUM_STAGE);
+fprintf('每级插值增益            = %.1f\n', INTERP_GAIN);
+fprintf('总等效直流增益          = %.1f\n', EXPECTED_TOTAL_GAIN);
 fprintf('总通带目标              = %.1f Hz ~ %.1f Hz\n', f_pass_low, f_pass_high);
 fprintf('总通带 ±纹波目标        = %.4f dB\n', total_ripple_target_db);
 fprintf('总阻带衰减目标          = %.1f dB\n', total_stop_target_db);
@@ -114,6 +121,8 @@ for stage_idx = 1:NUM_STAGE
     if stage_idx == 1
         f_stop_begin = f_stop_base;
     else
+        % 最终等效 FIR 要求从 24.1 kHz 起全阻带达标，因此后级还需
+        % 抑制前级 20~24.1 kHz 过渡带经插值产生的镜像。
         f_stop_begin = Fs_in_stage - f_stop_base;
     end
 
@@ -138,6 +147,7 @@ for stage_idx = 1:NUM_STAGE
         stage_stop_attn_target_db, ...
         FRAC_W_LIST, ...
         PRUNE_THR_LIST, ...
+        INTERP_GAIN, ...
         N_MAX, ...
         Nfft_stage);
 
@@ -158,7 +168,11 @@ for stage_idx = 1:NUM_STAGE
     stage_result(stage_idx).nonzero_half     = one_stage.nonzero_half;
     stage_result(stage_idx).pass_gain_db     = one_stage.res.pass_gain_db;
     stage_result(stage_idx).ripple_pm_db     = one_stage.res.ripple_pm_db;
+    stage_result(stage_idx).pass_abs_max_db  = one_stage.res.pass_abs_max_db;
     stage_result(stage_idx).stop_attn_db     = one_stage.res.stop_attn_db;
+    stage_result(stage_idx).dc_gain          = one_stage.res.dc_gain;
+    stage_result(stage_idx).phase0_gain      = one_stage.res.phase0_gain;
+    stage_result(stage_idx).phase1_gain      = one_stage.res.phase1_gain;
     stage_result(stage_idx).gd_mean          = one_stage.res.gd_mean;
     stage_result(stage_idx).gd_pp            = one_stage.res.gd_pp;
     stage_result(stage_idx).pass_all         = one_stage.res.pass_all;
@@ -174,10 +188,12 @@ end
 stage_csv = fullfile(script_dir, 'all2x_stage_search_result.csv');
 fid = fopen(stage_csv, 'w');
 fprintf(fid, ['STAGE,FS_IN,FS_OUT,FRAC_W,COEFF_W,PRUNE_THR,ORDER_N,TAPS,' ...
-              'PASS_GAIN_DB,RIPPLE_PM_DB,STOP_ATTN_DB,GD_MEAN,GD_PP,' ...
+              'PASS_GAIN_DB,RIPPLE_PM_DB,PASS_ABS_MAX_DB,STOP_ATTN_DB,' ...
+              'DC_GAIN,PHASE0_GAIN,PHASE1_GAIN,GD_MEAN,GD_PP,' ...
               'NONZERO_FULL,NONZERO_HALF,PASS_ALL\n']);
 for i = 1:size(stage_search_table, 1)
-    fprintf(fid, '%d,%.1f,%.1f,%d,%d,%d,%d,%d,%.8f,%.8f,%.8f,%.8f,%.12f,%d,%d,%d\n', ...
+    fprintf(fid, ['%d,%.1f,%.1f,%d,%d,%d,%d,%d,%.8f,%.8f,%.8f,%.8f,' ...
+                  '%.10f,%.10f,%.10f,%.8f,%.12f,%d,%d,%d\n'], ...
         stage_search_table(i, :));
 end
 fclose(fid);
@@ -210,6 +226,7 @@ total_res = check_total_chain( ...
     f_pass_high, ...
     total_ripple_target_db, ...
     total_stop_target_db, ...
+    EXPECTED_TOTAL_GAIN, ...
     Nfft_total);
 
 nonzero_half_total = 0;
@@ -224,6 +241,11 @@ fprintf('估算非零半系数总数             = %d\n', nonzero_half_total);
 fprintf('总通带峰峰纹波                 = %.8f dB\n', total_res.ripple_pp_db);
 fprintf('总通带 ±纹波                   = %.8f dB\n', total_res.ripple_pm_db);
 fprintf('总通带平均增益                 = %.8f dB\n', total_res.pass_gain_db);
+fprintf('总通带最大绝对误差             = %.8f dB\n', total_res.pass_abs_max_db);
+fprintf('总通带最高点                   = %.8f dB\n', total_res.pass_abs_peak_db);
+fprintf('总通带最低点                   = %.8f dB\n', total_res.pass_abs_min_db);
+fprintf('总等效直流增益                 = %.8f（目标 %.1f）\n', ...
+        total_res.dc_gain, total_res.expected_gain);
 fprintf('总阻带起始频率                 = %.1f Hz\n', total_res.f_stop_begin);
 fprintf('总阻带衰减                     = %.8f dB\n', total_res.stop_attn_db);
 fprintf('总通带平均群延迟               = %.8f 个最终采样点\n', total_res.gd_mean);
@@ -250,6 +272,11 @@ fprintf(fid, 'Total nonzero half coefficients= %d\n', nonzero_half_total);
 fprintf(fid, 'Total ripple_pm_db             = %.8f\n', total_res.ripple_pm_db);
 fprintf(fid, 'Total ripple_pp_db             = %.8f\n', total_res.ripple_pp_db);
 fprintf(fid, 'Total pass_gain_db             = %.8f\n', total_res.pass_gain_db);
+fprintf(fid, 'Total pass_abs_max_db          = %.8f\n', total_res.pass_abs_max_db);
+fprintf(fid, 'Total pass_abs_peak_db         = %.8f\n', total_res.pass_abs_peak_db);
+fprintf(fid, 'Total pass_abs_min_db          = %.8f\n', total_res.pass_abs_min_db);
+fprintf(fid, 'Total dc_gain                  = %.10f\n', total_res.dc_gain);
+fprintf(fid, 'Expected total gain            = %.1f\n', total_res.expected_gain);
 fprintf(fid, 'Total stop_attn_db             = %.8f\n', total_res.stop_attn_db);
 fprintf(fid, 'Total gd_mean                  = %.8f\n', total_res.gd_mean);
 fprintf(fid, 'Total gd_pp                    = %.12f\n', total_res.gd_pp);
@@ -273,11 +300,13 @@ for stage_idx = 1:NUM_STAGE
     fprintf(fid, ['Stage %d: Fs %.1f -> %.1f Hz, f_stop=%.1f Hz, order=%d, taps=%d, ' ...
                   'COEFF_W=%d, FRAC_W=%d, prune=%d, nz_half=%d, ' ...
                   'target_ripple=%.4f dB, target_stop=%.1f dB, ' ...
-                  'gain=%.8f dB, ripple_pm=%.8f dB, stop=%.8f dB\n'], ...
+                  'gain=%.8f dB, ripple_pm=%.8f dB, abs_max=%.8f dB, ' ...
+                  'stop=%.8f dB, dc=%.10f, phase0=%.10f, phase1=%.10f\n'], ...
                   r.stage_idx, r.Fs_in, r.Fs_out, r.f_stop_begin, r.order_n, r.taps, ...
                   r.coeff_w, r.frac_w, r.prune_thr, r.nonzero_half, ...
                   r.target_ripple_pm, r.target_stop_attn, ...
-                  r.pass_gain_db, r.ripple_pm_db, r.stop_attn_db);
+                  r.pass_gain_db, r.ripple_pm_db, r.pass_abs_max_db, ...
+                  r.stop_attn_db, r.dc_gain, r.phase0_gain, r.phase1_gain);
 end
 fclose(fid);
 
@@ -304,6 +333,7 @@ function [best, result_table] = design_one_2x_stage(stage_idx, Fs_in, Fs_out, ..
                                                     ripple_pm_target_db, ...
                                                     stop_attn_target_db, ...
                                                     frac_w_list, prune_thr_list, ...
+                                                    interp_gain, ...
                                                     n_max, nfft)
 
     if f_stop_begin <= f_pass_high
@@ -323,7 +353,7 @@ function [best, result_table] = design_one_2x_stage(stage_idx, Fs_in, Fs_out, ..
         n_est = n_est + 1;
     end
 
-    n_max_stage = max(n_max, n_est + 80);
+    n_max_stage = min(n_max, n_est + 80);
 
     fprintf('firpmord 估计阶数 n_est = %d，对应 tap 数 = %d\n', n_est, n_est + 1);
 
@@ -351,7 +381,7 @@ function [best, result_table] = design_one_2x_stage(stage_idx, Fs_in, Fs_out, ..
 
             for n = n_est : 2 : n_max_stage
                 try
-                    b_float = firpm(n, fo, ao, w);
+                    b_float = interp_gain * firpm(n, fo, ao, w);
                 catch
                     continue;
                 end
@@ -368,7 +398,8 @@ function [best, result_table] = design_one_2x_stage(stage_idx, Fs_in, Fs_out, ..
                 b_q = coeff_int_pruned / 2^frac_w_try;
 
                 res = check_one_stage(b_q, Fs_out, f_pass_low, f_pass_high, f_stop_begin, ...
-                                      stop_attn_target_db, ripple_pm_target_db, nfft);
+                                      stop_attn_target_db, ripple_pm_target_db, ...
+                                      interp_gain, nfft);
 
                 coeff_int_col = coeff_int_pruned(:);
                 nonzero_full = nnz(coeff_int_col);
@@ -380,8 +411,10 @@ function [best, result_table] = design_one_2x_stage(stage_idx, Fs_in, Fs_out, ..
 
                 result_table = [result_table; ...
                     stage_idx, Fs_in, Fs_out, frac_w_try, coeff_w_try, ...
-                    prune_thr, n, n+1, res.pass_gain_db, res.ripple_pm_db, res.stop_attn_db, ...
-                    res.gd_mean, res.gd_pp, nonzero_full, nonzero_half, pass_all];
+                    prune_thr, n, n+1, res.pass_gain_db, res.ripple_pm_db, ...
+                    res.pass_abs_max_db, res.stop_attn_db, res.dc_gain, ...
+                    res.phase0_gain, res.phase1_gain, res.gd_mean, res.gd_pp, ...
+                    nonzero_full, nonzero_half, pass_all];
 
                 fprintf(['Stage=%d FRAC=%2d COEFF=%2d prune=%2d n=%3d tap=%3d | ' ...
                          'nz_half=%3d | gain=%.4f ripple=%.6f stop=%.3f pass=%d\n'], ...
@@ -446,10 +479,12 @@ end
 % 本地函数：检查单级 2x FIR
 % ============================================================
 function res = check_one_stage(b, Fs_out, f_pass_low, f_pass_high, f_stop_begin, ...
-                               stop_attn_target_db, ripple_pm_target_db, nfft)
+                               stop_attn_target_db, ripple_pm_target_db, ...
+                               interp_gain, nfft)
 
     [H, f] = freqz(b, 1, nfft, Fs_out);
-    mag_db = 20*log10(abs(H) + eps);
+    H_norm = H / interp_gain;
+    mag_db = 20*log10(abs(H_norm) + eps);
 
     idx_pass = (f >= f_pass_low) & (f <= f_pass_high);
     idx_stop = (f >= f_stop_begin) & (f <= Fs_out/2);
@@ -460,7 +495,14 @@ function res = check_one_stage(b, Fs_out, f_pass_low, f_pass_high, f_stop_begin,
     pass_gain_db = mean(pass_db);
     ripple_pp_db = max(pass_db) - min(pass_db);
     ripple_pm_db = ripple_pp_db / 2;
+    pass_abs_max_db  = max(abs(pass_db));
+    pass_abs_peak_db = max(pass_db);
+    pass_abs_min_db  = min(pass_db);
     stop_attn_db = -max(stop_db);
+
+    dc_gain = sum(b);
+    phase0_gain = sum(b(1:2:end));
+    phase1_gain = sum(b(2:2:end));
 
     [gd, f_gd] = grpdelay(b, 1, nfft, Fs_out);
     idx_gd_pass = (f_gd >= f_pass_low) & (f_gd <= f_pass_high);
@@ -470,15 +512,23 @@ function res = check_one_stage(b, Fs_out, f_pass_low, f_pass_high, f_stop_begin,
 
     sym_err = max(abs(b(:).' - fliplr(b(:).')));
 
-    pass_ripple = (ripple_pm_db <= ripple_pm_target_db);
-    pass_gain   = (abs(pass_gain_db) <= max(0.02, 2*ripple_pm_target_db));
+    pass_abs_limit_db = max(0.02, 2*ripple_pm_target_db);
+    pass_ripple = (ripple_pm_db <= ripple_pm_target_db) && ...
+                  (pass_abs_max_db <= pass_abs_limit_db);
+    pass_gain   = (abs(pass_gain_db) <= pass_abs_limit_db);
     pass_stop   = (stop_attn_db >= stop_attn_target_db);
     pass_linear = (sym_err < 1e-10) && (gd_pp < 1e-6);
 
     res.pass_gain_db = pass_gain_db;
     res.ripple_pp_db = ripple_pp_db;
     res.ripple_pm_db = ripple_pm_db;
+    res.pass_abs_max_db  = pass_abs_max_db;
+    res.pass_abs_peak_db = pass_abs_peak_db;
+    res.pass_abs_min_db  = pass_abs_min_db;
     res.stop_attn_db = stop_attn_db;
+    res.dc_gain      = dc_gain;
+    res.phase0_gain  = phase0_gain;
+    res.phase1_gain  = phase1_gain;
     res.gd_mean      = gd_mean;
     res.gd_pp        = gd_pp;
     res.sym_err      = sym_err;
@@ -495,12 +545,14 @@ end
 % ============================================================
 function res = check_total_chain(h_total, Fs_in, Fs_out, ...
                                  f_pass_low, f_pass_high, ...
-                                 ripple_target_db, stop_target_db, nfft)
+                                 ripple_target_db, stop_target_db, ...
+                                 expected_gain, nfft)
 
     f_stop_begin = Fs_in - f_pass_high;
 
     [H, f] = freqz(h_total, 1, nfft, Fs_out);
-    H_db = 20*log10(abs(H) + 1e-15);
+    H_norm = H / expected_gain;
+    H_db = 20*log10(abs(H_norm) + 1e-15);
 
     pass_idx = (f >= f_pass_low) & (f <= f_pass_high);
     stop_idx = (f >= f_stop_begin) & (f <= Fs_out/2);
@@ -511,7 +563,11 @@ function res = check_total_chain(h_total, Fs_in, Fs_out, ...
     pass_gain_db = mean(pass_db);
     ripple_pp_db = max(pass_db) - min(pass_db);
     ripple_pm_db = max(abs(pass_db - pass_gain_db));
+    pass_abs_max_db  = max(abs(pass_db));
+    pass_abs_peak_db = max(pass_db);
+    pass_abs_min_db  = min(pass_db);
     stop_attn_db = -max(stop_db);
+    dc_gain = sum(h_total);
 
     [gd, fg] = grpdelay(h_total, 1, nfft, Fs_out);
     gd_idx = (fg >= f_pass_low) & (fg <= f_pass_high);
@@ -521,15 +577,20 @@ function res = check_total_chain(h_total, Fs_in, Fs_out, ...
 
     sym_err = max(abs(h_total(:).' - fliplr(h_total(:).')));
 
-    pass_ripple = (ripple_pm_db <= ripple_target_db);
+    pass_ripple = (pass_abs_max_db <= ripple_target_db);
     pass_gain   = (abs(pass_gain_db) <= ripple_target_db);
     pass_stop   = (stop_attn_db >= stop_target_db);
     pass_linear = (sym_err < 1e-10) && (gd_pp < 1e-6);
 
     res.f_stop_begin = f_stop_begin;
+    res.expected_gain = expected_gain;
+    res.dc_gain      = dc_gain;
     res.pass_gain_db = pass_gain_db;
     res.ripple_pp_db = ripple_pp_db;
     res.ripple_pm_db = ripple_pm_db;
+    res.pass_abs_max_db  = pass_abs_max_db;
+    res.pass_abs_peak_db = pass_abs_peak_db;
+    res.pass_abs_min_db  = pass_abs_min_db;
     res.stop_attn_db = stop_attn_db;
     res.gd_mean      = gd_mean;
     res.gd_pp        = gd_pp;
@@ -538,7 +599,7 @@ function res = check_total_chain(h_total, Fs_in, Fs_out, ...
     res.pass_ripple  = pass_ripple;
     res.pass_stop    = pass_stop;
     res.pass_linear  = pass_linear;
-    res.pass_all     = pass_gain && pass_ripple && pass_stop && pass_linear;
+    res.pass_all     = pass_ripple && pass_stop && pass_linear;
 end
 
 
@@ -589,6 +650,7 @@ function export_half_coeff_for_verilog(filename, coeff_half_int, coeff_w, frac_w
     fprintf(fid, '// 系数位宽     : %d bit\n', coeff_w);
     fprintf(fid, '// 小数位宽     : %d bit\n', frac_w);
     fprintf(fid, '// 裁剪阈值     : %d\n', prune_thr);
+    fprintf(fid, '// 插值增益     : 系数已包含 2 倍增益\n');
     fprintf(fid, '// 半系数总数   : %d\n', length(coeff_half_int));
     fprintf(fid, '// =====================================================\n');
 
@@ -620,13 +682,12 @@ function plot_total_response(h_total, total_res, Fs_in, Fs_out, ...
     title_font_size = 12;
 
     [H, f] = freqz(h_total, 1, nfft, Fs_out);
-    H_db = 20*log10(abs(H) + 1e-15);
+    H_db = 20*log10(abs(H / total_res.expected_gain) + 1e-15);
 
     [gd, fg] = grpdelay(h_total, 1, nfft, Fs_out);
 
     pass_idx_plot = (f >= f_pass_low) & (f <= f_pass_high);
-    pass_mean_db = mean(H_db(pass_idx_plot));
-    H_db_rel = H_db - pass_mean_db;
+    H_db_rel = H_db;
 
     gd_idx_plot = (fg >= f_pass_low) & (fg <= f_pass_high);
     gd_mean_plot = mean(gd(gd_idx_plot));

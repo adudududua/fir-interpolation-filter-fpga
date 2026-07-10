@@ -15,8 +15,8 @@
 //                当前默认配置：
 //                  数据位宽：24bit signed
 //                  默认级号：STAGE_ID = 1
-//                  默认 tap：101 tap
-//                  默认系数：18bit，Q16
+//                  默认 tap：93 tap
+//                  默认系数：17bit，Q16
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-10
@@ -24,14 +24,15 @@
 // 开发工具     : Vivado
 // 修订记录     :
 //                2026-07-10：新增全 2x 单级 2 倍插值封装模块。
+//                2026-07-10：Stage 1 切换为单乘法器时分复用 MAC 核。
 //=============================================================
 
 module interp2_top_symm_ce_all2x #(
     parameter integer STAGE_ID = 1,
     parameter integer DATA_W   = 24,
-    parameter integer COEFF_W  = 18,
-    parameter integer ACC_W    = 56,
-    parameter integer NTAPS    = 101,
+    parameter integer COEFF_W  = 17,
+    parameter integer ACC_W    = 43,
+    parameter integer NTAPS    = 93,
     parameter integer FRAC_W   = 16
 )(
     input  wire                         clk,
@@ -73,20 +74,39 @@ module interp2_top_symm_ce_all2x #(
         .sample_buf   (sample_buf_w)
     );
 
-    fir_core_symm_interp2_all2x #(
-        .STAGE_ID (STAGE_ID),
-        .DATA_W   (DATA_W),
-        .COEFF_W  (COEFF_W),
-        .ACC_W    (ACC_W),
-        .NTAPS    (NTAPS)
-    ) u_fir_core_symm_interp2_all2x (
-        .clk           (clk),
-        .rst_n         (rst_n),
-        .fir_in        (fir_in_w),
-        .fir_in_valid  (fir_in_valid_w),
-        .fir_out_full  (y_out_full_w),
-        .fir_out_valid (y_out_full_valid_w)
-    );
+    generate
+        if (STAGE_ID == 1) begin : gen_stage1_single_mac
+            fir_core_symm_interp2_stage1_mac #(
+                .DATA_W  (DATA_W),
+                .COEFF_W (COEFF_W),
+                .ACC_W   (ACC_W),
+                .NTAPS   (NTAPS)
+            ) u_fir_core_symm_interp2_stage1_mac (
+                .clk           (clk),
+                .rst_n         (rst_n),
+                .fir_in        (fir_in_w),
+                .fir_in_valid  (fir_in_valid_w),
+                .fir_out_full  (y_out_full_w),
+                .fir_out_valid (y_out_full_valid_w)
+            );
+        end
+        else begin : gen_parallel_fir
+            fir_core_symm_interp2_all2x #(
+                .STAGE_ID (STAGE_ID),
+                .DATA_W   (DATA_W),
+                .COEFF_W  (COEFF_W),
+                .ACC_W    (ACC_W),
+                .NTAPS    (NTAPS)
+            ) u_fir_core_symm_interp2_all2x (
+                .clk           (clk),
+                .rst_n         (rst_n),
+                .fir_in        (fir_in_w),
+                .fir_in_valid  (fir_in_valid_w),
+                .fir_out_full  (y_out_full_w),
+                .fir_out_valid (y_out_full_valid_w)
+            );
+        end
+    endgenerate
 
     round_sat_q16_to24 #(
         .IN_W   (ACC_W),

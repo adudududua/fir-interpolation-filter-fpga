@@ -1,0 +1,56 @@
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date         : Fri Jul 10 23:55:23 2026
+| Host         : LAPTOP-476JT8H0 running 64-bit major release  (build 9200)
+| Command      : report_utilization -hierarchical -file D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/alt_all2x/rtl_export/interp128_4x2x_utilization.txt
+| Design       : interp128_top_ce
+| Device       : 7a35tfgg484-2
+| Design State : Synthesized
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++-----------------------------+---------------------------------------+------------+------------+---------+------+------+--------+--------+--------------+
+|           Instance          |                 Module                | Total LUTs | Logic LUTs | LUTRAMs | SRLs |  FFs | RAMB36 | RAMB18 | DSP48 Blocks |
++-----------------------------+---------------------------------------+------------+------------+---------+------+------+--------+--------+--------------+
+| interp128_top_ce            |                                 (top) |       9002 |       8882 |       0 |  120 | 4497 |      0 |      0 |            2 |
+|   (interp128_top_ce)        |                                 (top) |       2445 |       2445 |       0 |    0 |    0 |      0 |      0 |            0 |
+|   u_bridge_16_to_32         |                  bridge_to_interp2_ce |         14 |         14 |       0 |    0 |   26 |      0 |      0 |            0 |
+|   u_bridge_32_to_64         |                bridge_to_interp2_ce_0 |         14 |         14 |       0 |    0 |   26 |      0 |      0 |            0 |
+|   u_bridge_4_to_8           |                bridge_to_interp2_ce_1 |         14 |         14 |       0 |    0 |   26 |      0 |      0 |            0 |
+|   u_bridge_64_to_128        |                bridge_to_interp2_ce_2 |         14 |         14 |       0 |    0 |   26 |      0 |      0 |            0 |
+|   u_bridge_8_to_16          |                bridge_to_interp2_ce_3 |         14 |         14 |       0 |    0 |   26 |      0 |      0 |            0 |
+|   u_interp2_top_128x        |                   interp2_top_symm_ce |       1175 |       1151 |       0 |   24 |  652 |      0 |      0 |            0 |
+|     u_fir_core_symm_interp2 |           fir_core_symm_interp2_v2_17 |       1139 |       1115 |       0 |   24 |  626 |      0 |      0 |            0 |
+|     u_interp2_ctrl_ce       |                    interp2_ctrl_ce_18 |          1 |          1 |       0 |    0 |   26 |      0 |      0 |            0 |
+|     u_round_sat_q16_to24    | round_sat_q16_to24__parameterized0_19 |         36 |         36 |       0 |    0 |    0 |      0 |      0 |            0 |
+|   u_interp2_top_16x         |                 interp2_top_symm_ce_4 |       1175 |       1151 |       0 |   24 |  652 |      0 |      0 |            0 |
+|     u_fir_core_symm_interp2 |           fir_core_symm_interp2_v2_14 |       1139 |       1115 |       0 |   24 |  626 |      0 |      0 |            0 |
+|     u_interp2_ctrl_ce       |                    interp2_ctrl_ce_15 |          1 |          1 |       0 |    0 |   26 |      0 |      0 |            0 |
+|     u_round_sat_q16_to24    | round_sat_q16_to24__parameterized0_16 |         36 |         36 |       0 |    0 |    0 |      0 |      0 |            0 |
+|   u_interp2_top_32x         |                 interp2_top_symm_ce_5 |       1175 |       1151 |       0 |   24 |  652 |      0 |      0 |            0 |
+|     u_fir_core_symm_interp2 |           fir_core_symm_interp2_v2_11 |       1139 |       1115 |       0 |   24 |  626 |      0 |      0 |            0 |
+|     u_interp2_ctrl_ce       |                    interp2_ctrl_ce_12 |          1 |          1 |       0 |    0 |   26 |      0 |      0 |            0 |
+|     u_round_sat_q16_to24    | round_sat_q16_to24__parameterized0_13 |         36 |         36 |       0 |    0 |    0 |      0 |      0 |            0 |
+|   u_interp2_top_64x         |                 interp2_top_symm_ce_6 |       1175 |       1151 |       0 |   24 |  652 |      0 |      0 |            0 |
+|     u_fir_core_symm_interp2 |            fir_core_symm_interp2_v2_8 |       1139 |       1115 |       0 |   24 |  626 |      0 |      0 |            0 |
+|     u_interp2_ctrl_ce       |                     interp2_ctrl_ce_9 |          1 |          1 |       0 |    0 |   26 |      0 |      0 |            0 |
+|     u_round_sat_q16_to24    | round_sat_q16_to24__parameterized0_10 |         36 |         36 |       0 |    0 |    0 |      0 |      0 |            0 |
+|   u_interp2_top_8x          |                 interp2_top_symm_ce_7 |       1176 |       1152 |       0 |   24 |  652 |      0 |      0 |            0 |
+|     u_fir_core_symm_interp2 |              fir_core_symm_interp2_v2 |       1140 |       1116 |       0 |   24 |  626 |      0 |      0 |            0 |
+|     u_interp2_ctrl_ce       |                       interp2_ctrl_ce |          1 |          1 |       0 |    0 |   26 |      0 |      0 |            0 |
+|     u_round_sat_q16_to24    |    round_sat_q16_to24__parameterized0 |         36 |         36 |       0 |    0 |    0 |      0 |      0 |            0 |
+|   u_interp4_top_symm_ce     |                   interp4_top_symm_ce |        616 |        616 |       0 |    0 | 1107 |      0 |      0 |            2 |
+|     (u_interp4_top_symm_ce) |                   interp4_top_symm_ce |        562 |        562 |       0 |    0 | 1107 |      0 |      0 |            2 |
+|     u_round_sat_q16_to24    |                    round_sat_q16_to24 |         55 |         55 |       0 |    0 |    0 |      0 |      0 |            0 |
++-----------------------------+---------------------------------------+------------+------------+---------+------+------+--------+--------+--------------+
+
+

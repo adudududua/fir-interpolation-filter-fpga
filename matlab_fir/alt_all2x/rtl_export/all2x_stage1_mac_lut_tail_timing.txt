@@ -1,0 +1,1368 @@
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date         : Fri Jul 10 21:31:32 2026
+| Host         : LAPTOP-476JT8H0 running 64-bit major release  (build 9200)
+| Command      : report_timing_summary -delay_type max -max_paths 10 -file D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/alt_all2x/rtl_export/all2x_stage1_mac_lut_tail_timing.txt
+| Design       : interp128_all2x_top_ce
+| Device       : 7a35t-fgg484
+| Speed File   : -2  PRODUCTION 1.23 2018-06-13
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Timing Summary Report
+
+------------------------------------------------------------------------------------------------
+| Timer Settings
+| --------------
+------------------------------------------------------------------------------------------------
+
+  Enable Multi Corner Analysis               :  Yes
+  Enable Pessimism Removal                   :  Yes
+  Pessimism Removal Resolution               :  Nearest Common Node
+  Enable Input Delay Default Clock           :  No
+  Enable Preset / Clear Arcs                 :  No
+  Disable Flight Delays                      :  No
+  Ignore I/O Paths                           :  No
+  Timing Early Launch at Borrowing Latches   :  false
+
+  Corner  Analyze    Analyze    
+  Name    Max Paths  Min Paths  
+  ------  ---------  ---------  
+  Slow    Yes        Yes        
+  Fast    Yes        Yes        
+
+
+
+check_timing report
+
+Table of Contents
+-----------------
+1. checking no_clock
+2. checking constant_clock
+3. checking pulse_width_clock
+4. checking unconstrained_internal_endpoints
+5. checking no_input_delay
+6. checking no_output_delay
+7. checking multiple_clock
+8. checking generated_clocks
+9. checking loops
+10. checking partial_input_delay
+11. checking partial_output_delay
+12. checking latch_loops
+
+1. checking no_clock
+--------------------
+ There are 0 register/latch pins with no clock.
+
+
+2. checking constant_clock
+--------------------------
+ There are 0 register/latch pins with constant_clock.
+
+
+3. checking pulse_width_clock
+-----------------------------
+ There are 0 register/latch pins which need pulse_width check
+
+
+4. checking unconstrained_internal_endpoints
+--------------------------------------------
+ There are 0 pins that are not constrained for maximum delay.
+
+ There are 0 pins that are not constrained for maximum delay due to constant clock.
+
+
+5. checking no_input_delay
+--------------------------
+ There are 33 input ports with no input delay specified. (HIGH)
+
+ There are 0 input ports with no input delay but user has a false path constraint.
+
+
+6. checking no_output_delay
+---------------------------
+ There are 175 ports with no output delay specified. (HIGH)
+
+ There are 0 ports with no output delay but user has a false path constraint
+
+ There are 0 ports with no output delay but with a timing clock defined on it or propagating through it
+
+
+7. checking multiple_clock
+--------------------------
+ There are 0 register/latch pins with multiple clocks.
+
+
+8. checking generated_clocks
+----------------------------
+ There are 0 generated clocks that are not connected to a clock source.
+
+
+9. checking loops
+-----------------
+ There are 0 combinational loops in the design.
+
+
+10. checking partial_input_delay
+--------------------------------
+ There are 0 input ports with partial input delay specified.
+
+
+11. checking partial_output_delay
+---------------------------------
+ There are 0 ports with partial output delay specified.
+
+
+12. checking latch_loops
+------------------------
+ There are 0 combinational latch loops in the design through latch input
+
+
+
+------------------------------------------------------------------------------------------------
+| Design Timing Summary
+| ---------------------
+------------------------------------------------------------------------------------------------
+
+    WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
+    -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
+    165.930        0.000                      0                 8060       88.077        0.000                       0                  4219  
+
+
+All user specified timing constraints are met.
+
+
+------------------------------------------------------------------------------------------------
+| Clock Summary
+| -------------
+------------------------------------------------------------------------------------------------
+
+Clock             Waveform(ns)         Period(ns)      Frequency(MHz)
+-----             ------------         ----------      --------------
+clk_audio_5m6448  {0.000 88.577}       177.154         5.645           
+
+
+------------------------------------------------------------------------------------------------
+| Intra Clock Table
+| -----------------
+------------------------------------------------------------------------------------------------
+
+Clock                 WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
+-----                 -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
+clk_audio_5m6448      165.930        0.000                      0                 8060       88.077        0.000                       0                  4219  
+
+
+------------------------------------------------------------------------------------------------
+| Inter Clock Table
+| -----------------
+------------------------------------------------------------------------------------------------
+
+From Clock    To Clock          WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints  
+----------    --------          -------      -------  ---------------------  -------------------  
+
+
+------------------------------------------------------------------------------------------------
+| Other Path Groups Table
+| -----------------------
+------------------------------------------------------------------------------------------------
+
+Path Group    From Clock    To Clock          WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints  
+----------    ----------    --------          -------      -------  ---------------------  -------------------  
+
+
+------------------------------------------------------------------------------------------------
+| Timing Details
+| --------------
+------------------------------------------------------------------------------------------------
+
+
+---------------------------------------------------------------------------------------------------
+From Clock:  clk_audio_5m6448
+  To Clock:  clk_audio_5m6448
+
+Setup :            0  Failing Endpoints,  Worst Slack      165.930ns,  Total Violation        0.000ns
+Hold  :           NA  Failing Endpoints,  Worst Slack           NA  ,  Total Violation           NA
+PW    :            0  Failing Endpoints,  Worst Slack       88.077ns,  Total Violation        0.000ns
+---------------------------------------------------------------------------------------------------
+
+
+Max Delay Paths
+--------------------------------------------------------------------------------------
+Slack (MET) :             165.930ns  (required time - arrival time)
+  Source:                 u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[4][1]/C
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Destination:            u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[37]/D
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Path Group:             clk_audio_5m6448
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            177.154ns  (clk_audio_5m6448 rise@177.154ns - clk_audio_5m6448 rise@0.000ns)
+  Data Path Delay:        11.103ns  (logic 6.253ns (56.318%)  route 4.850ns (43.682%))
+  Logic Levels:           24  (CARRY4=13 LUT2=2 LUT3=3 LUT4=2 LUT5=2 LUT6=2)
+  Clock Path Skew:        -0.145ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.893ns = ( 179.047 - 177.154 ) 
+    Source Clock Delay      (SCD):    2.205ns
+    Clock Pessimism Removal (CPR):    0.167ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_5m6448 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+                         IBUF (Prop_ibuf_I_O)         0.894     0.894 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.646     1.540    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.081     1.621 r  clk_IBUF_BUFG_inst/O
+                         net (fo=4219, unplaced)      0.584     2.205    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[4][1]/C
+  -------------------------------------------------------------------    -------------------
+                         FDCE (Prop_fdce_C_Q)         0.379     2.584 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[4][1]/Q
+                         net (fo=3, unplaced)         0.380     2.964    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[4]__0[1]
+                         LUT2 (Prop_lut2_I0_O)        0.232     3.196 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[3]_i_13__2/O
+                         net (fo=1, unplaced)         0.000     3.196    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[3]_i_13__2_n_0
+                         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.457     3.653 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[3]_i_5__1/CO[3]
+                         net (fo=1, unplaced)         0.008     3.661    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[3]_i_5__1_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     3.759 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[11]_i_73/CO[3]
+                         net (fo=1, unplaced)         0.000     3.759    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[11]_i_73_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     4.034 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[11]_i_72__0/O[3]
+                         net (fo=13, unplaced)        0.569     4.603    gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full30_in_1[11]
+                         LUT2 (Prop_lut2_I1_O)        0.250     4.853 r  fir_out_full[27]_i_182__0/O
+                         net (fo=1, unplaced)         0.000     4.853    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_156__0[3]
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332     5.185 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_161/CO[3]
+                         net (fo=1, unplaced)         0.000     5.185    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_161_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     5.460 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_195/O[3]
+                         net (fo=3, unplaced)         0.537     5.997    u_interp2_all2x_stage3_n_149
+                         LUT4 (Prop_lut4_I2_O)        0.250     6.247 r  fir_out_full[27]_i_162__0/O
+                         net (fo=1, unplaced)         0.000     6.247    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_75__1_1[3]
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332     6.579 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_125__0/CO[3]
+                         net (fo=1, unplaced)         0.000     6.579    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_125__0_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     6.854 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_135__0/O[3]
+                         net (fo=3, unplaced)         0.537     7.391    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_135__0_n_4
+                         LUT3 (Prop_lut3_I1_O)        0.250     7.641 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_121/O
+                         net (fo=2, unplaced)         0.358     7.999    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_121_n_0
+                         LUT5 (Prop_lut5_I4_O)        0.105     8.104 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_68__2/O
+                         net (fo=2, unplaced)         0.339     8.443    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_68__2_n_0
+                         LUT6 (Prop_lut6_I0_O)        0.105     8.548 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_72__1/O
+                         net (fo=1, unplaced)         0.000     8.548    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_72__1_n_0
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332     8.880 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_48__0/CO[3]
+                         net (fo=1, unplaced)         0.000     8.880    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_48__0_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     9.155 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_48__0/O[3]
+                         net (fo=2, unplaced)         0.530     9.685    gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full2_7[27]
+                         LUT3 (Prop_lut3_I2_O)        0.250     9.935 r  fir_out_full[31]_i_18__2/O
+                         net (fo=2, unplaced)         0.358    10.293    fir_out_full[31]_i_18__2_n_0
+                         LUT4 (Prop_lut4_I3_O)        0.105    10.398 r  fir_out_full[31]_i_22__2/O
+                         net (fo=1, unplaced)         0.000    10.398    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_8__2_1[3]
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332    10.730 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_12__1/CO[3]
+                         net (fo=1, unplaced)         0.000    10.730    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_12__1_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275    11.005 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]_i_12__1/O[3]
+                         net (fo=3, unplaced)         0.537    11.542    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]_i_12__1_n_4
+                         LUT3 (Prop_lut3_I0_O)        0.250    11.792 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[35]_i_11/O
+                         net (fo=2, unplaced)         0.358    12.150    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[35]_i_11_n_0
+                         LUT5 (Prop_lut5_I3_O)        0.105    12.255 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[35]_i_3__2/O
+                         net (fo=2, unplaced)         0.339    12.594    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[35]_i_3__2_n_0
+                         LUT6 (Prop_lut6_I0_O)        0.105    12.699 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[35]_i_7__2/O
+                         net (fo=1, unplaced)         0.000    12.699    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[35]_i_7__2_n_0
+                         CARRY4 (Prop_carry4_S[2]_CO[3])
+                                                      0.332    13.031 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]_i_1__2/CO[3]
+                         net (fo=1, unplaced)         0.000    13.031    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]_i_1__2_n_0
+                         CARRY4 (Prop_carry4_CI_O[1])
+                                                      0.277    13.308 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[39]_i_1__1/O[1]
+                         net (fo=1, unplaced)         0.000    13.308    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/acc_comb[37]
+                         FDCE                                         r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[37]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_5m6448 rise edge)
+                                                    177.154   177.154 r  
+                                                      0.000   177.154 r  clk (IN)
+                         net (fo=0)                   0.000   177.154    clk
+                         IBUF (Prop_ibuf_I_O)         0.763   177.917 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.613   178.531    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.077   178.608 r  clk_IBUF_BUFG_inst/O
+                         net (fo=4219, unplaced)      0.439   179.047    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[37]/C
+                         clock pessimism              0.167   179.214    
+                         clock uncertainty           -0.035   179.178    
+                         FDCE (Setup_fdce_C_D)        0.059   179.237    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[37]
+  -------------------------------------------------------------------
+                         required time                        179.237    
+                         arrival time                         -13.308    
+  -------------------------------------------------------------------
+                         slack                                165.930    
+
+Slack (MET) :             165.932ns  (required time - arrival time)
+  Source:                 u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[4][1]/C
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Destination:            u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[39]/D
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Path Group:             clk_audio_5m6448
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            177.154ns  (clk_audio_5m6448 rise@177.154ns - clk_audio_5m6448 rise@0.000ns)
+  Data Path Delay:        11.101ns  (logic 6.251ns (56.310%)  route 4.850ns (43.690%))
+  Logic Levels:           24  (CARRY4=13 LUT2=2 LUT3=3 LUT4=2 LUT5=2 LUT6=2)
+  Clock Path Skew:        -0.145ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.893ns = ( 179.047 - 177.154 ) 
+    Source Clock Delay      (SCD):    2.205ns
+    Clock Pessimism Removal (CPR):    0.167ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_5m6448 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+                         IBUF (Prop_ibuf_I_O)         0.894     0.894 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.646     1.540    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.081     1.621 r  clk_IBUF_BUFG_inst/O
+                         net (fo=4219, unplaced)      0.584     2.205    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[4][1]/C
+  -------------------------------------------------------------------    -------------------
+                         FDCE (Prop_fdce_C_Q)         0.379     2.584 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[4][1]/Q
+                         net (fo=3, unplaced)         0.380     2.964    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[4]__0[1]
+                         LUT2 (Prop_lut2_I0_O)        0.232     3.196 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[3]_i_13__2/O
+                         net (fo=1, unplaced)         0.000     3.196    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[3]_i_13__2_n_0
+                         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.457     3.653 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[3]_i_5__1/CO[3]
+                         net (fo=1, unplaced)         0.008     3.661    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[3]_i_5__1_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     3.759 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[11]_i_73/CO[3]
+                         net (fo=1, unplaced)         0.000     3.759    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[11]_i_73_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     4.034 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[11]_i_72__0/O[3]
+                         net (fo=13, unplaced)        0.569     4.603    gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full30_in_1[11]
+                         LUT2 (Prop_lut2_I1_O)        0.250     4.853 r  fir_out_full[27]_i_182__0/O
+                         net (fo=1, unplaced)         0.000     4.853    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_156__0[3]
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332     5.185 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_161/CO[3]
+                         net (fo=1, unplaced)         0.000     5.185    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_161_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     5.460 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_195/O[3]
+                         net (fo=3, unplaced)         0.537     5.997    u_interp2_all2x_stage3_n_149
+                         LUT4 (Prop_lut4_I2_O)        0.250     6.247 r  fir_out_full[27]_i_162__0/O
+                         net (fo=1, unplaced)         0.000     6.247    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_75__1_1[3]
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332     6.579 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_125__0/CO[3]
+                         net (fo=1, unplaced)         0.000     6.579    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_125__0_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     6.854 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_135__0/O[3]
+                         net (fo=3, unplaced)         0.537     7.391    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_135__0_n_4
+                         LUT3 (Prop_lut3_I1_O)        0.250     7.641 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_121/O
+                         net (fo=2, unplaced)         0.358     7.999    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_121_n_0
+                         LUT5 (Prop_lut5_I4_O)        0.105     8.104 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_68__2/O
+                         net (fo=2, unplaced)         0.339     8.443    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_68__2_n_0
+                         LUT6 (Prop_lut6_I0_O)        0.105     8.548 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_72__1/O
+                         net (fo=1, unplaced)         0.000     8.548    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_72__1_n_0
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332     8.880 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_48__0/CO[3]
+                         net (fo=1, unplaced)         0.000     8.880    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_48__0_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     9.155 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_48__0/O[3]
+                         net (fo=2, unplaced)         0.530     9.685    gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full2_7[27]
+                         LUT3 (Prop_lut3_I2_O)        0.250     9.935 r  fir_out_full[31]_i_18__2/O
+                         net (fo=2, unplaced)         0.358    10.293    fir_out_full[31]_i_18__2_n_0
+                         LUT4 (Prop_lut4_I3_O)        0.105    10.398 r  fir_out_full[31]_i_22__2/O
+                         net (fo=1, unplaced)         0.000    10.398    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_8__2_1[3]
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332    10.730 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_12__1/CO[3]
+                         net (fo=1, unplaced)         0.000    10.730    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_12__1_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275    11.005 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]_i_12__1/O[3]
+                         net (fo=3, unplaced)         0.537    11.542    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]_i_12__1_n_4
+                         LUT3 (Prop_lut3_I0_O)        0.250    11.792 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[35]_i_11/O
+                         net (fo=2, unplaced)         0.358    12.150    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[35]_i_11_n_0
+                         LUT5 (Prop_lut5_I3_O)        0.105    12.255 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[35]_i_3__2/O
+                         net (fo=2, unplaced)         0.339    12.594    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[35]_i_3__2_n_0
+                         LUT6 (Prop_lut6_I0_O)        0.105    12.699 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[35]_i_7__2/O
+                         net (fo=1, unplaced)         0.000    12.699    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[35]_i_7__2_n_0
+                         CARRY4 (Prop_carry4_S[2]_CO[3])
+                                                      0.332    13.031 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]_i_1__2/CO[3]
+                         net (fo=1, unplaced)         0.000    13.031    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]_i_1__2_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275    13.306 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[39]_i_1__1/O[3]
+                         net (fo=1, unplaced)         0.000    13.306    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/acc_comb[39]
+                         FDCE                                         r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[39]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_5m6448 rise edge)
+                                                    177.154   177.154 r  
+                                                      0.000   177.154 r  clk (IN)
+                         net (fo=0)                   0.000   177.154    clk
+                         IBUF (Prop_ibuf_I_O)         0.763   177.917 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.613   178.531    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.077   178.608 r  clk_IBUF_BUFG_inst/O
+                         net (fo=4219, unplaced)      0.439   179.047    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[39]/C
+                         clock pessimism              0.167   179.214    
+                         clock uncertainty           -0.035   179.178    
+                         FDCE (Setup_fdce_C_D)        0.059   179.237    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[39]
+  -------------------------------------------------------------------
+                         required time                        179.237    
+                         arrival time                         -13.306    
+  -------------------------------------------------------------------
+                         slack                                165.932    
+
+Slack (MET) :             165.983ns  (required time - arrival time)
+  Source:                 u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[7][1]/C
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Destination:            u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[40]/D
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Path Group:             clk_audio_5m6448
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            177.154ns  (clk_audio_5m6448 rise@177.154ns - clk_audio_5m6448 rise@0.000ns)
+  Data Path Delay:        11.050ns  (logic 6.472ns (58.570%)  route 4.578ns (41.430%))
+  Logic Levels:           22  (CARRY4=14 LUT2=1 LUT3=4 LUT4=3)
+  Clock Path Skew:        -0.145ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.893ns = ( 179.047 - 177.154 ) 
+    Source Clock Delay      (SCD):    2.205ns
+    Clock Pessimism Removal (CPR):    0.167ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_5m6448 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+                         IBUF (Prop_ibuf_I_O)         0.894     0.894 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.646     1.540    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.081     1.621 r  clk_IBUF_BUFG_inst/O
+                         net (fo=4219, unplaced)      0.584     2.205    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[7][1]/C
+  -------------------------------------------------------------------    -------------------
+                         FDCE (Prop_fdce_C_Q)         0.379     2.584 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[7][1]/Q
+                         net (fo=3, unplaced)         0.380     2.964    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[7]__0__0[1]
+                         LUT2 (Prop_lut2_I0_O)        0.232     3.196 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[7]_i_56__0/O
+                         net (fo=1, unplaced)         0.000     3.196    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[7]_i_56__0_n_0
+                         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.457     3.653 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[7]_i_37/CO[3]
+                         net (fo=1, unplaced)         0.008     3.661    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[7]_i_37_n_0
+                         CARRY4 (Prop_carry4_CI_O[0])
+                                                      0.191     3.852 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[7]_i_63/O[0]
+                         net (fo=14, unplaced)        0.592     4.444    gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full30_in_3[4]
+                         CARRY4 (Prop_carry4_DI[3]_CO[3])
+                                                      0.451     4.895 r  fir_out_full_reg[7]_i_39/CO[3]
+                         net (fo=1, unplaced)         0.008     4.903    fir_out_full_reg[7]_i_39_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     5.178 r  fir_out_full_reg[23]_i_223/O[3]
+                         net (fo=2, unplaced)         0.530     5.708    fir_out_full_reg[23]_i_223_n_4
+                         LUT3 (Prop_lut3_I2_O)        0.250     5.958 r  fir_out_full[23]_i_188/O
+                         net (fo=2, unplaced)         0.548     6.506    fir_out_full[23]_i_188_n_0
+                         CARRY4 (Prop_carry4_DI[1]_O[3])
+                                                      0.506     7.012 r  fir_out_full_reg[23]_i_133/O[3]
+                         net (fo=2, unplaced)         0.530     7.542    fir_out_full_reg[23]_i_133_n_4
+                         LUT3 (Prop_lut3_I0_O)        0.252     7.794 r  fir_out_full[23]_i_97__0/O
+                         net (fo=2, unplaced)         0.348     8.142    fir_out_full[23]_i_97__0_n_0
+                         LUT4 (Prop_lut4_I3_O)        0.274     8.416 r  fir_out_full[23]_i_101/O
+                         net (fo=1, unplaced)         0.000     8.416    fir_out_full[23]_i_101_n_0
+                         CARRY4 (Prop_carry4_S[0]_CO[3])
+                                                      0.440     8.856 r  fir_out_full_reg[23]_i_43/CO[3]
+                         net (fo=1, unplaced)         0.000     8.856    fir_out_full_reg[23]_i_43_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     9.131 r  fir_out_full_reg[27]_i_43/O[3]
+                         net (fo=2, unplaced)         0.530     9.661    gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full2[22]
+                         LUT3 (Prop_lut3_I0_O)        0.255     9.916 r  fir_out_full[27]_i_29__1/O
+                         net (fo=2, unplaced)         0.383    10.299    fir_out_full[27]_i_29__1_n_0
+                         LUT4 (Prop_lut4_I3_O)        0.268    10.567 r  fir_out_full[27]_i_33__1/O
+                         net (fo=1, unplaced)         0.000    10.567    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_4__1_1[3]
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332    10.899 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_12__0/CO[3]
+                         net (fo=1, unplaced)         0.000    10.899    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_12__0_n_0
+                         CARRY4 (Prop_carry4_CI_O[1])
+                                                      0.277    11.176 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_12__0/O[1]
+                         net (fo=2, unplaced)         0.483    11.659    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_12__0_n_6
+                         LUT3 (Prop_lut3_I2_O)        0.266    11.925 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_3__1/O
+                         net (fo=2, unplaced)         0.238    12.163    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_3__1_n_0
+                         LUT4 (Prop_lut4_I3_O)        0.275    12.438 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_7__1/O
+                         net (fo=1, unplaced)         0.000    12.438    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_7__1_n_0
+                         CARRY4 (Prop_carry4_S[2]_CO[3])
+                                                      0.332    12.770 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_1__1/CO[3]
+                         net (fo=1, unplaced)         0.000    12.770    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_1__1_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.868 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_1__1/CO[3]
+                         net (fo=1, unplaced)         0.000    12.868    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_1__1_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.966 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]_i_1__1/CO[3]
+                         net (fo=1, unplaced)         0.000    12.966    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]_i_1__1_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    13.064 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[39]_i_1__0/CO[3]
+                         net (fo=1, unplaced)         0.000    13.064    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[39]_i_1__0_n_0
+                         CARRY4 (Prop_carry4_CI_O[0])
+                                                      0.191    13.255 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[40]_i_1__0/O[0]
+                         net (fo=1, unplaced)         0.000    13.255    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/acc_comb[40]
+                         FDCE                                         r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[40]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_5m6448 rise edge)
+                                                    177.154   177.154 r  
+                                                      0.000   177.154 r  clk (IN)
+                         net (fo=0)                   0.000   177.154    clk
+                         IBUF (Prop_ibuf_I_O)         0.763   177.917 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.613   178.531    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.077   178.608 r  clk_IBUF_BUFG_inst/O
+                         net (fo=4219, unplaced)      0.439   179.047    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[40]/C
+                         clock pessimism              0.167   179.214    
+                         clock uncertainty           -0.035   179.178    
+                         FDCE (Setup_fdce_C_D)        0.059   179.237    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[40]
+  -------------------------------------------------------------------
+                         required time                        179.237    
+                         arrival time                         -13.255    
+  -------------------------------------------------------------------
+                         slack                                165.983    
+
+Slack (MET) :             165.993ns  (required time - arrival time)
+  Source:                 u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[4][1]/C
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Destination:            u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[38]/D
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Path Group:             clk_audio_5m6448
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            177.154ns  (clk_audio_5m6448 rise@177.154ns - clk_audio_5m6448 rise@0.000ns)
+  Data Path Delay:        11.040ns  (logic 6.190ns (56.069%)  route 4.850ns (43.931%))
+  Logic Levels:           24  (CARRY4=13 LUT2=2 LUT3=3 LUT4=2 LUT5=2 LUT6=2)
+  Clock Path Skew:        -0.145ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.893ns = ( 179.047 - 177.154 ) 
+    Source Clock Delay      (SCD):    2.205ns
+    Clock Pessimism Removal (CPR):    0.167ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_5m6448 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+                         IBUF (Prop_ibuf_I_O)         0.894     0.894 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.646     1.540    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.081     1.621 r  clk_IBUF_BUFG_inst/O
+                         net (fo=4219, unplaced)      0.584     2.205    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[4][1]/C
+  -------------------------------------------------------------------    -------------------
+                         FDCE (Prop_fdce_C_Q)         0.379     2.584 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[4][1]/Q
+                         net (fo=3, unplaced)         0.380     2.964    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[4]__0[1]
+                         LUT2 (Prop_lut2_I0_O)        0.232     3.196 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[3]_i_13__2/O
+                         net (fo=1, unplaced)         0.000     3.196    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[3]_i_13__2_n_0
+                         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.457     3.653 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[3]_i_5__1/CO[3]
+                         net (fo=1, unplaced)         0.008     3.661    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[3]_i_5__1_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     3.759 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[11]_i_73/CO[3]
+                         net (fo=1, unplaced)         0.000     3.759    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[11]_i_73_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     4.034 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[11]_i_72__0/O[3]
+                         net (fo=13, unplaced)        0.569     4.603    gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full30_in_1[11]
+                         LUT2 (Prop_lut2_I1_O)        0.250     4.853 r  fir_out_full[27]_i_182__0/O
+                         net (fo=1, unplaced)         0.000     4.853    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_156__0[3]
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332     5.185 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_161/CO[3]
+                         net (fo=1, unplaced)         0.000     5.185    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_161_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     5.460 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_195/O[3]
+                         net (fo=3, unplaced)         0.537     5.997    u_interp2_all2x_stage3_n_149
+                         LUT4 (Prop_lut4_I2_O)        0.250     6.247 r  fir_out_full[27]_i_162__0/O
+                         net (fo=1, unplaced)         0.000     6.247    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_75__1_1[3]
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332     6.579 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_125__0/CO[3]
+                         net (fo=1, unplaced)         0.000     6.579    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_125__0_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     6.854 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_135__0/O[3]
+                         net (fo=3, unplaced)         0.537     7.391    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_135__0_n_4
+                         LUT3 (Prop_lut3_I1_O)        0.250     7.641 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_121/O
+                         net (fo=2, unplaced)         0.358     7.999    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_121_n_0
+                         LUT5 (Prop_lut5_I4_O)        0.105     8.104 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_68__2/O
+                         net (fo=2, unplaced)         0.339     8.443    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_68__2_n_0
+                         LUT6 (Prop_lut6_I0_O)        0.105     8.548 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_72__1/O
+                         net (fo=1, unplaced)         0.000     8.548    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_72__1_n_0
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332     8.880 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_48__0/CO[3]
+                         net (fo=1, unplaced)         0.000     8.880    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_48__0_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     9.155 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_48__0/O[3]
+                         net (fo=2, unplaced)         0.530     9.685    gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full2_7[27]
+                         LUT3 (Prop_lut3_I2_O)        0.250     9.935 r  fir_out_full[31]_i_18__2/O
+                         net (fo=2, unplaced)         0.358    10.293    fir_out_full[31]_i_18__2_n_0
+                         LUT4 (Prop_lut4_I3_O)        0.105    10.398 r  fir_out_full[31]_i_22__2/O
+                         net (fo=1, unplaced)         0.000    10.398    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_8__2_1[3]
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332    10.730 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_12__1/CO[3]
+                         net (fo=1, unplaced)         0.000    10.730    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_12__1_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275    11.005 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]_i_12__1/O[3]
+                         net (fo=3, unplaced)         0.537    11.542    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]_i_12__1_n_4
+                         LUT3 (Prop_lut3_I0_O)        0.250    11.792 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[35]_i_11/O
+                         net (fo=2, unplaced)         0.358    12.150    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[35]_i_11_n_0
+                         LUT5 (Prop_lut5_I3_O)        0.105    12.255 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[35]_i_3__2/O
+                         net (fo=2, unplaced)         0.339    12.594    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[35]_i_3__2_n_0
+                         LUT6 (Prop_lut6_I0_O)        0.105    12.699 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[35]_i_7__2/O
+                         net (fo=1, unplaced)         0.000    12.699    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[35]_i_7__2_n_0
+                         CARRY4 (Prop_carry4_S[2]_CO[3])
+                                                      0.332    13.031 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]_i_1__2/CO[3]
+                         net (fo=1, unplaced)         0.000    13.031    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]_i_1__2_n_0
+                         CARRY4 (Prop_carry4_CI_O[2])
+                                                      0.214    13.245 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[39]_i_1__1/O[2]
+                         net (fo=1, unplaced)         0.000    13.245    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/acc_comb[38]
+                         FDCE                                         r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[38]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_5m6448 rise edge)
+                                                    177.154   177.154 r  
+                                                      0.000   177.154 r  clk (IN)
+                         net (fo=0)                   0.000   177.154    clk
+                         IBUF (Prop_ibuf_I_O)         0.763   177.917 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.613   178.531    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.077   178.608 r  clk_IBUF_BUFG_inst/O
+                         net (fo=4219, unplaced)      0.439   179.047    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[38]/C
+                         clock pessimism              0.167   179.214    
+                         clock uncertainty           -0.035   179.178    
+                         FDCE (Setup_fdce_C_D)        0.059   179.237    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[38]
+  -------------------------------------------------------------------
+                         required time                        179.237    
+                         arrival time                         -13.245    
+  -------------------------------------------------------------------
+                         slack                                165.993    
+
+Slack (MET) :             165.995ns  (required time - arrival time)
+  Source:                 u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[7][1]/C
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Destination:            u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[37]/D
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Path Group:             clk_audio_5m6448
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            177.154ns  (clk_audio_5m6448 rise@177.154ns - clk_audio_5m6448 rise@0.000ns)
+  Data Path Delay:        11.038ns  (logic 6.460ns (58.525%)  route 4.578ns (41.475%))
+  Logic Levels:           21  (CARRY4=13 LUT2=1 LUT3=4 LUT4=3)
+  Clock Path Skew:        -0.145ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.893ns = ( 179.047 - 177.154 ) 
+    Source Clock Delay      (SCD):    2.205ns
+    Clock Pessimism Removal (CPR):    0.167ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_5m6448 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+                         IBUF (Prop_ibuf_I_O)         0.894     0.894 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.646     1.540    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.081     1.621 r  clk_IBUF_BUFG_inst/O
+                         net (fo=4219, unplaced)      0.584     2.205    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[7][1]/C
+  -------------------------------------------------------------------    -------------------
+                         FDCE (Prop_fdce_C_Q)         0.379     2.584 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[7][1]/Q
+                         net (fo=3, unplaced)         0.380     2.964    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[7]__0__0[1]
+                         LUT2 (Prop_lut2_I0_O)        0.232     3.196 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[7]_i_56__0/O
+                         net (fo=1, unplaced)         0.000     3.196    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[7]_i_56__0_n_0
+                         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.457     3.653 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[7]_i_37/CO[3]
+                         net (fo=1, unplaced)         0.008     3.661    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[7]_i_37_n_0
+                         CARRY4 (Prop_carry4_CI_O[0])
+                                                      0.191     3.852 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[7]_i_63/O[0]
+                         net (fo=14, unplaced)        0.592     4.444    gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full30_in_3[4]
+                         CARRY4 (Prop_carry4_DI[3]_CO[3])
+                                                      0.451     4.895 r  fir_out_full_reg[7]_i_39/CO[3]
+                         net (fo=1, unplaced)         0.008     4.903    fir_out_full_reg[7]_i_39_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     5.178 r  fir_out_full_reg[23]_i_223/O[3]
+                         net (fo=2, unplaced)         0.530     5.708    fir_out_full_reg[23]_i_223_n_4
+                         LUT3 (Prop_lut3_I2_O)        0.250     5.958 r  fir_out_full[23]_i_188/O
+                         net (fo=2, unplaced)         0.548     6.506    fir_out_full[23]_i_188_n_0
+                         CARRY4 (Prop_carry4_DI[1]_O[3])
+                                                      0.506     7.012 r  fir_out_full_reg[23]_i_133/O[3]
+                         net (fo=2, unplaced)         0.530     7.542    fir_out_full_reg[23]_i_133_n_4
+                         LUT3 (Prop_lut3_I0_O)        0.252     7.794 r  fir_out_full[23]_i_97__0/O
+                         net (fo=2, unplaced)         0.348     8.142    fir_out_full[23]_i_97__0_n_0
+                         LUT4 (Prop_lut4_I3_O)        0.274     8.416 r  fir_out_full[23]_i_101/O
+                         net (fo=1, unplaced)         0.000     8.416    fir_out_full[23]_i_101_n_0
+                         CARRY4 (Prop_carry4_S[0]_CO[3])
+                                                      0.440     8.856 r  fir_out_full_reg[23]_i_43/CO[3]
+                         net (fo=1, unplaced)         0.000     8.856    fir_out_full_reg[23]_i_43_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     9.131 r  fir_out_full_reg[27]_i_43/O[3]
+                         net (fo=2, unplaced)         0.530     9.661    gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full2[22]
+                         LUT3 (Prop_lut3_I0_O)        0.255     9.916 r  fir_out_full[27]_i_29__1/O
+                         net (fo=2, unplaced)         0.383    10.299    fir_out_full[27]_i_29__1_n_0
+                         LUT4 (Prop_lut4_I3_O)        0.268    10.567 r  fir_out_full[27]_i_33__1/O
+                         net (fo=1, unplaced)         0.000    10.567    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_4__1_1[3]
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332    10.899 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_12__0/CO[3]
+                         net (fo=1, unplaced)         0.000    10.899    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_12__0_n_0
+                         CARRY4 (Prop_carry4_CI_O[1])
+                                                      0.277    11.176 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_12__0/O[1]
+                         net (fo=2, unplaced)         0.483    11.659    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_12__0_n_6
+                         LUT3 (Prop_lut3_I2_O)        0.266    11.925 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_3__1/O
+                         net (fo=2, unplaced)         0.238    12.163    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_3__1_n_0
+                         LUT4 (Prop_lut4_I3_O)        0.275    12.438 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_7__1/O
+                         net (fo=1, unplaced)         0.000    12.438    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_7__1_n_0
+                         CARRY4 (Prop_carry4_S[2]_CO[3])
+                                                      0.332    12.770 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_1__1/CO[3]
+                         net (fo=1, unplaced)         0.000    12.770    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_1__1_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.868 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_1__1/CO[3]
+                         net (fo=1, unplaced)         0.000    12.868    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_1__1_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.966 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]_i_1__1/CO[3]
+                         net (fo=1, unplaced)         0.000    12.966    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]_i_1__1_n_0
+                         CARRY4 (Prop_carry4_CI_O[1])
+                                                      0.277    13.243 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[39]_i_1__0/O[1]
+                         net (fo=1, unplaced)         0.000    13.243    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/acc_comb[37]
+                         FDCE                                         r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[37]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_5m6448 rise edge)
+                                                    177.154   177.154 r  
+                                                      0.000   177.154 r  clk (IN)
+                         net (fo=0)                   0.000   177.154    clk
+                         IBUF (Prop_ibuf_I_O)         0.763   177.917 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.613   178.531    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.077   178.608 r  clk_IBUF_BUFG_inst/O
+                         net (fo=4219, unplaced)      0.439   179.047    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[37]/C
+                         clock pessimism              0.167   179.214    
+                         clock uncertainty           -0.035   179.178    
+                         FDCE (Setup_fdce_C_D)        0.059   179.237    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[37]
+  -------------------------------------------------------------------
+                         required time                        179.237    
+                         arrival time                         -13.243    
+  -------------------------------------------------------------------
+                         slack                                165.995    
+
+Slack (MET) :             165.997ns  (required time - arrival time)
+  Source:                 u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[7][1]/C
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Destination:            u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[39]/D
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Path Group:             clk_audio_5m6448
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            177.154ns  (clk_audio_5m6448 rise@177.154ns - clk_audio_5m6448 rise@0.000ns)
+  Data Path Delay:        11.036ns  (logic 6.458ns (58.518%)  route 4.578ns (41.482%))
+  Logic Levels:           21  (CARRY4=13 LUT2=1 LUT3=4 LUT4=3)
+  Clock Path Skew:        -0.145ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.893ns = ( 179.047 - 177.154 ) 
+    Source Clock Delay      (SCD):    2.205ns
+    Clock Pessimism Removal (CPR):    0.167ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_5m6448 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+                         IBUF (Prop_ibuf_I_O)         0.894     0.894 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.646     1.540    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.081     1.621 r  clk_IBUF_BUFG_inst/O
+                         net (fo=4219, unplaced)      0.584     2.205    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[7][1]/C
+  -------------------------------------------------------------------    -------------------
+                         FDCE (Prop_fdce_C_Q)         0.379     2.584 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[7][1]/Q
+                         net (fo=3, unplaced)         0.380     2.964    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[7]__0__0[1]
+                         LUT2 (Prop_lut2_I0_O)        0.232     3.196 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[7]_i_56__0/O
+                         net (fo=1, unplaced)         0.000     3.196    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[7]_i_56__0_n_0
+                         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.457     3.653 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[7]_i_37/CO[3]
+                         net (fo=1, unplaced)         0.008     3.661    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[7]_i_37_n_0
+                         CARRY4 (Prop_carry4_CI_O[0])
+                                                      0.191     3.852 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[7]_i_63/O[0]
+                         net (fo=14, unplaced)        0.592     4.444    gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full30_in_3[4]
+                         CARRY4 (Prop_carry4_DI[3]_CO[3])
+                                                      0.451     4.895 r  fir_out_full_reg[7]_i_39/CO[3]
+                         net (fo=1, unplaced)         0.008     4.903    fir_out_full_reg[7]_i_39_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     5.178 r  fir_out_full_reg[23]_i_223/O[3]
+                         net (fo=2, unplaced)         0.530     5.708    fir_out_full_reg[23]_i_223_n_4
+                         LUT3 (Prop_lut3_I2_O)        0.250     5.958 r  fir_out_full[23]_i_188/O
+                         net (fo=2, unplaced)         0.548     6.506    fir_out_full[23]_i_188_n_0
+                         CARRY4 (Prop_carry4_DI[1]_O[3])
+                                                      0.506     7.012 r  fir_out_full_reg[23]_i_133/O[3]
+                         net (fo=2, unplaced)         0.530     7.542    fir_out_full_reg[23]_i_133_n_4
+                         LUT3 (Prop_lut3_I0_O)        0.252     7.794 r  fir_out_full[23]_i_97__0/O
+                         net (fo=2, unplaced)         0.348     8.142    fir_out_full[23]_i_97__0_n_0
+                         LUT4 (Prop_lut4_I3_O)        0.274     8.416 r  fir_out_full[23]_i_101/O
+                         net (fo=1, unplaced)         0.000     8.416    fir_out_full[23]_i_101_n_0
+                         CARRY4 (Prop_carry4_S[0]_CO[3])
+                                                      0.440     8.856 r  fir_out_full_reg[23]_i_43/CO[3]
+                         net (fo=1, unplaced)         0.000     8.856    fir_out_full_reg[23]_i_43_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     9.131 r  fir_out_full_reg[27]_i_43/O[3]
+                         net (fo=2, unplaced)         0.530     9.661    gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full2[22]
+                         LUT3 (Prop_lut3_I0_O)        0.255     9.916 r  fir_out_full[27]_i_29__1/O
+                         net (fo=2, unplaced)         0.383    10.299    fir_out_full[27]_i_29__1_n_0
+                         LUT4 (Prop_lut4_I3_O)        0.268    10.567 r  fir_out_full[27]_i_33__1/O
+                         net (fo=1, unplaced)         0.000    10.567    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_4__1_1[3]
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332    10.899 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_12__0/CO[3]
+                         net (fo=1, unplaced)         0.000    10.899    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_12__0_n_0
+                         CARRY4 (Prop_carry4_CI_O[1])
+                                                      0.277    11.176 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_12__0/O[1]
+                         net (fo=2, unplaced)         0.483    11.659    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_12__0_n_6
+                         LUT3 (Prop_lut3_I2_O)        0.266    11.925 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_3__1/O
+                         net (fo=2, unplaced)         0.238    12.163    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_3__1_n_0
+                         LUT4 (Prop_lut4_I3_O)        0.275    12.438 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_7__1/O
+                         net (fo=1, unplaced)         0.000    12.438    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_7__1_n_0
+                         CARRY4 (Prop_carry4_S[2]_CO[3])
+                                                      0.332    12.770 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_1__1/CO[3]
+                         net (fo=1, unplaced)         0.000    12.770    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_1__1_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.868 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_1__1/CO[3]
+                         net (fo=1, unplaced)         0.000    12.868    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_1__1_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.966 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]_i_1__1/CO[3]
+                         net (fo=1, unplaced)         0.000    12.966    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]_i_1__1_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275    13.241 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[39]_i_1__0/O[3]
+                         net (fo=1, unplaced)         0.000    13.241    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/acc_comb[39]
+                         FDCE                                         r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[39]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_5m6448 rise edge)
+                                                    177.154   177.154 r  
+                                                      0.000   177.154 r  clk (IN)
+                         net (fo=0)                   0.000   177.154    clk
+                         IBUF (Prop_ibuf_I_O)         0.763   177.917 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.613   178.531    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.077   178.608 r  clk_IBUF_BUFG_inst/O
+                         net (fo=4219, unplaced)      0.439   179.047    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[39]/C
+                         clock pessimism              0.167   179.214    
+                         clock uncertainty           -0.035   179.178    
+                         FDCE (Setup_fdce_C_D)        0.059   179.237    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[39]
+  -------------------------------------------------------------------
+                         required time                        179.237    
+                         arrival time                         -13.241    
+  -------------------------------------------------------------------
+                         slack                                165.997    
+
+Slack (MET) :             166.016ns  (required time - arrival time)
+  Source:                 u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[4][1]/C
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Destination:            u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[36]/D
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Path Group:             clk_audio_5m6448
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            177.154ns  (clk_audio_5m6448 rise@177.154ns - clk_audio_5m6448 rise@0.000ns)
+  Data Path Delay:        11.017ns  (logic 6.167ns (55.977%)  route 4.850ns (44.023%))
+  Logic Levels:           24  (CARRY4=13 LUT2=2 LUT3=3 LUT4=2 LUT5=2 LUT6=2)
+  Clock Path Skew:        -0.145ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.893ns = ( 179.047 - 177.154 ) 
+    Source Clock Delay      (SCD):    2.205ns
+    Clock Pessimism Removal (CPR):    0.167ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_5m6448 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+                         IBUF (Prop_ibuf_I_O)         0.894     0.894 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.646     1.540    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.081     1.621 r  clk_IBUF_BUFG_inst/O
+                         net (fo=4219, unplaced)      0.584     2.205    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[4][1]/C
+  -------------------------------------------------------------------    -------------------
+                         FDCE (Prop_fdce_C_Q)         0.379     2.584 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[4][1]/Q
+                         net (fo=3, unplaced)         0.380     2.964    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[4]__0[1]
+                         LUT2 (Prop_lut2_I0_O)        0.232     3.196 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[3]_i_13__2/O
+                         net (fo=1, unplaced)         0.000     3.196    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[3]_i_13__2_n_0
+                         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.457     3.653 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[3]_i_5__1/CO[3]
+                         net (fo=1, unplaced)         0.008     3.661    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[3]_i_5__1_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     3.759 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[11]_i_73/CO[3]
+                         net (fo=1, unplaced)         0.000     3.759    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[11]_i_73_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     4.034 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[11]_i_72__0/O[3]
+                         net (fo=13, unplaced)        0.569     4.603    gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full30_in_1[11]
+                         LUT2 (Prop_lut2_I1_O)        0.250     4.853 r  fir_out_full[27]_i_182__0/O
+                         net (fo=1, unplaced)         0.000     4.853    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_156__0[3]
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332     5.185 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_161/CO[3]
+                         net (fo=1, unplaced)         0.000     5.185    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_161_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     5.460 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_195/O[3]
+                         net (fo=3, unplaced)         0.537     5.997    u_interp2_all2x_stage3_n_149
+                         LUT4 (Prop_lut4_I2_O)        0.250     6.247 r  fir_out_full[27]_i_162__0/O
+                         net (fo=1, unplaced)         0.000     6.247    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_75__1_1[3]
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332     6.579 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_125__0/CO[3]
+                         net (fo=1, unplaced)         0.000     6.579    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_125__0_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     6.854 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_135__0/O[3]
+                         net (fo=3, unplaced)         0.537     7.391    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_135__0_n_4
+                         LUT3 (Prop_lut3_I1_O)        0.250     7.641 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_121/O
+                         net (fo=2, unplaced)         0.358     7.999    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_121_n_0
+                         LUT5 (Prop_lut5_I4_O)        0.105     8.104 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_68__2/O
+                         net (fo=2, unplaced)         0.339     8.443    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_68__2_n_0
+                         LUT6 (Prop_lut6_I0_O)        0.105     8.548 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_72__1/O
+                         net (fo=1, unplaced)         0.000     8.548    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_72__1_n_0
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332     8.880 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_48__0/CO[3]
+                         net (fo=1, unplaced)         0.000     8.880    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_48__0_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     9.155 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_48__0/O[3]
+                         net (fo=2, unplaced)         0.530     9.685    gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full2_7[27]
+                         LUT3 (Prop_lut3_I2_O)        0.250     9.935 r  fir_out_full[31]_i_18__2/O
+                         net (fo=2, unplaced)         0.358    10.293    fir_out_full[31]_i_18__2_n_0
+                         LUT4 (Prop_lut4_I3_O)        0.105    10.398 r  fir_out_full[31]_i_22__2/O
+                         net (fo=1, unplaced)         0.000    10.398    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_8__2_1[3]
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332    10.730 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_12__1/CO[3]
+                         net (fo=1, unplaced)         0.000    10.730    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_12__1_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275    11.005 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]_i_12__1/O[3]
+                         net (fo=3, unplaced)         0.537    11.542    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]_i_12__1_n_4
+                         LUT3 (Prop_lut3_I0_O)        0.250    11.792 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[35]_i_11/O
+                         net (fo=2, unplaced)         0.358    12.150    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[35]_i_11_n_0
+                         LUT5 (Prop_lut5_I3_O)        0.105    12.255 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[35]_i_3__2/O
+                         net (fo=2, unplaced)         0.339    12.594    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[35]_i_3__2_n_0
+                         LUT6 (Prop_lut6_I0_O)        0.105    12.699 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[35]_i_7__2/O
+                         net (fo=1, unplaced)         0.000    12.699    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[35]_i_7__2_n_0
+                         CARRY4 (Prop_carry4_S[2]_CO[3])
+                                                      0.332    13.031 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]_i_1__2/CO[3]
+                         net (fo=1, unplaced)         0.000    13.031    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]_i_1__2_n_0
+                         CARRY4 (Prop_carry4_CI_O[0])
+                                                      0.191    13.222 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[39]_i_1__1/O[0]
+                         net (fo=1, unplaced)         0.000    13.222    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/acc_comb[36]
+                         FDCE                                         r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[36]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_5m6448 rise edge)
+                                                    177.154   177.154 r  
+                                                      0.000   177.154 r  clk (IN)
+                         net (fo=0)                   0.000   177.154    clk
+                         IBUF (Prop_ibuf_I_O)         0.763   177.917 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.613   178.531    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.077   178.608 r  clk_IBUF_BUFG_inst/O
+                         net (fo=4219, unplaced)      0.439   179.047    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[36]/C
+                         clock pessimism              0.167   179.214    
+                         clock uncertainty           -0.035   179.178    
+                         FDCE (Setup_fdce_C_D)        0.059   179.237    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[36]
+  -------------------------------------------------------------------
+                         required time                        179.237    
+                         arrival time                         -13.222    
+  -------------------------------------------------------------------
+                         slack                                166.016    
+
+Slack (MET) :             166.028ns  (required time - arrival time)
+  Source:                 u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[4][1]/C
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Destination:            u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[33]/D
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Path Group:             clk_audio_5m6448
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            177.154ns  (clk_audio_5m6448 rise@177.154ns - clk_audio_5m6448 rise@0.000ns)
+  Data Path Delay:        11.005ns  (logic 6.155ns (55.929%)  route 4.850ns (44.071%))
+  Logic Levels:           23  (CARRY4=12 LUT2=3 LUT3=3 LUT4=1 LUT5=2 LUT6=2)
+  Clock Path Skew:        -0.145ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.893ns = ( 179.047 - 177.154 ) 
+    Source Clock Delay      (SCD):    2.205ns
+    Clock Pessimism Removal (CPR):    0.167ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_5m6448 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+                         IBUF (Prop_ibuf_I_O)         0.894     0.894 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.646     1.540    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.081     1.621 r  clk_IBUF_BUFG_inst/O
+                         net (fo=4219, unplaced)      0.584     2.205    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[4][1]/C
+  -------------------------------------------------------------------    -------------------
+                         FDCE (Prop_fdce_C_Q)         0.379     2.584 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[4][1]/Q
+                         net (fo=3, unplaced)         0.380     2.964    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[4]__0[1]
+                         LUT2 (Prop_lut2_I0_O)        0.232     3.196 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[3]_i_13__2/O
+                         net (fo=1, unplaced)         0.000     3.196    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[3]_i_13__2_n_0
+                         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.457     3.653 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[3]_i_5__1/CO[3]
+                         net (fo=1, unplaced)         0.008     3.661    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[3]_i_5__1_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     3.936 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[11]_i_73/O[3]
+                         net (fo=13, unplaced)        0.569     4.505    gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full30_in_1[7]
+                         LUT2 (Prop_lut2_I1_O)        0.250     4.755 r  fir_out_full[11]_i_102__0/O
+                         net (fo=1, unplaced)         0.000     4.755    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[11]_i_77_0[3]
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332     5.087 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[11]_i_101/CO[3]
+                         net (fo=1, unplaced)         0.000     5.087    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[11]_i_101_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     5.362 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_161/O[3]
+                         net (fo=3, unplaced)         0.537     5.899    u_interp2_all2x_stage3_n_382
+                         LUT2 (Prop_lut2_I0_O)        0.250     6.149 r  fir_out_full[23]_i_153__0/O
+                         net (fo=1, unplaced)         0.000     6.149    fir_out_full[23]_i_153__0_n_0
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332     6.481 r  fir_out_full_reg[23]_i_125__0/CO[3]
+                         net (fo=1, unplaced)         0.000     6.481    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_75__1_0[0]
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     6.756 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_125__0/O[3]
+                         net (fo=3, unplaced)         0.537     7.293    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_125__0_n_4
+                         LUT3 (Prop_lut3_I1_O)        0.250     7.543 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_121/O
+                         net (fo=2, unplaced)         0.358     7.901    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_121_n_0
+                         LUT5 (Prop_lut5_I4_O)        0.105     8.006 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_68__1/O
+                         net (fo=2, unplaced)         0.339     8.345    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_68__1_n_0
+                         LUT6 (Prop_lut6_I0_O)        0.105     8.450 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_72__1/O
+                         net (fo=1, unplaced)         0.000     8.450    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_72__1_n_0
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332     8.782 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[23]_i_48__0/CO[3]
+                         net (fo=1, unplaced)         0.000     8.782    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[23]_i_48__0_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     9.057 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_48__0/O[3]
+                         net (fo=2, unplaced)         0.530     9.587    gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full2_7[23]
+                         LUT3 (Prop_lut3_I2_O)        0.250     9.837 r  fir_out_full[27]_i_18__2/O
+                         net (fo=2, unplaced)         0.358    10.195    fir_out_full[27]_i_18__2_n_0
+                         LUT4 (Prop_lut4_I3_O)        0.105    10.300 r  fir_out_full[27]_i_22__2/O
+                         net (fo=1, unplaced)         0.000    10.300    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_8__2_1[3]
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332    10.632 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_12__1/CO[3]
+                         net (fo=1, unplaced)         0.000    10.632    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_12__1_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275    10.907 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_12__1/O[3]
+                         net (fo=3, unplaced)         0.537    11.444    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_12__1_n_4
+                         LUT3 (Prop_lut3_I0_O)        0.250    11.694 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[31]_i_11/O
+                         net (fo=2, unplaced)         0.358    12.052    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[31]_i_11_n_0
+                         LUT5 (Prop_lut5_I3_O)        0.105    12.157 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[31]_i_3__2/O
+                         net (fo=2, unplaced)         0.339    12.496    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[31]_i_3__2_n_0
+                         LUT6 (Prop_lut6_I0_O)        0.105    12.601 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[31]_i_7__2/O
+                         net (fo=1, unplaced)         0.000    12.601    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[31]_i_7__2_n_0
+                         CARRY4 (Prop_carry4_S[2]_CO[3])
+                                                      0.332    12.933 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_1__2/CO[3]
+                         net (fo=1, unplaced)         0.000    12.933    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_1__2_n_0
+                         CARRY4 (Prop_carry4_CI_O[1])
+                                                      0.277    13.210 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]_i_1__2/O[1]
+                         net (fo=1, unplaced)         0.000    13.210    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/acc_comb[33]
+                         FDCE                                         r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[33]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_5m6448 rise edge)
+                                                    177.154   177.154 r  
+                                                      0.000   177.154 r  clk (IN)
+                         net (fo=0)                   0.000   177.154    clk
+                         IBUF (Prop_ibuf_I_O)         0.763   177.917 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.613   178.531    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.077   178.608 r  clk_IBUF_BUFG_inst/O
+                         net (fo=4219, unplaced)      0.439   179.047    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[33]/C
+                         clock pessimism              0.167   179.214    
+                         clock uncertainty           -0.035   179.178    
+                         FDCE (Setup_fdce_C_D)        0.059   179.237    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[33]
+  -------------------------------------------------------------------
+                         required time                        179.237    
+                         arrival time                         -13.210    
+  -------------------------------------------------------------------
+                         slack                                166.028    
+
+Slack (MET) :             166.030ns  (required time - arrival time)
+  Source:                 u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[4][1]/C
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Destination:            u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]/D
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Path Group:             clk_audio_5m6448
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            177.154ns  (clk_audio_5m6448 rise@177.154ns - clk_audio_5m6448 rise@0.000ns)
+  Data Path Delay:        11.003ns  (logic 6.153ns (55.921%)  route 4.850ns (44.079%))
+  Logic Levels:           23  (CARRY4=12 LUT2=3 LUT3=3 LUT4=1 LUT5=2 LUT6=2)
+  Clock Path Skew:        -0.145ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.893ns = ( 179.047 - 177.154 ) 
+    Source Clock Delay      (SCD):    2.205ns
+    Clock Pessimism Removal (CPR):    0.167ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_5m6448 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+                         IBUF (Prop_ibuf_I_O)         0.894     0.894 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.646     1.540    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.081     1.621 r  clk_IBUF_BUFG_inst/O
+                         net (fo=4219, unplaced)      0.584     2.205    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[4][1]/C
+  -------------------------------------------------------------------    -------------------
+                         FDCE (Prop_fdce_C_Q)         0.379     2.584 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[4][1]/Q
+                         net (fo=3, unplaced)         0.380     2.964    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[4]__0[1]
+                         LUT2 (Prop_lut2_I0_O)        0.232     3.196 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[3]_i_13__2/O
+                         net (fo=1, unplaced)         0.000     3.196    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[3]_i_13__2_n_0
+                         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.457     3.653 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[3]_i_5__1/CO[3]
+                         net (fo=1, unplaced)         0.008     3.661    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[3]_i_5__1_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     3.936 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[11]_i_73/O[3]
+                         net (fo=13, unplaced)        0.569     4.505    gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full30_in_1[7]
+                         LUT2 (Prop_lut2_I1_O)        0.250     4.755 r  fir_out_full[11]_i_102__0/O
+                         net (fo=1, unplaced)         0.000     4.755    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[11]_i_77_0[3]
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332     5.087 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[11]_i_101/CO[3]
+                         net (fo=1, unplaced)         0.000     5.087    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[11]_i_101_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     5.362 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_161/O[3]
+                         net (fo=3, unplaced)         0.537     5.899    u_interp2_all2x_stage3_n_382
+                         LUT2 (Prop_lut2_I0_O)        0.250     6.149 r  fir_out_full[23]_i_153__0/O
+                         net (fo=1, unplaced)         0.000     6.149    fir_out_full[23]_i_153__0_n_0
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332     6.481 r  fir_out_full_reg[23]_i_125__0/CO[3]
+                         net (fo=1, unplaced)         0.000     6.481    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_75__1_0[0]
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     6.756 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_125__0/O[3]
+                         net (fo=3, unplaced)         0.537     7.293    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_125__0_n_4
+                         LUT3 (Prop_lut3_I1_O)        0.250     7.543 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_121/O
+                         net (fo=2, unplaced)         0.358     7.901    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_121_n_0
+                         LUT5 (Prop_lut5_I4_O)        0.105     8.006 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_68__1/O
+                         net (fo=2, unplaced)         0.339     8.345    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_68__1_n_0
+                         LUT6 (Prop_lut6_I0_O)        0.105     8.450 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_72__1/O
+                         net (fo=1, unplaced)         0.000     8.450    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_72__1_n_0
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332     8.782 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[23]_i_48__0/CO[3]
+                         net (fo=1, unplaced)         0.000     8.782    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[23]_i_48__0_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     9.057 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_48__0/O[3]
+                         net (fo=2, unplaced)         0.530     9.587    gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full2_7[23]
+                         LUT3 (Prop_lut3_I2_O)        0.250     9.837 r  fir_out_full[27]_i_18__2/O
+                         net (fo=2, unplaced)         0.358    10.195    fir_out_full[27]_i_18__2_n_0
+                         LUT4 (Prop_lut4_I3_O)        0.105    10.300 r  fir_out_full[27]_i_22__2/O
+                         net (fo=1, unplaced)         0.000    10.300    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_8__2_1[3]
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332    10.632 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_12__1/CO[3]
+                         net (fo=1, unplaced)         0.000    10.632    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_12__1_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275    10.907 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_12__1/O[3]
+                         net (fo=3, unplaced)         0.537    11.444    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_12__1_n_4
+                         LUT3 (Prop_lut3_I0_O)        0.250    11.694 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[31]_i_11/O
+                         net (fo=2, unplaced)         0.358    12.052    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[31]_i_11_n_0
+                         LUT5 (Prop_lut5_I3_O)        0.105    12.157 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[31]_i_3__2/O
+                         net (fo=2, unplaced)         0.339    12.496    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[31]_i_3__2_n_0
+                         LUT6 (Prop_lut6_I0_O)        0.105    12.601 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[31]_i_7__2/O
+                         net (fo=1, unplaced)         0.000    12.601    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[31]_i_7__2_n_0
+                         CARRY4 (Prop_carry4_S[2]_CO[3])
+                                                      0.332    12.933 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_1__2/CO[3]
+                         net (fo=1, unplaced)         0.000    12.933    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_1__2_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275    13.208 r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]_i_1__2/O[3]
+                         net (fo=1, unplaced)         0.000    13.208    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/acc_comb[35]
+                         FDCE                                         r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_5m6448 rise edge)
+                                                    177.154   177.154 r  
+                                                      0.000   177.154 r  clk (IN)
+                         net (fo=0)                   0.000   177.154    clk
+                         IBUF (Prop_ibuf_I_O)         0.763   177.917 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.613   178.531    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.077   178.608 r  clk_IBUF_BUFG_inst/O
+                         net (fo=4219, unplaced)      0.439   179.047    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]/C
+                         clock pessimism              0.167   179.214    
+                         clock uncertainty           -0.035   179.178    
+                         FDCE (Setup_fdce_C_D)        0.059   179.237    u_interp2_all2x_stage3/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]
+  -------------------------------------------------------------------
+                         required time                        179.237    
+                         arrival time                         -13.208    
+  -------------------------------------------------------------------
+                         slack                                166.030    
+
+Slack (MET) :             166.058ns  (required time - arrival time)
+  Source:                 u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[7][1]/C
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Destination:            u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[38]/D
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Path Group:             clk_audio_5m6448
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            177.154ns  (clk_audio_5m6448 rise@177.154ns - clk_audio_5m6448 rise@0.000ns)
+  Data Path Delay:        10.975ns  (logic 6.397ns (58.287%)  route 4.578ns (41.713%))
+  Logic Levels:           21  (CARRY4=13 LUT2=1 LUT3=4 LUT4=3)
+  Clock Path Skew:        -0.145ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.893ns = ( 179.047 - 177.154 ) 
+    Source Clock Delay      (SCD):    2.205ns
+    Clock Pessimism Removal (CPR):    0.167ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_5m6448 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+                         IBUF (Prop_ibuf_I_O)         0.894     0.894 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.646     1.540    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.081     1.621 r  clk_IBUF_BUFG_inst/O
+                         net (fo=4219, unplaced)      0.584     2.205    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[7][1]/C
+  -------------------------------------------------------------------    -------------------
+                         FDCE (Prop_fdce_C_Q)         0.379     2.584 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[7][1]/Q
+                         net (fo=3, unplaced)         0.380     2.964    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/x_reg_reg[7]__0__0[1]
+                         LUT2 (Prop_lut2_I0_O)        0.232     3.196 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[7]_i_56__0/O
+                         net (fo=1, unplaced)         0.000     3.196    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[7]_i_56__0_n_0
+                         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.457     3.653 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[7]_i_37/CO[3]
+                         net (fo=1, unplaced)         0.008     3.661    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[7]_i_37_n_0
+                         CARRY4 (Prop_carry4_CI_O[0])
+                                                      0.191     3.852 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[7]_i_63/O[0]
+                         net (fo=14, unplaced)        0.592     4.444    gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full30_in_3[4]
+                         CARRY4 (Prop_carry4_DI[3]_CO[3])
+                                                      0.451     4.895 r  fir_out_full_reg[7]_i_39/CO[3]
+                         net (fo=1, unplaced)         0.008     4.903    fir_out_full_reg[7]_i_39_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     5.178 r  fir_out_full_reg[23]_i_223/O[3]
+                         net (fo=2, unplaced)         0.530     5.708    fir_out_full_reg[23]_i_223_n_4
+                         LUT3 (Prop_lut3_I2_O)        0.250     5.958 r  fir_out_full[23]_i_188/O
+                         net (fo=2, unplaced)         0.548     6.506    fir_out_full[23]_i_188_n_0
+                         CARRY4 (Prop_carry4_DI[1]_O[3])
+                                                      0.506     7.012 r  fir_out_full_reg[23]_i_133/O[3]
+                         net (fo=2, unplaced)         0.530     7.542    fir_out_full_reg[23]_i_133_n_4
+                         LUT3 (Prop_lut3_I0_O)        0.252     7.794 r  fir_out_full[23]_i_97__0/O
+                         net (fo=2, unplaced)         0.348     8.142    fir_out_full[23]_i_97__0_n_0
+                         LUT4 (Prop_lut4_I3_O)        0.274     8.416 r  fir_out_full[23]_i_101/O
+                         net (fo=1, unplaced)         0.000     8.416    fir_out_full[23]_i_101_n_0
+                         CARRY4 (Prop_carry4_S[0]_CO[3])
+                                                      0.440     8.856 r  fir_out_full_reg[23]_i_43/CO[3]
+                         net (fo=1, unplaced)         0.000     8.856    fir_out_full_reg[23]_i_43_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275     9.131 r  fir_out_full_reg[27]_i_43/O[3]
+                         net (fo=2, unplaced)         0.530     9.661    gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full2[22]
+                         LUT3 (Prop_lut3_I0_O)        0.255     9.916 r  fir_out_full[27]_i_29__1/O
+                         net (fo=2, unplaced)         0.383    10.299    fir_out_full[27]_i_29__1_n_0
+                         LUT4 (Prop_lut4_I3_O)        0.268    10.567 r  fir_out_full[27]_i_33__1/O
+                         net (fo=1, unplaced)         0.000    10.567    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[23]_i_4__1_1[3]
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.332    10.899 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_12__0/CO[3]
+                         net (fo=1, unplaced)         0.000    10.899    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_12__0_n_0
+                         CARRY4 (Prop_carry4_CI_O[1])
+                                                      0.277    11.176 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_12__0/O[1]
+                         net (fo=2, unplaced)         0.483    11.659    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_12__0_n_6
+                         LUT3 (Prop_lut3_I2_O)        0.266    11.925 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_3__1/O
+                         net (fo=2, unplaced)         0.238    12.163    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_3__1_n_0
+                         LUT4 (Prop_lut4_I3_O)        0.275    12.438 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_7__1/O
+                         net (fo=1, unplaced)         0.000    12.438    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full[27]_i_7__1_n_0
+                         CARRY4 (Prop_carry4_S[2]_CO[3])
+                                                      0.332    12.770 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_1__1/CO[3]
+                         net (fo=1, unplaced)         0.000    12.770    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[27]_i_1__1_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.868 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_1__1/CO[3]
+                         net (fo=1, unplaced)         0.000    12.868    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[31]_i_1__1_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.966 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]_i_1__1/CO[3]
+                         net (fo=1, unplaced)         0.000    12.966    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[35]_i_1__1_n_0
+                         CARRY4 (Prop_carry4_CI_O[2])
+                                                      0.214    13.180 r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[39]_i_1__0/O[2]
+                         net (fo=1, unplaced)         0.000    13.180    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/acc_comb[38]
+                         FDCE                                         r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[38]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_5m6448 rise edge)
+                                                    177.154   177.154 r  
+                                                      0.000   177.154 r  clk (IN)
+                         net (fo=0)                   0.000   177.154    clk
+                         IBUF (Prop_ibuf_I_O)         0.763   177.917 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.613   178.531    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.077   178.608 r  clk_IBUF_BUFG_inst/O
+                         net (fo=4219, unplaced)      0.439   179.047    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[38]/C
+                         clock pessimism              0.167   179.214    
+                         clock uncertainty           -0.035   179.178    
+                         FDCE (Setup_fdce_C_D)        0.059   179.237    u_interp2_all2x_stage2/gen_parallel_fir.u_fir_core_symm_interp2_all2x/fir_out_full_reg[38]
+  -------------------------------------------------------------------
+                         required time                        179.237    
+                         arrival time                         -13.180    
+  -------------------------------------------------------------------
+                         slack                                166.058    
+
+
+
+
+
+Pulse Width Checks
+--------------------------------------------------------------------------------------
+Clock Name:         clk_audio_5m6448
+Waveform(ns):       { 0.000 88.577 }
+Period(ns):         177.154
+Sources:            { clk }
+
+Check Type        Corner  Lib Pin  Reference Pin  Required(ns)  Actual(ns)  Slack(ns)  Location  Pin
+Min Period        n/a     BUFG/I   n/a            1.592         177.154     175.562              clk_IBUF_BUFG_inst/I
+Min Period        n/a     FDRE/C   n/a            1.000         177.154     176.154              u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[35][8]/C
+Min Period        n/a     FDRE/C   n/a            1.000         177.154     176.154              u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[35][9]/C
+Min Period        n/a     FDRE/C   n/a            1.000         177.154     176.154              u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[36][0]/C
+Min Period        n/a     FDRE/C   n/a            1.000         177.154     176.154              u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[36][10]/C
+Min Period        n/a     FDRE/C   n/a            1.000         177.154     176.154              u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[36][11]/C
+Min Period        n/a     FDRE/C   n/a            1.000         177.154     176.154              u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[36][12]/C
+Min Period        n/a     FDRE/C   n/a            1.000         177.154     176.154              u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[36][13]/C
+Min Period        n/a     FDRE/C   n/a            1.000         177.154     176.154              u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[36][14]/C
+Min Period        n/a     FDRE/C   n/a            1.000         177.154     176.154              u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[36][15]/C
+Low Pulse Width   Slow    FDRE/C   n/a            0.500         88.577      88.077               u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[35][8]/C
+Low Pulse Width   Slow    FDRE/C   n/a            0.500         88.577      88.077               u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[35][9]/C
+Low Pulse Width   Slow    FDRE/C   n/a            0.500         88.577      88.077               u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[36][0]/C
+Low Pulse Width   Slow    FDRE/C   n/a            0.500         88.577      88.077               u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[36][10]/C
+Low Pulse Width   Slow    FDRE/C   n/a            0.500         88.577      88.077               u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[36][11]/C
+Low Pulse Width   Slow    FDRE/C   n/a            0.500         88.577      88.077               u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[36][12]/C
+Low Pulse Width   Slow    FDRE/C   n/a            0.500         88.577      88.077               u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[36][13]/C
+Low Pulse Width   Slow    FDRE/C   n/a            0.500         88.577      88.077               u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[36][14]/C
+Low Pulse Width   Slow    FDRE/C   n/a            0.500         88.577      88.077               u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[36][15]/C
+Low Pulse Width   Slow    FDRE/C   n/a            0.500         88.577      88.077               u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[36][16]/C
+High Pulse Width  Fast    FDRE/C   n/a            0.500         88.577      88.077               u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[35][8]/C
+High Pulse Width  Fast    FDRE/C   n/a            0.500         88.577      88.077               u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[35][9]/C
+High Pulse Width  Fast    FDRE/C   n/a            0.500         88.577      88.077               u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[36][0]/C
+High Pulse Width  Fast    FDRE/C   n/a            0.500         88.577      88.077               u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[36][10]/C
+High Pulse Width  Fast    FDRE/C   n/a            0.500         88.577      88.077               u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[36][11]/C
+High Pulse Width  Fast    FDRE/C   n/a            0.500         88.577      88.077               u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[36][12]/C
+High Pulse Width  Fast    FDRE/C   n/a            0.500         88.577      88.077               u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[36][13]/C
+High Pulse Width  Fast    FDRE/C   n/a            0.500         88.577      88.077               u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[36][14]/C
+High Pulse Width  Fast    FDRE/C   n/a            0.500         88.577      88.077               u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[36][15]/C
+High Pulse Width  Fast    FDRE/C   n/a            0.500         88.577      88.077               u_interp2_all2x_stage1/gen_stage1_single_mac.u_fir_core_symm_interp2_stage1_mac/x_reg_reg[36][16]/C
+
+
+

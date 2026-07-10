@@ -32,6 +32,8 @@
 // 开发工具     : Vivado
 // 修订记录     :
 //                2026-07-10：新增全 2x 结构 128 倍插值顶层模块。
+//                2026-07-10：同步含 2 倍插值增益的新系数参数，并按
+//                            bit-true 结果收紧系数与累加器位宽。
 //=============================================================
 
 module interp128_all2x_top_ce #(
@@ -107,9 +109,9 @@ module interp128_all2x_top_ce #(
     interp2_top_symm_ce_all2x #(
         .STAGE_ID (1),
         .DATA_W   (DATA_W),
-        .COEFF_W  (18),
-        .ACC_W    (56),
-        .NTAPS    (101),
+        .COEFF_W  (17),
+        .ACC_W    (43),
+        .NTAPS    (93),
         .FRAC_W   (16)
     ) u_interp2_all2x_stage1 (
         .clk              (clk),
@@ -142,10 +144,10 @@ module interp128_all2x_top_ce #(
     interp2_top_symm_ce_all2x #(
         .STAGE_ID (2),
         .DATA_W   (DATA_W),
-        .COEFF_W  (18),
-        .ACC_W    (54),
+        .COEFF_W  (16),
+        .ACC_W    (41),
         .NTAPS    (17),
-        .FRAC_W   (16)
+        .FRAC_W   (15)
     ) u_interp2_all2x_stage2 (
         .clk              (clk),
         .rst_n            (rst_n),
@@ -177,10 +179,10 @@ module interp128_all2x_top_ce #(
     interp2_top_symm_ce_all2x #(
         .STAGE_ID (3),
         .DATA_W   (DATA_W),
-        .COEFF_W  (17),
-        .ACC_W    (52),
+        .COEFF_W  (15),
+        .ACC_W    (40),
         .NTAPS    (11),
-        .FRAC_W   (15)
+        .FRAC_W   (14)
     ) u_interp2_all2x_stage3 (
         .clk              (clk),
         .rst_n            (rst_n),
@@ -212,10 +214,10 @@ module interp128_all2x_top_ce #(
     interp2_top_symm_ce_all2x #(
         .STAGE_ID (4),
         .DATA_W   (DATA_W),
-        .COEFF_W  (18),
-        .ACC_W    (52),
+        .COEFF_W  (16),
+        .ACC_W    (41),
         .NTAPS    (7),
-        .FRAC_W   (16)
+        .FRAC_W   (15)
     ) u_interp2_all2x_stage4 (
         .clk              (clk),
         .rst_n            (rst_n),
@@ -248,9 +250,9 @@ module interp128_all2x_top_ce #(
         .STAGE_ID (5),
         .DATA_W   (DATA_W),
         .COEFF_W  (14),
-        .ACC_W    (48),
+        .ACC_W    (39),
         .NTAPS    (7),
-        .FRAC_W   (12)
+        .FRAC_W   (13)
     ) u_interp2_all2x_stage5 (
         .clk              (clk),
         .rst_n            (rst_n),
@@ -282,10 +284,10 @@ module interp128_all2x_top_ce #(
     interp2_top_symm_ce_all2x #(
         .STAGE_ID (6),
         .DATA_W   (DATA_W),
-        .COEFF_W  (15),
-        .ACC_W    (49),
+        .COEFF_W  (13),
+        .ACC_W    (38),
         .NTAPS    (7),
-        .FRAC_W   (13)
+        .FRAC_W   (12)
     ) u_interp2_all2x_stage6 (
         .clk              (clk),
         .rst_n            (rst_n),
@@ -318,7 +320,7 @@ module interp128_all2x_top_ce #(
         .STAGE_ID (7),
         .DATA_W   (DATA_W),
         .COEFF_W  (14),
-        .ACC_W    (48),
+        .ACC_W    (38),
         .NTAPS    (7),
         .FRAC_W   (12)
     ) u_interp2_all2x_stage7 (

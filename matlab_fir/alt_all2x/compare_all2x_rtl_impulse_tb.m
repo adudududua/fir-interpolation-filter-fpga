@@ -22,7 +22,7 @@ clc; clear; close all;
 % 当前默认配置：
 %                  输入激励    ：单点脉冲，幅度 1000000
 %                  插值结构    ：7 级 2x
-%                  RTL CSV 文件：../../interp128_all2x_tb_output.csv
+%                  RTL CSV 文件：系统临时 Vivado 工作目录
 %
 % 设计作者     : kafeizizi
 % 创建日期     : 2026-07-10
@@ -30,6 +30,8 @@ clc; clear; close all;
 % 开发工具     : MATLAB
 % 修订记录     :
 %                2026-07-10：新增全 2x RTL 脉冲响应 golden 对拍脚本。
+%                2026-07-10：改为自动读取最新逐级 FRAC_W，并优先从
+%                            专用 Vivado 临时目录读取 RTL 输出。
 %=============================================================
 
 %% 1) 路径与参数
@@ -41,10 +43,21 @@ if isempty(script_dir)
 end
 
 repo_dir = fullfile(script_dir, '..', '..');
-rtl_csv = fullfile(repo_dir, 'interp128_all2x_tb_output.csv');
+bittrue_dir = fullfile(script_dir, 'bittrue');
+addpath(bittrue_dir);
 
-FRAC_W_LIST = [16 16 15 16 12 13 12];
-NUM_STAGE = 7;
+stage_config = load_all2x_stage_config(script_dir, 24);
+NUM_STAGE = numel(stage_config);
+
+rtl_csv_temp = fullfile(tempdir, 'codex_vivado_fir_interpolation', ...
+                        'interp128_all2x_tb_output.csv');
+rtl_csv_legacy = fullfile(repo_dir, 'interp128_all2x_tb_output.csv');
+
+if exist(rtl_csv_temp, 'file')
+    rtl_csv = rtl_csv_temp;
+else
+    rtl_csv = rtl_csv_legacy;
+end
 IMPULSE_AMP = 1000000;
 OUT_W = 24;
 
@@ -84,7 +97,7 @@ for stage_idx = 1:NUM_STAGE
     x_up(1:2:end) = golden_y;
 
     acc_full = conv(x_up, coeff_int);
-    golden_y = round_sat_to_int(acc_full, FRAC_W_LIST(stage_idx), OUT_W);
+    golden_y = round_sat_to_int(acc_full, stage_config(stage_idx).frac_w, OUT_W);
 
     fprintf('Stage %d golden 长度 = %d，非零样本数 = %d\n', ...
             stage_idx, length(golden_y), nnz(golden_y));

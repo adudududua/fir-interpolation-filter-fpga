@@ -1,9 +1,9 @@
 All-2x RTL impulse comparison summary
 =====================================
 RTL CSV samples       = 29997
-Golden samples        = 7163
-Best shift            = 263
+Golden samples        = 6651
+Best shift            = 327
 Max abs error LSB     = 0
 RMS error LSB         = 0.000000
-Mismatch samples      = 0 / 7163
+Mismatch samples      = 0 / 6651
 Pass all              = 1

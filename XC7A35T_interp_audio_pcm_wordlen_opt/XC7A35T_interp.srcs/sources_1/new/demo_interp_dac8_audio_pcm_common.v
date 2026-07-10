@@ -4,8 +4,8 @@
 // 模块名       : demo_interp_dac8_audio_pcm_common
 // 功能简述     : 音频 PCM 输入版 FIR 插值 DAC 演示公共模块。
 //                本模块使用 audio_pcm_rom_source 读取 24bit
-//                signed 音频 PCM 采样点，并送入现有 128x
-//                插值滤波器链路。
+//                signed 音频 PCM 采样点，并送入 44.1kHz 专用
+//                全 2x 七级 128x 插值滤波器链路。
 //                
 //                与正弦 ROM 版本相比，本模块的区别是：
 //                  原输入：内部 64 点正弦 ROM
@@ -21,10 +21,12 @@
 // 开发工具     : Vivado
 // 修订记录     :
 //                2026-06-21：新增音频 PCM 输入版本。
+//                2026-07-10：替换为 7 级全 2x 插值链路，新增
+//                            ce2_out，并去掉旧链路显示增益补偿。
 //=============================================================
 
 module demo_interp_dac8_audio_pcm_common (
-    input  wire        clk_audio_128x,  // 5.6448MHz 或 6.144MHz 连续音频 128x 时钟
+    input  wire        clk_audio_128x,  // 5.6448MHz 连续音频 128x 时钟
     input  wire        rst_n,           // 低有效复位
     input  wire [1:0]  mode_sel,        // 插值倍率选择：00=4x，01=8x，10/11=128x
 
@@ -73,20 +75,16 @@ module demo_interp_dac8_audio_pcm_common (
     //=========================================================
     // 2）在音频 128x 时钟域内产生整数 CE
     //
-    // 若 clk_audio_128x = 6.144MHz：
-    //   x_in_update_ce = 48kHz
-    //   ce4_out        = 192kHz
-    //   ce8_out        = 384kHz
-    //   ce128_out      = 6.144MHz
-    //
-    // 若 clk_audio_128x = 5.6448MHz：
+    // clk_audio_128x = 5.6448MHz：
     //   x_in_update_ce = 44.1kHz
+    //   ce2_out        = 88.2kHz
     //   ce4_out        = 176.4kHz
     //   ce8_out        = 352.8kHz
     //   ce128_out      = 5.6448MHz
     //=========================================================
     reg [6:0] ce_cnt;
 
+    wire ce2_out;
     wire ce4_out;
     wire ce8_out;
     wire ce16_out;
@@ -101,6 +99,7 @@ module demo_interp_dac8_audio_pcm_common (
     assign ce16_out       = (ce_cnt[2:0] == 3'b000);
     assign ce8_out        = (ce_cnt[3:0] == 4'b0000);
     assign ce4_out        = (ce_cnt[4:0] == 5'b00000);
+    assign ce2_out        = (ce_cnt[5:0] == 6'b000000);
     assign x_in_update_ce = (ce_cnt == 7'd127);
 
     always @(posedge clk_audio_128x or negedge rst_n) begin
@@ -113,17 +112,9 @@ module demo_interp_dac8_audio_pcm_common (
     //=========================================================
     // 3）音频 PCM ROM 输入源
     //
-    // audio_pcm_rom_source:
-    //   从 audio_48k_24bit_1024.mem 中读取 24bit signed
-    //   PCM 音频采样点。
-    //
-    // 注意：
-    //   这个 .mem 文件本身是 48kHz 生成的测试数据。
-    //   当 sw2=1 时，按照 48kHz 正常速度播放；
-    //   当 sw2=0 时，按照 44.1kHz 速度播放，会稍微变慢。
-    //
-    //   这不影响我们用示波器验证“真实音频采样可以进入
-    //   FIR 插值链并输出”。
+    // audio_pcm_rom_source 从 audio_48k_24bit_1024.mem 中读取
+    // 24bit signed PCM 测试采样点。该测试数据按 44.1kHz 节拍
+    // 播放，仅用于示波器观察插值链输出。
     //=========================================================
     wire signed [23:0] audio_sample_w;
     wire               audio_sample_update_w;
@@ -167,11 +158,10 @@ module demo_interp_dac8_audio_pcm_common (
     end
 
     //=========================================================
-    // 5）实例化 128x 统一插值链
+    // 5）实例化 44.1kHz 专用全 2x 插值链
     //
     // 插值链内部结构：
-    //   第一级：4x 插值 FIR
-    //   后五级：2x 插值 FIR 级联
+    //   2x × 2x × 2x × 2x × 2x × 2x × 2x = 128x
     //
     // 输出节点：
     //   dbg_y4 ：4x 输出
@@ -193,17 +183,13 @@ module demo_interp_dac8_audio_pcm_common (
     wire signed [23:0] dbg_y64_w;
     wire               dbg_y64_valid_w;
 
-    interp128_top_ce #(
-        .DATA_W   (24),
-        .COEFF_W  (18),
-        // .ACC_W    (56),
-        .ACC_W    (49), // 4x 前级 ACC_W 扫描后选择的资源/精度折中点
-        .NTAPS4X  (155),
-        .NTAPS2X  (29)
-    ) u_interp128_top_ce (
+    interp128_all2x_top_ce #(
+        .DATA_W (24)
+    ) u_interp128_all2x_top_ce (
         .clk            (clk_audio_128x),
         .rst_n          (rst_n),
 
+        .ce2_out        (ce2_out),
         .ce4_out        (ce4_out),
         .ce8_out        (ce8_out),
         .ce16_out       (ce16_out),
@@ -217,12 +203,16 @@ module demo_interp_dac8_audio_pcm_common (
         .y_out          (y_out_w),
         .y_out_valid    (y_out_valid_w),
 
+        .dbg_y2         (),
+        .dbg_y2_valid   (),
         .dbg_y4         (dbg_y4_w),
         .dbg_y4_valid   (dbg_y4_valid_w),
 
         .dbg_y8         (dbg_y8_w),
         .dbg_y8_valid   (dbg_y8_valid_w),
 
+        .dbg_y16        (),
+        .dbg_y16_valid  (),
         .dbg_y32        (dbg_y32_w),
         .dbg_y32_valid  (dbg_y32_valid_w),
 
@@ -265,17 +255,10 @@ module demo_interp_dac8_audio_pcm_common (
     end
 
     //=========================================================
-    // 7）按模式做 DAC 显示幅度补偿
+    // 7）DAC 显示幅度处理
     //
-    // 补偿只用于 AD9708 示波器显示，不改变 FIR 内部算法。
-    //
-    // 当前补偿：
-    //   4x   ：不补偿
-    //   8x   ：不补偿
-    //   128x ：左移 4 位
-    //
-    // 如果示波器上 128x 音频波形幅度太小，可以改成 <<< 5。
-    // 如果削顶明显，则保持 <<< 4 或进一步减小。
+    // 全 2x 各级系数已经包含 2 倍插值增益，4x、8x、128x
+    // 三个节点均保持输入幅度，因此不再做额外左移补偿。
     //=========================================================
     reg  signed [31:0] display_sample_ext;
     reg  signed [23:0] display_sample_sat;
@@ -284,38 +267,8 @@ module demo_interp_dac8_audio_pcm_common (
     wire signed [8:0] sample_bias_w;
     reg        [7:0]  sample_u8_w;
 
-    // always @(*) begin
-    //     case (mode_state)
-    //         MODE_4X: begin
-    //             display_sample_ext = {{8{selected_sample[23]}}, selected_sample};
-    //         end
-
-    //         MODE_8X: begin
-    //             display_sample_ext = ({{8{selected_sample[23]}}, selected_sample} <<< 1);
-    //         end
-
-    //         default: begin
-    //             display_sample_ext = ({{8{selected_sample[23]}}, selected_sample} <<< 4);
-    //         end
-    //     endcase
-    // end
     always @(*) begin
-        case (mode_state)
-            MODE_4X: begin
-                display_sample_ext = {{8{selected_sample[23]}}, selected_sample};
-            end
-
-            MODE_8X: begin
-                // polyphase_mac2_v2b 测试：先不做显示放大，避免削顶成方波
-                display_sample_ext = {{8{selected_sample[23]}}, selected_sample};
-            end
-
-            default: begin
-                // 128x DAC 显示补偿：5 级 2x FIR 每级幅度约减半，
-                // 这里左移 4 位做显示放大，只影响 DAC 显示。
-                display_sample_ext = ({{8{selected_sample[23]}}, selected_sample} <<< 4);
-            end
-        endcase
+        display_sample_ext = {{8{selected_sample[23]}}, selected_sample};
     end
 
     always @(*) begin

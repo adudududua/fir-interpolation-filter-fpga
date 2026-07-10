@@ -1,0 +1,33 @@
+All-2x 128x bit-true validation summary
+=======================================
+Input sample rate       = 44100.0 Hz
+Output sample rate      = 5644800.0 Hz
+Data width              = 24 bit signed
+Total equivalent taps   = 6651
+
+Stage configuration
+-------------------
+Stage 1: taps=93, COEFF_W_DESIGN=18, COEFF_W_MIN=17, FRAC_W=16, ACC_W_MIN=42, ACC_W_REC=43, dc=2.0005645752, phase0=1.0001678467, phase1=1.0003967285, max_abs_acc=740319794088, overflow=0, sat=4008
+Stage 2: taps=17, COEFF_W_DESIGN=17, COEFF_W_MIN=16, FRAC_W=15, ACC_W_MIN=40, ACC_W_REC=41, dc=1.9996337891, phase0=0.9998779297, phase1=0.9997558594, max_abs_acc=333719503582, overflow=0, sat=86
+Stage 3: taps=11, COEFF_W_DESIGN=16, COEFF_W_MIN=15, FRAC_W=14, ACC_W_MIN=39, ACC_W_REC=40, dc=1.9997558594, phase0=0.9998779297, phase1=0.9998779297, max_abs_acc=142832131300, overflow=0, sat=28
+Stage 4: taps=7, COEFF_W_DESIGN=17, COEFF_W_MIN=16, FRAC_W=15, ACC_W_MIN=40, ACC_W_REC=41, dc=2.0003356934, phase0=1.0001220703, phase1=1.0002136230, max_abs_acc=278272225653, overflow=0, sat=292
+Stage 5: taps=7, COEFF_W_DESIGN=15, COEFF_W_MIN=14, FRAC_W=13, ACC_W_MIN=38, ACC_W_REC=39, dc=2.0000000000, phase0=1.0000000000, phase1=1.0000000000, max_abs_acc=68925640403, overflow=0, sat=120
+Stage 6: taps=7, COEFF_W_DESIGN=14, COEFF_W_MIN=13, FRAC_W=12, ACC_W_MIN=37, ACC_W_REC=38, dc=2.0000000000, phase0=1.0000000000, phase1=1.0000000000, max_abs_acc=34383141376, overflow=0, sat=134
+Stage 7: taps=7, COEFF_W_DESIGN=14, COEFF_W_MIN=14, FRAC_W=12, ACC_W_MIN=37, ACC_W_REC=38, dc=2.0000000000, phase0=1.0000000000, phase1=1.0000000000, max_abs_acc=34367659520, overflow=0, sat=130
+
+Test result
+-----------
+impulse_2p22: gain=NaN dB, SNR=NaN dB, input_peak=4194304, output_peak=4176595, overflow=0, sat=0, zero_ratio=0.83632384, direct_error=0, pass=1
+dc_2p20: gain=0.001258 dB, SNR=31.934 dB, input_peak=1048576, output_peak=1195342, overflow=0, sat=0, zero_ratio=0.00167157, direct_error=0, pass=1
+sine_1k_m1dbfs: gain=-0.003740 dB, SNR=83.409 dB, input_peak=7476307, output_peak=7620281, overflow=0, sat=0, zero_ratio=0.00068763, direct_error=0, pass=1
+sine_19k_m6dbfs: gain=-0.000487 dB, SNR=80.699 dB, input_peak=4204236, output_peak=4475341, overflow=0, sat=0, zero_ratio=0.00072531, direct_error=0, pass=1
+sine_20k_m6dbfs: gain=-0.007778 dB, SNR=77.059 dB, input_peak=4204236, output_peak=4508109, overflow=0, sat=0, zero_ratio=0.00073096, direct_error=0, pass=1
+sine_1k_m60dbfs: gain=-0.003519 dB, SNR=77.060 dB, input_peak=8389, output_peak=8399, overflow=0, sat=0, zero_ratio=0.00659925, direct_error=0, pass=1
+sine_1k_m90dbfs: gain=0.014786 dB, SNR=48.230 dB, input_peak=265, output_peak=265, overflow=0, sat=0, zero_ratio=0.01682380, direct_error=0, pass=1
+sine_1k_m110dbfs: gain=0.013108 dB, SNR=30.439 dB, input_peak=27, output_peak=27, overflow=0, sat=0, zero_ratio=0.03394165, direct_error=0, pass=1
+random_pcm_21bit: gain=NaN dB, SNR=NaN dB, input_peak=1047859, output_peak=1581815, overflow=0, sat=0, zero_ratio=0.00166430, direct_error=0, pass=1
+fullscale_positive: gain=NaN dB, SNR=NaN dB, input_peak=8388607, output_peak=8388607, overflow=0, sat=2351, zero_ratio=0.00143901, direct_error=0, pass=1
+fullscale_negative: gain=NaN dB, SNR=NaN dB, input_peak=8388608, output_peak=8388608, overflow=0, sat=2351, zero_ratio=0.00143901, direct_error=0, pass=1
+fullscale_alternating: gain=NaN dB, SNR=NaN dB, input_peak=8388608, output_peak=8388608, overflow=0, sat=96, zero_ratio=0.00143901, direct_error=0, pass=1
+
+Pass all = 1

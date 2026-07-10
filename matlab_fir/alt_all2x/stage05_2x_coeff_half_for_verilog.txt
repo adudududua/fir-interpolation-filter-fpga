@@ -2,12 +2,13 @@
 // All-2x Stage 5 FIR half coefficients
 // 阶数 n       : 6
 // tap 数       : 7
-// 系数位宽     : 14 bit
-// 小数位宽     : 12 bit
+// 系数位宽     : 15 bit
+// 小数位宽     : 13 bit
 // 裁剪阈值     : 0
+// 插值增益     : 系数已包含 2 倍增益
 // 半系数总数   : 4
 // =====================================================
-        coeff_half[0] = -14'sd128;
-        coeff_half[1] = 14'sd2;
-        coeff_half[2] = 14'sd1152;
-        coeff_half[3] = 14'sd2044;
+        coeff_half[0] = -15'sd513;
+        coeff_half[1] = 15'sd7;
+        coeff_half[2] = 15'sd4609;
+        coeff_half[3] = 15'sd8178;
