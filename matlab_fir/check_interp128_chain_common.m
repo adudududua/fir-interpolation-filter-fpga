@@ -23,7 +23,8 @@ clc; clear; close all;
 %% ============================================================
 
 %% 1) 基本参数
-FRAC_W = 16;                     % 系数小数位数（Q16）
+FRAC_W4 = 16;                    % 4x FIR 系数小数位数（Q16）
+FRAC_W2 = 12;                    % 2x FIR 系数小数位数（Q12）
 f_pass_low  = 10;                % 通带下限
 f_pass_high = 20000;             % 通带上限
 
@@ -32,25 +33,47 @@ stop_target_db   = 70;           % 阻带衰减 >= 70 dB
 
 Nfft = 262144;                   % 频响分析点数，够细一些
 
+script_dir = fileparts(mfilename('fullpath'));
+if isempty(script_dir)
+    script_dir = pwd;
+end
+
+fig_dir = fullfile(script_dir, 'figures');
+if ~exist(fig_dir, 'dir')
+    mkdir(fig_dir);
+end
+
+% Plot style close to the requested yellow-green-blue-purple palette.
+color_yellow = [0.82 0.88 0.02];
+color_green  = [0.35 0.73 0.28];
+color_teal   = [0.08 0.63 0.50];
+color_cyan   = [0.09 0.48 0.56];
+color_blue   = [0.16 0.34 0.56];
+color_purple = [0.25 0.13 0.47];
+font_name = 'Microsoft YaHei';
+axis_font_size = 11;
+label_font_size = 13;
+title_font_size = 12;
+
 %% 2) 读取 4x / 2x 系数
 % ------------------------------------------------------------
 % 4x 公共 FIR：
-%   fir_coeff_decimal_v2.txt
+%   acc_opt/interp4_fixed155_sparse_coeff_decimal.txt
 %
 % 2x 公共 FIR：
-%   interp2_coeff_decimal.txt
+%   opt/interp2_coeff_decimal_wordlen_opt.txt
 %
 % 注意：
 % 如果你的文件名有变化，就在这里改。
 % ------------------------------------------------------------
-coeff4_int = readmatrix('fir_coeff_decimal_v2.txt');
-coeff2_int = readmatrix('interp2_coeff_decimal.txt');
+coeff4_int = readmatrix(fullfile(script_dir, 'acc_opt', 'interp4_fixed155_sparse_coeff_decimal.txt'));
+coeff2_int = readmatrix(fullfile(script_dir, 'opt', 'interp2_coeff_decimal_wordlen_opt.txt'));
 
 coeff4_int = coeff4_int(~isnan(coeff4_int));
 coeff2_int = coeff2_int(~isnan(coeff2_int));
 
-b4 = coeff4_int(:).' / 2^FRAC_W;   % 4x FIR，转成行向量
-b2 = coeff2_int(:).' / 2^FRAC_W;   % 2x FIR，转成行向量
+b4 = coeff4_int(:).' / 2^FRAC_W4;  % 4x FIR，转成行向量
+b2 = coeff2_int(:).' / 2^FRAC_W2;  % 2x FIR，转成行向量
 
 fprintf('4x FIR 长度 = %d tap\n', length(b4));
 fprintf('2x FIR 长度 = %d tap\n', length(b2));
@@ -191,7 +214,7 @@ for i = 1:size(result_table,1)
 end
 fprintf('==============================================================\n');
 
-%% 7) 画两种最终模式下的总频响
+%% 7) 画两种最终模式下的总频响，并保存 PNG
 for i = 1:size(modes,1)
     Fs_in  = modes(i,1);
     Fs_out = modes(i,2);
@@ -202,23 +225,130 @@ for i = 1:size(modes,1)
 
     [gd, fg] = grpdelay(h_total, 1, Nfft, Fs_out);
 
-    figure('Color', 'w', 'Name', sprintf('128x total chain - Fsout=%.1f', Fs_out));
+    pass_idx_plot = (f >= f_pass_low) & (f <= f_pass_high);
+    pass_mean_db = mean(H_db(pass_idx_plot));
+    H_db_rel = H_db - pass_mean_db;
 
-    subplot(2,1,1);
-    plot(f, H_db, 'LineWidth', 1.0); grid on;
-    xlabel('频率 / Hz');
-    ylabel('幅度 / dB');
-    title(sprintf('整体 128x 链路频率响应（Fs_{out}=%.1f Hz）', Fs_out));
-    xline(f_pass_low, '--r', '10 Hz');
-    xline(f_pass_high, '--r', '20 kHz');
-    xline(f_stop_begin, '--m', sprintf('f_{stop}=%.1f Hz', f_stop_begin));
+    gd_idx_plot = (fg >= f_pass_low) & (fg <= f_pass_high);
+    gd_mean_plot = mean(gd(gd_idx_plot));
+    gd_dev = gd - gd_mean_plot;
+    gd_dev_pass = gd_dev(gd_idx_plot);
+    max_gd_dev_pass = max(abs(gd_dev_pass));
+
+    fig = figure( ...
+        'Color', 'w', ...
+        'Name', sprintf('128x total chain - Fsout=%.1f', Fs_out), ...
+        'Units', 'pixels', ...
+        'Position', [80 80 1280 820]);
+
+    set(fig, 'PaperPositionMode', 'auto');
+
+    subplot(2,2,1);
+    plot(f/1000, H_db_rel, 'Color', color_purple, 'LineWidth', 1.8); grid on; box on;
+    xlabel('频率 / kHz', 'FontName', font_name, 'FontWeight', 'bold', 'FontSize', label_font_size);
+    ylabel('相对幅度 / dB', 'FontName', font_name, 'FontWeight', 'bold', 'FontSize', label_font_size);
+    title(sprintf('通带细节：%.1f kHz -> %.4f MHz', Fs_in/1000, Fs_out/1e6), ...
+        'FontName', font_name, 'FontWeight', 'bold', 'FontSize', title_font_size);
+    xlim([0 22]);
+    ylim([-0.08 0.08]);
+    yline(ripple_target_db, '--', 'Color', color_yellow, 'LineWidth', 1.2);
+    yline(-ripple_target_db, '--', 'Color', color_yellow, 'LineWidth', 1.2);
+    xline(f_pass_high/1000, '--', 'Color', color_teal, 'LineWidth', 1.2);
+    legend('通带响应', '+0.05 dB', '-0.05 dB', '20 kHz', ...
+        'Location', 'southwest', 'Box', 'off', 'FontName', font_name, ...
+        'FontWeight', 'bold', 'FontSize', 9);
+    ax = gca;
+    set(ax, 'FontName', font_name, 'FontSize', axis_font_size, 'FontWeight', 'bold', ...
+        'LineWidth', 1.3, 'XColor', 'k', 'YColor', 'k', 'TickDir', 'in', ...
+        'XMinorTick', 'on', 'YMinorTick', 'on', 'GridAlpha', 0.18);
+    set_mid_minor_ticks(ax);
+
+    subplot(2,2,2);
+    plot(f/1000, H_db, 'Color', color_blue, 'LineWidth', 1.7); grid on; box on;
+    xlabel('频率 / kHz', 'FontName', font_name, 'FontWeight', 'bold', 'FontSize', label_font_size);
+    ylabel('幅度 / dB', 'FontName', font_name, 'FontWeight', 'bold', 'FontSize', label_font_size);
+    title('通带到阻带入口', 'FontName', font_name, 'FontWeight', 'bold', 'FontSize', title_font_size);
+    xlim([0 80]);
+    ylim([-120 5]);
+    xline(f_pass_high/1000, '--', 'Color', color_green, 'LineWidth', 1.2);
+    xline(f_stop_begin/1000, '--', 'Color', color_purple, 'LineWidth', 1.2);
+    yline(-stop_target_db, '--', 'Color', color_yellow, 'LineWidth', 1.2);
+    legend('频率响应', '20 kHz', '阻带起点', '-70 dB', ...
+        'Location', 'southwest', 'Box', 'off', 'FontName', font_name, ...
+        'FontWeight', 'bold', 'FontSize', 9);
+    ax = gca;
+    set(ax, 'FontName', font_name, 'FontSize', axis_font_size, 'FontWeight', 'bold', ...
+        'LineWidth', 1.3, 'XColor', 'k', 'YColor', 'k', 'TickDir', 'in', ...
+        'XMinorTick', 'on', 'YMinorTick', 'on', 'GridAlpha', 0.18);
+    set_mid_minor_ticks(ax);
+
+    subplot(2,2,3);
+    plot(f/1e6, H_db, 'Color', color_cyan, 'LineWidth', 1.6); grid on; box on;
+    xlabel('频率 / MHz', 'FontName', font_name, 'FontWeight', 'bold', 'FontSize', label_font_size);
+    ylabel('幅度 / dB', 'FontName', font_name, 'FontWeight', 'bold', 'FontSize', label_font_size);
+    title('全频段响应', 'FontName', font_name, 'FontWeight', 'bold', 'FontSize', title_font_size);
+    xlim([0 Fs_out/2/1e6]);
     ylim([-160 5]);
+    yline(-stop_target_db, '--', 'Color', color_yellow, 'LineWidth', 1.2);
+    ax = gca;
+    set(ax, 'FontName', font_name, 'FontSize', axis_font_size, 'FontWeight', 'bold', ...
+        'LineWidth', 1.3, 'XColor', 'k', 'YColor', 'k', 'TickDir', 'in', ...
+        'XMinorTick', 'on', 'YMinorTick', 'on', 'GridAlpha', 0.18);
+    set_mid_minor_ticks(ax);
 
-    subplot(2,1,2);
-    plot(fg, gd, 'LineWidth', 1.0); grid on;
-    xlabel('频率 / Hz');
-    ylabel('群延迟 / 样点');
-    title('整体 128x 链路群延迟');
-    xline(f_pass_low, '--r', '10 Hz');
-    xline(f_pass_high, '--r', '20 kHz');
+    subplot(2,2,4);
+    plot(fg(gd_idx_plot)/1000, gd_dev_pass, 'Color', color_purple, 'LineWidth', 1.7); grid on; box on;
+    xlabel('频率 / kHz', 'FontName', font_name, 'FontWeight', 'bold', 'FontSize', label_font_size);
+    ylabel('群延迟偏差 / 样点', 'FontName', font_name, 'FontWeight', 'bold', 'FontSize', label_font_size);
+    title('通带群延迟平坦度', 'FontName', font_name, 'FontWeight', 'bold', 'FontSize', title_font_size);
+    xlim([0 22]);
+    ylim([-1e-9 1e-9]);
+    yline(0, '-', 'Color', color_yellow, 'LineWidth', 1.1);
+    xline(f_pass_high/1000, '--', 'Color', color_teal, 'LineWidth', 1.2);
+    text(0.05, 0.90, sprintf('max |\\Delta\\tau| = %.2e samples', max_gd_dev_pass), ...
+        'Units', 'normalized', 'FontName', font_name, 'FontWeight', 'bold', ...
+        'FontSize', 9, 'Color', color_purple);
+    ax = gca;
+    set(ax, 'FontName', font_name, 'FontSize', axis_font_size, 'FontWeight', 'bold', ...
+        'LineWidth', 1.3, 'XColor', 'k', 'YColor', 'k', 'TickDir', 'in', ...
+        'XMinorTick', 'on', 'YMinorTick', 'on', 'GridAlpha', 0.18);
+    set_mid_minor_ticks(ax);
+
+    png_name = sprintf('interp128_%dHz_to_%dHz.png', round(Fs_in), round(Fs_out));
+    png_path = fullfile(fig_dir, png_name);
+    print(fig, png_path, '-dpng', '-r200');
+    fprintf('已保存图像：%s\n', png_path);
+end
+
+
+function set_mid_minor_ticks(ax)
+    try
+        ax.XMinorTick = 'on';
+        ax.YMinorTick = 'on';
+
+        if isprop(ax.XAxis, 'MinorTickValues')
+            ax.XAxis.MinorTickValues = midpoint_ticks(ax.XTick, ax.XLim);
+        end
+
+        if isprop(ax.YAxis, 'MinorTickValues')
+            ax.YAxis.MinorTickValues = midpoint_ticks(ax.YTick, ax.YLim);
+        end
+    catch
+        ax.XMinorTick = 'off';
+        ax.YMinorTick = 'off';
+    end
+end
+
+
+function ticks_minor = midpoint_ticks(ticks_major, axis_lim)
+    ticks_major = ticks_major(:).';
+    ticks_major = ticks_major(ticks_major >= axis_lim(1) & ticks_major <= axis_lim(2));
+
+    if numel(ticks_major) < 2
+        ticks_minor = [];
+        return;
+    end
+
+    ticks_minor = (ticks_major(1:end-1) + ticks_major(2:end)) / 2;
+    ticks_minor = ticks_minor(ticks_minor > axis_lim(1) & ticks_minor < axis_lim(2));
 end

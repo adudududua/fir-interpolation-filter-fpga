@@ -478,37 +478,110 @@ function plot_response_compare(b_base, b_sparse, Fs1, Fs2, f_pass_high, filename
 
     Nfft_plot = 65536;
 
+    color_yellow = [0.82 0.88 0.02];
+    color_teal   = [0.08 0.63 0.50];
+    color_blue   = [0.16 0.34 0.56];
+    color_purple = [0.25 0.13 0.47];
+    font_name = 'Microsoft YaHei';
+    axis_font_size = 11;
+    label_font_size = 14;
+    title_font_size = 13;
+
     [H1_base, f1] = freqz(b_base,   1, Nfft_plot, Fs1);
     [H1_sp,   ~ ] = freqz(b_sparse, 1, Nfft_plot, Fs1);
 
     [H2_base, f2] = freqz(b_base,   1, Nfft_plot, Fs2);
     [H2_sp,   ~ ] = freqz(b_sparse, 1, Nfft_plot, Fs2);
 
-    figure('Color', 'w');
+    fig = figure( ...
+        'Color', 'w', ...
+        'Name', '4x FIR fixed-155 sparse pruning response', ...
+        'Units', 'pixels', ...
+        'Position', [100 80 1040 760]);
+    set(fig, 'PaperPositionMode', 'auto');
 
     subplot(2,1,1);
-    plot(f1/1000, 20*log10(abs(H1_base)+eps), 'LineWidth', 1.0);
+    h1_base = plot(f1/1000, 20*log10(abs(H1_base)+eps), ...
+        'Color', color_blue, 'LineWidth', 2.0);
     hold on;
-    plot(f1/1000, 20*log10(abs(H1_sp)+eps), '--', 'LineWidth', 1.0);
-    grid on;
-    xlabel('Frequency (kHz)');
-    ylabel('Magnitude (dB)');
-    title('4x FIR Fixed-155 Sparse Pruning Response, Fs=176.4kHz');
-    legend('Baseline Q16', 'Sparse pruned', 'Location', 'best');
-    xline(f_pass_high/1000, '--');
+    h1_sp = plot(f1/1000, 20*log10(abs(H1_sp)+eps), '--', ...
+        'Color', color_purple, 'LineWidth', 2.0);
+    grid on; box on;
+    xlabel('频率 / kHz', 'FontName', font_name, 'FontWeight', 'bold', 'FontSize', label_font_size);
+    ylabel('幅度 / dB', 'FontName', font_name, 'FontWeight', 'bold', 'FontSize', label_font_size);
+    title('4x FIR 固定 155 tap 稀疏裁剪频率响应：Fs = 176.4 kHz', ...
+        'FontName', font_name, 'FontWeight', 'bold', 'FontSize', title_font_size);
+    h1_pass = xline(f_pass_high/1000, '--', 'Color', color_teal, 'LineWidth', 1.4);
+    h1_stop = yline(-70, '--', 'Color', color_yellow, 'LineWidth', 1.4);
+    legend([h1_base, h1_sp, h1_pass, h1_stop], ...
+        'Baseline Q16', 'Sparse pruned', '20 kHz', '-70 dB', ...
+        'Location', 'southwest', 'Box', 'off', ...
+        'FontName', font_name, 'FontWeight', 'bold', 'FontSize', 10);
+    xlim([0, Fs1/2000]);
     ylim([-120, 5]);
+    ax = gca;
+    set(ax, 'FontName', font_name, 'FontSize', axis_font_size, 'FontWeight', 'bold', ...
+        'LineWidth', 1.4, 'XColor', 'k', 'YColor', 'k', 'TickDir', 'in', ...
+        'XMinorTick', 'on', 'YMinorTick', 'on', 'GridAlpha', 0.18);
+    set_mid_minor_ticks(ax);
 
     subplot(2,1,2);
-    plot(f2/1000, 20*log10(abs(H2_base)+eps), 'LineWidth', 1.0);
+    h2_base = plot(f2/1000, 20*log10(abs(H2_base)+eps), ...
+        'Color', color_blue, 'LineWidth', 2.0);
     hold on;
-    plot(f2/1000, 20*log10(abs(H2_sp)+eps), '--', 'LineWidth', 1.0);
-    grid on;
-    xlabel('Frequency (kHz)');
-    ylabel('Magnitude (dB)');
-    title('4x FIR Fixed-155 Sparse Pruning Response, Fs=192kHz');
-    legend('Baseline Q16', 'Sparse pruned', 'Location', 'best');
-    xline(f_pass_high/1000, '--');
+    h2_sp = plot(f2/1000, 20*log10(abs(H2_sp)+eps), '--', ...
+        'Color', color_purple, 'LineWidth', 2.0);
+    grid on; box on;
+    xlabel('频率 / kHz', 'FontName', font_name, 'FontWeight', 'bold', 'FontSize', label_font_size);
+    ylabel('幅度 / dB', 'FontName', font_name, 'FontWeight', 'bold', 'FontSize', label_font_size);
+    title('4x FIR 固定 155 tap 稀疏裁剪频率响应：Fs = 192 kHz', ...
+        'FontName', font_name, 'FontWeight', 'bold', 'FontSize', title_font_size);
+    h2_pass = xline(f_pass_high/1000, '--', 'Color', color_teal, 'LineWidth', 1.4);
+    h2_stop = yline(-70, '--', 'Color', color_yellow, 'LineWidth', 1.4);
+    legend([h2_base, h2_sp, h2_pass, h2_stop], ...
+        'Baseline Q16', 'Sparse pruned', '20 kHz', '-70 dB', ...
+        'Location', 'southwest', 'Box', 'off', ...
+        'FontName', font_name, 'FontWeight', 'bold', 'FontSize', 10);
+    xlim([0, Fs2/2000]);
     ylim([-120, 5]);
+    ax = gca;
+    set(ax, 'FontName', font_name, 'FontSize', axis_font_size, 'FontWeight', 'bold', ...
+        'LineWidth', 1.4, 'XColor', 'k', 'YColor', 'k', 'TickDir', 'in', ...
+        'XMinorTick', 'on', 'YMinorTick', 'on', 'GridAlpha', 0.18);
+    set_mid_minor_ticks(ax);
 
-    saveas(gcf, filename);
+    print(fig, filename, '-dpng', '-r200');
+end
+
+
+function set_mid_minor_ticks(ax)
+    try
+        ax.XMinorTick = 'on';
+        ax.YMinorTick = 'on';
+
+        if isprop(ax.XAxis, 'MinorTickValues')
+            ax.XAxis.MinorTickValues = midpoint_ticks(ax.XTick, ax.XLim);
+        end
+
+        if isprop(ax.YAxis, 'MinorTickValues')
+            ax.YAxis.MinorTickValues = midpoint_ticks(ax.YTick, ax.YLim);
+        end
+    catch
+        ax.XMinorTick = 'off';
+        ax.YMinorTick = 'off';
+    end
+end
+
+
+function ticks_minor = midpoint_ticks(ticks_major, axis_lim)
+    ticks_major = ticks_major(:).';
+    ticks_major = ticks_major(ticks_major >= axis_lim(1) & ticks_major <= axis_lim(2));
+
+    if numel(ticks_major) < 2
+        ticks_minor = [];
+        return;
+    end
+
+    ticks_minor = (ticks_major(1:end-1) + ticks_major(2:end)) / 2;
+    ticks_minor = ticks_minor(ticks_minor > axis_lim(1) & ticks_minor < axis_lim(2));
 end

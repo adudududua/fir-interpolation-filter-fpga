@@ -531,25 +531,84 @@ function plot_two_mode_response(b, Fs1, Fs2, f_pass_high, filename)
 
     Nfft_plot = 65536;
 
+    color_yellow = [0.82 0.88 0.02];
+    color_teal   = [0.08 0.63 0.50];
+    color_blue   = [0.16 0.34 0.56];
+    color_purple = [0.25 0.13 0.47];
+    font_name = 'Microsoft YaHei';
+    axis_font_size = 12;
+    label_font_size = 16;
+    title_font_size = 14;
+
     [H1, f1] = freqz(b, 1, Nfft_plot, Fs1);
     [H2, f2] = freqz(b, 1, Nfft_plot, Fs2);
 
     mag1 = 20*log10(abs(H1) + eps);
     mag2 = 20*log10(abs(H2) + eps);
 
-    figure;
-    plot(f1/1000, mag1, 'LineWidth', 1.1);
+    fig = figure( ...
+        'Color', 'w', ...
+        'Name', '2x FIR word-length optimized response', ...
+        'Units', 'pixels', ...
+        'Position', [100 100 980 680]);
+    set(fig, 'PaperPositionMode', 'auto');
+
+    plot(f1/1000, mag1, 'Color', color_blue, 'LineWidth', 2.0);
     hold on;
-    plot(f2/1000, mag2, 'LineWidth', 1.1);
-    grid on;
-    xlabel('Frequency (kHz)');
-    ylabel('Magnitude (dB)');
-    title('2x FIR Word-Length Optimized Frequency Response');
-    legend(sprintf('Fs = %.1f kHz', Fs1/1000), sprintf('Fs = %.1f kHz', Fs2/1000), 'Location', 'best');
+    plot(f2/1000, mag2, 'Color', color_purple, 'LineWidth', 2.0);
+    grid on; box on;
+    xlabel('频率 / kHz', 'FontName', font_name, 'FontWeight', 'bold', 'FontSize', label_font_size);
+    ylabel('幅度 / dB', 'FontName', font_name, 'FontWeight', 'bold', 'FontSize', label_font_size);
+    title('2x FIR 字长优化频率响应', ...
+        'FontName', font_name, 'FontWeight', 'bold', 'FontSize', title_font_size);
+    legend(sprintf('Fs = %.1f kHz', Fs1/1000), ...
+           sprintf('Fs = %.1f kHz', Fs2/1000), ...
+           'Location', 'southwest', 'Box', 'off', ...
+           'FontName', font_name, 'FontWeight', 'bold', 'FontSize', 11);
     xlim([0, max(Fs1, Fs2)/2000]);
     ylim([-120, 5]);
 
-    xline(f_pass_high/1000, '--');
+    xline(f_pass_high/1000, '--', 'Color', color_teal, 'LineWidth', 1.4);
+    yline(-70, '--', 'Color', color_yellow, 'LineWidth', 1.4);
 
-    saveas(gcf, filename);
+    ax = gca;
+    set(ax, 'FontName', font_name, 'FontSize', axis_font_size, 'FontWeight', 'bold', ...
+        'LineWidth', 1.5, 'XColor', 'k', 'YColor', 'k', 'TickDir', 'in', ...
+        'XMinorTick', 'on', 'YMinorTick', 'on', 'GridAlpha', 0.18);
+    set_mid_minor_ticks(ax);
+
+    print(fig, filename, '-dpng', '-r200');
+end
+
+
+function set_mid_minor_ticks(ax)
+    try
+        ax.XMinorTick = 'on';
+        ax.YMinorTick = 'on';
+
+        if isprop(ax.XAxis, 'MinorTickValues')
+            ax.XAxis.MinorTickValues = midpoint_ticks(ax.XTick, ax.XLim);
+        end
+
+        if isprop(ax.YAxis, 'MinorTickValues')
+            ax.YAxis.MinorTickValues = midpoint_ticks(ax.YTick, ax.YLim);
+        end
+    catch
+        ax.XMinorTick = 'off';
+        ax.YMinorTick = 'off';
+    end
+end
+
+
+function ticks_minor = midpoint_ticks(ticks_major, axis_lim)
+    ticks_major = ticks_major(:).';
+    ticks_major = ticks_major(ticks_major >= axis_lim(1) & ticks_major <= axis_lim(2));
+
+    if numel(ticks_major) < 2
+        ticks_minor = [];
+        return;
+    end
+
+    ticks_minor = (ticks_major(1:end-1) + ticks_major(2:end)) / 2;
+    ticks_minor = ticks_minor(ticks_minor > axis_lim(1) & ticks_minor < axis_lim(2));
 end

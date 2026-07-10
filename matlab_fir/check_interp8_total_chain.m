@@ -27,17 +27,18 @@ clc; clear; close all;
 %% ============================================================
 
 %% 1) 读取 4x 与 2x 系数（Q16 定点整数）
-coeff4_int = readmatrix('fir_coeff_decimal_v2.txt');
-coeff2_int = readmatrix('interp2_coeff_decimal.txt');
+coeff4_int = readmatrix('acc_opt/interp4_fixed155_sparse_coeff_decimal.txt');
+coeff2_int = readmatrix('opt/interp2_coeff_decimal_wordlen_opt.txt');
 
 coeff4_int = coeff4_int(:).';   % 转成行向量
 coeff2_int = coeff2_int(:).';
 
-FRAC_W = 16;
+FRAC_W4 = 16;
+FRAC_W2 = 12;
 
 % 转成浮点系数，用于频响分析
-b4 = coeff4_int / 2^FRAC_W;
-b2 = coeff2_int / 2^FRAC_W;
+b4 = coeff4_int / 2^FRAC_W4;
+b2 = coeff2_int / 2^FRAC_W2;
 
 fprintf('4x FIR 长度 = %d tap\n', length(b4));
 fprintf('2x FIR 长度 = %d tap\n', length(b2));
