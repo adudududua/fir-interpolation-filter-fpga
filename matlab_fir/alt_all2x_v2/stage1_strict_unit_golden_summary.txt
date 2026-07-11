@@ -1,0 +1,10 @@
+Stage 1 strict-halfband RTL unit golden
+=======================================
+Impulse input count  = 256
+Impulse output count = 615
+Impulse overflow     = 0
+Impulse saturation   = 0
+Random input count   = 128
+Random output count  = 359
+Random overflow      = 0
+Random saturation    = 0

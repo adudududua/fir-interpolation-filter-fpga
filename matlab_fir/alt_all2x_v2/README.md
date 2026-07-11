@@ -49,6 +49,13 @@ Stage 4～7
 4. `v2_04_compare_canonical_rtl.m`
 5. `v2_05_export_stage23_polyphase.m`
 6. `v2_06_compare_stage23_rtl.m`
+7. `v2_07_design_stage1_strict_halfband.m`
+8. `v2_08_validate_stage1_strict_bittrue.m`
+9. `v3_01_select_stage1_pareto.m`
+10. `v3_02_export_stage1_rtl.m`
+11. `v3_03_generate_stage1_rtl_golden.m`
+12. `v3_04_compare_stage1_rtl.m`
+13. `v3_05_compare_stage1_bram_rtl.m`
 
 ## Phase 1 结果
 
@@ -85,4 +92,24 @@ valid-only 轻量结构：
 
 ```text
 ../all2x_phase2_polyphase_feedback.md
+```
+
+## Phase 3 结果
+
+Stage 1 改为 105-tap Q15 strict-halfband true-polyphase，分别验证
+FF 历史和 BRAM 循环缓冲两个版本：
+
+| 版本 | LUT | FF | DSP | BRAM Tile | WNS / ns |
+|---|---:|---:|---:|---:|---:|
+| Phase 2 | 3975 | 3103 | 1 | 0 | +156.988 |
+| Strict-HB FF | 3537 | 2105 | 1 | 0 | +159.856 |
+| Strict-HB BRAM | 3222 | 925 | 1 | 1 | +159.809 |
+
+FF 和 BRAM 版本的 Stage 1 单元及完整七级冲激、随机 PCM 对拍均为
+0 LSB。当前推荐实验点是 BRAM 版本，板级稳定实例仍保持 Phase 2。
+
+详细过程见：
+
+```text
+../all2x_phase3_stage1_strict_feedback.md
 ```

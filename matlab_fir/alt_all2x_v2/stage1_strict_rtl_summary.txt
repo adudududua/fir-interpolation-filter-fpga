@@ -1,0 +1,4 @@
+V3 Stage 1 strict-halfband RTL comparison
+==========================================
+impulse  shift=  127 rtl= 69999 golden= 40059 max=   0 LSB mismatch=0 pass=1
+random   shift=  127 rtl= 69999 golden= 23675 max=   0 LSB mismatch=0 pass=1
