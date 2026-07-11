@@ -1,0 +1,17 @@
+Stage 1 strict halfband search summary
+======================================
+Order                 = 104
+Taps                  = 105
+FRAC_W                = 15
+COEFF_W               = 17
+ACC_W                 = 42
+Nonzero half          = 27
+Phase0 sum int        = 32768
+Phase1 sum int        = 32768
+Stage pass abs dB     = 0.00116156
+Stage stop attenuation= 77.47489888 dB
+Total pass abs dB     = 0.00508556
+Total stop attenuation= 78.61969770 dB
+Total DC gain         = 127.9609403610
+Total group delay     = 3709.00000000 samples
+Pass all              = 1

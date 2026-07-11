@@ -1,0 +1,10 @@
+Stage 1 strict halfband bit-true validation
+===========================================
+impulse              class=regular output=  40059 peak=  4193825 overflow=0 sat=0 functional=1 no_clip=1
+dc                   class=regular output=  72827 peak=  1195662 overflow=0 sat=0 functional=1 no_clip=1
+sine_1k_m1dbfs       class=regular output= 138363 peak=  7943258 overflow=0 sat=0 functional=1 no_clip=1
+sine_19k_m6dbfs      class=regular output= 138363 peak=  4508314 overflow=0 sat=0 functional=1 no_clip=1
+sine_20k_m6dbfs      class=regular output= 138363 peak=  4402905 overflow=0 sat=0 functional=1 no_clip=1
+random               class=regular output=  23675 peak=  1635722 overflow=0 sat=0 functional=1 no_clip=1
+alternate_fullscale  class=stress  output=  72827 peak=  8388608 overflow=0 sat=186 functional=1 no_clip=0
+random_fullscale     class=stress  output=  40059 peak=  8388608 overflow=0 sat=361 functional=1 no_clip=0

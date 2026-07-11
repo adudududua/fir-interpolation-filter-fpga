@@ -212,6 +212,7 @@
       </File>
       <File Path="$PSRCDIR/sim_1/new/tb_interp128_all2x_random_ce.v">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
