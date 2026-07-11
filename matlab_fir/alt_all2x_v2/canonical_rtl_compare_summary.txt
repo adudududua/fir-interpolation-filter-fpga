@@ -1,0 +1,14 @@
+Canonical halfband7 RTL comparison
+==================================
+
+[random]
+stage7     rtl= 49999 golden= 22907 shift=  327 max=   0 LSB mismatch=0 pass=1
+stage6_7   rtl= 49999 golden= 22907 shift=  325 max=   0 LSB mismatch=0 pass=1
+stage5_7   rtl= 49999 golden= 22907 shift=  321 max=   0 LSB mismatch=0 pass=1
+stage4_7   rtl= 49999 golden= 22907 shift=  321 max=   0 LSB mismatch=0 pass=1
+
+[impulse]
+stage7     rtl= 49999 golden= 39291 shift=  327 max=   0 LSB mismatch=0 pass=1
+stage6_7   rtl= 49999 golden= 39291 shift=  325 max=   0 LSB mismatch=0 pass=1
+stage5_7   rtl= 49999 golden= 39291 shift=  321 max=   0 LSB mismatch=0 pass=1
+stage4_7   rtl= 49999 golden= 39291 shift=  321 max=   0 LSB mismatch=0 pass=1

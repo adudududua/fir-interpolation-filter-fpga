@@ -1,0 +1,12 @@
+All-2x V2 stable baseline manifest
+=================================
+Git commit            = 8418c7f
+Git tag               = regional-final-all2x-baseline
+Equivalent taps       = 6651
+Pass abs max dB       = 0.00729793
+Pass ripple pm dB     = 0.00793139
+Stop attenuation dB   = 77.67936345
+DC gain               = 128.0185460294
+Group delay samples   = 3325.00000000
+Group delay pp        = 0.000000000007
+Pass all              = 1

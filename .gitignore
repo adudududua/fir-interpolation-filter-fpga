@@ -80,3 +80,11 @@ Desktop.ini
 !**/*.png
 !**/*.jpg
 !**/*.jpeg
+
+#============================================================
+# All-2x V2 reproducible intermediate results
+#============================================================
+
+matlab_fir/alt_all2x_v2/*.mat
+matlab_fir/alt_all2x_v2/golden/
+matlab_fir/alt_all2x_v2/vivado_results/

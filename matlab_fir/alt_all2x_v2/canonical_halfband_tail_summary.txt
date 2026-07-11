@@ -1,0 +1,10 @@
+Canonical halfband7 tail experiment
+===================================
+Kernel = [-1 0 9 16 9 0 -1] / 16
+Acceptance: pass_abs<=0.010 dB, stop>=75.0 dB
+
+baseline   first_stage=8 pass_abs=0.00729793 dB ripple_pm=0.00793139 dB stop=77.67936345 dB dc=128.0185460294 gd=3325.000 nz_half=77 pass=1
+stage7     first_stage=7 pass_abs=0.00729793 dB ripple_pm=0.00793139 dB stop=77.67936345 dB dc=128.0185460294 gd=3325.000 nz_half=77 pass=1
+stage6_7   first_stage=6 pass_abs=0.00728953 dB ripple_pm=0.00792580 dB stop=77.67934521 dB dc=128.0185460294 gd=3325.000 nz_half=76 pass=1
+stage5_7   first_stage=5 pass_abs=0.00720560 dB ripple_pm=0.00786988 dB stop=77.67916297 dB dc=128.0185460294 gd=3325.000 nz_half=75 pass=1
+stage4_7   first_stage=4 pass_abs=0.00715181 dB ripple_pm=0.00686375 dB stop=77.67735619 dB dc=127.9970621475 gd=3325.000 nz_half=74 pass=1

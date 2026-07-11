@@ -1,0 +1,42 @@
+Canonical halfband7 bit-true validation
+=======================================
+
+[baseline]
+impulse              output=  39291 peak=  4176595 overflow=0 sat=0 pass=1
+dc                   output=  72059 peak=  1195342 overflow=0 sat=0 pass=1
+sine_1k_m1dbfs       output= 137595 peak=  7936690 overflow=0 sat=0 pass=1
+sine_19k_m6dbfs      output= 137595 peak=  4503188 overflow=0 sat=0 pass=1
+sine_20k_m6dbfs      output= 137595 peak=  4355852 overflow=0 sat=0 pass=1
+random               output=  22907 peak=  1639187 overflow=0 sat=0 pass=1
+
+[stage7]
+impulse              output=  39291 peak=  4176595 overflow=0 sat=0 pass=1
+dc                   output=  72059 peak=  1195342 overflow=0 sat=0 pass=1
+sine_1k_m1dbfs       output= 137595 peak=  7936690 overflow=0 sat=0 pass=1
+sine_19k_m6dbfs      output= 137595 peak=  4503188 overflow=0 sat=0 pass=1
+sine_20k_m6dbfs      output= 137595 peak=  4355852 overflow=0 sat=0 pass=1
+random               output=  22907 peak=  1639187 overflow=0 sat=0 pass=1
+
+[stage6_7]
+impulse              output=  39291 peak=  4176598 overflow=0 sat=0 pass=1
+dc                   output=  72059 peak=  1195342 overflow=0 sat=0 pass=1
+sine_1k_m1dbfs       output= 137595 peak=  7936691 overflow=0 sat=0 pass=1
+sine_19k_m6dbfs      output= 137595 peak=  4503191 overflow=0 sat=0 pass=1
+sine_20k_m6dbfs      output= 137595 peak=  4355861 overflow=0 sat=0 pass=1
+random               output=  22907 peak=  1639188 overflow=0 sat=0 pass=1
+
+[stage5_7]
+impulse              output=  39291 peak=  4176644 overflow=0 sat=0 pass=1
+dc                   output=  72059 peak=  1195344 overflow=0 sat=0 pass=1
+sine_1k_m1dbfs       output= 137595 peak=  7936719 overflow=0 sat=0 pass=1
+sine_19k_m6dbfs      output= 137595 peak=  4503187 overflow=0 sat=0 pass=1
+sine_20k_m6dbfs      output= 137595 peak=  4355840 overflow=0 sat=0 pass=1
+random               output=  22907 peak=  1639186 overflow=0 sat=0 pass=1
+
+[stage4_7]
+impulse              output=  39291 peak=  4176504 overflow=0 sat=0 pass=1
+dc                   output=  72059 peak=  1195182 overflow=0 sat=0 pass=1
+sine_1k_m1dbfs       output= 137595 peak=  7935629 overflow=0 sat=0 pass=1
+sine_19k_m6dbfs      output= 137595 peak=  4502750 overflow=0 sat=0 pass=1
+sine_20k_m6dbfs      output= 137595 peak=  4356746 overflow=0 sat=0 pass=1
+random               output=  22907 peak=  1639100 overflow=0 sat=0 pass=1
