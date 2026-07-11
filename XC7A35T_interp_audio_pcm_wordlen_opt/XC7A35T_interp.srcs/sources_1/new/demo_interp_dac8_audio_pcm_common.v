@@ -23,6 +23,8 @@
 //                2026-06-21：新增音频 PCM 输入版本。
 //                2026-07-10：替换为 7 级全 2x 插值链路，新增
 //                            ce2_out，并去掉旧链路显示增益补偿。
+//                2026-07-11：板级链路切换为 V2 Phase 2 true-polyphase
+//                            与 valid-only 轻量桥接结构。
 //=============================================================
 
 module demo_interp_dac8_audio_pcm_common (
@@ -183,9 +185,11 @@ module demo_interp_dac8_audio_pcm_common (
     wire signed [23:0] dbg_y64_w;
     wire               dbg_y64_valid_w;
 
-    interp128_all2x_top_ce #(
-        .DATA_W (24)
-    ) u_interp128_all2x_top_ce (
+    interp128_all2x_v2_lightbridge_top_ce #(
+        .DATA_W                       (24),
+        .FIRST_CANONICAL_STAGE        (4),
+        .FIRST_TRUE_POLYPHASE_STAGE   (2)
+    ) u_interp128_all2x_v2_lightbridge_top_ce (
         .clk            (clk_audio_128x),
         .rst_n          (rst_n),
 
