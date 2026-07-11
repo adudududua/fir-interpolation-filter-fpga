@@ -1,0 +1,7 @@
+VERSION,LUT,FF,DSP,WNS_NS,LUT_DELTA_VS_PHASE1,FF_DELTA_VS_PHASE1
+phase1_canonical_tail,4302,3678,1,165.930,0,0
+stage3_dual_datapath,4387,3492,1,161.885,85,-186
+stage23_dual_datapath,4570,3233,1,160.605,268,-445
+stage3_shared_datapath,4141,3498,1,161.846,-161,-180
+stage23_shared_datapath,3985,3247,1,159.856,-317,-431
+stage23_lightbridge,3975,3103,1,156.988,-327,-575

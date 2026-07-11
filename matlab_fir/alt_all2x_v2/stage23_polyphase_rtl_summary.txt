@@ -1,0 +1,12 @@
+Stage 2/3 true-polyphase RTL comparison
+========================================
+
+[random]
+poly_stage3  shift=  321 max=   0 LSB mismatch=0 pass=1
+poly_stage2  shift=  321 max=   0 LSB mismatch=0 pass=1
+lightbridge  shift=  319 max=   0 LSB mismatch=0 pass=1
+
+[impulse]
+poly_stage3  shift=  321 max=   0 LSB mismatch=0 pass=1
+poly_stage2  shift=  321 max=   0 LSB mismatch=0 pass=1
+lightbridge  shift=  319 max=   0 LSB mismatch=0 pass=1

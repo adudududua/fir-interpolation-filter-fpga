@@ -1,0 +1,8 @@
+Stage 2/3 polyphase coefficient export
+======================================
+Stage 2: taps=17 coeff_w=16 frac_w=15 checksum=589716
+  phase0 = [-115 534 -1302 2116 30298 2116 -1302 534 -115]
+  phase1 = [-203 1233 -4595 19945 19945 -4595 1233 -203]
+Stage 3: taps=11 coeff_w=15 frac_w=14 checksum=196584
+  phase0 = [202 -1636 9625 9625 -1636 202]
+  phase1 = [-74 261 16008 261 -74]

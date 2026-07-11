@@ -47,6 +47,8 @@ Stage 4～7
 2. `v2_02_test_canonical_halfband7.m`
 3. `v2_03_validate_canonical_bittrue.m`
 4. `v2_04_compare_canonical_rtl.m`
+5. `v2_05_export_stage23_polyphase.m`
+6. `v2_06_compare_stage23_rtl.m`
 
 ## Phase 1 结果
 
@@ -64,4 +66,23 @@ Stage 4～7
 
 ```text
 ../all2x_optimization_guide_v2_feedback.md
+```
+
+## Phase 2 结果
+
+Stage 2/3 改为共享数据通路 true-polyphase，六个级间桥改为
+valid-only 轻量结构：
+
+```text
+频响：通带最大绝对误差 0.00715181 dB
+      阻带衰减 77.67735619 dB
+对拍：随机 PCM 与冲激响应均为 0 LSB
+资源：3975 LUT / 3103 FF / 1 DSP
+时序：WNS +156.988 ns
+```
+
+详细过程见：
+
+```text
+../all2x_phase2_polyphase_feedback.md
 ```
