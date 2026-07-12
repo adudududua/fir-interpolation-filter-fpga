@@ -1,0 +1,9 @@
+V4 Stage 2/3 shared DSP RTL comparison
+=======================================
+stage2_impulse   shift=   0 compare=  2188 max=   0 LSB mismatch=     0 pass=1
+stage2_random    shift=   0 compare=  2188 max=   0 LSB mismatch=     0 pass=1
+stage3_impulse   shift=   0 compare=  4375 max=   0 LSB mismatch=     0 pass=1
+stage3_random    shift=   0 compare=  4375 max=   0 LSB mismatch=     0 pass=1
+full_impulse     shift= 127 compare= 40059 max=   0 LSB mismatch=     0 pass=1
+full_random      shift= 127 compare= 23675 max=   0 LSB mismatch=     0 pass=1
+overall_pass=1

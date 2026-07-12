@@ -7,9 +7,8 @@
 //                signed 音频 PCM 采样点，并送入 44.1kHz 专用
 //                全 2x 七级 128x 插值滤波器链路。
 //                
-//                与正弦 ROM 版本相比，本模块的区别是：
-//                  原输入：内部 64 点正弦 ROM
-//                  新输入：1024 点音频 PCM ROM
+//                当前输入为 147 点、15kHz、24bit 单正弦 ROM，
+//                专门用于示波器比较四档阶梯粗糙度。
 //
 //                输出仍然通过 AD9708 并行 DAC 送到示波器，
 //                用于验证真实音频采样经过 FIR 插值链后的
@@ -27,12 +26,14 @@
 //                            与 valid-only 轻量桥接结构。
 //                2026-07-12：板级链路切换为 V3 Stage 1 严格半带
 //                            BRAM 循环缓冲结构，其余级保持 V2 优化结构。
+//                2026-07-12：测试输入改为 15kHz 单正弦，并增加
+//                            未经过插值链的 1x DAC 旁路档位。
 //=============================================================
 
 module demo_interp_dac8_audio_pcm_common (
     input  wire        clk_audio_128x,  // 5.6448MHz 连续音频 128x 时钟
     input  wire        rst_n,           // 低有效复位
-    input  wire [1:0]  mode_sel,        // 插值倍率选择：00=4x，01=8x，10/11=128x
+    input  wire [1:0]  mode_sel,        // 00=1x，01=4x，10=8x，11=128x
 
     output wire        dac_clk,         // 输出给 AD9708 的 DAC 采样时钟
     output wire [7:0]  dac_data,        // 输出给 AD9708 的 8bit 并行数据
@@ -43,11 +44,12 @@ module demo_interp_dac8_audio_pcm_common (
     // 1）模式设置
     //
     // mode_sel:
-    //   00 -> 4x 输出
-    //   01 -> 8x 输出
-    //   10 -> 128x 输出
+    //   00 -> 1x 原始 PCM 输出
+    //   01 -> 4x 输出
+    //   10 -> 8x 输出
     //   11 -> 128x 输出
     //=========================================================
+    localparam [1:0] MODE_1X   = 2'b00;
     localparam [1:0] MODE_4X   = 2'b01;
     localparam [1:0] MODE_8X   = 2'b10;
     localparam [1:0] MODE_128X = 2'b11;
@@ -57,15 +59,15 @@ module demo_interp_dac8_audio_pcm_common (
     always @(*) begin
         case (mode_sel)
             2'b00: begin
-                mode_state = MODE_4X;
+                mode_state = MODE_1X;
             end
 
             2'b01: begin
-                mode_state = MODE_8X;
+                mode_state = MODE_4X;
             end
 
             2'b10: begin
-                mode_state = MODE_128X;
+                mode_state = MODE_8X;
             end
 
             default: begin
@@ -116,19 +118,19 @@ module demo_interp_dac8_audio_pcm_common (
     //=========================================================
     // 3）音频 PCM ROM 输入源
     //
-    // audio_pcm_rom_source 从 audio_48k_24bit_1024.mem 中读取
-    // 24bit signed PCM 测试采样点。该测试数据按 44.1kHz 节拍
-    // 播放，仅用于示波器观察插值链输出。
+    // audio_pcm_rom_source 从 demo_sine_15k_44k1_24bit_147.mem
+    // 中读取 24bit signed、15kHz 单正弦采样点。该测试数据按
+    // 44.1kHz 节拍播放，用于示波器比较四档阶梯粗糙度。
     //=========================================================
     wire signed [23:0] audio_sample_w;
     wire               audio_sample_update_w;
-    wire [9:0] audio_sample_addr_dbg_w;
+    wire [7:0] audio_sample_addr_dbg_w;
 
     audio_pcm_rom_source #(
         .DATA_W   (24),
-        .ADDR_W   (10),
-        .DEPTH    (1024),
-        .MEM_FILE ("audio_48k_24bit_1024.mem")
+        .ADDR_W   (8),
+        .DEPTH    (147),
+        .MEM_FILE ("demo_sine_15k_44k1_24bit_147.mem")
     ) u_audio_pcm_rom_source (
         .clk             (clk_audio_128x),
         .rst_n           (rst_n),
@@ -146,7 +148,7 @@ module demo_interp_dac8_audio_pcm_common (
     //   x_in_valid 在复位释放后保持为 1。
     //
     // audio_sample_w 只会在 x_in_update_ce 节拍更新。
-    // 插值链看到的是一个 44.1kHz/48kHz 更新的 24bit
+    // 插值链看到的是一个 44.1kHz 更新的 24bit
     // signed 音频采样序列。
     //=========================================================
     wire signed [23:0] x_in;
@@ -166,6 +168,7 @@ module demo_interp_dac8_audio_pcm_common (
     //
     // 插值链内部结构：
     //   2x × 2x × 2x × 2x × 2x × 2x × 2x = 128x
+    //   Stage 1 使用 BRAM 单 DSP，Stage 2/3 共用第 2 个 DSP。
     //
     // 输出节点：
     //   dbg_y4 ：4x 输出
@@ -187,9 +190,9 @@ module demo_interp_dac8_audio_pcm_common (
     wire signed [23:0] dbg_y64_w;
     wire               dbg_y64_valid_w;
 
-    interp128_all2x_v3_strict_s1_bram_top_ce #(
+    interp128_all2x_v4_shared_dsp_top_ce #(
         .DATA_W (24)
-    ) u_interp128_all2x_v3_strict_s1_bram_top_ce (
+    ) u_interp128_all2x_v4_shared_dsp_top_ce (
         .clk            (clk_audio_128x),
         .rst_n          (rst_n),
 
@@ -227,6 +230,9 @@ module demo_interp_dac8_audio_pcm_common (
     //=========================================================
     // 6）选择当前需要送到 DAC 的插值节点
     //
+    // mode_state = MODE_1X:
+    //   DAC 直接输出原始 44.1kHz PCM，不经过插值链。
+    //
     // mode_state = MODE_4X:
     //   DAC 输出 dbg_y4。
     //
@@ -241,6 +247,11 @@ module demo_interp_dac8_audio_pcm_common (
 
     always @(*) begin
         case (mode_state)
+            MODE_1X: begin
+                selected_sample = audio_sample_w;
+                selected_valid  = audio_sample_update_w;
+            end
+
             MODE_4X: begin
                 selected_sample = dbg_y4_w;
                 selected_valid  = dbg_y4_valid_w;
@@ -261,8 +272,8 @@ module demo_interp_dac8_audio_pcm_common (
     //=========================================================
     // 7）DAC 显示幅度处理
     //
-    // 全 2x 各级系数已经包含 2 倍插值增益，4x、8x、128x
-    // 三个节点均保持输入幅度，因此不再做额外左移补偿。
+    // 全 2x 各级系数已经包含 2 倍插值增益，1x、4x、8x、128x
+    // 四个节点均保持输入幅度，因此不再做额外左移补偿。
     //=========================================================
     reg  signed [31:0] display_sample_ext;
     reg  signed [23:0] display_sample_sat;
@@ -317,7 +328,8 @@ module demo_interp_dac8_audio_pcm_common (
 
     assign dac_data = dac_data_r;
 
-    assign dac_clk = (mode_state == MODE_4X) ? ce_cnt[4] :
+    assign dac_clk = (mode_state == MODE_1X) ? ce_cnt[6] :
+                     (mode_state == MODE_4X) ? ce_cnt[4] :
                      (mode_state == MODE_8X) ? ce_cnt[3] :
                                                 clk_audio_128x;
 

@@ -1,46 +1,53 @@
 # 高阶数字插值滤波器设计与 FPGA 验证
 
-> 当前稳定版本：44.1 kHz 专用、7 级全 2x、128 倍插值、V3 Stage 1 strict-halfband BRAM 结构<br>
+> 当前实现版本：44.1 kHz 专用、7 级全 2x、128 倍插值、V4 Stage 2/3 共享 DSP 结构<br>
 > FPGA：Xilinx Artix-7 `XC7A35T-FGG484-2`<br>
 > 工具：MATLAB R2023a、Vivado 2018.3<br>
-> 稳定提交：`6132cbb`<br>
-> 稳定标签：`LUT3676_DSP1_FF1106_board_successful`
+> V3 实板回退提交：`6132cbb`<br>
+> V3 实板回退标签：`LUT3676_DSP1_FF1106_board_successful`
 
 本项目面向“高阶数字插值滤波器设计与验证”赛题，完成了从 MATLAB 数学建模、等波纹 FIR 设计、定点量化、bit-true 验证、RTL 编码、功能仿真、综合实现到 FPGA 板级测试的完整闭环。
 
-当前比赛展示版本输入为 **44.1 kHz、24 bit signed PCM**，经过 7 级 2 倍 FIR 插值后得到 **5.6448 MHz** 的 128 倍输出，同时保留 4 倍与 8 倍中间节点，经 AD9708 8 bit 并行 DAC 输出到示波器。
+当前 V4 版本输入为 **44.1 kHz、24 bit signed PCM**，经过 7 级 2 倍 FIR 插值后得到 **5.6448 MHz** 的 128 倍输出，同时保留 4 倍与 8 倍中间节点，并新增未经插值链的 1 倍旁路档位，经 AD9708 8 bit 并行 DAC 输出到示波器。V4 保持全部 FIR 系数、定点格式和输出序列不变，仅将 Stage 2/3 的 LUT 常系数乘法网络改造成单个共享 DSP48E1 时分复用数据通路。
 
 ## 1. 当前结论
 
 ### 1.1 核心指标
 
-| 项目 | 赛题要求 | 当前 V3 MATLAB / RTL 结果 | 判定 |
+| 项目 | 赛题要求 | 当前 V4 MATLAB / RTL 结果 | 判定 |
 |---|---:|---:|---|
 | 输入格式 | 24 bit signed | 24 bit signed PCM | 通过 |
 | 输入采样率 | 44.1 kHz | 44.1 kHz | 通过 |
 | 输出采样率 | 5.6448 MHz | 5.6448 MHz | 通过 |
 | 插值倍数 | 128 倍 | `2^7 = 128` | 通过 |
+| 板级展示档位 | 方法不限 | 1x、4x、8x、128x | 通过 |
 | 通带 | 10 Hz～20 kHz | 10 Hz～20 kHz | 通过 |
 | 通带纹波 | 不超过 ±0.05 dB | 最大绝对误差约 0.00523 dB | 通过 |
 | 阻带衰减 | 不低于 70 dB | 约 78.62 dB | 通过 |
 | 相位 | 严格线性相位 | 群延迟波动约 `7e-12` sample | 通过 |
-| MATLAB 与 RTL | 功能一致 | 冲激、随机 PCM 均为 0 LSB | 通过 |
+| MATLAB 与 RTL | 功能一致 | Stage2、Stage3 与完整链冲激/随机 PCM 均为 0 LSB | 通过 |
 
-### 1.2 最终板级结果
+### 1.2 V4 共享 DSP 三档版板级实现结果
 
 | 项目 | 实现后结果 | XC7A35T 可用量 | 利用率 |
 |---|---:|---:|---:|
-| Slice LUTs | **3676** | 20800 | 17.67% |
-| Slice Registers | **1106** | 41600 | 2.66% |
-| DSP48E1 | **1** | 90 | 1.11% |
+| Slice LUTs | **2122** | 20800 | 10.20% |
+| Slice Registers | **1198** | 41600 | 2.88% |
+| DSP48E1 | **2** | 90 | 2.22% |
 | Block RAM Tile | **1**，对应 2 个 RAMB18E1 | 50 | 2.00% |
 | IOB | 19 | 250 | 7.60% |
 | MMCM | 1 | 5 | 20.00% |
-| WNS / TNS | `+44.204 ns / 0 ns` | - | 时序通过 |
-| WHS / THS | `+0.108 ns / 0 ns` | - | 时序通过 |
+| WNS / TNS | `+44.960 ns / 0 ns` | - | 时序通过 |
+| WHS / THS | `+0.121 ns / 0 ns` | - | 时序通过 |
 | 估算片上功耗 | 0.168 W | - | Low confidence |
 
-### 1.3 板级实测
+![V4 板级实现资源利用率](matlab_fir/alt_all2x_v4/figures/v4_board_impl_utilization.png)
+
+V4 相比已实板验证的 V3 板级版本，LUT 从 3676 降至 2122，减少 **1554 LUT（约 42.27%）**；FF 从 1106 增至 1198，增加 92 个；DSP 从 1 增至 2；BRAM Tile 仍为 1。资源交换符合 Phase 4 的设计目标，并满足板级 Go 条件 `LUT < 3300、FF <= 1300、DSP = 2、BRAM Tile <= 1、WNS/WHS > 0`。
+
+以上数据对应已经实板通过的三档 V4 版本。当前 15 kHz ROM 与 1x 旁路修改完成后必须重新实现，新的四档版资源以下一次 Vivado 报告为准。
+
+### 1.3 V4 三档实测与四档扩展状态
 
 | 模式 | 理论 DA_CLK | 实测 DA_CLK | 相对误差 | DA 波形 |
 |---|---:|---:|---:|---|
@@ -48,7 +55,7 @@
 | 8x | 352.8 kHz | 352.86 kHz | 约 +0.017% | 正常 |
 | 128x | 5.6448 MHz | 5.64 MHz | 约 -0.085% | 正常 |
 
-三档输出、矩阵按键切换和 DA 波形均已完成实板验证，因此 `6132cbb` 可作为比赛稳定展示基线。
+上述三档频率和 DA 波形已经在 V4 共享 DSP bitstream 上完成实板验证。此后新增的 15 kHz 测试 ROM 与 1x 旁路属于新一轮板级修改，需要重新综合、实现、Generate Bitstream，并按四档重新测量；`6132cbb` 仍作为可靠回退基线。
 
 ---
 
@@ -64,6 +71,8 @@
 阻带衰减：>= 70 dB
 相位：严格线性相位
 ```
+
+1x 原始 PCM 档位是为了在示波器上直观比较“未插值、4x、8x、128x”的阶梯粗糙度而增加的展示功能，不改变赛题要求的 128 倍插值链及其指标。
 
 仓库早期版本曾支持 44.1 kHz / 48 kHz 双采样率家族。当前分赛区决赛展示只要求 44.1 kHz，因此稳定版移除了 48 kHz MMCM 和双时钟切换逻辑，集中优化 44.1 kHz 到 5.6448 MHz 的 128 倍插值链路。
 
@@ -86,23 +95,26 @@ board_demo_competition_dac8_top
 ```mermaid
 flowchart LR
     A["24 bit signed PCM ROM<br/>44.1 kHz"] --> B["Stage 1<br/>strict-halfband 2x"]
+    A --> X["1x 原始 PCM 旁路<br/>44.1 kHz"]
     B --> C["88.2 kHz"]
-    C --> D["Stage 2<br/>true-polyphase 2x"]
+    C --> D["Stage 2<br/>true-polyphase 2x<br/>共享 DSP"]
     D --> E["176.4 kHz<br/>4x 输出节点"]
-    E --> F["Stage 3<br/>true-polyphase 2x"]
+    E --> F["Stage 3<br/>true-polyphase 2x<br/>共享 DSP"]
     F --> G["352.8 kHz<br/>8x 输出节点"]
     G --> H["Stage 4～7<br/>canonical halfband 2x"]
     H --> I["5.6448 MHz<br/>128x 输出节点"]
     I --> J["24 bit -> 8 bit<br/>偏置与饱和"]
+    X --> J
     J --> K["AD9708 DAC"]
     K --> L["示波器"]
 ```
 
 板载 20 MHz 晶振进入 Clock Wizard，产生连续的 5.6448 MHz 音频时钟。所有 FIR 级工作在同一时钟域内，各级使用整数时钟使能 `ce2_out`～`ce128_out` 控制采样节拍，避免在 FPGA 内部生成大量派生逻辑时钟。
 
-三档 DAC 输出节点为：
+四档 DAC 输出节点为：
 
 ```text
+1x   ：原始 PCM 旁路，44.1 kHz
 4x   ：Stage 2 输出，176.4 kHz
 8x   ：Stage 3 输出，352.8 kHz
 128x ：Stage 7 输出，5.6448 MHz
@@ -229,8 +241,8 @@ $$
 | 级数 | 采样率变化 | taps | 系数格式 | 累加器 | RTL 结构 |
 |---:|---|---:|---|---:|---|
 | Stage 1 | 44.1 -> 88.2 kHz | 105 | 17 bit / Q15 | 42 bit | strict-halfband、单 DSP MAC、BRAM 历史 |
-| Stage 2 | 88.2 -> 176.4 kHz | 17 | 16 bit / Q15 | 41 bit | 共享数据通路 true-polyphase |
-| Stage 3 | 176.4 -> 352.8 kHz | 11 | 15 bit / Q14 | 40 bit | 共享数据通路 true-polyphase |
+| Stage 2 | 88.2 -> 176.4 kHz | 17 | 16 bit / Q15 | 42 bit 共享累加器 | true-polyphase，Stage2/3 共用 DSP |
+| Stage 3 | 176.4 -> 352.8 kHz | 11 | 15 bit / Q14 | 42 bit 共享累加器 | true-polyphase，Stage2/3 共用 DSP |
 | Stage 4 | 352.8 -> 705.6 kHz | 7 | 精确 Q4 | 41 bit | canonical halfband shift-add |
 | Stage 5 | 705.6 kHz -> 1.4112 MHz | 7 | 精确 Q4 | 39 bit | canonical halfband shift-add |
 | Stage 6 | 1.4112 -> 2.8224 MHz | 7 | 精确 Q4 | 38 bit | canonical halfband shift-add |
@@ -258,7 +270,7 @@ Stage 1 对系统资源和阻带性能影响最大。MATLAB 同时搜索 taps、
 
 ![Stage 1 Pareto 候选频响](matlab_fir/alt_all2x_v2/stage1_strict_halfband_selected_response.png)
 
-### 5.3 最终 V3 MATLAB 指标
+### 5.3 当前 V4 沿用的 MATLAB 指标
 
 | 项目 | 数值 |
 |---|---:|
@@ -283,7 +295,7 @@ $$
 
 ### 5.4 全 2x 设计基线频响
 
-下图为全 2x 逐级设计得到的总链路频响。V3 保留 Stage 2～7 的系统级频率分配，并使用更高阻带余量的 strict-halfband Stage 1。
+下图为全 2x 逐级设计得到的总链路频响。V4 没有重新设计系数：Stage 1 继续使用 V3 strict-halfband BRAM 结构，Stage 2～7 的系数和各级舍入格式也完全不变，因此 V4 的数学频响、通带纹波、阻带衰减和线性相位指标与 V3 一致。
 
 ![全 2x 七级总链路频响](matlab_fir/alt_all2x/all2x_interp128_response.png)
 
@@ -295,7 +307,7 @@ $$
 
 ### 6.1 MATLAB 指标对比
 
-| 项目 | 旧 `4x + 5×2x` | 全 2x 初始设计 | 当前 V3 BRAM |
+| 项目 | 旧 `4x + 5×2x` | 全 2x 初始设计 | 当前 V4 共享 DSP |
 |---|---:|---:|---:|
 | 输入采样率 | 44.1 kHz | 44.1 kHz | 44.1 kHz |
 | 输出采样率 | 5.6448 MHz | 5.6448 MHz | 5.6448 MHz |
@@ -303,7 +315,7 @@ $$
 | 阻带衰减 | 70.339 dB | 77.679 dB | 78.620 dB |
 | 最终采样点群延迟 | 2898 | 3325 | 3709 |
 | 非零半系数估算 | 138 | 77 | Stage1 为 26 对，其余进一步结构化 |
-| 主要优势 | 双采样率兼容、已有经验 | 频响余量更大 | 频响、资源与验证闭环最佳 |
+| 主要优势 | 双采样率兼容、已有经验 | 频响余量更大 | 频响不变，板级 LUT 进一步下降 |
 
 ### 6.2 频响图对比
 
@@ -311,7 +323,7 @@ $$
 |---|---|
 | ![旧 4x+2x 总链路](matlab_fir/figures/interp128_44100Hz_to_5644800Hz.png) | ![全 2x 总链路](matlab_fir/alt_all2x/all2x_interp128_response.png) |
 
-旧方案已经满足赛题最低指标，但阻带只有约 0.34 dB 余量。全 2x 初始设计把阻带提升到约 77.68 dB；V3 strict-halfband Stage 1 又把最终阻带提升到约 78.62 dB。
+旧方案已经满足赛题最低指标，但阻带只有约 0.34 dB 余量。全 2x 初始设计把阻带提升到约 77.68 dB；V3 strict-halfband Stage 1 又把最终阻带提升到约 78.62 dB。V4 只优化运算资源映射，不改变这组频响结果。
 
 ### 6.3 结构选择结论
 
@@ -354,7 +366,7 @@ Stage 1 使用 64 深度、24 bit 宽的双口 BRAM 循环缓冲保存 52 个有
 
 使用 BRAM 后，Stage 1 不再由大量 FF 保存历史样点，完整板级 FF 从 V2 的 3279 降到 1106。
 
-### 7.3 Stage 2/3 true-polyphase
+### 7.3 Stage 2/3 true-polyphase 共享 DSP
 
 Stage 2 和 Stage 3 不再先显式插零再进入普通 FIR，而是直接按偶相、奇相计算：
 
@@ -362,7 +374,35 @@ $$
 y[2m+p] = \sum_r h[2r+p]x[m-r],\quad p\in\{0,1\}
 $$
 
-两个相位共享数据通路，系数乘法由常系数 LUT 网络实现。级间桥只传递 `data + valid`，不再保存冗余相位状态。
+V3 中两个相位共享各自级内的数据通路，但系数乘法仍被综合为较大的 LUT 常系数网络。V4 保留同一组 polyphase 公式、系数与舍入方式，将 Stage 2/3 的乘法统一调度到一个 `25×16 signed` DSP48E1：
+
+| 级数 | phase0 | phase1 | CE 到达间隔 | 最坏 MAC 数 |
+|---:|---:|---:|---:|---:|
+| Stage 2 | 5 MAC | 4 MAC | 32 个 5.6448 MHz 时钟 | 5 |
+| Stage 3 | 3 MAC | 3 MAC | 16 个 5.6448 MHz 时钟 | 3 |
+
+当 Stage 2/3 任务同拍到达时，调度器始终先执行速率更高的 Stage 3，再执行 Stage 2。64 拍超周期的最坏调度为：
+
+```text
+arrival=0  : Stage3 phase1，3 MAC，finish=4，deadline=8，slack=4
+arrival=0  : Stage2 phase1，4 MAC，finish=9，deadline=16，slack=7
+arrival=16 : Stage3 phase0，3 MAC，finish=20，deadline=24，slack=4
+arrival=32 : Stage3 phase1，3 MAC，finish=36，deadline=40，slack=4
+arrival=32 : Stage2 phase0，5 MAC，finish=42，deadline=48，slack=6
+arrival=48 : Stage3 phase0，3 MAC，finish=52，deadline=56，slack=4
+```
+
+```mermaid
+flowchart LR
+    A["Stage 2 CE<br/>17 tap / Q15"] --> Q["Stage3 优先<br/>任务调度器"]
+    B["Stage 3 CE<br/>11 tap / Q14"] --> Q
+    Q --> M["1 个 25×16<br/>DSP48E1 乘法器"]
+    M --> C["42 bit<br/>共享累加器"]
+    C --> R2["Q15 舍入饱和<br/>Stage 2 输出"]
+    C --> R3["Q14 舍入饱和<br/>Stage 3 输出"]
+```
+
+RTL 仿真中的 `pending overwrite` 与 `deadline miss` 断言均为 0。级间桥继续只传递 `data + valid`，共享计算引入的是固定流水延迟，不改变有效输出样点序列。
 
 ### 7.4 Stage 4～7 canonical halfband
 
@@ -405,8 +445,34 @@ DAC 显示路径取 24 bit 数据高 8 位并加 128 偏置，转换为 AD9708 �
 | V3 Stage1 FF / random | 23675 | 127 | 0 LSB | 0 |
 | V3 Stage1 BRAM / impulse | 40059 | 127 | 0 LSB | 0 |
 | V3 Stage1 BRAM / random | 23675 | 127 | 0 LSB | 0 |
+| **V4 shared DSP / impulse** | **40059** | **127** | **0 LSB** | **0** |
+| **V4 shared DSP / random** | **23675** | **127** | **0 LSB** | **0** |
 
-固定 `shift=127` 是 RTL 流水、CE 调度和级间 valid 传播造成的实现延迟，不是频率响应中的算法群延迟。对齐后所有有效输出逐点完全一致。
+固定 `shift=127` 是 RTL 流水、CE 调度和级间 valid 传播造成的实现延迟，不是频率响应中的算法群延迟。V4 共享 DSP 没有改变链尾有效样点 shift，对齐后所有有效输出逐点完全一致。
+
+V4 还对 Stage 2/3 中间节点进行了独立分级回归：
+
+| 节点 | 测试 | 比较点数 | 固定 shift | 最大误差 | mismatch |
+|---|---|---:|---:|---:|---:|
+| Stage 2 | impulse | 2188 | 0 | 0 LSB | 0 |
+| Stage 2 | random PCM | 2188 | 0 | 0 LSB | 0 |
+| Stage 3 | impulse | 4375 | 0 | 0 LSB | 0 |
+| Stage 3 | random PCM | 4375 | 0 | 0 LSB | 0 |
+
+这组分级对拍证明资源下降来自运算调度和 DSP 映射，而不是删除系数、降低字长或放宽滤波指标。
+
+### 8.3 四档 DAC 与矩阵按键仿真
+
+`tb_demo_interp_dac8_four_mode.v` 在每档预热 10000 拍后，用固定 4096 个 5.6448 MHz 时钟周期统计 DA_CLK：
+
+| 模式编码 | 档位 | 预期 DA_CLK 边沿 | 实测边沿 | DAC 数据变化次数 | 判定 |
+|---:|---:|---:|---:|---:|---|
+| 0 | 1x | 32 | 32 | 32 | PASS |
+| 1 | 4x | 128 | 128 | 127 | PASS |
+| 2 | 8x | 256 | 256 | 251 | PASS |
+| 3 | 128x | 4096 | 4096 | 3306 | PASS |
+
+`tb_matrix_keypad_four_mode.v` 进一步模拟矩阵电气连接、同步与消抖，SW1～SW8 依次得到模式编码 `0/1/2/3/0/1/2/3`，全部通过。两项测试的 XSim 临时文件均位于 `%TEMP%/codex_fir_interpolation/four_mode_sim/`。
 
 ![全 2x 基线随机 PCM MATLAB 与 RTL 对拍](matlab_fir/alt_all2x/all2x_rtl_random_compare.png)
 
@@ -429,6 +495,7 @@ DAC 显示路径取 24 bit 数据高 8 位并加 128 偏置，转换为 AD9708 �
 | Phase 2 | Stage2/3 polyphase + light bridge | 3975 | 3103 | 1 | 0 | +156.988 | 是 |
 | Phase 3 FF | Stage1 strict-HB + FF 历史 | 3537 | 2105 | 1 | 0 | +159.856 | 是 |
 | **Phase 3 BRAM** | **Stage1 strict-HB + BRAM 历史** | **3222** | **925** | **1** | **1** | **+159.809** | **是** |
+| **Phase 4 V4** | **Stage2/3 共享 DSP + Stage1 BRAM** | **1648** | **1016** | **2** | **1** | **+161.944** | **是** |
 
 Phase 3 BRAM 相对全 2x 稳定基线：
 
@@ -439,6 +506,18 @@ DSP：1 -> 1
 BRAM Tile：0 -> 1
 ```
 
+Phase 4 V4 相对 Phase 3 BRAM 独立链：
+
+```text
+LUT：3222 -> 1648，减少 1574，下降约 48.85%
+FF ： 925 -> 1016，增加   91，上升约  9.84%
+DSP：1 -> 2
+BRAM Tile：1 -> 1
+WNS：+159.809 ns -> +161.944 ns
+```
+
+增加 1 个 DSP 后，Stage 2/3 常系数乘法选择网络大幅缩小。FF 小幅增加来自 pending job、相位、MAC 索引和共享调度状态寄存器，但仍低于独立链 `FF <= 1100` 的 Go 门槛。
+
 ### 9.2 完整板级版本对比
 
 完整板级统计包含插值链、20 MHz/5.6448 MHz 时钟、PCM ROM、矩阵按键、DAC 和复位逻辑。
@@ -447,7 +526,8 @@ BRAM Tile：0 -> 1
 |---|---:|---:|---:|---:|---|
 | 全 2x 初始稳定板级 | 6426 | 4416 | 1 | 0 | 首个可板级展示的全 2x 版本 |
 | V2 Phase 2 板级 | 4428 | 3279 | 1 | 0 | canonical + Stage2/3 polyphase |
-| **V3 BRAM 最终板级** | **3676** | **1106** | **1** | **1** | 当前比赛稳定版 |
+| V3 BRAM 板级 | 3676 | 1106 | 1 | 1 | 已完成实板三档验证的回退基线 |
+| **V4 共享 DSP 板级** | **2122** | **1198** | **2** | **1** | **当前实现通过版本，待 bitstream 实板复测** |
 
 V3 相对全 2x 初始稳定板级：
 
@@ -463,7 +543,25 @@ LUT：4428 -> 3676，减少 752，下降约 17.0%
 FF ：3279 -> 1106，减少 2173，下降约 66.3%
 ```
 
-这说明 BRAM 版本不是简单地把资源从 LUT 换到 DSP，而是在保持单 DSP 的同时显著减少了 Stage 1 历史寄存器和控制逻辑。
+V4 相对 V3 BRAM 板级：
+
+```text
+LUT：3676 -> 2122，减少 1554，下降约 42.27%
+FF ：1106 -> 1198，增加   92，上升约  8.32%
+DSP：1 -> 2
+BRAM Tile：1 -> 1
+```
+
+从全 2x 初始稳定板级到 V4：
+
+```text
+LUT：6426 -> 2122，累计减少 4304，下降约 66.98%
+FF ：4416 -> 1198，累计减少 3218，下降约 72.87%
+DSP：1 -> 2
+BRAM Tile：0 -> 1
+```
+
+这说明 V3 通过 BRAM 消除了 Stage 1 大量历史寄存器，V4 再用第 2 个 DSP 替换 Stage 2/3 的 LUT 乘法网络。两次优化针对不同资源瓶颈，可以叠加而不会改变 FIR 数学响应。
 
 ---
 
@@ -473,15 +571,15 @@ FF ：3279 -> 1106，减少 2173，下降约 66.3%
 
 | 指标 | 结果 |
 |---|---:|
-| WNS | +44.204 ns |
+| WNS | +44.960 ns |
 | TNS | 0 ns |
 | Setup failing endpoints | 0 |
-| WHS | +0.108 ns |
+| WHS | +0.121 ns |
 | THS | 0 ns |
 | Hold failing endpoints | 0 |
 | Timing constraints | 全部满足 |
 
-当前关键音频时钟只有 5.6448 MHz，时序余量充足。Phase 4 若增加 DSP 或流水，不是为了修复时序，而是尝试进一步降低 Stage 2/3 的 LUT。
+当前关键音频时钟为 5.6448 MHz，板级还包含 20 MHz 矩阵按键与控制时钟。V4 实现后所有用户时序约束均满足；增加第 2 个 DSP 的目的是降低 Stage 2/3 LUT，而不是修复时序违例。与 V3 相比，WNS 从 +44.204 ns 提升到 +44.960 ns，WHS 从 +0.108 ns 提升到 +0.121 ns。
 
 ### 10.2 功耗
 
@@ -497,17 +595,17 @@ FF ：3279 -> 1106，减少 2173，下降约 66.3%
 
 ### 10.3 DRC 说明
 
-实现后 DRC 为 0 Error、25 Warning：
+V4 实现后 DRC 为 0 Error、30 Warning：
 
 | 规则 | 数量 | 含义 |
 |---|---:|---|
 | CHECK-3 | 1 | 报告达到规则显示上限 |
-| DPIP-1 | 2 | DSP 输入未使用内部流水寄存器 |
-| DPOP-1 | 1 | DSP PREG 输出流水建议 |
-| DPOP-2 | 1 | DSP MREG 输出流水建议 |
+| DPIP-1 | 5 | 两个 DSP 的部分输入未使用内部流水寄存器 |
+| DPOP-1 | 2 | 两个 DSP 的 PREG 输出流水建议 |
+| DPOP-2 | 2 | 两个 DSP 的 MREG 输出流水建议 |
 | REQP-1840 | 20 | 推断 RAMB18 的异步控制检查 |
 
-这些均为性能或结构建议，不是实现错误。当前 post-route setup/hold 全部通过，且板级三档输出已实测正常。若后续修改 BRAM 控制或增加 DSP 流水，必须重新进行 bit-true 与板级回归。
+这些均为性能或结构建议，不是实现错误。当前 V4 post-route setup/hold 全部通过；DPIP/DPOP 数量增加是因为设计从 1 个 DSP 增加到 2 个 DSP。若后续为 DSP 增加内部流水，必须同步调整调度时延并重新进行 bit-true 与板级回归。
 
 ---
 
@@ -524,19 +622,35 @@ FF ：3279 -> 1106，减少 2173，下降约 66.3%
 | 矩阵按键 `KC0..KC3` | T21、U21、V22、W22 |
 | 蜂鸣器 `BEEP-IO` | AB18，高电平关闭 |
 
-### 11.2 按键映射
+### 11.2 15 kHz 示波器对比信号
+
+原测试 ROM 是按 48 kHz 生成的 440 Hz、880 Hz、1760 Hz 多频音频，在当前 44.1 kHz 节拍播放时最高分量约为 1.62 kHz。信号周期相对各档 DA_CLK 很长，因此 4x、8x、128x 在示波器连线显示下都显得较平滑。
+
+当前改为 44.1 kHz 采样、0.80FS 的 15 kHz 单正弦。147 点 ROM 正好包含 50 个完整周期，循环边界连续：
+
+| 档位 | DA_CLK | 每个 15 kHz 周期的采样点 | 预期观感 |
+|---|---:|---:|---|
+| 1x | 44.1 kHz | 2.94 | 最粗糙，直接显示原始 PCM 阶梯 |
+| 4x | 176.4 kHz | 11.76 | 阶梯明显 |
+| 8x | 352.8 kHz | 23.52 | 明显比 4x 平滑 |
+| 128x | 5.6448 MHz | 376.32 | 最平滑 |
+
+15 kHz 仍位于 10 Hz～20 kHz 设计通带内，所以该修改只改变演示激励，不改变 FIR 系数、通带纹波或阻带衰减。
+
+### 11.3 按键映射
 
 | 按键 | 插值节点 | 理论 DA_CLK |
 |---|---:|---:|
-| SW1 或 SW5 | 4x | 176.4 kHz |
-| SW2 或 SW6 | 8x | 352.8 kHz |
-| SW3、SW4、SW7 或 SW8 | 128x | 5.6448 MHz |
+| SW1 或 SW5 | 1x 原始 PCM | 44.1 kHz |
+| SW2 或 SW6 | 4x | 176.4 kHz |
+| SW3 或 SW7 | 8x | 352.8 kHz |
+| SW4 或 SW8 | 128x | 5.6448 MHz |
 
-上电默认进入 128x 模式。矩阵按键由 20 MHz 时钟域扫描、同步和消抖，模式信号通过两级同步器进入 5.6448 MHz 音频域。
+上电默认进入 128x 模式。矩阵按键由 20 MHz 时钟域扫描、同步和消抖，模式信号通过两级同步器进入 5.6448 MHz 音频域。1x 只旁路 DAC 显示选择器，七级插值链仍在后台连续运行，因此切换档位不需要重新锁定时钟或复位 FIR。
 
-### 11.3 DAC 数据时序
+### 11.4 DAC 数据时序
 
-`dac_data[7:0]` 在音频时钟下降沿更新，AD9708 在 `dac_clk` 上升沿采样。4x 和 8x 模式下，`dac_clk` 分别取 CE 计数器的对应二分频位；128x 模式直接输出 5.6448 MHz 连续时钟。
+`dac_data[7:0]` 在音频时钟下降沿更新，AD9708 在 `dac_clk` 上升沿采样。1x、4x 和 8x 模式下，`dac_clk` 分别取 CE 计数器的 44.1 kHz、176.4 kHz、352.8 kHz 分频位；128x 模式直接输出 5.6448 MHz 连续时钟。
 
 ---
 
@@ -558,22 +672,39 @@ FF ：3279 -> 1106，减少 2173，下降约 66.3%
 | `matlab_fir/alt_all2x_v2/v3_03_generate_stage1_rtl_golden.m` | Stage1 与完整链 golden 生成 |
 | `matlab_fir/alt_all2x_v2/v3_04_compare_stage1_rtl.m` | FF 历史版本 RTL 对拍 |
 | `matlab_fir/alt_all2x_v2/v3_05_compare_stage1_bram_rtl.m` | BRAM 历史版本 RTL 对拍 |
+| `matlab_fir/alt_all2x_v4/v4_01_analyze_stage23_shared_dsp_schedule.m` | Stage2/3 共享 DSP 64 拍超周期调度分析 |
+| `matlab_fir/alt_all2x_v4/v4_02_compare_shared_dsp_rtl.m` | V4 分级与完整链 0 LSB 对拍 |
+| `matlab_fir/all2x_phase4_dsp_sharing_plan.md` | Phase4 Stop/Go 计划、执行记录和结果汇总 |
+| `audio_data/generate_demo_sine_15k_44k1.m` | 生成 44.1 kHz / 24 bit / 15 kHz 示波器对比 ROM |
 
 ### 12.2 RTL
 
 | 文件 / 模块 | 作用 |
 |---|---|
 | `board_demo_competition_dac8_top.v` | 板级顶层、时钟、复位、按键与 DAC 接口 |
-| `demo_interp_dac8_audio_pcm_common.v` | PCM 输入、V3 插值链实例、节点选择与 DAC 数据转换 |
+| `demo_interp_dac8_audio_pcm_common.v` | PCM 输入、V4 插值链实例、节点选择与 DAC 数据转换 |
 | `audio_pcm_rom_source.v` | 24 bit signed PCM ROM 输入源 |
+| `demo_sine_15k_44k1_24bit_147.mem` | 147 点、50 周期、0.80FS 的 15 kHz 单正弦 |
 | `all2x_v3/interp2_stage1_strict_halfband_bram_ce.v` | Stage1 strict-halfband 双口 BRAM 单 DSP MAC |
 | `all2x_v3/interp128_all2x_v3_stage1_select_top_ce.v` | V3 七级公共顶层 |
-| `all2x_v3/interp128_all2x_v3_strict_s1_bram_top_ce.v` | 当前板级 V3 BRAM 包装顶层 |
+| `all2x_v3/interp128_all2x_v3_strict_s1_bram_top_ce.v` | 已实板验证的 V3 BRAM 回退包装顶层 |
 | `all2x_v3/all2x_v3_stage1_coeff_pkg.vh` | MATLAB 自动导出的 Stage1 Q15 系数 |
+| `all2x_v4/interp2_stage23_shared_dsp_ce.v` | Stage2/3 单 DSP 时分复用调度、MAC 与双格式舍入 |
+| `all2x_v4/interp128_all2x_v4_shared_dsp_top_ce.v` | 当前 V4 七级 128x 顶层 |
 | `all2x_v2/interp2_stage23_polyphase_ce.v` | Stage2/3 true-polyphase 实现 |
 | `all2x_v2/interp2_halfband7_shiftadd_ce.v` | Stage4～7 canonical shift-add 实现 |
 | `all2x_v2/bridge_valid_only_to_interp2_ce.v` | 级间轻量 valid 桥 |
 | `round_sat_q16_to24.v` | 舍入与 24 bit 饱和 |
+
+### 12.3 V4 仿真与 Vivado 脚本
+
+| 文件 | 作用 |
+|---|---|
+| `sim_1/new/all2x_v4/tb_interp128_all2x_v4_shared_dsp_ce.v` | V3/V4 并行输入，导出 Stage2、Stage3 和链尾结果 |
+| `sim_1/new/all2x_v4/tb_demo_interp_dac8_four_mode.v` | 验证四档 DA_CLK 倍率和 DAC 数据变化 |
+| `sim_1/new/all2x_v4/tb_matrix_keypad_four_mode.v` | 验证 SW1～SW8 的两组四档按键映射 |
+| `alt_all2x_v4/vivado/synth_stage23_shared_dsp.tcl` | V4 独立链同口径综合与报告导出 |
+| `alt_all2x_v4/vivado/build_board_v4_shared_dsp.tcl` | V4 板级源文件登记、综合、实现和报告自动构建 |
 
 ---
 
@@ -608,6 +739,23 @@ v3_05_compare_stage1_bram_rtl.m
 
 MATLAB 会输出频响 PNG、候选 CSV、定点 summary、Verilog 系数头文件和 RTL golden 数据。
 
+V4 共享 DSP 验证按以下顺序执行：
+
+```matlab
+cd('matlab_fir/alt_all2x_v4');
+run('v4_01_analyze_stage23_shared_dsp_schedule.m');
+run('v4_02_compare_shared_dsp_rtl.m');
+```
+
+生成当前 15 kHz 示波器对比 ROM：
+
+```matlab
+cd('audio_data');
+run('generate_demo_sine_15k_44k1.m');
+```
+
+其中 `v4_02_compare_shared_dsp_rtl.m` 需要先运行 V4 XSim 测试平台，RTL CSV 放在系统临时目录 `%TEMP%/codex_fir_interpolation/phase4_sim/`，不会污染仓库根目录。
+
 ### 13.2 Vivado
 
 打开工程：
@@ -616,13 +764,7 @@ MATLAB 会输出频响 PNG、候选 CSV、定点 summary、Verilog 系数头文�
 XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.xpr
 ```
 
-若从不含 V3 文件的旧工程状态恢复，可在 Tcl Console 执行：
-
-```tcl
-source D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/add_all2x_v3_to_project.tcl
-```
-
-然后重新运行：
+当前 `XC7A35T_interp.xpr` 已正式登记 V4 RTL、`all2x_v4` include 目录和 15 kHz `.mem` 文件，不需要再次手动 Add Sources。15 kHz ROM 与 1x 旁路是在上一次 `2122 LUT / 1198 FF` 实现后新增的修改，因此该资源结果不能直接作为四档版本最终结果。关闭并重新打开 Vivado 工程后，应 Reset `synth_1` 与 `impl_1`，再依次执行：
 
 ```text
 Run Synthesis
@@ -632,13 +774,20 @@ Open Hardware Manager
 Program Device
 ```
 
-下载后依次按下 4x、8x、128x 按键，测量 `DA_CLK` 并观察 AD9708 模拟输出波形。
+为避免看到旧报告，在运行前应 Reset `synth_1` 与 `impl_1`，运行后关闭旧 Utilization 标签页并从最新 run 重新打开报告。可在综合后确认层次结构包含：
+
+```text
+u_interp128_all2x_v4_shared_dsp_top_ce
+u_interp2_stage23_shared_dsp_ce
+```
+
+下载新 bitstream 后依次按下 1x、4x、8x、128x 按键，测量 `DA_CLK` 并观察 AD9708 模拟输出波形。预期频率为 44.1 kHz、176.4 kHz、352.8 kHz、5.6448 MHz，四档模拟波形应呈现从粗糙阶梯到平滑正弦的渐进差异。
 
 ---
 
 ## 14. Git 稳定基线与后续工作
 
-稳定板级版本：
+已实板验证的回退版本：
 
 ```text
 branch : release/regional-final-demo
@@ -646,18 +795,19 @@ commit : 6132cbb
 tag    : LUT3676_DSP1_FF1106_board_successful
 ```
 
-当前 Phase 4 实验分支：
+当前 V4 实现分支：
 
 ```text
 codex/all2x-phase4-dsp-sharing
 ```
 
-Phase 4 计划尝试增加第 2 个 DSP，由 Stage 2/3 共享，用 DSP 替代当前较大的 LUT 常系数乘法网络。该实验必须继续满足：
+Phase 4 已增加第 2 个 DSP，由 Stage 2/3 共享，并完成以下 Stop/Go 闭环：
 
-1. MATLAB 指标不下降到赛题边界附近。
-2. 冲激与随机 PCM 对拍保持 0 LSB。
-3. MAC 调度在 CE 截止时间前完成。
-4. 板级 LUT 明显下降才考虑替换稳定版。
-5. 任何失败都直接回退到 `6132cbb` 稳定基线。
+1. FIR 系数和 MATLAB 指标不变。
+2. Stage2、Stage3 与完整链冲激/随机 PCM 对拍均为 0 LSB。
+3. MAC 调度最坏 slack 为 4 拍，deadline miss 和 pending overwrite 均为 0。
+4. 独立链达到 1648 LUT / 1016 FF / 2 DSP / 1 BRAM Tile。
+5. 板级实现达到 2122 LUT / 1198 FF / 2 DSP / 1 BRAM Tile。
+6. post-route WNS +44.960 ns、WHS +0.121 ns，时序全部通过。
 
-当前 README 描述的仍是已经板级验证通过的 V3 BRAM 稳定版本，Phase 4 尚未改变正式设计结果。
+V4 共享 DSP 三档版本已完成 bitstream 和实板回归。当前工作区又增加了 15 kHz 单正弦 ROM 与 1x 原始 PCM 旁路，两项 XSim 四档测试均已通过，但这次增量修改仍需重新完成综合、实现、Generate Bitstream 和四档实板回归；若板测异常，可立即回退到 `6132cbb` 或上一版 V4 三档 bitstream。

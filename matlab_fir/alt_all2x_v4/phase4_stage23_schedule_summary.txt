@@ -1,0 +1,11 @@
+Phase 4 Stage 2/3 shared DSP schedule summary
+================================================
+Super period cycles       = 64
+Dispatch overhead cycles  = 1
+Stage 2 CE period         = 32
+Stage 3 CE period         = 16
+Stage 2 consumer deadline = 16 cycles
+Stage 3 consumer deadline = 8 cycles
+Worst simultaneous MAC    = 8
+Worst schedule slack      = 4 cycles
+All jobs pass             = 1

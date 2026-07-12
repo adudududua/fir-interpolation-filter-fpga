@@ -10,9 +10,9 @@
 //                24bit signed 音频采样点。
 //                
 //                当前默认配置：
-//                  采样点数：1024 点
+//                  采样点数：147 点
 //                  数据位宽：24bit signed
-//                  数据文件：audio_48k_24bit_1024.mem
+//                  数据文件：demo_sine_15k_44k1_24bit_147.mem
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-06-20
@@ -20,17 +20,19 @@
 // 开发工具     : Vivado
 // 修订记录     :
 //                2026-06-20：新增音频 PCM ROM 输入源。
+//                2026-07-12：默认数据切换为 44.1kHz 采样的
+//                            15kHz 单正弦示波器对比信号。
 //=============================================================
 
 module audio_pcm_rom_source #(
     parameter DATA_W   = 24,                               // PCM 数据位宽
-    parameter ADDR_W   = 10,                               // 1024 点需要 10bit 地址
-    parameter DEPTH    = 1024,                             // ROM 深度
-    parameter MEM_FILE = "audio_48k_24bit_1024.mem"        // ROM 初始化文件
+    parameter ADDR_W   = 8,                                // 147 点需要 8bit 地址
+    parameter DEPTH    = 147,                              // ROM 深度
+    parameter MEM_FILE = "demo_sine_15k_44k1_24bit_147.mem"
 )(
     input  wire                       clk,                 // 工作时钟，接 clk_audio_128x
     input  wire                       rst_n,               // 低有效复位
-    input  wire                       sample_ce,           // 输入采样更新节拍，48kHz 或 44.1kHz
+    input  wire                       sample_ce,           // 输入采样更新节拍，当前为 44.1kHz
 
     output reg  signed [DATA_W-1:0]   sample_out,          // 输出音频采样点
     output reg                        sample_update,       // 输出采样更新脉冲
@@ -40,8 +42,8 @@ module audio_pcm_rom_source #(
     //=========================================================
     // 0）末地址参数
     //
-    // DEPTH = 1024 时：
-    //   LAST_ADDR = 1023
+    // DEPTH = 147 时：
+    //   LAST_ADDR = 146
     //
     // 用这个参数判断 ROM 是否读到最后一个地址。
     //=========================================================

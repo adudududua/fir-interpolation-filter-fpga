@@ -6,7 +6,7 @@
 //                专用全 2x 插值演示顶层。
 //                当前展示版本只保留：
 //                20MHz -> clk_wiz_audio_44k1 -> 5.6448MHz
-//                矩阵按键用于选择 4x、8x 和 128x 输出节点。
+//                矩阵按键用于选择 1x、4x、8x 和 128x 输出节点。
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-06-20
@@ -21,9 +21,11 @@
 //                            44.1kHz / 5.6448MHz 时钟家族。
 //                2026-07-10：板级公共模块切换为全 2x 插值链路。
 //                2026-07-10：增加 mode_sel 的音频时钟域两级同步器。
+//                2026-07-12：增加 1x 原始 PCM 旁路档，SW1～SW4
+//                            映射为 1x/4x/8x/128x。
 // 其他描述     :
-//                1. SW1/SW2/SW3：4x/8x/128x。
-//                2. SW5/SW6/SW7：同样映射为 4x/8x/128x。
+//                1. SW1/SW2/SW3/SW4：1x/4x/8x/128x。
+//                2. SW5/SW6/SW7/SW8：重复映射 1x/4x/8x/128x。
 //=============================================================
 
 module board_demo_competition_dac8_top (
@@ -175,13 +177,13 @@ module board_demo_competition_dac8_top (
     // 音频域前使用两级同步器。按键模式在消抖后长时间保持稳定，
     // 因此逐位同步不会影响实际模式切换。
     //=========================================================
-    (* ASYNC_REG = "TRUE" *) reg [1:0] mode_audio_meta = 2'b10;
-    (* ASYNC_REG = "TRUE" *) reg [1:0] mode_audio_sync = 2'b10;
+    (* ASYNC_REG = "TRUE" *) reg [1:0] mode_audio_meta = 2'b11;
+    (* ASYNC_REG = "TRUE" *) reg [1:0] mode_audio_sync = 2'b11;
 
     always @(posedge clk_audio_128x_44k1 or negedge rst_audio_n) begin
         if (!rst_audio_n) begin
-            mode_audio_meta <= 2'b10;
-            mode_audio_sync <= 2'b10;
+            mode_audio_meta <= 2'b11;
+            mode_audio_sync <= 2'b11;
         end
         else begin
             mode_audio_meta <= key_mode_sel;
@@ -220,12 +222,14 @@ endmodule
 //   KC[3:0]：列/行输入，板上已有 10k 上拉，按下时读到低电平。
 //
 // 按键映射：
-//   SW1  = KC0 + KR0：44.1kHz，4x
-//   SW2  = KC0 + KR1：44.1kHz，8x
-//   SW3/4= KC0 + KR2/3：44.1kHz，128x
-//   SW5  = KC1 + KR0：44.1kHz，4x
-//   SW6  = KC1 + KR1：44.1kHz，8x
-//   SW7/8= KC1 + KR2/3：44.1kHz，128x
+//   SW1 = KC0 + KR0：44.1kHz，1x 原始 PCM
+//   SW2 = KC0 + KR1：44.1kHz，4x
+//   SW3 = KC0 + KR2：44.1kHz，8x
+//   SW4 = KC0 + KR3：44.1kHz，128x
+//   SW5 = KC1 + KR0：44.1kHz，1x 原始 PCM
+//   SW6 = KC1 + KR1：44.1kHz，4x
+//   SW7 = KC1 + KR2：44.1kHz，8x
+//   SW8 = KC1 + KR3：44.1kHz，128x
 //
 // family_sel 为兼容原接口保留，当前板级顶层不再使用。
 //=============================================================
@@ -240,7 +244,7 @@ module matrix_keypad_mode_ctrl #(
     output reg  [3:0] kr_drive_low,
 
     output reg        family_sel,    // 兼容保留；当前板级顶层忽略
-    output reg  [1:0] mode_sel,      // 00=4x，01=8x，10/11=128x
+    output reg  [1:0] mode_sel,      // 00=1x，01=4x，10=8x，11=128x
     output reg        key_strobe,    // 消抖后的新按键脉冲，调试用
     output reg  [3:0] key_code       // 0=SW1, 1=SW2, ... 15=SW16
 );
@@ -317,7 +321,7 @@ module matrix_keypad_mode_ctrl #(
             stable_cnt        <= 4'd0;
 
             family_sel        <= 1'b0;
-            mode_sel          <= 2'b10;  // 上电默认 128x，DA_CLK=5.6448MHz
+            mode_sel          <= 2'b11;  // 上电默认 128x，DA_CLK=5.6448MHz
             key_strobe        <= 1'b0;
             key_code          <= 4'd0;
         end
@@ -356,7 +360,8 @@ module matrix_keypad_mode_ctrl #(
 
                                     4'd2, 4'd3: begin
                                         family_sel <= 1'b0;
-                                        mode_sel   <= 2'b10;
+                                        mode_sel   <= (first_key_code(sampled_bitmap_next) == 4'd2) ?
+                                                      2'b10 : 2'b11;
                                     end
 
                                     4'd4: begin
@@ -371,7 +376,8 @@ module matrix_keypad_mode_ctrl #(
 
                                     4'd6, 4'd7: begin
                                         family_sel <= 1'b1;
-                                        mode_sel   <= 2'b10;
+                                        mode_sel   <= (first_key_code(sampled_bitmap_next) == 4'd6) ?
+                                                      2'b10 : 2'b11;
                                     end
 
                                     default: begin
