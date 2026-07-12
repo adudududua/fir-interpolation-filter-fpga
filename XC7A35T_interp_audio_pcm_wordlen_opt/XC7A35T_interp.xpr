@@ -157,6 +157,13 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PSRCDIR/sources_1/new/all2x_v5/round_sat_q15_compact_to24.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PSRCDIR/sources_1/new/round_sat_q16_to24.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -311,6 +318,7 @@
         <Option Name="VerilogDir" Val="$PSRCDIR/sources_1/new/all2x_v2"/>
         <Option Name="VerilogDir" Val="$PSRCDIR/sources_1/new/all2x_v3"/>
         <Option Name="VerilogDir" Val="$PSRCDIR/sources_1/new/all2x_v4"/>
+        <Option Name="VerilogDir" Val="$PSRCDIR/sources_1/new/all2x_v5"/>
       </Config>
     </FileSet>
     <FileSet Name="constrs_1" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1">

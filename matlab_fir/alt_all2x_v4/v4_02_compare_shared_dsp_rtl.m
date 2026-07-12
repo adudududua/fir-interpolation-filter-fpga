@@ -5,7 +5,8 @@ clc; clear;
 % 脚本名       : v4_02_compare_shared_dsp_rtl
 % 功能简述     : V4 Stage 2/3 共享 DSP RTL 分级 bit-true 对拍。
 %                Stage 2/3 输出与 V3 BRAM 参考链比较，最终 128x
-%                输出与 MATLAB golden 比较，并自动搜索固定延迟。
+%                输出与 MATLAB golden 按预期固定延迟直接比较，
+%                不再自动搜索最佳延迟，避免掩盖漏样或相位错位。
 %
 %                输出文件：
 %                  phase4_shared_dsp_rtl_results.csv
@@ -15,7 +16,7 @@ clc; clear;
 %                  测试类型：冲激、随机 PCM
 %                  比较节点：Stage 2、Stage 3、完整 128x
 %                  通过标准：最大误差 0 LSB，mismatch 数 0
-%                  RTL 目录：%TEMP%/codex_fir_interpolation/phase4_sim
+%                  RTL 目录：%TEMP%/codex_fir_interpolation/phase5_q15_sim
 %
 % 设计作者     : kafeizizi
 % 创建日期     : 2026-07-12
@@ -23,12 +24,13 @@ clc; clear;
 % 开发工具     : MATLAB / Vivado
 % 修订记录     :
 %                2026-07-12：新增 V4 共享 DSP 分级 RTL 对拍。
+%                2026-07-12：Phase 5 固定 Stage 2/3/完整链延迟。
 %=============================================================
 
 script_dir = fileparts(mfilename('fullpath'));
 golden_dir = fullfile(fileparts(script_dir), 'alt_all2x_v2', 'golden');
 rtl_dir = fullfile(getenv('TEMP'), 'codex_fir_interpolation', ...
-                   'phase4_sim');
+                   'phase5_q15_sim');
 
 row_name = {
     'stage2_impulse';
@@ -52,6 +54,7 @@ ref_file = {
     'stage1_strict_impulse_golden_24bit.mem';
     'stage1_strict_random_golden_24bit.mem'};
 ref_is_mem = [false; false; false; false; true; true];
+expected_shift = [0; 0; 0; 0; 127; 127];
 
 n_case = numel(row_name);
 fixed_shift = zeros(n_case, 1);
@@ -68,15 +71,14 @@ for case_idx = 1:n_case
     if ref_is_mem(case_idx)
         ref_y = read_signed_hex_mem(...
             fullfile(golden_dir, ref_file{case_idx}), 24);
-        search_radius = 512;
         require_full_ref = true;
     else
         ref_y = read_csv_stream(fullfile(rtl_dir, ref_file{case_idx}));
-        search_radius = 32;
         require_full_ref = false;
     end
 
-    result = compare_one(test_y, ref_y, search_radius, require_full_ref);
+    result = compare_one(test_y, ref_y, expected_shift(case_idx), ...
+                         require_full_ref);
     fixed_shift(case_idx) = result.shift;
     test_count(case_idx) = numel(test_y);
     ref_count(case_idx) = numel(ref_y);
@@ -126,65 +128,41 @@ function data = read_csv_stream(filename)
 end
 
 
-function result = compare_one(test_y, ref_y, radius, require_full_ref)
+function result = compare_one(test_y, ref_y, expected_shift, require_full_ref)
     test_first = find(test_y ~= 0, 1, 'first');
     ref_first = find(ref_y ~= 0, 1, 'first');
     if isempty(test_first) || isempty(ref_first)
         error('测试流或参考流全零，拒绝产生伪通过结果。');
     end
 
-    shift_estimate = test_first - ref_first;
-    best_score = [inf, inf, inf, inf];
-    best = struct();
-    for shift = shift_estimate-radius : shift_estimate+radius
-        ref_start = max(1, 1-shift);
-        test_start = ref_start + shift;
-        count = min(numel(ref_y)-ref_start+1, ...
-                    numel(test_y)-test_start+1);
-        if count <= 0
-            continue;
-        end
-        if require_full_ref && count ~= numel(ref_y)
-            continue;
-        end
-        if ~require_full_ref && count < min(numel(test_y), numel(ref_y))-64
-            continue;
-        end
-
-        error_value = test_y(test_start:test_start+count-1) - ...
-                      ref_y(ref_start:ref_start+count-1);
-        mismatch_value = nnz(error_value);
-        max_value = max(abs(error_value));
-        rms_value = sqrt(mean(error_value.^2));
-        score = [mismatch_value, max_value, rms_value, -count];
-        if lexicographic_less(score, best_score)
-            best_score = score;
-            best.shift = shift;
-            best.compare_count = count;
-            best.max_abs_error = max_value;
-            best.rms_error = rms_value;
-            best.mismatch = mismatch_value;
-        end
+    observed_shift = test_first - ref_first;
+    if observed_shift ~= expected_shift
+        error('固定延迟错误：预期 %d，实际首个非零样点偏移 %d。', ...
+              expected_shift, observed_shift);
     end
 
-    if ~isfield(best, 'shift')
-        error('没有找到满足覆盖长度要求的固定延迟。');
+    ref_start = max(1, 1-expected_shift);
+    test_start = ref_start + expected_shift;
+    count = min(numel(ref_y)-ref_start+1, ...
+                numel(test_y)-test_start+1);
+    if count <= 0
+        error('固定延迟后没有可比较样点。');
     end
-    best.pass = best.max_abs_error == 0 && best.mismatch == 0;
-    result = best;
-end
-
-
-function is_less = lexicographic_less(lhs, rhs)
-    is_less = false;
-    for idx = 1:numel(lhs)
-        if lhs(idx) < rhs(idx)
-            is_less = true;
-            return;
-        elseif lhs(idx) > rhs(idx)
-            return;
-        end
+    if require_full_ref && count ~= numel(ref_y)
+        error('完整链固定延迟后没有覆盖全部参考样点。');
     end
+    if ~require_full_ref && count < min(numel(test_y), numel(ref_y))-64
+        error('分级固定延迟后的覆盖长度不足。');
+    end
+
+    error_value = test_y(test_start:test_start+count-1) - ...
+                  ref_y(ref_start:ref_start+count-1);
+    result.shift = expected_shift;
+    result.compare_count = count;
+    result.max_abs_error = max(abs(error_value));
+    result.rms_error = sqrt(mean(error_value.^2));
+    result.mismatch = nnz(error_value);
+    result.pass = result.max_abs_error == 0 && result.mismatch == 0;
 end
 
 

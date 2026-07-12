@@ -11,7 +11,7 @@
 //                25x16 signed 乘法器和 42bit 累加器。
 //
 //                Stage 2：phase0=5 MAC，phase1=4 MAC，Q15
-//                Stage 3：phase0=3 MAC，phase1=3 MAC，Q14
+//                Stage 3：phase0=3 MAC，phase1=3 MAC，等价改写为 Q15
 //
 // 当前默认配置：
 //                  输入输出位宽：24bit signed
@@ -25,6 +25,10 @@
 // 开发工具     : Vivado
 // 修订记录     :
 //                2026-07-12：新增 Stage 2/3 共享 DSP 实验模块。
+//                2026-07-12：Stage 3 系数乘 2 改为 Q15，
+//                            Stage 2/3 共用一个舍入饱和单元。
+//                2026-07-12：共享舍入器改为余数进位与高位一致性
+//                            饱和结构，消除 42bit 舍入偏置加法器。
 //=============================================================
 
 module interp2_stage23_shared_dsp_ce #(
@@ -86,8 +90,7 @@ module interp2_stage23_shared_dsp_ce #(
     wire signed [PROD_W-1:0] product_comb;
     wire signed [ACC_W-1:0] product_ext;
     wire signed [ACC_W-1:0] mac_sum_comb;
-    wire signed [DATA_W-1:0] stage2_rounded;
-    wire signed [DATA_W-1:0] stage3_rounded;
+    wire signed [DATA_W-1:0] shared_q15_rounded;
 
     wire signed [DATA_W-1:0] stage2_x_current;
     wire signed [DATA_W-1:0] stage3_x_current;
@@ -100,8 +103,15 @@ module interp2_stage23_shared_dsp_ce #(
                               {DATA_W{1'b0}};
 
     assign product_comb = pair_sum_comb * coeff_comb;
-    assign product_ext = {{(ACC_W-PROD_W){product_comb[PROD_W-1]}},
-                          product_comb};
+    generate
+        if (ACC_W >= PROD_W) begin : gen_product_sign_extend
+            assign product_ext =
+                {{(ACC_W-PROD_W){product_comb[PROD_W-1]}}, product_comb};
+        end
+        else begin : gen_product_narrow
+            assign product_ext = product_comb[ACC_W-1:0];
+        end
+    endgenerate
     assign mac_sum_comb = (job_mac_index == 4'd0) ? product_ext :
                           (acc_reg + product_ext);
 
@@ -111,22 +121,12 @@ module interp2_stage23_shared_dsp_ce #(
     assign scheduler_stage_dbg = job_stage;
     assign scheduler_mac_index_dbg = job_mac_index;
 
-    round_sat_q16_to24 #(
+    round_sat_q15_compact_to24 #(
         .IN_W   (ACC_W),
-        .OUT_W  (DATA_W),
-        .FRAC_W (15)
-    ) u_round_stage2 (
+        .OUT_W  (DATA_W)
+    ) u_round_shared_q15_compact (
         .din_full (mac_sum_comb),
-        .dout_24  (stage2_rounded)
-    );
-
-    round_sat_q16_to24 #(
-        .IN_W   (ACC_W),
-        .OUT_W  (DATA_W),
-        .FRAC_W (14)
-    ) u_round_stage3 (
-        .din_full (mac_sum_comb),
-        .dout_24  (stage3_rounded)
+        .dout_24  (shared_q15_rounded)
     );
 
     always @(*) begin
@@ -230,7 +230,7 @@ module interp2_stage23_shared_dsp_ce #(
                                      stage3_hist[0]}) +
                             $signed({stage3_hist[5][DATA_W-1],
                                      stage3_hist[5]});
-                        coeff_comb = `V2_S3_P0_C0;
+                        coeff_comb = 16'sd404;
                     end
                     4'd1: begin
                         pair_sum_comb =
@@ -238,7 +238,7 @@ module interp2_stage23_shared_dsp_ce #(
                                      stage3_hist[1]}) +
                             $signed({stage3_hist[4][DATA_W-1],
                                      stage3_hist[4]});
-                        coeff_comb = `V2_S3_P0_C1;
+                        coeff_comb = -16'sd3272;
                     end
                     4'd2: begin
                         pair_sum_comb =
@@ -246,7 +246,7 @@ module interp2_stage23_shared_dsp_ce #(
                                      stage3_hist[2]}) +
                             $signed({stage3_hist[3][DATA_W-1],
                                      stage3_hist[3]});
-                        coeff_comb = `V2_S3_P0_C2;
+                        coeff_comb = 16'sd19250;
                     end
                     default: begin
                         pair_sum_comb = {PAIR_W{1'b0}};
@@ -262,7 +262,7 @@ module interp2_stage23_shared_dsp_ce #(
                                      stage3_hist[0]}) +
                             $signed({stage3_hist[4][DATA_W-1],
                                      stage3_hist[4]});
-                        coeff_comb = `V2_S3_P1_C0;
+                        coeff_comb = -16'sd148;
                     end
                     4'd1: begin
                         pair_sum_comb =
@@ -270,13 +270,13 @@ module interp2_stage23_shared_dsp_ce #(
                                      stage3_hist[1]}) +
                             $signed({stage3_hist[3][DATA_W-1],
                                      stage3_hist[3]});
-                        coeff_comb = `V2_S3_P1_C1;
+                        coeff_comb = 16'sd522;
                     end
                     4'd2: begin
                         pair_sum_comb =
                             $signed({stage3_hist[2][DATA_W-1],
                                      stage3_hist[2]});
-                        coeff_comb = `V2_S3_P1_C2;
+                        coeff_comb = 16'sd32016;
                     end
                     default: begin
                         pair_sum_comb = {PAIR_W{1'b0}};
@@ -351,11 +351,11 @@ module interp2_stage23_shared_dsp_ce #(
             if (job_active) begin
                 if (job_mac_index == job_mac_count - 4'd1) begin
                     if (job_stage == 2'd2) begin
-                        stage2_y_out <= stage2_rounded;
+                        stage2_y_out <= shared_q15_rounded;
                         stage2_y_out_valid <= 1'b1;
                     end
                     else begin
-                        stage3_y_out <= stage3_rounded;
+                        stage3_y_out <= shared_q15_rounded;
                         stage3_y_out_valid <= 1'b1;
                     end
 
@@ -394,6 +394,11 @@ module interp2_stage23_shared_dsp_ce #(
 `ifndef SYNTHESIS
     always @(posedge clk) begin
         if (rst_n) begin
+            if (ACC_W < PROD_W &&
+                product_comb[PROD_W-1:ACC_W] !=
+                {(PROD_W-ACC_W){product_comb[ACC_W-1]}})
+                $fatal(1, "Stage 2/3 product exceeds ACC_W=%0d", ACC_W);
+
             if (stage2_ce_out && stage2_pending)
                 $fatal(1, "Stage 2 shared DSP pending overwrite");
             if (stage3_ce_out && stage3_pending)

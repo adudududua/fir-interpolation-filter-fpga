@@ -24,7 +24,8 @@
 //=============================================================
 
 module interp128_all2x_v4_shared_dsp_top_ce #(
-    parameter integer DATA_W = 24
+    parameter integer DATA_W = 24,
+    parameter integer STAGE23_ACC_W = 40
 )(
     input  wire                         clk,
     input  wire                         rst_n,
@@ -128,7 +129,7 @@ module interp128_all2x_v4_shared_dsp_top_ce #(
     interp2_stage23_shared_dsp_ce #(
         .DATA_W  (DATA_W),
         .COEFF_W (16),
-        .ACC_W   (42)
+        .ACC_W   (STAGE23_ACC_W)
     ) u_interp2_stage23_shared_dsp_ce (
         .clk                     (clk),
         .rst_n                   (rst_n),

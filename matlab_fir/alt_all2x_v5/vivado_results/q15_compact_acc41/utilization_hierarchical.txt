@@ -1,0 +1,50 @@
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date         : Sun Jul 12 21:22:29 2026
+| Host         : LAPTOP-476JT8H0 running 64-bit major release  (build 9200)
+| Command      : report_utilization -hierarchical -file D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/alt_all2x_v5/vivado_results/q15_compact_acc41/utilization_hierarchical.txt
+| Design       : interp128_all2x_v4_shared_dsp_top_ce
+| Device       : 7a35tfgg484-2
+| Design State : Synthesized
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++---------------------------------------------------+-----------------------------------------------+------------+------------+---------+------+------+--------+--------+--------------+
+|                      Instance                     |                     Module                    | Total LUTs | Logic LUTs | LUTRAMs | SRLs |  FFs | RAMB36 | RAMB18 | DSP48 Blocks |
++---------------------------------------------------+-----------------------------------------------+------------+------------+---------+------+------+--------+--------+--------------+
+| interp128_all2x_v4_shared_dsp_top_ce              |                                         (top) |       1393 |       1393 |       0 |    0 | 1018 |      0 |      2 |            2 |
+|   (interp128_all2x_v4_shared_dsp_top_ce)          |                                         (top) |        292 |        292 |       0 |    0 |    0 |      0 |      0 |            0 |
+|   u_bridge_16_to_32                               |               bridge_valid_only_to_interp2_ce |         14 |         14 |       0 |    0 |    2 |      0 |      0 |            0 |
+|   u_bridge_2_to_4                                 |             bridge_valid_only_to_interp2_ce_0 |         14 |         14 |       0 |    0 |    2 |      0 |      0 |            0 |
+|   u_bridge_32_to_64                               |             bridge_valid_only_to_interp2_ce_1 |         14 |         14 |       0 |    0 |    2 |      0 |      0 |            0 |
+|   u_bridge_4_to_8                                 |             bridge_valid_only_to_interp2_ce_2 |         14 |         14 |       0 |    0 |    2 |      0 |      0 |            0 |
+|   u_bridge_64_to_128                              |             bridge_valid_only_to_interp2_ce_3 |         14 |         14 |       0 |    0 |    2 |      0 |      0 |            0 |
+|   u_bridge_8_to_16                                |             bridge_valid_only_to_interp2_ce_4 |         14 |         14 |       0 |    0 |    2 |      0 |      0 |            0 |
+|   u_interp2_all2x_stage4                          |                 interp2_all2x_v2_stage_select |         82 |         82 |       0 |    0 |   98 |      0 |      0 |            0 |
+|     (u_interp2_all2x_stage4)                      |                 interp2_all2x_v2_stage_select |          1 |          1 |       0 |    0 |    0 |      0 |      0 |            0 |
+|     gen_canonical.u_interp2_halfband7_shiftadd_ce |               interp2_halfband7_shiftadd_ce_7 |         81 |         81 |       0 |    0 |   98 |      0 |      0 |            0 |
+|   u_interp2_all2x_stage5                          | interp2_all2x_v2_stage_select__parameterized0 |         81 |         81 |       0 |    0 |   98 |      0 |      0 |            0 |
+|     gen_canonical.u_interp2_halfband7_shiftadd_ce |               interp2_halfband7_shiftadd_ce_6 |         81 |         81 |       0 |    0 |   98 |      0 |      0 |            0 |
+|   u_interp2_all2x_stage6                          | interp2_all2x_v2_stage_select__parameterized1 |         81 |         81 |       0 |    0 |   98 |      0 |      0 |            0 |
+|     gen_canonical.u_interp2_halfband7_shiftadd_ce |               interp2_halfband7_shiftadd_ce_5 |         81 |         81 |       0 |    0 |   98 |      0 |      0 |            0 |
+|   u_interp2_all2x_stage7                          | interp2_all2x_v2_stage_select__parameterized2 |         57 |         57 |       0 |    0 |   98 |      0 |      0 |            0 |
+|     (u_interp2_all2x_stage7)                      | interp2_all2x_v2_stage_select__parameterized2 |          1 |          1 |       0 |    0 |    0 |      0 |      0 |            0 |
+|     gen_canonical.u_interp2_halfband7_shiftadd_ce |                 interp2_halfband7_shiftadd_ce |         56 |         56 |       0 |    0 |   98 |      0 |      0 |            0 |
+|   u_interp2_stage1_strict_halfband_bram_ce        |        interp2_stage1_strict_halfband_bram_ce |        264 |        264 |       0 |    0 |  143 |      0 |      2 |            1 |
+|     (u_interp2_stage1_strict_halfband_bram_ce)    |        interp2_stage1_strict_halfband_bram_ce |        158 |        158 |       0 |    0 |  143 |      0 |      2 |            1 |
+|     u_round_sat_q15_to_data                       |                            round_sat_q16_to24 |        106 |        106 |       0 |    0 |    0 |      0 |      0 |            0 |
+|   u_interp2_stage23_shared_dsp_ce                 |                 interp2_stage23_shared_dsp_ce |        452 |        452 |       0 |    0 |  471 |      0 |      0 |            1 |
+|     (u_interp2_stage23_shared_dsp_ce)             |                 interp2_stage23_shared_dsp_ce |        424 |        424 |       0 |    0 |  471 |      0 |      0 |            1 |
+|     u_round_shared_q15_compact                    |                    round_sat_q15_compact_to24 |         28 |         28 |       0 |    0 |    0 |      0 |      0 |            0 |
++---------------------------------------------------+-----------------------------------------------+------------+------------+---------+------+------+--------+--------+--------------+
+
+

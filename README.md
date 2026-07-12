@@ -1,6 +1,6 @@
 # 高阶数字插值滤波器设计与 FPGA 验证
 
-> 当前实现版本：44.1 kHz 专用、7 级全 2x、128 倍插值、V4 Stage 2/3 共享 DSP 结构<br>
+> 当前实现版本：44.1 kHz 专用、7 级全 2x、Phase 5 Q15 紧凑舍入 ACC40<br>
 > FPGA：Xilinx Artix-7 `XC7A35T-FGG484-2`<br>
 > 工具：MATLAB R2023a、Vivado 2018.3<br>
 > V3 实板回退提交：`6132cbb`<br>
@@ -8,7 +8,7 @@
 
 本项目面向“高阶数字插值滤波器设计与验证”赛题，完成了从 MATLAB 数学建模、等波纹 FIR 设计、定点量化、bit-true 验证、RTL 编码、功能仿真、综合实现到 FPGA 板级测试的完整闭环。
 
-当前 V4 版本输入为 **44.1 kHz、24 bit signed PCM**，经过 7 级 2 倍 FIR 插值后得到 **5.6448 MHz** 的 128 倍输出，同时保留 4 倍与 8 倍中间节点，并新增未经插值链的 1 倍旁路档位，经 AD9708 8 bit 并行 DAC 输出到示波器。V4 保持全部 FIR 系数、定点格式和输出序列不变，仅将 Stage 2/3 的 LUT 常系数乘法网络改造成单个共享 DSP48E1 时分复用数据通路。
+当前版本输入为 **44.1 kHz、24 bit signed PCM**，经过 7 级 2 倍 FIR 插值后得到 **5.6448 MHz** 的 128 倍输出，同时提供 1 倍旁路、4 倍与 8 倍中间节点，经 AD9708 8 bit 并行 DAC 输出到示波器。Phase 5 保持 FIR 频响和有效输出序列不变，将 Stage 3 精确改写为 Q15，使 Stage 2/3 共用紧凑舍入饱和单元，并把共享累加器从 42 bit 优化为 40 bit。
 
 ## 1. 当前结论
 
@@ -27,27 +27,23 @@
 | 相位 | 严格线性相位 | 群延迟波动约 `7e-12` sample | 通过 |
 | MATLAB 与 RTL | 功能一致 | Stage2、Stage3 与完整链冲激/随机 PCM 均为 0 LSB | 通过 |
 
-### 1.2 V4 共享 DSP 三档版板级实现结果
+### 1.2 当前板级实现结果
 
 | 项目 | 实现后结果 | XC7A35T 可用量 | 利用率 |
 |---|---:|---:|---:|
-| Slice LUTs | **2122** | 20800 | 10.20% |
-| Slice Registers | **1198** | 41600 | 2.88% |
+| Slice LUTs | **1536** | 20800 | 7.38% |
+| Slice Registers | **1181** | 41600 | 2.84% |
 | DSP48E1 | **2** | 90 | 2.22% |
 | Block RAM Tile | **1**，对应 2 个 RAMB18E1 | 50 | 2.00% |
 | IOB | 19 | 250 | 7.60% |
 | MMCM | 1 | 5 | 20.00% |
-| WNS / TNS | `+44.960 ns / 0 ns` | - | 时序通过 |
-| WHS / THS | `+0.121 ns / 0 ns` | - | 时序通过 |
-| 估算片上功耗 | 0.168 W | - | Low confidence |
+| WNS / TNS | `+44.892 ns / 0 ns` | - | 时序通过 |
 
 ![V4 板级实现资源利用率](matlab_fir/alt_all2x_v4/figures/v4_board_impl_utilization.png)
 
-V4 相比已实板验证的 V3 板级版本，LUT 从 3676 降至 2122，减少 **1554 LUT（约 42.27%）**；FF 从 1106 增至 1198，增加 92 个；DSP 从 1 增至 2；BRAM Tile 仍为 1。资源交换符合 Phase 4 的设计目标，并满足板级 Go 条件 `LUT < 3300、FF <= 1300、DSP = 2、BRAM Tile <= 1、WNS/WHS > 0`。
+当前四档 V4 板测基线为 `1817 LUT / 1182 FF / 2 DSP / 1 BRAM Tile`。Phase 5 完整重跑综合、实现和 bitstream 后降至 1536 LUT，减少 **281 LUT（约 15.5%）**；FF 减少 1，DSP 和 BRAM 不变。Phase 5 bitstream 已生成，等待四档实板复测。
 
-以上数据对应已经实板通过的三档 V4 版本。当前 15 kHz ROM 与 1x 旁路修改完成后必须重新实现，新的四档版资源以下一次 Vivado 报告为准。
-
-### 1.3 V4 三档实测与四档扩展状态
+### 1.3 四档实测与 Phase 5 状态
 
 | 模式 | 理论 DA_CLK | 实测 DA_CLK | 相对误差 | DA 波形 |
 |---|---:|---:|---:|---|
@@ -55,7 +51,7 @@ V4 相比已实板验证的 V3 板级版本，LUT 从 3676 降至 2122，减少 
 | 8x | 352.8 kHz | 352.86 kHz | 约 +0.017% | 正常 |
 | 128x | 5.6448 MHz | 5.64 MHz | 约 -0.085% | 正常 |
 
-上述三档频率和 DA 波形已经在 V4 共享 DSP bitstream 上完成实板验证。此后新增的 15 kHz 测试 ROM 与 1x 旁路属于新一轮板级修改，需要重新综合、实现、Generate Bitstream，并按四档重新测量；`6132cbb` 仍作为可靠回退基线。
+包含 1x 的四档 V4 基线已经完成板测并提交为 `e9882fc`。Phase 5 经过固定延迟 0 LSB、多种子满幅、四档功能仿真和完整实现验证，尚需下载新 bitstream 完成最后的四档实板确认；`e9882fc` 和 `6132cbb` 均可作为回退点。
 
 ---
 
@@ -496,6 +492,7 @@ V4 还对 Stage 2/3 中间节点进行了独立分级回归：
 | Phase 3 FF | Stage1 strict-HB + FF 历史 | 3537 | 2105 | 1 | 0 | +159.856 | 是 |
 | **Phase 3 BRAM** | **Stage1 strict-HB + BRAM 历史** | **3222** | **925** | **1** | **1** | **+159.809** | **是** |
 | **Phase 4 V4** | **Stage2/3 共享 DSP + Stage1 BRAM** | **1648** | **1016** | **2** | **1** | **+161.944** | **是** |
+| **Phase 5 ACC40** | **Q15 紧凑舍入 + ACC40** | **1379** | **1015** | **2** | **1** | **+165.332** | **是** |
 
 Phase 3 BRAM 相对全 2x 稳定基线：
 
@@ -527,7 +524,9 @@ WNS：+159.809 ns -> +161.944 ns
 | 全 2x 初始稳定板级 | 6426 | 4416 | 1 | 0 | 首个可板级展示的全 2x 版本 |
 | V2 Phase 2 板级 | 4428 | 3279 | 1 | 0 | canonical + Stage2/3 polyphase |
 | V3 BRAM 板级 | 3676 | 1106 | 1 | 1 | 已完成实板三档验证的回退基线 |
-| **V4 共享 DSP 板级** | **2122** | **1198** | **2** | **1** | **当前实现通过版本，待 bitstream 实板复测** |
+| V4 共享 DSP 三档板级 | 2122 | 1198 | 2 | 1 | 已实板验证的三档版本 |
+| V4 四档板测基线 | 1817 | 1182 | 2 | 1 | 1x/4x/8x/128x 均正常，提交 `e9882fc` |
+| **Phase 5 ACC40 四档板级** | **1536** | **1181** | **2** | **1** | **实现与 bitstream 通过，待实板复测** |
 
 V3 相对全 2x 初始稳定板级：
 
@@ -562,6 +561,15 @@ BRAM Tile：0 -> 1
 ```
 
 这说明 V3 通过 BRAM 消除了 Stage 1 大量历史寄存器，V4 再用第 2 个 DSP 替换 Stage 2/3 的 LUT 乘法网络。两次优化针对不同资源瓶颈，可以叠加而不会改变 FIR 数学响应。
+
+Phase 5 相对 V4 四档板测基线：
+
+```text
+LUT：1817 -> 1536，减少 281，下降约 15.5%
+FF ：1182 -> 1181，减少   1
+DSP：2 -> 2
+BRAM Tile：1 -> 1
+```
 
 ---
 
@@ -764,7 +772,7 @@ run('generate_demo_sine_15k_44k1.m');
 XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.xpr
 ```
 
-当前 `XC7A35T_interp.xpr` 已正式登记 V4 RTL、`all2x_v4` include 目录和 15 kHz `.mem` 文件，不需要再次手动 Add Sources。15 kHz ROM 与 1x 旁路是在上一次 `2122 LUT / 1198 FF` 实现后新增的修改，因此该资源结果不能直接作为四档版本最终结果。关闭并重新打开 Vivado 工程后，应 Reset `synth_1` 与 `impl_1`，再依次执行：
+当前 `XC7A35T_interp.xpr` 已正式登记 V4 RTL、Phase 5 紧凑舍入 RTL、`all2x_v2`～`all2x_v5` include 目录和 15 kHz `.mem` 文件，不需要再次手动 Add Sources。Phase 5 构建脚本已经 Reset 并重跑 `synth_1`、`impl_1` 与 bitstream；后续手动复现时可依次执行：
 
 ```text
 Run Synthesis
@@ -801,6 +809,12 @@ tag    : LUT3676_DSP1_FF1106_board_successful
 codex/all2x-phase4-dsp-sharing
 ```
 
+当前 Phase 5 优化分支：
+
+```text
+codex/phase5-q15-single-rounder
+```
+
 Phase 4 已增加第 2 个 DSP，由 Stage 2/3 共享，并完成以下 Stop/Go 闭环：
 
 1. FIR 系数和 MATLAB 指标不变。
@@ -810,4 +824,4 @@ Phase 4 已增加第 2 个 DSP，由 Stage 2/3 共享，并完成以下 Stop/Go 
 5. 板级实现达到 2122 LUT / 1198 FF / 2 DSP / 1 BRAM Tile。
 6. post-route WNS +44.960 ns、WHS +0.121 ns，时序全部通过。
 
-V4 共享 DSP 三档版本已完成 bitstream 和实板回归。当前工作区又增加了 15 kHz 单正弦 ROM 与 1x 原始 PCM 旁路，两项 XSim 四档测试均已通过，但这次增量修改仍需重新完成综合、实现、Generate Bitstream 和四档实板回归；若板测异常，可立即回退到 `6132cbb` 或上一版 V4 三档 bitstream。
+V4 四档版本已完成 bitstream 和实板回归。Phase 5 在此基础上完成 Q15 单舍入、紧凑饱和和 ACC40，独立链为 1379 LUT，四档板级为 1536 LUT；固定延迟、多种子、四档功能、综合、实现和 bitstream 均已通过，目前只剩新 bitstream 的四档实板复测。详细过程见 `matlab_fir/all2x_phase5_execution_report.md`。
