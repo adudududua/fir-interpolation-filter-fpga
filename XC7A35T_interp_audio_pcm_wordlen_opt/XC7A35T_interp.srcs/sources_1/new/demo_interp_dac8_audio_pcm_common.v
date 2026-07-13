@@ -5,7 +5,7 @@
 // 功能简述     : 音频 PCM 输入版 FIR 插值 DAC 演示公共模块。
 //                本模块使用 audio_pcm_rom_source 读取 24bit
 //                signed 音频 PCM 采样点，并送入 44.1kHz 专用
-//                全 2x 七级 128x 插值滤波器链路。
+//                Phase 6 混合字长全 2x 七级 128x 插值滤波器链路。
 //                
 //                当前输入为 147 点、15kHz、24bit 单正弦 ROM，
 //                专门用于示波器比较四档阶梯粗糙度。
@@ -28,6 +28,8 @@
 //                            BRAM 循环缓冲结构，其余级保持 V2 优化结构。
 //                2026-07-12：测试输入改为 15kHz 单正弦，并增加
 //                            未经过插值链的 1x DAC 旁路档位。
+//                2026-07-13：板级链路切换为 Phase 6 混合数据字长
+//                            24/22/20/18/18/18/18bit 结构。
 //=============================================================
 
 module demo_interp_dac8_audio_pcm_common (
@@ -168,7 +170,8 @@ module demo_interp_dac8_audio_pcm_common (
     //
     // 插值链内部结构：
     //   2x × 2x × 2x × 2x × 2x × 2x × 2x = 128x
-    //   Stage 1 使用 BRAM 单 DSP，Stage 2/3 共用第 2 个 DSP。
+    //   Stage 1 使用 BRAM 单 DSP，Stage 2/3 共用第 2 个 DSP；
+    //   级间数据采用 24/22/20/18/18/18/18bit Q 格式。
     //
     // 输出节点：
     //   dbg_y4 ：4x 输出
@@ -190,9 +193,9 @@ module demo_interp_dac8_audio_pcm_common (
     wire signed [23:0] dbg_y64_w;
     wire               dbg_y64_valid_w;
 
-    interp128_all2x_v4_shared_dsp_top_ce #(
-        .DATA_W (24)
-    ) u_interp128_all2x_v4_shared_dsp_top_ce (
+    interp128_all2x_v6_mixed_width_top_ce #(
+        .STAGE23_ACC_W (38)
+    ) u_interp128_all2x_v6_mixed_width_top_ce (
         .clk            (clk_audio_128x),
         .rst_n          (rst_n),
 

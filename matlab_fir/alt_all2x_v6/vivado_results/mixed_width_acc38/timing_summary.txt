@@ -1,0 +1,1265 @@
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date         : Mon Jul 13 16:51:06 2026
+| Host         : LAPTOP-476JT8H0 running 64-bit major release  (build 9200)
+| Command      : report_timing_summary -delay_type max -max_paths 10 -file D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/alt_all2x_v6/vivado_results/mixed_width_acc38/timing_summary.txt
+| Design       : interp128_all2x_v6_mixed_width_top_ce
+| Device       : 7a35t-fgg484
+| Speed File   : -2  PRODUCTION 1.23 2018-06-13
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Timing Summary Report
+
+------------------------------------------------------------------------------------------------
+| Timer Settings
+| --------------
+------------------------------------------------------------------------------------------------
+
+  Enable Multi Corner Analysis               :  Yes
+  Enable Pessimism Removal                   :  Yes
+  Pessimism Removal Resolution               :  Nearest Common Node
+  Enable Input Delay Default Clock           :  No
+  Enable Preset / Clear Arcs                 :  No
+  Disable Flight Delays                      :  No
+  Ignore I/O Paths                           :  No
+  Timing Early Launch at Borrowing Latches   :  false
+
+  Corner  Analyze    Analyze    
+  Name    Max Paths  Min Paths  
+  ------  ---------  ---------  
+  Slow    Yes        Yes        
+  Fast    Yes        Yes        
+
+
+
+check_timing report
+
+Table of Contents
+-----------------
+1. checking no_clock
+2. checking constant_clock
+3. checking pulse_width_clock
+4. checking unconstrained_internal_endpoints
+5. checking no_input_delay
+6. checking no_output_delay
+7. checking multiple_clock
+8. checking generated_clocks
+9. checking loops
+10. checking partial_input_delay
+11. checking partial_output_delay
+12. checking latch_loops
+
+1. checking no_clock
+--------------------
+ There are 0 register/latch pins with no clock.
+
+
+2. checking constant_clock
+--------------------------
+ There are 0 register/latch pins with constant_clock.
+
+
+3. checking pulse_width_clock
+-----------------------------
+ There are 0 register/latch pins which need pulse_width check
+
+
+4. checking unconstrained_internal_endpoints
+--------------------------------------------
+ There are 0 pins that are not constrained for maximum delay.
+
+ There are 0 pins that are not constrained for maximum delay due to constant clock.
+
+
+5. checking no_input_delay
+--------------------------
+ There are 33 input ports with no input delay specified. (HIGH)
+
+ There are 0 input ports with no input delay but user has a false path constraint.
+
+
+6. checking no_output_delay
+---------------------------
+ There are 145 ports with no output delay specified. (HIGH)
+
+ There are 0 ports with no output delay but user has a false path constraint
+
+ There are 0 ports with no output delay but with a timing clock defined on it or propagating through it
+
+
+7. checking multiple_clock
+--------------------------
+ There are 0 register/latch pins with multiple clocks.
+
+
+8. checking generated_clocks
+----------------------------
+ There are 0 generated clocks that are not connected to a clock source.
+
+
+9. checking loops
+-----------------
+ There are 0 combinational loops in the design.
+
+
+10. checking partial_input_delay
+--------------------------------
+ There are 0 input ports with partial input delay specified.
+
+
+11. checking partial_output_delay
+---------------------------------
+ There are 0 ports with partial output delay specified.
+
+
+12. checking latch_loops
+------------------------
+ There are 0 combinational latch loops in the design through latch input
+
+
+
+------------------------------------------------------------------------------------------------
+| Design Timing Summary
+| ---------------------
+------------------------------------------------------------------------------------------------
+
+    WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
+    -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
+    165.427        0.000                      0                 1731       88.077        0.000                       0                   872  
+
+
+All user specified timing constraints are met.
+
+
+------------------------------------------------------------------------------------------------
+| Clock Summary
+| -------------
+------------------------------------------------------------------------------------------------
+
+Clock             Waveform(ns)         Period(ns)      Frequency(MHz)
+-----             ------------         ----------      --------------
+clk_audio_5m6448  {0.000 88.577}       177.154         5.645           
+
+
+------------------------------------------------------------------------------------------------
+| Intra Clock Table
+| -----------------
+------------------------------------------------------------------------------------------------
+
+Clock                 WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
+-----                 -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
+clk_audio_5m6448      165.427        0.000                      0                 1731       88.077        0.000                       0                   872  
+
+
+------------------------------------------------------------------------------------------------
+| Inter Clock Table
+| -----------------
+------------------------------------------------------------------------------------------------
+
+From Clock    To Clock          WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints  
+----------    --------          -------      -------  ---------------------  -------------------  
+
+
+------------------------------------------------------------------------------------------------
+| Other Path Groups Table
+| -----------------------
+------------------------------------------------------------------------------------------------
+
+Path Group    From Clock    To Clock          WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints  
+----------    ----------    --------          -------      -------  ---------------------  -------------------  
+
+
+------------------------------------------------------------------------------------------------
+| Timing Details
+| --------------
+------------------------------------------------------------------------------------------------
+
+
+---------------------------------------------------------------------------------------------------
+From Clock:  clk_audio_5m6448
+  To Clock:  clk_audio_5m6448
+
+Setup :            0  Failing Endpoints,  Worst Slack      165.427ns,  Total Violation        0.000ns
+Hold  :           NA  Failing Endpoints,  Worst Slack           NA  ,  Total Violation           NA
+PW    :            0  Failing Endpoints,  Worst Slack       88.077ns,  Total Violation        0.000ns
+---------------------------------------------------------------------------------------------------
+
+
+Max Delay Paths
+--------------------------------------------------------------------------------------
+Slack (MET) :             165.427ns  (required time - arrival time)
+  Source:                 u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/C
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Destination:            u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[18]/D
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Path Group:             clk_audio_5m6448
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            177.154ns  (clk_audio_5m6448 rise@177.154ns - clk_audio_5m6448 rise@0.000ns)
+  Data Path Delay:        11.576ns  (logic 6.616ns (57.152%)  route 4.960ns (42.848%))
+  Logic Levels:           18  (CARRY4=11 DSP48E1=1 LUT4=1 LUT6=5)
+  Clock Path Skew:        -0.145ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.893ns = ( 179.047 - 177.154 ) 
+    Source Clock Delay      (SCD):    2.205ns
+    Clock Pessimism Removal (CPR):    0.167ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_5m6448 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+                         IBUF (Prop_ibuf_I_O)         0.894     0.894 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.646     1.540    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.081     1.621 r  clk_IBUF_BUFG_inst/O
+                         net (fo=872, unplaced)       0.584     2.205    u_interp2_stage23_shared_dsp_ce/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/C
+  -------------------------------------------------------------------    -------------------
+                         FDCE (Prop_fdce_C_Q)         0.379     2.584 r  u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/Q
+                         net (fo=3, unplaced)         0.797     3.381    u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5]_11[1]
+                         LUT6 (Prop_lut6_I0_O)        0.232     3.613 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_353/O
+                         net (fo=2, unplaced)         0.548     4.161    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_353_n_0
+                         CARRY4 (Prop_carry4_DI[1]_CO[3])
+                                                      0.418     4.579 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_223/CO[3]
+                         net (fo=1, unplaced)         0.008     4.587    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_223_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.685 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_212/CO[3]
+                         net (fo=1, unplaced)         0.000     4.685    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_212_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.783 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_201/CO[3]
+                         net (fo=1, unplaced)         0.000     4.783    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_201_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.881 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_190/CO[3]
+                         net (fo=1, unplaced)         0.000     4.881    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_190_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.979 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_173/CO[3]
+                         net (fo=1, unplaced)         0.000     4.979    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_173_n_0
+                         CARRY4 (Prop_carry4_CI_O[2])
+                                                      0.214     5.193 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_144/O[2]
+                         net (fo=1, unplaced)         0.584     5.777    u_interp2_stage23_shared_dsp_ce/p_6_in[22]
+                         LUT6 (Prop_lut6_I1_O)        0.244     6.021 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_87/O
+                         net (fo=1, unplaced)         0.347     6.368    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_87_n_0
+                         LUT6 (Prop_lut6_I3_O)        0.105     6.473 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_17/O
+                         net (fo=8, unplaced)         0.646     7.118    u_interp2_stage23_shared_dsp_ce/A[22]
+                         DSP48E1 (Prop_dsp48e1_A[29]_P[1])
+                                                      3.230    10.348 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0/P[1]
+                         net (fo=2, unplaced)         0.646    10.994    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_n_104
+                         LUT6 (Prop_lut6_I5_O)        0.105    11.099 r  u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_2/O
+                         net (fo=1, unplaced)         0.582    11.681    u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_2_n_0
+                         LUT4 (Prop_lut4_I1_O)        0.105    11.786 r  u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_1/O
+                         net (fo=1, unplaced)         0.000    11.786    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/S[0]
+                         CARRY4 (Prop_carry4_S[0]_CO[3])
+                                                      0.440    12.226 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry/CO[3]
+                         net (fo=1, unplaced)         0.008    12.234    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.332 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__0/CO[3]
+                         net (fo=1, unplaced)         0.000    12.332    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__0_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.430 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__1/CO[3]
+                         net (fo=1, unplaced)         0.000    12.430    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__1_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.528 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__2/CO[3]
+                         net (fo=1, unplaced)         0.000    12.528    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__2_n_0
+                         CARRY4 (Prop_carry4_CI_O[2])
+                                                      0.214    12.742 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__3/O[2]
+                         net (fo=2, unplaced)         0.795    13.537    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact_n_17
+                         LUT6 (Prop_lut6_I0_O)        0.244    13.781 r  u_interp2_stage23_shared_dsp_ce/stage3_y_out[18]_i_1/O
+                         net (fo=1, unplaced)         0.000    13.781    u_interp2_stage23_shared_dsp_ce/stage3_q15_rounded[18]
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[18]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_5m6448 rise edge)
+                                                    177.154   177.154 r  
+                                                      0.000   177.154 r  clk (IN)
+                         net (fo=0)                   0.000   177.154    clk
+                         IBUF (Prop_ibuf_I_O)         0.763   177.917 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.613   178.531    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.077   178.608 r  clk_IBUF_BUFG_inst/O
+                         net (fo=872, unplaced)       0.439   179.047    u_interp2_stage23_shared_dsp_ce/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[18]/C
+                         clock pessimism              0.167   179.214    
+                         clock uncertainty           -0.035   179.178    
+                         FDCE (Setup_fdce_C_D)        0.029   179.207    u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[18]
+  -------------------------------------------------------------------
+                         required time                        179.207    
+                         arrival time                         -13.781    
+  -------------------------------------------------------------------
+                         slack                                165.427    
+
+Slack (MET) :             165.434ns  (required time - arrival time)
+  Source:                 u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/C
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Destination:            u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[0]/D
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Path Group:             clk_audio_5m6448
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            177.154ns  (clk_audio_5m6448 rise@177.154ns - clk_audio_5m6448 rise@0.000ns)
+  Data Path Delay:        11.569ns  (logic 6.683ns (57.766%)  route 4.886ns (42.234%))
+  Logic Levels:           18  (CARRY4=11 DSP48E1=1 LUT4=1 LUT6=5)
+  Clock Path Skew:        -0.145ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.893ns = ( 179.047 - 177.154 ) 
+    Source Clock Delay      (SCD):    2.205ns
+    Clock Pessimism Removal (CPR):    0.167ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_5m6448 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+                         IBUF (Prop_ibuf_I_O)         0.894     0.894 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.646     1.540    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.081     1.621 r  clk_IBUF_BUFG_inst/O
+                         net (fo=872, unplaced)       0.584     2.205    u_interp2_stage23_shared_dsp_ce/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/C
+  -------------------------------------------------------------------    -------------------
+                         FDCE (Prop_fdce_C_Q)         0.379     2.584 r  u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/Q
+                         net (fo=3, unplaced)         0.797     3.381    u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5]_11[1]
+                         LUT6 (Prop_lut6_I0_O)        0.232     3.613 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_353/O
+                         net (fo=2, unplaced)         0.548     4.161    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_353_n_0
+                         CARRY4 (Prop_carry4_DI[1]_CO[3])
+                                                      0.418     4.579 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_223/CO[3]
+                         net (fo=1, unplaced)         0.008     4.587    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_223_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.685 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_212/CO[3]
+                         net (fo=1, unplaced)         0.000     4.685    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_212_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.783 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_201/CO[3]
+                         net (fo=1, unplaced)         0.000     4.783    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_201_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.881 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_190/CO[3]
+                         net (fo=1, unplaced)         0.000     4.881    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_190_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.979 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_173/CO[3]
+                         net (fo=1, unplaced)         0.000     4.979    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_173_n_0
+                         CARRY4 (Prop_carry4_CI_O[2])
+                                                      0.214     5.193 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_144/O[2]
+                         net (fo=1, unplaced)         0.584     5.777    u_interp2_stage23_shared_dsp_ce/p_6_in[22]
+                         LUT6 (Prop_lut6_I1_O)        0.244     6.021 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_87/O
+                         net (fo=1, unplaced)         0.347     6.368    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_87_n_0
+                         LUT6 (Prop_lut6_I3_O)        0.105     6.473 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_17/O
+                         net (fo=8, unplaced)         0.646     7.118    u_interp2_stage23_shared_dsp_ce/A[22]
+                         DSP48E1 (Prop_dsp48e1_A[29]_P[1])
+                                                      3.230    10.348 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0/P[1]
+                         net (fo=2, unplaced)         0.646    10.994    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_n_104
+                         LUT6 (Prop_lut6_I5_O)        0.105    11.099 r  u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_2/O
+                         net (fo=1, unplaced)         0.582    11.681    u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_2_n_0
+                         LUT4 (Prop_lut4_I1_O)        0.105    11.786 r  u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_1/O
+                         net (fo=1, unplaced)         0.000    11.786    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/S[0]
+                         CARRY4 (Prop_carry4_S[0]_CO[3])
+                                                      0.440    12.226 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry/CO[3]
+                         net (fo=1, unplaced)         0.008    12.234    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.332 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__0/CO[3]
+                         net (fo=1, unplaced)         0.000    12.332    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__0_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.430 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__1/CO[3]
+                         net (fo=1, unplaced)         0.000    12.430    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__1_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.528 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__2/CO[3]
+                         net (fo=1, unplaced)         0.000    12.528    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__2_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275    12.803 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__3/O[3]
+                         net (fo=20, unplaced)        0.721    13.524    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact_n_16
+                         LUT6 (Prop_lut6_I5_O)        0.250    13.774 r  u_interp2_stage23_shared_dsp_ce/stage3_y_out[0]_i_1/O
+                         net (fo=1, unplaced)         0.000    13.774    u_interp2_stage23_shared_dsp_ce/stage3_q15_rounded[0]
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[0]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_5m6448 rise edge)
+                                                    177.154   177.154 r  
+                                                      0.000   177.154 r  clk (IN)
+                         net (fo=0)                   0.000   177.154    clk
+                         IBUF (Prop_ibuf_I_O)         0.763   177.917 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.613   178.531    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.077   178.608 r  clk_IBUF_BUFG_inst/O
+                         net (fo=872, unplaced)       0.439   179.047    u_interp2_stage23_shared_dsp_ce/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[0]/C
+                         clock pessimism              0.167   179.214    
+                         clock uncertainty           -0.035   179.178    
+                         FDCE (Setup_fdce_C_D)        0.029   179.207    u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[0]
+  -------------------------------------------------------------------
+                         required time                        179.207    
+                         arrival time                         -13.774    
+  -------------------------------------------------------------------
+                         slack                                165.434    
+
+Slack (MET) :             165.434ns  (required time - arrival time)
+  Source:                 u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/C
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Destination:            u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[10]/D
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Path Group:             clk_audio_5m6448
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            177.154ns  (clk_audio_5m6448 rise@177.154ns - clk_audio_5m6448 rise@0.000ns)
+  Data Path Delay:        11.569ns  (logic 6.683ns (57.766%)  route 4.886ns (42.234%))
+  Logic Levels:           18  (CARRY4=11 DSP48E1=1 LUT4=1 LUT6=5)
+  Clock Path Skew:        -0.145ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.893ns = ( 179.047 - 177.154 ) 
+    Source Clock Delay      (SCD):    2.205ns
+    Clock Pessimism Removal (CPR):    0.167ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_5m6448 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+                         IBUF (Prop_ibuf_I_O)         0.894     0.894 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.646     1.540    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.081     1.621 r  clk_IBUF_BUFG_inst/O
+                         net (fo=872, unplaced)       0.584     2.205    u_interp2_stage23_shared_dsp_ce/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/C
+  -------------------------------------------------------------------    -------------------
+                         FDCE (Prop_fdce_C_Q)         0.379     2.584 r  u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/Q
+                         net (fo=3, unplaced)         0.797     3.381    u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5]_11[1]
+                         LUT6 (Prop_lut6_I0_O)        0.232     3.613 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_353/O
+                         net (fo=2, unplaced)         0.548     4.161    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_353_n_0
+                         CARRY4 (Prop_carry4_DI[1]_CO[3])
+                                                      0.418     4.579 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_223/CO[3]
+                         net (fo=1, unplaced)         0.008     4.587    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_223_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.685 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_212/CO[3]
+                         net (fo=1, unplaced)         0.000     4.685    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_212_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.783 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_201/CO[3]
+                         net (fo=1, unplaced)         0.000     4.783    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_201_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.881 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_190/CO[3]
+                         net (fo=1, unplaced)         0.000     4.881    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_190_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.979 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_173/CO[3]
+                         net (fo=1, unplaced)         0.000     4.979    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_173_n_0
+                         CARRY4 (Prop_carry4_CI_O[2])
+                                                      0.214     5.193 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_144/O[2]
+                         net (fo=1, unplaced)         0.584     5.777    u_interp2_stage23_shared_dsp_ce/p_6_in[22]
+                         LUT6 (Prop_lut6_I1_O)        0.244     6.021 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_87/O
+                         net (fo=1, unplaced)         0.347     6.368    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_87_n_0
+                         LUT6 (Prop_lut6_I3_O)        0.105     6.473 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_17/O
+                         net (fo=8, unplaced)         0.646     7.118    u_interp2_stage23_shared_dsp_ce/A[22]
+                         DSP48E1 (Prop_dsp48e1_A[29]_P[1])
+                                                      3.230    10.348 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0/P[1]
+                         net (fo=2, unplaced)         0.646    10.994    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_n_104
+                         LUT6 (Prop_lut6_I5_O)        0.105    11.099 r  u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_2/O
+                         net (fo=1, unplaced)         0.582    11.681    u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_2_n_0
+                         LUT4 (Prop_lut4_I1_O)        0.105    11.786 r  u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_1/O
+                         net (fo=1, unplaced)         0.000    11.786    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/S[0]
+                         CARRY4 (Prop_carry4_S[0]_CO[3])
+                                                      0.440    12.226 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry/CO[3]
+                         net (fo=1, unplaced)         0.008    12.234    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.332 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__0/CO[3]
+                         net (fo=1, unplaced)         0.000    12.332    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__0_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.430 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__1/CO[3]
+                         net (fo=1, unplaced)         0.000    12.430    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__1_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.528 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__2/CO[3]
+                         net (fo=1, unplaced)         0.000    12.528    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__2_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275    12.803 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__3/O[3]
+                         net (fo=20, unplaced)        0.721    13.524    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact_n_16
+                         LUT6 (Prop_lut6_I5_O)        0.250    13.774 r  u_interp2_stage23_shared_dsp_ce/stage3_y_out[10]_i_1/O
+                         net (fo=1, unplaced)         0.000    13.774    u_interp2_stage23_shared_dsp_ce/stage3_q15_rounded[10]
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[10]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_5m6448 rise edge)
+                                                    177.154   177.154 r  
+                                                      0.000   177.154 r  clk (IN)
+                         net (fo=0)                   0.000   177.154    clk
+                         IBUF (Prop_ibuf_I_O)         0.763   177.917 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.613   178.531    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.077   178.608 r  clk_IBUF_BUFG_inst/O
+                         net (fo=872, unplaced)       0.439   179.047    u_interp2_stage23_shared_dsp_ce/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[10]/C
+                         clock pessimism              0.167   179.214    
+                         clock uncertainty           -0.035   179.178    
+                         FDCE (Setup_fdce_C_D)        0.029   179.207    u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[10]
+  -------------------------------------------------------------------
+                         required time                        179.207    
+                         arrival time                         -13.774    
+  -------------------------------------------------------------------
+                         slack                                165.434    
+
+Slack (MET) :             165.434ns  (required time - arrival time)
+  Source:                 u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/C
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Destination:            u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[11]/D
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Path Group:             clk_audio_5m6448
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            177.154ns  (clk_audio_5m6448 rise@177.154ns - clk_audio_5m6448 rise@0.000ns)
+  Data Path Delay:        11.569ns  (logic 6.683ns (57.766%)  route 4.886ns (42.234%))
+  Logic Levels:           18  (CARRY4=11 DSP48E1=1 LUT4=1 LUT6=5)
+  Clock Path Skew:        -0.145ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.893ns = ( 179.047 - 177.154 ) 
+    Source Clock Delay      (SCD):    2.205ns
+    Clock Pessimism Removal (CPR):    0.167ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_5m6448 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+                         IBUF (Prop_ibuf_I_O)         0.894     0.894 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.646     1.540    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.081     1.621 r  clk_IBUF_BUFG_inst/O
+                         net (fo=872, unplaced)       0.584     2.205    u_interp2_stage23_shared_dsp_ce/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/C
+  -------------------------------------------------------------------    -------------------
+                         FDCE (Prop_fdce_C_Q)         0.379     2.584 r  u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/Q
+                         net (fo=3, unplaced)         0.797     3.381    u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5]_11[1]
+                         LUT6 (Prop_lut6_I0_O)        0.232     3.613 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_353/O
+                         net (fo=2, unplaced)         0.548     4.161    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_353_n_0
+                         CARRY4 (Prop_carry4_DI[1]_CO[3])
+                                                      0.418     4.579 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_223/CO[3]
+                         net (fo=1, unplaced)         0.008     4.587    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_223_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.685 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_212/CO[3]
+                         net (fo=1, unplaced)         0.000     4.685    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_212_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.783 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_201/CO[3]
+                         net (fo=1, unplaced)         0.000     4.783    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_201_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.881 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_190/CO[3]
+                         net (fo=1, unplaced)         0.000     4.881    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_190_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.979 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_173/CO[3]
+                         net (fo=1, unplaced)         0.000     4.979    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_173_n_0
+                         CARRY4 (Prop_carry4_CI_O[2])
+                                                      0.214     5.193 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_144/O[2]
+                         net (fo=1, unplaced)         0.584     5.777    u_interp2_stage23_shared_dsp_ce/p_6_in[22]
+                         LUT6 (Prop_lut6_I1_O)        0.244     6.021 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_87/O
+                         net (fo=1, unplaced)         0.347     6.368    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_87_n_0
+                         LUT6 (Prop_lut6_I3_O)        0.105     6.473 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_17/O
+                         net (fo=8, unplaced)         0.646     7.118    u_interp2_stage23_shared_dsp_ce/A[22]
+                         DSP48E1 (Prop_dsp48e1_A[29]_P[1])
+                                                      3.230    10.348 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0/P[1]
+                         net (fo=2, unplaced)         0.646    10.994    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_n_104
+                         LUT6 (Prop_lut6_I5_O)        0.105    11.099 r  u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_2/O
+                         net (fo=1, unplaced)         0.582    11.681    u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_2_n_0
+                         LUT4 (Prop_lut4_I1_O)        0.105    11.786 r  u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_1/O
+                         net (fo=1, unplaced)         0.000    11.786    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/S[0]
+                         CARRY4 (Prop_carry4_S[0]_CO[3])
+                                                      0.440    12.226 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry/CO[3]
+                         net (fo=1, unplaced)         0.008    12.234    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.332 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__0/CO[3]
+                         net (fo=1, unplaced)         0.000    12.332    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__0_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.430 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__1/CO[3]
+                         net (fo=1, unplaced)         0.000    12.430    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__1_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.528 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__2/CO[3]
+                         net (fo=1, unplaced)         0.000    12.528    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__2_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275    12.803 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__3/O[3]
+                         net (fo=20, unplaced)        0.721    13.524    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact_n_16
+                         LUT6 (Prop_lut6_I5_O)        0.250    13.774 r  u_interp2_stage23_shared_dsp_ce/stage3_y_out[11]_i_1/O
+                         net (fo=1, unplaced)         0.000    13.774    u_interp2_stage23_shared_dsp_ce/stage3_q15_rounded[11]
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[11]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_5m6448 rise edge)
+                                                    177.154   177.154 r  
+                                                      0.000   177.154 r  clk (IN)
+                         net (fo=0)                   0.000   177.154    clk
+                         IBUF (Prop_ibuf_I_O)         0.763   177.917 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.613   178.531    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.077   178.608 r  clk_IBUF_BUFG_inst/O
+                         net (fo=872, unplaced)       0.439   179.047    u_interp2_stage23_shared_dsp_ce/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[11]/C
+                         clock pessimism              0.167   179.214    
+                         clock uncertainty           -0.035   179.178    
+                         FDCE (Setup_fdce_C_D)        0.029   179.207    u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[11]
+  -------------------------------------------------------------------
+                         required time                        179.207    
+                         arrival time                         -13.774    
+  -------------------------------------------------------------------
+                         slack                                165.434    
+
+Slack (MET) :             165.434ns  (required time - arrival time)
+  Source:                 u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/C
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Destination:            u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[12]/D
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Path Group:             clk_audio_5m6448
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            177.154ns  (clk_audio_5m6448 rise@177.154ns - clk_audio_5m6448 rise@0.000ns)
+  Data Path Delay:        11.569ns  (logic 6.683ns (57.766%)  route 4.886ns (42.234%))
+  Logic Levels:           18  (CARRY4=11 DSP48E1=1 LUT4=1 LUT6=5)
+  Clock Path Skew:        -0.145ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.893ns = ( 179.047 - 177.154 ) 
+    Source Clock Delay      (SCD):    2.205ns
+    Clock Pessimism Removal (CPR):    0.167ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_5m6448 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+                         IBUF (Prop_ibuf_I_O)         0.894     0.894 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.646     1.540    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.081     1.621 r  clk_IBUF_BUFG_inst/O
+                         net (fo=872, unplaced)       0.584     2.205    u_interp2_stage23_shared_dsp_ce/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/C
+  -------------------------------------------------------------------    -------------------
+                         FDCE (Prop_fdce_C_Q)         0.379     2.584 r  u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/Q
+                         net (fo=3, unplaced)         0.797     3.381    u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5]_11[1]
+                         LUT6 (Prop_lut6_I0_O)        0.232     3.613 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_353/O
+                         net (fo=2, unplaced)         0.548     4.161    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_353_n_0
+                         CARRY4 (Prop_carry4_DI[1]_CO[3])
+                                                      0.418     4.579 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_223/CO[3]
+                         net (fo=1, unplaced)         0.008     4.587    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_223_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.685 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_212/CO[3]
+                         net (fo=1, unplaced)         0.000     4.685    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_212_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.783 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_201/CO[3]
+                         net (fo=1, unplaced)         0.000     4.783    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_201_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.881 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_190/CO[3]
+                         net (fo=1, unplaced)         0.000     4.881    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_190_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.979 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_173/CO[3]
+                         net (fo=1, unplaced)         0.000     4.979    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_173_n_0
+                         CARRY4 (Prop_carry4_CI_O[2])
+                                                      0.214     5.193 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_144/O[2]
+                         net (fo=1, unplaced)         0.584     5.777    u_interp2_stage23_shared_dsp_ce/p_6_in[22]
+                         LUT6 (Prop_lut6_I1_O)        0.244     6.021 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_87/O
+                         net (fo=1, unplaced)         0.347     6.368    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_87_n_0
+                         LUT6 (Prop_lut6_I3_O)        0.105     6.473 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_17/O
+                         net (fo=8, unplaced)         0.646     7.118    u_interp2_stage23_shared_dsp_ce/A[22]
+                         DSP48E1 (Prop_dsp48e1_A[29]_P[1])
+                                                      3.230    10.348 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0/P[1]
+                         net (fo=2, unplaced)         0.646    10.994    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_n_104
+                         LUT6 (Prop_lut6_I5_O)        0.105    11.099 r  u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_2/O
+                         net (fo=1, unplaced)         0.582    11.681    u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_2_n_0
+                         LUT4 (Prop_lut4_I1_O)        0.105    11.786 r  u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_1/O
+                         net (fo=1, unplaced)         0.000    11.786    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/S[0]
+                         CARRY4 (Prop_carry4_S[0]_CO[3])
+                                                      0.440    12.226 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry/CO[3]
+                         net (fo=1, unplaced)         0.008    12.234    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.332 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__0/CO[3]
+                         net (fo=1, unplaced)         0.000    12.332    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__0_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.430 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__1/CO[3]
+                         net (fo=1, unplaced)         0.000    12.430    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__1_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.528 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__2/CO[3]
+                         net (fo=1, unplaced)         0.000    12.528    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__2_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275    12.803 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__3/O[3]
+                         net (fo=20, unplaced)        0.721    13.524    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact_n_16
+                         LUT6 (Prop_lut6_I5_O)        0.250    13.774 r  u_interp2_stage23_shared_dsp_ce/stage3_y_out[12]_i_1/O
+                         net (fo=1, unplaced)         0.000    13.774    u_interp2_stage23_shared_dsp_ce/stage3_q15_rounded[12]
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[12]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_5m6448 rise edge)
+                                                    177.154   177.154 r  
+                                                      0.000   177.154 r  clk (IN)
+                         net (fo=0)                   0.000   177.154    clk
+                         IBUF (Prop_ibuf_I_O)         0.763   177.917 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.613   178.531    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.077   178.608 r  clk_IBUF_BUFG_inst/O
+                         net (fo=872, unplaced)       0.439   179.047    u_interp2_stage23_shared_dsp_ce/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[12]/C
+                         clock pessimism              0.167   179.214    
+                         clock uncertainty           -0.035   179.178    
+                         FDCE (Setup_fdce_C_D)        0.029   179.207    u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[12]
+  -------------------------------------------------------------------
+                         required time                        179.207    
+                         arrival time                         -13.774    
+  -------------------------------------------------------------------
+                         slack                                165.434    
+
+Slack (MET) :             165.434ns  (required time - arrival time)
+  Source:                 u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/C
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Destination:            u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[13]/D
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Path Group:             clk_audio_5m6448
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            177.154ns  (clk_audio_5m6448 rise@177.154ns - clk_audio_5m6448 rise@0.000ns)
+  Data Path Delay:        11.569ns  (logic 6.683ns (57.766%)  route 4.886ns (42.234%))
+  Logic Levels:           18  (CARRY4=11 DSP48E1=1 LUT4=1 LUT6=5)
+  Clock Path Skew:        -0.145ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.893ns = ( 179.047 - 177.154 ) 
+    Source Clock Delay      (SCD):    2.205ns
+    Clock Pessimism Removal (CPR):    0.167ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_5m6448 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+                         IBUF (Prop_ibuf_I_O)         0.894     0.894 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.646     1.540    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.081     1.621 r  clk_IBUF_BUFG_inst/O
+                         net (fo=872, unplaced)       0.584     2.205    u_interp2_stage23_shared_dsp_ce/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/C
+  -------------------------------------------------------------------    -------------------
+                         FDCE (Prop_fdce_C_Q)         0.379     2.584 r  u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/Q
+                         net (fo=3, unplaced)         0.797     3.381    u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5]_11[1]
+                         LUT6 (Prop_lut6_I0_O)        0.232     3.613 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_353/O
+                         net (fo=2, unplaced)         0.548     4.161    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_353_n_0
+                         CARRY4 (Prop_carry4_DI[1]_CO[3])
+                                                      0.418     4.579 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_223/CO[3]
+                         net (fo=1, unplaced)         0.008     4.587    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_223_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.685 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_212/CO[3]
+                         net (fo=1, unplaced)         0.000     4.685    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_212_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.783 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_201/CO[3]
+                         net (fo=1, unplaced)         0.000     4.783    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_201_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.881 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_190/CO[3]
+                         net (fo=1, unplaced)         0.000     4.881    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_190_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.979 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_173/CO[3]
+                         net (fo=1, unplaced)         0.000     4.979    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_173_n_0
+                         CARRY4 (Prop_carry4_CI_O[2])
+                                                      0.214     5.193 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_144/O[2]
+                         net (fo=1, unplaced)         0.584     5.777    u_interp2_stage23_shared_dsp_ce/p_6_in[22]
+                         LUT6 (Prop_lut6_I1_O)        0.244     6.021 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_87/O
+                         net (fo=1, unplaced)         0.347     6.368    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_87_n_0
+                         LUT6 (Prop_lut6_I3_O)        0.105     6.473 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_17/O
+                         net (fo=8, unplaced)         0.646     7.118    u_interp2_stage23_shared_dsp_ce/A[22]
+                         DSP48E1 (Prop_dsp48e1_A[29]_P[1])
+                                                      3.230    10.348 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0/P[1]
+                         net (fo=2, unplaced)         0.646    10.994    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_n_104
+                         LUT6 (Prop_lut6_I5_O)        0.105    11.099 r  u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_2/O
+                         net (fo=1, unplaced)         0.582    11.681    u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_2_n_0
+                         LUT4 (Prop_lut4_I1_O)        0.105    11.786 r  u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_1/O
+                         net (fo=1, unplaced)         0.000    11.786    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/S[0]
+                         CARRY4 (Prop_carry4_S[0]_CO[3])
+                                                      0.440    12.226 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry/CO[3]
+                         net (fo=1, unplaced)         0.008    12.234    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.332 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__0/CO[3]
+                         net (fo=1, unplaced)         0.000    12.332    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__0_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.430 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__1/CO[3]
+                         net (fo=1, unplaced)         0.000    12.430    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__1_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.528 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__2/CO[3]
+                         net (fo=1, unplaced)         0.000    12.528    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__2_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275    12.803 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__3/O[3]
+                         net (fo=20, unplaced)        0.721    13.524    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact_n_16
+                         LUT6 (Prop_lut6_I5_O)        0.250    13.774 r  u_interp2_stage23_shared_dsp_ce/stage3_y_out[13]_i_1/O
+                         net (fo=1, unplaced)         0.000    13.774    u_interp2_stage23_shared_dsp_ce/stage3_q15_rounded[13]
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[13]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_5m6448 rise edge)
+                                                    177.154   177.154 r  
+                                                      0.000   177.154 r  clk (IN)
+                         net (fo=0)                   0.000   177.154    clk
+                         IBUF (Prop_ibuf_I_O)         0.763   177.917 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.613   178.531    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.077   178.608 r  clk_IBUF_BUFG_inst/O
+                         net (fo=872, unplaced)       0.439   179.047    u_interp2_stage23_shared_dsp_ce/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[13]/C
+                         clock pessimism              0.167   179.214    
+                         clock uncertainty           -0.035   179.178    
+                         FDCE (Setup_fdce_C_D)        0.029   179.207    u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[13]
+  -------------------------------------------------------------------
+                         required time                        179.207    
+                         arrival time                         -13.774    
+  -------------------------------------------------------------------
+                         slack                                165.434    
+
+Slack (MET) :             165.434ns  (required time - arrival time)
+  Source:                 u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/C
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Destination:            u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[14]/D
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Path Group:             clk_audio_5m6448
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            177.154ns  (clk_audio_5m6448 rise@177.154ns - clk_audio_5m6448 rise@0.000ns)
+  Data Path Delay:        11.569ns  (logic 6.683ns (57.766%)  route 4.886ns (42.234%))
+  Logic Levels:           18  (CARRY4=11 DSP48E1=1 LUT4=1 LUT6=5)
+  Clock Path Skew:        -0.145ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.893ns = ( 179.047 - 177.154 ) 
+    Source Clock Delay      (SCD):    2.205ns
+    Clock Pessimism Removal (CPR):    0.167ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_5m6448 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+                         IBUF (Prop_ibuf_I_O)         0.894     0.894 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.646     1.540    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.081     1.621 r  clk_IBUF_BUFG_inst/O
+                         net (fo=872, unplaced)       0.584     2.205    u_interp2_stage23_shared_dsp_ce/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/C
+  -------------------------------------------------------------------    -------------------
+                         FDCE (Prop_fdce_C_Q)         0.379     2.584 r  u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/Q
+                         net (fo=3, unplaced)         0.797     3.381    u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5]_11[1]
+                         LUT6 (Prop_lut6_I0_O)        0.232     3.613 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_353/O
+                         net (fo=2, unplaced)         0.548     4.161    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_353_n_0
+                         CARRY4 (Prop_carry4_DI[1]_CO[3])
+                                                      0.418     4.579 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_223/CO[3]
+                         net (fo=1, unplaced)         0.008     4.587    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_223_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.685 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_212/CO[3]
+                         net (fo=1, unplaced)         0.000     4.685    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_212_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.783 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_201/CO[3]
+                         net (fo=1, unplaced)         0.000     4.783    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_201_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.881 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_190/CO[3]
+                         net (fo=1, unplaced)         0.000     4.881    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_190_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.979 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_173/CO[3]
+                         net (fo=1, unplaced)         0.000     4.979    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_173_n_0
+                         CARRY4 (Prop_carry4_CI_O[2])
+                                                      0.214     5.193 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_144/O[2]
+                         net (fo=1, unplaced)         0.584     5.777    u_interp2_stage23_shared_dsp_ce/p_6_in[22]
+                         LUT6 (Prop_lut6_I1_O)        0.244     6.021 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_87/O
+                         net (fo=1, unplaced)         0.347     6.368    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_87_n_0
+                         LUT6 (Prop_lut6_I3_O)        0.105     6.473 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_17/O
+                         net (fo=8, unplaced)         0.646     7.118    u_interp2_stage23_shared_dsp_ce/A[22]
+                         DSP48E1 (Prop_dsp48e1_A[29]_P[1])
+                                                      3.230    10.348 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0/P[1]
+                         net (fo=2, unplaced)         0.646    10.994    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_n_104
+                         LUT6 (Prop_lut6_I5_O)        0.105    11.099 r  u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_2/O
+                         net (fo=1, unplaced)         0.582    11.681    u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_2_n_0
+                         LUT4 (Prop_lut4_I1_O)        0.105    11.786 r  u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_1/O
+                         net (fo=1, unplaced)         0.000    11.786    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/S[0]
+                         CARRY4 (Prop_carry4_S[0]_CO[3])
+                                                      0.440    12.226 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry/CO[3]
+                         net (fo=1, unplaced)         0.008    12.234    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.332 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__0/CO[3]
+                         net (fo=1, unplaced)         0.000    12.332    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__0_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.430 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__1/CO[3]
+                         net (fo=1, unplaced)         0.000    12.430    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__1_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.528 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__2/CO[3]
+                         net (fo=1, unplaced)         0.000    12.528    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__2_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275    12.803 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__3/O[3]
+                         net (fo=20, unplaced)        0.721    13.524    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact_n_16
+                         LUT6 (Prop_lut6_I5_O)        0.250    13.774 r  u_interp2_stage23_shared_dsp_ce/stage3_y_out[14]_i_1/O
+                         net (fo=1, unplaced)         0.000    13.774    u_interp2_stage23_shared_dsp_ce/stage3_q15_rounded[14]
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[14]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_5m6448 rise edge)
+                                                    177.154   177.154 r  
+                                                      0.000   177.154 r  clk (IN)
+                         net (fo=0)                   0.000   177.154    clk
+                         IBUF (Prop_ibuf_I_O)         0.763   177.917 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.613   178.531    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.077   178.608 r  clk_IBUF_BUFG_inst/O
+                         net (fo=872, unplaced)       0.439   179.047    u_interp2_stage23_shared_dsp_ce/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[14]/C
+                         clock pessimism              0.167   179.214    
+                         clock uncertainty           -0.035   179.178    
+                         FDCE (Setup_fdce_C_D)        0.029   179.207    u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[14]
+  -------------------------------------------------------------------
+                         required time                        179.207    
+                         arrival time                         -13.774    
+  -------------------------------------------------------------------
+                         slack                                165.434    
+
+Slack (MET) :             165.434ns  (required time - arrival time)
+  Source:                 u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/C
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Destination:            u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[15]/D
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Path Group:             clk_audio_5m6448
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            177.154ns  (clk_audio_5m6448 rise@177.154ns - clk_audio_5m6448 rise@0.000ns)
+  Data Path Delay:        11.569ns  (logic 6.683ns (57.766%)  route 4.886ns (42.234%))
+  Logic Levels:           18  (CARRY4=11 DSP48E1=1 LUT4=1 LUT6=5)
+  Clock Path Skew:        -0.145ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.893ns = ( 179.047 - 177.154 ) 
+    Source Clock Delay      (SCD):    2.205ns
+    Clock Pessimism Removal (CPR):    0.167ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_5m6448 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+                         IBUF (Prop_ibuf_I_O)         0.894     0.894 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.646     1.540    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.081     1.621 r  clk_IBUF_BUFG_inst/O
+                         net (fo=872, unplaced)       0.584     2.205    u_interp2_stage23_shared_dsp_ce/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/C
+  -------------------------------------------------------------------    -------------------
+                         FDCE (Prop_fdce_C_Q)         0.379     2.584 r  u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/Q
+                         net (fo=3, unplaced)         0.797     3.381    u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5]_11[1]
+                         LUT6 (Prop_lut6_I0_O)        0.232     3.613 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_353/O
+                         net (fo=2, unplaced)         0.548     4.161    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_353_n_0
+                         CARRY4 (Prop_carry4_DI[1]_CO[3])
+                                                      0.418     4.579 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_223/CO[3]
+                         net (fo=1, unplaced)         0.008     4.587    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_223_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.685 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_212/CO[3]
+                         net (fo=1, unplaced)         0.000     4.685    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_212_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.783 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_201/CO[3]
+                         net (fo=1, unplaced)         0.000     4.783    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_201_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.881 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_190/CO[3]
+                         net (fo=1, unplaced)         0.000     4.881    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_190_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.979 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_173/CO[3]
+                         net (fo=1, unplaced)         0.000     4.979    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_173_n_0
+                         CARRY4 (Prop_carry4_CI_O[2])
+                                                      0.214     5.193 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_144/O[2]
+                         net (fo=1, unplaced)         0.584     5.777    u_interp2_stage23_shared_dsp_ce/p_6_in[22]
+                         LUT6 (Prop_lut6_I1_O)        0.244     6.021 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_87/O
+                         net (fo=1, unplaced)         0.347     6.368    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_87_n_0
+                         LUT6 (Prop_lut6_I3_O)        0.105     6.473 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_17/O
+                         net (fo=8, unplaced)         0.646     7.118    u_interp2_stage23_shared_dsp_ce/A[22]
+                         DSP48E1 (Prop_dsp48e1_A[29]_P[1])
+                                                      3.230    10.348 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0/P[1]
+                         net (fo=2, unplaced)         0.646    10.994    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_n_104
+                         LUT6 (Prop_lut6_I5_O)        0.105    11.099 r  u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_2/O
+                         net (fo=1, unplaced)         0.582    11.681    u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_2_n_0
+                         LUT4 (Prop_lut4_I1_O)        0.105    11.786 r  u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_1/O
+                         net (fo=1, unplaced)         0.000    11.786    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/S[0]
+                         CARRY4 (Prop_carry4_S[0]_CO[3])
+                                                      0.440    12.226 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry/CO[3]
+                         net (fo=1, unplaced)         0.008    12.234    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.332 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__0/CO[3]
+                         net (fo=1, unplaced)         0.000    12.332    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__0_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.430 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__1/CO[3]
+                         net (fo=1, unplaced)         0.000    12.430    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__1_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.528 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__2/CO[3]
+                         net (fo=1, unplaced)         0.000    12.528    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__2_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275    12.803 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__3/O[3]
+                         net (fo=20, unplaced)        0.721    13.524    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact_n_16
+                         LUT6 (Prop_lut6_I5_O)        0.250    13.774 r  u_interp2_stage23_shared_dsp_ce/stage3_y_out[15]_i_1/O
+                         net (fo=1, unplaced)         0.000    13.774    u_interp2_stage23_shared_dsp_ce/stage3_q15_rounded[15]
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[15]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_5m6448 rise edge)
+                                                    177.154   177.154 r  
+                                                      0.000   177.154 r  clk (IN)
+                         net (fo=0)                   0.000   177.154    clk
+                         IBUF (Prop_ibuf_I_O)         0.763   177.917 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.613   178.531    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.077   178.608 r  clk_IBUF_BUFG_inst/O
+                         net (fo=872, unplaced)       0.439   179.047    u_interp2_stage23_shared_dsp_ce/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[15]/C
+                         clock pessimism              0.167   179.214    
+                         clock uncertainty           -0.035   179.178    
+                         FDCE (Setup_fdce_C_D)        0.029   179.207    u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[15]
+  -------------------------------------------------------------------
+                         required time                        179.207    
+                         arrival time                         -13.774    
+  -------------------------------------------------------------------
+                         slack                                165.434    
+
+Slack (MET) :             165.434ns  (required time - arrival time)
+  Source:                 u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/C
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Destination:            u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[16]/D
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Path Group:             clk_audio_5m6448
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            177.154ns  (clk_audio_5m6448 rise@177.154ns - clk_audio_5m6448 rise@0.000ns)
+  Data Path Delay:        11.569ns  (logic 6.683ns (57.766%)  route 4.886ns (42.234%))
+  Logic Levels:           18  (CARRY4=11 DSP48E1=1 LUT4=1 LUT6=5)
+  Clock Path Skew:        -0.145ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.893ns = ( 179.047 - 177.154 ) 
+    Source Clock Delay      (SCD):    2.205ns
+    Clock Pessimism Removal (CPR):    0.167ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_5m6448 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+                         IBUF (Prop_ibuf_I_O)         0.894     0.894 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.646     1.540    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.081     1.621 r  clk_IBUF_BUFG_inst/O
+                         net (fo=872, unplaced)       0.584     2.205    u_interp2_stage23_shared_dsp_ce/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/C
+  -------------------------------------------------------------------    -------------------
+                         FDCE (Prop_fdce_C_Q)         0.379     2.584 r  u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/Q
+                         net (fo=3, unplaced)         0.797     3.381    u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5]_11[1]
+                         LUT6 (Prop_lut6_I0_O)        0.232     3.613 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_353/O
+                         net (fo=2, unplaced)         0.548     4.161    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_353_n_0
+                         CARRY4 (Prop_carry4_DI[1]_CO[3])
+                                                      0.418     4.579 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_223/CO[3]
+                         net (fo=1, unplaced)         0.008     4.587    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_223_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.685 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_212/CO[3]
+                         net (fo=1, unplaced)         0.000     4.685    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_212_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.783 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_201/CO[3]
+                         net (fo=1, unplaced)         0.000     4.783    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_201_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.881 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_190/CO[3]
+                         net (fo=1, unplaced)         0.000     4.881    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_190_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.979 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_173/CO[3]
+                         net (fo=1, unplaced)         0.000     4.979    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_173_n_0
+                         CARRY4 (Prop_carry4_CI_O[2])
+                                                      0.214     5.193 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_144/O[2]
+                         net (fo=1, unplaced)         0.584     5.777    u_interp2_stage23_shared_dsp_ce/p_6_in[22]
+                         LUT6 (Prop_lut6_I1_O)        0.244     6.021 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_87/O
+                         net (fo=1, unplaced)         0.347     6.368    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_87_n_0
+                         LUT6 (Prop_lut6_I3_O)        0.105     6.473 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_17/O
+                         net (fo=8, unplaced)         0.646     7.118    u_interp2_stage23_shared_dsp_ce/A[22]
+                         DSP48E1 (Prop_dsp48e1_A[29]_P[1])
+                                                      3.230    10.348 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0/P[1]
+                         net (fo=2, unplaced)         0.646    10.994    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_n_104
+                         LUT6 (Prop_lut6_I5_O)        0.105    11.099 r  u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_2/O
+                         net (fo=1, unplaced)         0.582    11.681    u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_2_n_0
+                         LUT4 (Prop_lut4_I1_O)        0.105    11.786 r  u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_1/O
+                         net (fo=1, unplaced)         0.000    11.786    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/S[0]
+                         CARRY4 (Prop_carry4_S[0]_CO[3])
+                                                      0.440    12.226 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry/CO[3]
+                         net (fo=1, unplaced)         0.008    12.234    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.332 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__0/CO[3]
+                         net (fo=1, unplaced)         0.000    12.332    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__0_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.430 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__1/CO[3]
+                         net (fo=1, unplaced)         0.000    12.430    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__1_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.528 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__2/CO[3]
+                         net (fo=1, unplaced)         0.000    12.528    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__2_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275    12.803 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__3/O[3]
+                         net (fo=20, unplaced)        0.721    13.524    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact_n_16
+                         LUT6 (Prop_lut6_I5_O)        0.250    13.774 r  u_interp2_stage23_shared_dsp_ce/stage3_y_out[16]_i_1/O
+                         net (fo=1, unplaced)         0.000    13.774    u_interp2_stage23_shared_dsp_ce/stage3_q15_rounded[16]
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[16]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_5m6448 rise edge)
+                                                    177.154   177.154 r  
+                                                      0.000   177.154 r  clk (IN)
+                         net (fo=0)                   0.000   177.154    clk
+                         IBUF (Prop_ibuf_I_O)         0.763   177.917 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.613   178.531    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.077   178.608 r  clk_IBUF_BUFG_inst/O
+                         net (fo=872, unplaced)       0.439   179.047    u_interp2_stage23_shared_dsp_ce/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[16]/C
+                         clock pessimism              0.167   179.214    
+                         clock uncertainty           -0.035   179.178    
+                         FDCE (Setup_fdce_C_D)        0.029   179.207    u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[16]
+  -------------------------------------------------------------------
+                         required time                        179.207    
+                         arrival time                         -13.774    
+  -------------------------------------------------------------------
+                         slack                                165.434    
+
+Slack (MET) :             165.434ns  (required time - arrival time)
+  Source:                 u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/C
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Destination:            u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[17]/D
+                            (rising edge-triggered cell FDCE clocked by clk_audio_5m6448  {rise@0.000ns fall@88.577ns period=177.154ns})
+  Path Group:             clk_audio_5m6448
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            177.154ns  (clk_audio_5m6448 rise@177.154ns - clk_audio_5m6448 rise@0.000ns)
+  Data Path Delay:        11.569ns  (logic 6.683ns (57.766%)  route 4.886ns (42.234%))
+  Logic Levels:           18  (CARRY4=11 DSP48E1=1 LUT4=1 LUT6=5)
+  Clock Path Skew:        -0.145ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.893ns = ( 179.047 - 177.154 ) 
+    Source Clock Delay      (SCD):    2.205ns
+    Clock Pessimism Removal (CPR):    0.167ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_5m6448 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+                         IBUF (Prop_ibuf_I_O)         0.894     0.894 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.646     1.540    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.081     1.621 r  clk_IBUF_BUFG_inst/O
+                         net (fo=872, unplaced)       0.584     2.205    u_interp2_stage23_shared_dsp_ce/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/C
+  -------------------------------------------------------------------    -------------------
+                         FDCE (Prop_fdce_C_Q)         0.379     2.584 r  u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5][1]/Q
+                         net (fo=3, unplaced)         0.797     3.381    u_interp2_stage23_shared_dsp_ce/stage2_hist_reg[5]_11[1]
+                         LUT6 (Prop_lut6_I0_O)        0.232     3.613 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_353/O
+                         net (fo=2, unplaced)         0.548     4.161    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_353_n_0
+                         CARRY4 (Prop_carry4_DI[1]_CO[3])
+                                                      0.418     4.579 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_223/CO[3]
+                         net (fo=1, unplaced)         0.008     4.587    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_223_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.685 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_212/CO[3]
+                         net (fo=1, unplaced)         0.000     4.685    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_212_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.783 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_201/CO[3]
+                         net (fo=1, unplaced)         0.000     4.783    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_201_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.881 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_190/CO[3]
+                         net (fo=1, unplaced)         0.000     4.881    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_190_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     4.979 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_173/CO[3]
+                         net (fo=1, unplaced)         0.000     4.979    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_173_n_0
+                         CARRY4 (Prop_carry4_CI_O[2])
+                                                      0.214     5.193 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_144/O[2]
+                         net (fo=1, unplaced)         0.584     5.777    u_interp2_stage23_shared_dsp_ce/p_6_in[22]
+                         LUT6 (Prop_lut6_I1_O)        0.244     6.021 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_87/O
+                         net (fo=1, unplaced)         0.347     6.368    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_87_n_0
+                         LUT6 (Prop_lut6_I3_O)        0.105     6.473 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_i_17/O
+                         net (fo=8, unplaced)         0.646     7.118    u_interp2_stage23_shared_dsp_ce/A[22]
+                         DSP48E1 (Prop_dsp48e1_A[29]_P[1])
+                                                      3.230    10.348 r  u_interp2_stage23_shared_dsp_ce/mac_sum_comb0/P[1]
+                         net (fo=2, unplaced)         0.646    10.994    u_interp2_stage23_shared_dsp_ce/mac_sum_comb0_n_104
+                         LUT6 (Prop_lut6_I5_O)        0.105    11.099 r  u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_2/O
+                         net (fo=1, unplaced)         0.582    11.681    u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_2_n_0
+                         LUT4 (Prop_lut4_I1_O)        0.105    11.786 r  u_interp2_stage23_shared_dsp_ce/rounded_value_carry_i_1/O
+                         net (fo=1, unplaced)         0.000    11.786    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/S[0]
+                         CARRY4 (Prop_carry4_S[0]_CO[3])
+                                                      0.440    12.226 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry/CO[3]
+                         net (fo=1, unplaced)         0.008    12.234    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.332 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__0/CO[3]
+                         net (fo=1, unplaced)         0.000    12.332    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__0_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.430 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__1/CO[3]
+                         net (fo=1, unplaced)         0.000    12.430    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__1_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098    12.528 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__2/CO[3]
+                         net (fo=1, unplaced)         0.000    12.528    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__2_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.275    12.803 r  u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact/rounded_value_carry__3/O[3]
+                         net (fo=20, unplaced)        0.721    13.524    u_interp2_stage23_shared_dsp_ce/gen_separate_rounders.u_round_stage3_q15_compact_n_16
+                         LUT6 (Prop_lut6_I5_O)        0.250    13.774 r  u_interp2_stage23_shared_dsp_ce/stage3_y_out[17]_i_1/O
+                         net (fo=1, unplaced)         0.000    13.774    u_interp2_stage23_shared_dsp_ce/stage3_q15_rounded[17]
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[17]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_5m6448 rise edge)
+                                                    177.154   177.154 r  
+                                                      0.000   177.154 r  clk (IN)
+                         net (fo=0)                   0.000   177.154    clk
+                         IBUF (Prop_ibuf_I_O)         0.763   177.917 r  clk_IBUF_inst/O
+                         net (fo=1, unplaced)         0.613   178.531    clk_IBUF
+                         BUFG (Prop_bufg_I_O)         0.077   178.608 r  clk_IBUF_BUFG_inst/O
+                         net (fo=872, unplaced)       0.439   179.047    u_interp2_stage23_shared_dsp_ce/clk_IBUF_BUFG
+                         FDCE                                         r  u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[17]/C
+                         clock pessimism              0.167   179.214    
+                         clock uncertainty           -0.035   179.178    
+                         FDCE (Setup_fdce_C_D)        0.029   179.207    u_interp2_stage23_shared_dsp_ce/stage3_y_out_reg[17]
+  -------------------------------------------------------------------
+                         required time                        179.207    
+                         arrival time                         -13.774    
+  -------------------------------------------------------------------
+                         slack                                165.434    
+
+
+
+
+
+Pulse Width Checks
+--------------------------------------------------------------------------------------
+Clock Name:         clk_audio_5m6448
+Waveform(ns):       { 0.000 88.577 }
+Period(ns):         177.154
+Sources:            { clk }
+
+Check Type        Corner  Lib Pin             Reference Pin  Required(ns)  Actual(ns)  Slack(ns)  Location  Pin
+Min Period        n/a     RAMB18E1/CLKARDCLK  n/a            2.472         177.154     174.682              u_interp2_stage1_strict_halfband_bram_ce/sample_mem_reg_1/CLKARDCLK
+Min Period        n/a     RAMB18E1/CLKBWRCLK  n/a            2.472         177.154     174.682              u_interp2_stage1_strict_halfband_bram_ce/sample_mem_reg_1/CLKBWRCLK
+Min Period        n/a     RAMB18E1/CLKARDCLK  n/a            2.472         177.154     174.682              u_interp2_stage1_strict_halfband_bram_ce/sample_mem_reg_2/CLKARDCLK
+Min Period        n/a     RAMB18E1/CLKBWRCLK  n/a            2.472         177.154     174.682              u_interp2_stage1_strict_halfband_bram_ce/sample_mem_reg_2/CLKBWRCLK
+Min Period        n/a     BUFG/I              n/a            1.592         177.154     175.562              clk_IBUF_BUFG_inst/I
+Min Period        n/a     FDRE/C              n/a            1.000         177.154     176.154              u_interp2_stage1_strict_halfband_bram_ce/base_ptr_reg[0]/C
+Min Period        n/a     FDRE/C              n/a            1.000         177.154     176.154              u_interp2_stage1_strict_halfband_bram_ce/base_ptr_reg[1]/C
+Min Period        n/a     FDRE/C              n/a            1.000         177.154     176.154              u_interp2_stage1_strict_halfband_bram_ce/base_ptr_reg[2]/C
+Min Period        n/a     FDRE/C              n/a            1.000         177.154     176.154              u_interp2_stage1_strict_halfband_bram_ce/base_ptr_reg[3]/C
+Min Period        n/a     FDRE/C              n/a            1.000         177.154     176.154              u_interp2_stage1_strict_halfband_bram_ce/base_ptr_reg[4]/C
+Low Pulse Width   Slow    FDRE/C              n/a            0.500         88.577      88.077               u_interp2_stage1_strict_halfband_bram_ce/base_ptr_reg[0]/C
+Low Pulse Width   Slow    FDRE/C              n/a            0.500         88.577      88.077               u_interp2_stage1_strict_halfband_bram_ce/base_ptr_reg[1]/C
+Low Pulse Width   Slow    FDRE/C              n/a            0.500         88.577      88.077               u_interp2_stage1_strict_halfband_bram_ce/base_ptr_reg[2]/C
+Low Pulse Width   Slow    FDRE/C              n/a            0.500         88.577      88.077               u_interp2_stage1_strict_halfband_bram_ce/base_ptr_reg[3]/C
+Low Pulse Width   Slow    FDRE/C              n/a            0.500         88.577      88.077               u_interp2_stage1_strict_halfband_bram_ce/base_ptr_reg[4]/C
+Low Pulse Width   Slow    FDRE/C              n/a            0.500         88.577      88.077               u_interp2_stage1_strict_halfband_bram_ce/base_ptr_reg[5]/C
+Low Pulse Width   Slow    FDRE/C              n/a            0.500         88.577      88.077               u_interp2_stage1_strict_halfband_bram_ce/delay_ready_reg/C
+Low Pulse Width   Slow    FDRE/C              n/a            0.500         88.577      88.077               u_interp2_stage1_strict_halfband_bram_ce/delay_result_reg[0]/C
+Low Pulse Width   Slow    FDRE/C              n/a            0.500         88.577      88.077               u_interp2_stage1_strict_halfband_bram_ce/delay_result_reg[10]/C
+Low Pulse Width   Slow    FDRE/C              n/a            0.500         88.577      88.077               u_interp2_stage1_strict_halfband_bram_ce/delay_result_reg[11]/C
+High Pulse Width  Fast    FDRE/C              n/a            0.500         88.577      88.077               u_interp2_stage1_strict_halfband_bram_ce/base_ptr_reg[0]/C
+High Pulse Width  Fast    FDRE/C              n/a            0.500         88.577      88.077               u_interp2_stage1_strict_halfband_bram_ce/base_ptr_reg[1]/C
+High Pulse Width  Fast    FDRE/C              n/a            0.500         88.577      88.077               u_interp2_stage1_strict_halfband_bram_ce/base_ptr_reg[2]/C
+High Pulse Width  Fast    FDRE/C              n/a            0.500         88.577      88.077               u_interp2_stage1_strict_halfband_bram_ce/base_ptr_reg[3]/C
+High Pulse Width  Fast    FDRE/C              n/a            0.500         88.577      88.077               u_interp2_stage1_strict_halfband_bram_ce/base_ptr_reg[4]/C
+High Pulse Width  Fast    FDRE/C              n/a            0.500         88.577      88.077               u_interp2_stage1_strict_halfband_bram_ce/base_ptr_reg[5]/C
+High Pulse Width  Fast    FDRE/C              n/a            0.500         88.577      88.077               u_interp2_stage1_strict_halfband_bram_ce/delay_ready_reg/C
+High Pulse Width  Fast    FDRE/C              n/a            0.500         88.577      88.077               u_interp2_stage1_strict_halfband_bram_ce/delay_result_reg[0]/C
+High Pulse Width  Fast    FDRE/C              n/a            0.500         88.577      88.077               u_interp2_stage1_strict_halfband_bram_ce/delay_result_reg[10]/C
+High Pulse Width  Fast    FDRE/C              n/a            0.500         88.577      88.077               u_interp2_stage1_strict_halfband_bram_ce/delay_result_reg[11]/C
+
+
+

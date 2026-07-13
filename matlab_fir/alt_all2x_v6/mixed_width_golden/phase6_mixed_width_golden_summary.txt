@@ -1,0 +1,13 @@
+Phase 6 mixed-width RTL golden
+================================
+width_profile = 24/22/20/18/18/18/18
+impulse_input = 256
+random_input = 128
+impulse_stage2 = 1245
+random_stage2 = 733
+impulse_stage3 = 2499
+random_stage3 = 1475
+impulse_full = 40059
+random_full = 23675
+acc_overflow = 0
+saturation = 0

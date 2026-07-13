@@ -1,0 +1,23 @@
+Phase 6 stage data wordlength search
+====================================
+Coefficient passband abs max = 0.00523192 dB
+Coefficient stopband attenuation = 78.61965812 dB
+Coefficient group-delay ripple = 9.09494701773e-12 sample
+Pass limits: |gain|<=0.01dB, delta SNR>=90dB, SINAD drop<=0.5dB, overflow=0, saturation=0
+
+24-22-20-18-18-18-18 cost= 606 gain= 0.00008 deltaSNR=  91.53 SINAD=  76.68 drop= 0.109 THD=-114.71 pass=1
+24-22-22-18-18-18-18 cost= 618 gain= 0.00004 deltaSNR=  92.23 SINAD=  76.68 drop= 0.114 THD=-116.95 pass=1
+24-24-20-18-18-18-18 cost= 624 gain= 0.00007 deltaSNR=  91.76 SINAD=  76.67 drop= 0.122 THD=-114.71 pass=1
+24-24-22-18-18-18-18 cost= 636 gain= 0.00004 deltaSNR=  92.23 SINAD=  76.68 drop= 0.128 THD=-117.50 pass=1
+24-22-20-20-20-20-20 cost= 638 gain= 0.00002 deltaSNR= 102.61 SINAD=  76.70 drop= 0.000 THD=-124.62 pass=1
+24-24-24-18-18-18-18 cost= 648 gain= 0.00003 deltaSNR=  92.33 SINAD=  76.68 drop= 0.116 THD=-119.18 pass=1
+24-22-22-20-20-20-20 cost= 650 gain= 0.00002 deltaSNR= 103.44 SINAD=  76.70 drop= 0.004 THD=-123.18 pass=1
+24-24-20-20-20-20-20 cost= 656 gain= 0.00001 deltaSNR= 103.14 SINAD=  76.70 drop= 0.003 THD=-124.43 pass=1
+24-24-22-20-20-20-20 cost= 668 gain= 0.00002 deltaSNR= 103.52 SINAD=  76.70 drop= 0.002 THD=-122.62 pass=1
+24-24-24-20-20-20-20 cost= 680 gain= 0.00001 deltaSNR= 104.23 SINAD=  76.70 drop= 0.006 THD=-124.70 pass=1
+24-22-22-22-22-22-22 cost= 682 gain= 0.00000 deltaSNR= 113.79 SINAD=  76.70 drop= 0.000 THD=-129.00 pass=1
+24-24-22-22-22-22-22 cost= 700 gain= 0.00000 deltaSNR= 114.75 SINAD=  76.70 drop= 0.000 THD=-128.15 pass=1
+24-24-24-22-22-22-22 cost= 712 gain= 0.00000 deltaSNR= 115.96 SINAD=  76.70 drop= 0.002 THD=-127.88 pass=1
+24-24-24-24-24-24-24 cost= 744 gain= 0.00000 deltaSNR=    Inf SINAD=  76.70 drop= 0.000 THD=-128.62 pass=1
+
+Recommended first RTL candidate = 24-22-20-18-18-18-18

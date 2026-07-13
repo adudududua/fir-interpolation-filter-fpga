@@ -88,3 +88,9 @@ Desktop.ini
 matlab_fir/alt_all2x_v2/*.mat
 matlab_fir/alt_all2x_v2/golden/
 matlab_fir/alt_all2x_v2/vivado_results/
+
+#============================================================
+# Phase 6 dedicated Vivado temporary projects
+#============================================================
+
+matlab_fir/alt_all2x_v6/vivado_work/

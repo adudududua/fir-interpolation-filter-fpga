@@ -87,6 +87,13 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PSRCDIR/sources_1/new/all2x_v6/bridge_valid_quantized_to_interp2_ce.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PSRCDIR/sources_1/new/demo_interp_dac8_audio_pcm_common.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -108,7 +115,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PSRCDIR/sources_1/new/all2x_v4/interp128_all2x_v4_shared_dsp_top_ce.v">
+      <File Path="$PSRCDIR/sources_1/new/all2x_v6/interp128_all2x_v6_mixed_width_top_ce.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -171,8 +178,23 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PSRCDIR/sources_1/new/all2x_v6/round_sat_shift_compact.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PSRCDIR/sources_1/new/board_demo_competition_dac8_top.v">
         <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/new/all2x_v4/interp128_all2x_v4_shared_dsp_top_ce.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -319,6 +341,7 @@
         <Option Name="VerilogDir" Val="$PSRCDIR/sources_1/new/all2x_v3"/>
         <Option Name="VerilogDir" Val="$PSRCDIR/sources_1/new/all2x_v4"/>
         <Option Name="VerilogDir" Val="$PSRCDIR/sources_1/new/all2x_v5"/>
+        <Option Name="VerilogDir" Val="$PSRCDIR/sources_1/new/all2x_v6"/>
       </Config>
     </FileSet>
     <FileSet Name="constrs_1" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1">

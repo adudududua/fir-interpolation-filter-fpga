@@ -29,10 +29,14 @@
 //                            Stage 2/3 共用一个舍入饱和单元。
 //                2026-07-12：共享舍入器改为余数进位与高位一致性
 //                            饱和结构，消除 42bit 舍入偏置加法器。
+//                2026-07-13：增加 Stage 2/3 独立数据位宽参数；
+//                            等位宽时仍只生成一个共享舍入器。
 //=============================================================
 
 module interp2_stage23_shared_dsp_ce #(
     parameter integer DATA_W = 24,
+    parameter integer STAGE2_DATA_W = DATA_W,
+    parameter integer STAGE3_DATA_W = DATA_W,
     parameter integer COEFF_W = 16,
     parameter integer ACC_W = 42
 )(
@@ -40,15 +44,15 @@ module interp2_stage23_shared_dsp_ce #(
     input  wire                         rst_n,
 
     input  wire                         stage2_ce_out,
-    input  wire signed [DATA_W-1:0]     stage2_x_in,
+    input  wire signed [STAGE2_DATA_W-1:0] stage2_x_in,
     input  wire                         stage2_x_in_valid,
-    output reg  signed [DATA_W-1:0]     stage2_y_out,
+    output reg  signed [STAGE2_DATA_W-1:0] stage2_y_out,
     output reg                          stage2_y_out_valid,
 
     input  wire                         stage3_ce_out,
-    input  wire signed [DATA_W-1:0]     stage3_x_in,
+    input  wire signed [STAGE3_DATA_W-1:0] stage3_x_in,
     input  wire                         stage3_x_in_valid,
-    output reg  signed [DATA_W-1:0]     stage3_y_out,
+    output reg  signed [STAGE3_DATA_W-1:0] stage3_y_out,
     output reg                          stage3_y_out_valid,
 
     output wire                         stage2_phase_dbg,
@@ -58,11 +62,11 @@ module interp2_stage23_shared_dsp_ce #(
     output wire [3:0]                   scheduler_mac_index_dbg
 );
 
-    localparam integer PAIR_W = DATA_W + 1;
+    localparam integer PAIR_W = STAGE2_DATA_W + 1;
     localparam integer PROD_W = PAIR_W + COEFF_W;
 
-    reg signed [DATA_W-1:0] stage2_hist [0:8];
-    reg signed [DATA_W-1:0] stage3_hist [0:5];
+    reg signed [STAGE2_DATA_W-1:0] stage2_hist [0:8];
+    reg signed [STAGE3_DATA_W-1:0] stage3_hist [0:5];
 
     reg stage2_phase;
     reg stage3_phase;
@@ -90,17 +94,18 @@ module interp2_stage23_shared_dsp_ce #(
     wire signed [PROD_W-1:0] product_comb;
     wire signed [ACC_W-1:0] product_ext;
     wire signed [ACC_W-1:0] mac_sum_comb;
-    wire signed [DATA_W-1:0] shared_q15_rounded;
+    wire signed [STAGE2_DATA_W-1:0] stage2_q15_rounded;
+    wire signed [STAGE3_DATA_W-1:0] stage3_q15_rounded;
 
-    wire signed [DATA_W-1:0] stage2_x_current;
-    wire signed [DATA_W-1:0] stage3_x_current;
+    wire signed [STAGE2_DATA_W-1:0] stage2_x_current;
+    wire signed [STAGE3_DATA_W-1:0] stage3_x_current;
 
     integer i;
 
     assign stage2_x_current = stage2_x_in_valid ? stage2_x_in :
-                              {DATA_W{1'b0}};
+                              {STAGE2_DATA_W{1'b0}};
     assign stage3_x_current = stage3_x_in_valid ? stage3_x_in :
-                              {DATA_W{1'b0}};
+                              {STAGE3_DATA_W{1'b0}};
 
     assign product_comb = pair_sum_comb * coeff_comb;
     generate
@@ -121,13 +126,34 @@ module interp2_stage23_shared_dsp_ce #(
     assign scheduler_stage_dbg = job_stage;
     assign scheduler_mac_index_dbg = job_mac_index;
 
-    round_sat_q15_compact_to24 #(
-        .IN_W   (ACC_W),
-        .OUT_W  (DATA_W)
-    ) u_round_shared_q15_compact (
-        .din_full (mac_sum_comb),
-        .dout_24  (shared_q15_rounded)
-    );
+    generate
+        if (STAGE2_DATA_W == STAGE3_DATA_W) begin : gen_shared_rounder
+            round_sat_q15_compact_to24 #(
+                .IN_W  (ACC_W),
+                .OUT_W (STAGE2_DATA_W)
+            ) u_round_shared_q15_compact (
+                .din_full (mac_sum_comb),
+                .dout_24  (stage2_q15_rounded)
+            );
+            assign stage3_q15_rounded = stage2_q15_rounded;
+        end
+        else begin : gen_separate_rounders
+            round_sat_q15_compact_to24 #(
+                .IN_W  (ACC_W),
+                .OUT_W (STAGE2_DATA_W)
+            ) u_round_stage2_q15_compact (
+                .din_full (mac_sum_comb),
+                .dout_24  (stage2_q15_rounded)
+            );
+            round_sat_q15_compact_to24 #(
+                .IN_W  (ACC_W),
+                .OUT_W (STAGE3_DATA_W)
+            ) u_round_stage3_q15_compact (
+                .din_full (mac_sum_comb),
+                .dout_24  (stage3_q15_rounded)
+            );
+        end
+    endgenerate
 
     always @(*) begin
         pair_sum_comb = {PAIR_W{1'b0}};
@@ -138,39 +164,39 @@ module interp2_stage23_shared_dsp_ce #(
                 case (job_mac_index)
                     4'd0: begin
                         pair_sum_comb =
-                            $signed({stage2_hist[0][DATA_W-1],
+                            $signed({stage2_hist[0][STAGE2_DATA_W-1],
                                      stage2_hist[0]}) +
-                            $signed({stage2_hist[8][DATA_W-1],
+                            $signed({stage2_hist[8][STAGE2_DATA_W-1],
                                      stage2_hist[8]});
                         coeff_comb = `V2_S2_P0_C0;
                     end
                     4'd1: begin
                         pair_sum_comb =
-                            $signed({stage2_hist[1][DATA_W-1],
+                            $signed({stage2_hist[1][STAGE2_DATA_W-1],
                                      stage2_hist[1]}) +
-                            $signed({stage2_hist[7][DATA_W-1],
+                            $signed({stage2_hist[7][STAGE2_DATA_W-1],
                                      stage2_hist[7]});
                         coeff_comb = `V2_S2_P0_C1;
                     end
                     4'd2: begin
                         pair_sum_comb =
-                            $signed({stage2_hist[2][DATA_W-1],
+                            $signed({stage2_hist[2][STAGE2_DATA_W-1],
                                      stage2_hist[2]}) +
-                            $signed({stage2_hist[6][DATA_W-1],
+                            $signed({stage2_hist[6][STAGE2_DATA_W-1],
                                      stage2_hist[6]});
                         coeff_comb = `V2_S2_P0_C2;
                     end
                     4'd3: begin
                         pair_sum_comb =
-                            $signed({stage2_hist[3][DATA_W-1],
+                            $signed({stage2_hist[3][STAGE2_DATA_W-1],
                                      stage2_hist[3]}) +
-                            $signed({stage2_hist[5][DATA_W-1],
+                            $signed({stage2_hist[5][STAGE2_DATA_W-1],
                                      stage2_hist[5]});
                         coeff_comb = `V2_S2_P0_C3;
                     end
                     4'd4: begin
                         pair_sum_comb =
-                            $signed({stage2_hist[4][DATA_W-1],
+                            $signed({stage2_hist[4][STAGE2_DATA_W-1],
                                      stage2_hist[4]});
                         coeff_comb = `V2_S2_P0_C4;
                     end
@@ -184,33 +210,33 @@ module interp2_stage23_shared_dsp_ce #(
                 case (job_mac_index)
                     4'd0: begin
                         pair_sum_comb =
-                            $signed({stage2_hist[0][DATA_W-1],
+                            $signed({stage2_hist[0][STAGE2_DATA_W-1],
                                      stage2_hist[0]}) +
-                            $signed({stage2_hist[7][DATA_W-1],
+                            $signed({stage2_hist[7][STAGE2_DATA_W-1],
                                      stage2_hist[7]});
                         coeff_comb = `V2_S2_P1_C0;
                     end
                     4'd1: begin
                         pair_sum_comb =
-                            $signed({stage2_hist[1][DATA_W-1],
+                            $signed({stage2_hist[1][STAGE2_DATA_W-1],
                                      stage2_hist[1]}) +
-                            $signed({stage2_hist[6][DATA_W-1],
+                            $signed({stage2_hist[6][STAGE2_DATA_W-1],
                                      stage2_hist[6]});
                         coeff_comb = `V2_S2_P1_C1;
                     end
                     4'd2: begin
                         pair_sum_comb =
-                            $signed({stage2_hist[2][DATA_W-1],
+                            $signed({stage2_hist[2][STAGE2_DATA_W-1],
                                      stage2_hist[2]}) +
-                            $signed({stage2_hist[5][DATA_W-1],
+                            $signed({stage2_hist[5][STAGE2_DATA_W-1],
                                      stage2_hist[5]});
                         coeff_comb = `V2_S2_P1_C2;
                     end
                     4'd3: begin
                         pair_sum_comb =
-                            $signed({stage2_hist[3][DATA_W-1],
+                            $signed({stage2_hist[3][STAGE2_DATA_W-1],
                                      stage2_hist[3]}) +
-                            $signed({stage2_hist[4][DATA_W-1],
+                            $signed({stage2_hist[4][STAGE2_DATA_W-1],
                                      stage2_hist[4]});
                         coeff_comb = `V2_S2_P1_C3;
                     end
@@ -226,25 +252,25 @@ module interp2_stage23_shared_dsp_ce #(
                 case (job_mac_index)
                     4'd0: begin
                         pair_sum_comb =
-                            $signed({stage3_hist[0][DATA_W-1],
+                            $signed({stage3_hist[0][STAGE3_DATA_W-1],
                                      stage3_hist[0]}) +
-                            $signed({stage3_hist[5][DATA_W-1],
+                            $signed({stage3_hist[5][STAGE3_DATA_W-1],
                                      stage3_hist[5]});
                         coeff_comb = 16'sd404;
                     end
                     4'd1: begin
                         pair_sum_comb =
-                            $signed({stage3_hist[1][DATA_W-1],
+                            $signed({stage3_hist[1][STAGE3_DATA_W-1],
                                      stage3_hist[1]}) +
-                            $signed({stage3_hist[4][DATA_W-1],
+                            $signed({stage3_hist[4][STAGE3_DATA_W-1],
                                      stage3_hist[4]});
                         coeff_comb = -16'sd3272;
                     end
                     4'd2: begin
                         pair_sum_comb =
-                            $signed({stage3_hist[2][DATA_W-1],
+                            $signed({stage3_hist[2][STAGE3_DATA_W-1],
                                      stage3_hist[2]}) +
-                            $signed({stage3_hist[3][DATA_W-1],
+                            $signed({stage3_hist[3][STAGE3_DATA_W-1],
                                      stage3_hist[3]});
                         coeff_comb = 16'sd19250;
                     end
@@ -258,23 +284,23 @@ module interp2_stage23_shared_dsp_ce #(
                 case (job_mac_index)
                     4'd0: begin
                         pair_sum_comb =
-                            $signed({stage3_hist[0][DATA_W-1],
+                            $signed({stage3_hist[0][STAGE3_DATA_W-1],
                                      stage3_hist[0]}) +
-                            $signed({stage3_hist[4][DATA_W-1],
+                            $signed({stage3_hist[4][STAGE3_DATA_W-1],
                                      stage3_hist[4]});
                         coeff_comb = -16'sd148;
                     end
                     4'd1: begin
                         pair_sum_comb =
-                            $signed({stage3_hist[1][DATA_W-1],
+                            $signed({stage3_hist[1][STAGE3_DATA_W-1],
                                      stage3_hist[1]}) +
-                            $signed({stage3_hist[3][DATA_W-1],
+                            $signed({stage3_hist[3][STAGE3_DATA_W-1],
                                      stage3_hist[3]});
                         coeff_comb = 16'sd522;
                     end
                     4'd2: begin
                         pair_sum_comb =
-                            $signed({stage3_hist[2][DATA_W-1],
+                            $signed({stage3_hist[2][STAGE3_DATA_W-1],
                                      stage3_hist[2]});
                         coeff_comb = 16'sd32016;
                     end
@@ -305,15 +331,15 @@ module interp2_stage23_shared_dsp_ce #(
             job_deadline <= 32'd0;
             cycle_count <= 32'd0;
             acc_reg <= {ACC_W{1'b0}};
-            stage2_y_out <= {DATA_W{1'b0}};
-            stage3_y_out <= {DATA_W{1'b0}};
+            stage2_y_out <= {STAGE2_DATA_W{1'b0}};
+            stage3_y_out <= {STAGE3_DATA_W{1'b0}};
             stage2_y_out_valid <= 1'b0;
             stage3_y_out_valid <= 1'b0;
 
             for (i = 0; i < 9; i = i + 1)
-                stage2_hist[i] <= {DATA_W{1'b0}};
+                stage2_hist[i] <= {STAGE2_DATA_W{1'b0}};
             for (i = 0; i < 6; i = i + 1)
-                stage3_hist[i] <= {DATA_W{1'b0}};
+                stage3_hist[i] <= {STAGE3_DATA_W{1'b0}};
         end
         else begin
             cycle_count <= cycle_count + 32'd1;
@@ -351,11 +377,11 @@ module interp2_stage23_shared_dsp_ce #(
             if (job_active) begin
                 if (job_mac_index == job_mac_count - 4'd1) begin
                     if (job_stage == 2'd2) begin
-                        stage2_y_out <= shared_q15_rounded;
+                        stage2_y_out <= stage2_q15_rounded;
                         stage2_y_out_valid <= 1'b1;
                     end
                     else begin
-                        stage3_y_out <= shared_q15_rounded;
+                        stage3_y_out <= stage3_q15_rounded;
                         stage3_y_out_valid <= 1'b1;
                     end
 
@@ -392,6 +418,11 @@ module interp2_stage23_shared_dsp_ce #(
     end
 
 `ifndef SYNTHESIS
+    initial begin
+        if (STAGE2_DATA_W < STAGE3_DATA_W)
+            $fatal(1, "Stage 2 data width must be >= Stage 3 data width");
+    end
+
     always @(posedge clk) begin
         if (rst_n) begin
             if (ACC_W < PROD_W &&
