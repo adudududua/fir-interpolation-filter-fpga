@@ -1,0 +1,11 @@
+Phase 7 Stage3 folded compensation search
+===========================================
+Architecture: Stage1 -> Stage2 -> folded Stage3 -> CIC16
+Limits: pass<0.01dB, stop>70dB, linear phase
+
+folded_n3 taps=11 Q15/17bit weight=0.01 pass=0.00301944dB ripple=0.00592011dB stop=72.36609417dB gd=0
+coeff_int = 561 137 -4234 -1555 20057 35604 20057 -1555 -4234 137 561 
+
+folded_n4 taps=11 Q15/17bit weight=10 pass=0.00295999dB ripple=0.00586378dB stop=78.59952255dB gd=1.09139364213e-11
+coeff_int = 624 153 -4587 -1971 20348 36402 20348 -1971 -4587 153 624 
+

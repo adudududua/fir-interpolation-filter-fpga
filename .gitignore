@@ -94,3 +94,10 @@ matlab_fir/alt_all2x_v2/vivado_results/
 #============================================================
 
 matlab_fir/alt_all2x_v6/vivado_work/
+
+#============================================================
+# Phase 7 reproducible MATLAB caches
+#============================================================
+
+matlab_fir/alt_all2x_v7/*.mat
+matlab_fir/alt_all2x_v7/**/*.mat

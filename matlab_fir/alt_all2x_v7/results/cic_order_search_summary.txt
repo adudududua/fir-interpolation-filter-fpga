@@ -1,0 +1,10 @@
+Phase 7-A CIC order search
+===========================
+Structure: low-rate comb -> upsample16 -> high-rate integrator
+Input width at Stage3 output = 20 bit
+
+N=3 droop20k=-0.13735635 passAbs=0.14084412 ripple=0.13912102 stop=72.51622026 growth=12 fullWidth=32 pass=0
+N=4 droop20k=-0.18314180 passAbs=0.18662481 ripple=0.18483933 stop=79.06134032 growth=16 fullWidth=36 pass=0
+N=5 droop20k=-0.22892725 passAbs=0.23240551 ripple=0.23056060 stop=79.17434026 growth=20 fullWidth=40 pass=0
+
+All CIC orders require passband compensation before RTL.

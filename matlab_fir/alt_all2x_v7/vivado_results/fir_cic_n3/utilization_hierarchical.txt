@@ -1,0 +1,48 @@
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date         : Mon Jul 13 23:40:41 2026
+| Host         : LAPTOP-476JT8H0 running 64-bit major release  (build 9200)
+| Command      : report_utilization -hierarchical -file D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/alt_all2x_v7/vivado_results/fir_cic_n3/utilization_hierarchical.txt
+| Design       : interp128_all2x_v7_fir_cic_top_ce
+| Device       : 7a35tfgg484-2
+| Design State : Synthesized
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++------------------------------------------------------+------------------------------------------------------+------------+------------+---------+------+------+--------+--------+--------------+
+|                       Instance                       |                        Module                        | Total LUTs | Logic LUTs | LUTRAMs | SRLs |  FFs | RAMB36 | RAMB18 | DSP48 Blocks |
++------------------------------------------------------+------------------------------------------------------+------------+------------+---------+------+------+--------+--------+--------------+
+| interp128_all2x_v7_fir_cic_top_ce                    |                                                (top) |       1199 |       1199 |       0 |    0 | 1154 |      0 |      2 |            3 |
+|   (interp128_all2x_v7_fir_cic_top_ce)                |                                                (top) |          0 |          0 |       0 |    0 |    0 |      0 |      0 |            0 |
+|   u_bridge_2_to_4_quantized                          |                 bridge_valid_quantized_to_interp2_ce |         13 |         13 |       0 |    0 |    2 |      0 |      0 |            0 |
+|     (u_bridge_2_to_4_quantized)                      |                 bridge_valid_quantized_to_interp2_ce |          2 |          2 |       0 |    0 |    2 |      0 |      0 |            0 |
+|     u_round_sat_shift_compact                        |                              round_sat_shift_compact |         11 |         11 |       0 |    0 |    0 |      0 |      0 |            0 |
+|   u_bridge_4_to_8_quantized                          | bridge_valid_quantized_to_interp2_ce__parameterized0 |         12 |         12 |       0 |    0 |    2 |      0 |      0 |            0 |
+|     (u_bridge_4_to_8_quantized)                      | bridge_valid_quantized_to_interp2_ce__parameterized0 |          2 |          2 |       0 |    0 |    2 |      0 |      0 |            0 |
+|     u_round_sat_shift_compact                        |              round_sat_shift_compact__parameterized0 |         10 |         10 |       0 |    0 |    0 |      0 |      0 |            0 |
+|   u_cic_interp16_top                                 |                                     cic_interp16_top |        517 |        517 |       0 |    0 |  591 |      0 |      0 |            1 |
+|     u_cic_compensation_fir_ce                        |                              cic_compensation_fir_ce |        236 |        236 |       0 |    0 |  366 |      0 |      0 |            1 |
+|       (u_cic_compensation_fir_ce)                    |                              cic_compensation_fir_ce |        219 |        219 |       0 |    0 |  366 |      0 |      0 |            1 |
+|       u_round_compensation_q12                       |              round_sat_shift_compact__parameterized1 |         17 |         17 |       0 |    0 |    0 |      0 |      0 |            0 |
+|     u_cic_interp16_core_ce                           |                                 cic_interp16_core_ce |        281 |        281 |       0 |    0 |  225 |      0 |      0 |            0 |
+|       (u_cic_interp16_core_ce)                       |                                 cic_interp16_core_ce |        162 |        162 |       0 |    0 |  225 |      0 |      0 |            0 |
+|       u_round_cic_normalized_output                  |              round_sat_shift_compact__parameterized3 |         13 |         13 |       0 |    0 |    0 |      0 |      0 |            0 |
+|       u_round_final_integrator_input                 |              round_sat_shift_compact__parameterized2 |        106 |        106 |       0 |    0 |    0 |      0 |      0 |            0 |
+|   u_interp2_stage1_strict_halfband_bram_ce           |               interp2_stage1_strict_halfband_bram_ce |        265 |        265 |       0 |    0 |  143 |      0 |      2 |            1 |
+|     (u_interp2_stage1_strict_halfband_bram_ce)       |               interp2_stage1_strict_halfband_bram_ce |        159 |        159 |       0 |    0 |  143 |      0 |      2 |            1 |
+|     u_round_sat_q15_to_data                          |                                   round_sat_q16_to24 |        106 |        106 |       0 |    0 |    0 |      0 |      0 |            0 |
+|   u_interp2_stage23_shared_dsp_ce                    |                        interp2_stage23_shared_dsp_ce |        392 |        392 |       0 |    0 |  416 |      0 |      0 |            1 |
+|     (u_interp2_stage23_shared_dsp_ce)                |                        interp2_stage23_shared_dsp_ce |        392 |        392 |       0 |    0 |  416 |      0 |      0 |            1 |
+|     gen_separate_rounders.u_round_stage3_q15_compact |           round_sat_q15_compact_to24__parameterized0 |          0 |          0 |       0 |    0 |    0 |      0 |      0 |            0 |
++------------------------------------------------------+------------------------------------------------------+------------+------------+---------+------+------+--------+--------+--------------+
+
+

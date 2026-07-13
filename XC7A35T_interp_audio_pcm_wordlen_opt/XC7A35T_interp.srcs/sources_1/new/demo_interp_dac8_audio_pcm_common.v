@@ -5,7 +5,7 @@
 // 功能简述     : 音频 PCM 输入版 FIR 插值 DAC 演示公共模块。
 //                本模块使用 audio_pcm_rom_source 读取 24bit
 //                signed 音频 PCM 采样点，并送入 44.1kHz 专用
-//                Phase 6 混合字长全 2x 七级 128x 插值滤波器链路。
+//                Phase 7 N=3 折叠补偿 FIR-CIC 128x 插值链路。
 //                
 //                当前输入为 147 点、15kHz、24bit 单正弦 ROM，
 //                专门用于示波器比较四档阶梯粗糙度。
@@ -30,9 +30,13 @@
 //                            未经过插值链的 1x DAC 旁路档位。
 //                2026-07-13：板级链路切换为 Phase 6 混合数据字长
 //                            24/22/20/18/18/18/18bit 结构。
+//                2026-07-13：增加 Phase 7 N=3 折叠补偿 FIR-CIC
+//                            分支，并保留 Phase 6 常量回退路径。
 //=============================================================
 
-module demo_interp_dac8_audio_pcm_common (
+module demo_interp_dac8_audio_pcm_common #(
+    parameter integer USE_PHASE7_FOLDED = 1
+)(
     input  wire        clk_audio_128x,  // 5.6448MHz 连续音频 128x 时钟
     input  wire        rst_n,           // 低有效复位
     input  wire [1:0]  mode_sel,        // 00=1x，01=4x，10=8x，11=128x
@@ -166,12 +170,13 @@ module demo_interp_dac8_audio_pcm_common (
     end
 
     //=========================================================
-    // 5）实例化 44.1kHz 专用全 2x 插值链
+    // 5）实例化 44.1kHz 专用 128x 插值链
     //
-    // 插值链内部结构：
-    //   2x × 2x × 2x × 2x × 2x × 2x × 2x = 128x
+    // 默认 Phase 7 结构：
+    //   2x × 2x × 2x × CIC16 = 128x
     //   Stage 1 使用 BRAM 单 DSP，Stage 2/3 共用第 2 个 DSP；
-    //   级间数据采用 24/22/20/18/18/18/18bit Q 格式。
+    //   Stage3 11tap Q15 系数同时承担 CIC 通带补偿，CIC 为 N=3。
+    // USE_PHASE7_FOLDED=0 时回退到 Phase 6 七级全 2x 结构。
     //
     // 输出节点：
     //   dbg_y4 ：4x 输出
@@ -193,42 +198,48 @@ module demo_interp_dac8_audio_pcm_common (
     wire signed [23:0] dbg_y64_w;
     wire               dbg_y64_valid_w;
 
-    interp128_all2x_v6_mixed_width_top_ce #(
-        .STAGE23_ACC_W (38)
-    ) u_interp128_all2x_v6_mixed_width_top_ce (
-        .clk            (clk_audio_128x),
-        .rst_n          (rst_n),
-
-        .ce2_out        (ce2_out),
-        .ce4_out        (ce4_out),
-        .ce8_out        (ce8_out),
-        .ce16_out       (ce16_out),
-        .ce32_out       (ce32_out),
-        .ce64_out       (ce64_out),
-        .ce128_out      (ce128_out),
-
-        .x_in           (x_in),
-        .x_in_valid     (x_in_valid),
-
-        .y_out          (y_out_w),
-        .y_out_valid    (y_out_valid_w),
-
-        .dbg_y2         (),
-        .dbg_y2_valid   (),
-        .dbg_y4         (dbg_y4_w),
-        .dbg_y4_valid   (dbg_y4_valid_w),
-
-        .dbg_y8         (dbg_y8_w),
-        .dbg_y8_valid   (dbg_y8_valid_w),
-
-        .dbg_y16        (),
-        .dbg_y16_valid  (),
-        .dbg_y32        (dbg_y32_w),
-        .dbg_y32_valid  (dbg_y32_valid_w),
-
-        .dbg_y64        (dbg_y64_w),
-        .dbg_y64_valid  (dbg_y64_valid_w)
-    );
+    generate
+        if (USE_PHASE7_FOLDED != 0) begin : gen_phase7_folded
+            interp128_all2x_v7_folded_fir_cic_top_ce #(
+                .STAGE23_ACC_W   (38),
+                .CIC_ORDER       (3),
+                .FINAL_PRUNE_LSB (0)
+            ) u_interp128_all2x_v7_folded_fir_cic_top_ce (
+                .clk(clk_audio_128x), .rst_n(rst_n),
+                .ce2_out(ce2_out), .ce4_out(ce4_out),
+                .ce8_out(ce8_out), .ce16_out(ce16_out),
+                .ce32_out(ce32_out), .ce64_out(ce64_out),
+                .ce128_out(ce128_out),
+                .x_in(x_in), .x_in_valid(x_in_valid),
+                .y_out(y_out_w), .y_out_valid(y_out_valid_w),
+                .dbg_y2(), .dbg_y2_valid(),
+                .dbg_y4(dbg_y4_w), .dbg_y4_valid(dbg_y4_valid_w),
+                .dbg_y8(dbg_y8_w), .dbg_y8_valid(dbg_y8_valid_w),
+                .dbg_y16(), .dbg_y16_valid(),
+                .dbg_y32(dbg_y32_w), .dbg_y32_valid(dbg_y32_valid_w),
+                .dbg_y64(dbg_y64_w), .dbg_y64_valid(dbg_y64_valid_w)
+            );
+        end
+        else begin : gen_phase6_fallback
+            interp128_all2x_v6_mixed_width_top_ce #(
+                .STAGE23_ACC_W (38)
+            ) u_interp128_all2x_v6_mixed_width_top_ce (
+                .clk(clk_audio_128x), .rst_n(rst_n),
+                .ce2_out(ce2_out), .ce4_out(ce4_out),
+                .ce8_out(ce8_out), .ce16_out(ce16_out),
+                .ce32_out(ce32_out), .ce64_out(ce64_out),
+                .ce128_out(ce128_out),
+                .x_in(x_in), .x_in_valid(x_in_valid),
+                .y_out(y_out_w), .y_out_valid(y_out_valid_w),
+                .dbg_y2(), .dbg_y2_valid(),
+                .dbg_y4(dbg_y4_w), .dbg_y4_valid(dbg_y4_valid_w),
+                .dbg_y8(dbg_y8_w), .dbg_y8_valid(dbg_y8_valid_w),
+                .dbg_y16(), .dbg_y16_valid(),
+                .dbg_y32(dbg_y32_w), .dbg_y32_valid(dbg_y32_valid_w),
+                .dbg_y64(dbg_y64_w), .dbg_y64_valid(dbg_y64_valid_w)
+            );
+        end
+    endgenerate
 
     //=========================================================
     // 6）选择当前需要送到 DAC 的插值节点

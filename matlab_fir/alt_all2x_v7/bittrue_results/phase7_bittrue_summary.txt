@@ -1,0 +1,8 @@
+Phase 7-C full-precision bit-true validation
+================================================
+Architecture: Stage1-3 FIR -> compensation FIR -> comb -> upsample16 -> integrator
+Stage3 data width = 20bit
+Pass limits: pass<0.01dB, stop>70dB, random delta SNR>=90dB, overflow=0, saturation=0
+
+aggressive_n3 N=3 fullW=32 pass=0.00330949dB stop=72.35456588dB deltaSNR=98.925dB SINAD15=78.658dB THD15=-126.772dB SINAD20=70.987dB THD20=-131.580dB overflow=0 sat=0 pass=1
+robust_n4 N=4 fullW=36 pass=0.00445935dB stop=78.74168267dB deltaSNR=99.217dB SINAD15=91.152dB THD15=-126.612dB SINAD20=82.748dB THD20=-129.251dB overflow=0 sat=0 pass=1

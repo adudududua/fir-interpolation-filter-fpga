@@ -1,0 +1,7 @@
+Phase 7 folded Stage3 bit-true validation
+==========================================
+Architecture: Stage1 -> Stage2 -> folded Stage3 -> CIC16
+Limits: pass<0.01dB, stop>70dB, delta SNR>=94dB, overflow=0, saturation=0
+
+folded_n3 N=3 profile=0-0-0-0-0-0 pass=0.00303062dB stop=72.34928971dB deltaSNR=96.403dB SINAD15=78.550dB THD15=-122.275dB SINAD20=70.912dB THD20=-128.319dB overflow=0 sat=0 pass=1
+folded_n4 N=4 profile=0-0-0-0-0-0-0-7 pass=0.00294246dB stop=78.78393881dB deltaSNR=94.740dB SINAD15=89.596dB THD15=-121.483dB SINAD20=82.193dB THD20=-130.239dB overflow=0 sat=0 pass=1

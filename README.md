@@ -1,6 +1,7 @@
 # 高阶数字插值滤波器设计与 FPGA 验证
 
-> 当前实现版本：44.1 kHz 专用、7 级全 2x、Phase 6 混合数据字长、2 DSP、ACC38<br>
+> 当前候选版本：44.1 kHz 专用、Phase 7 折叠补偿 FIR-CIC、2 DSP<br>
+> 已实板验证回退：Phase 6 混合数据字长、7 级全 2x、2 DSP、ACC38<br>
 > FPGA：Xilinx Artix-7 `XC7A35T-FGG484-2`<br>
 > 工具：MATLAB R2023a、Vivado 2018.3<br>
 > V3 实板回退提交：`6132cbb`<br>
@@ -9,13 +10,109 @@
 
 本项目面向“高阶数字插值滤波器设计与验证”赛题，完成了从 MATLAB 数学建模、等波纹 FIR 设计、定点量化、bit-true 验证、RTL 编码、功能仿真、综合实现到 FPGA 板级测试的完整闭环。
 
-当前版本输入为 **44.1 kHz、24 bit signed PCM**，经过 7 级 2 倍 FIR 插值后得到 **5.6448 MHz** 的 128 倍输出，同时提供 1 倍旁路、4 倍与 8 倍中间节点，经 AD9708 8 bit 并行 DAC 输出到示波器。Phase 6 保留 Phase 5 的严格半带系数、Stage 2/3 共享 DSP 和逐点有效输出序列，在级间加入对称舍入量化，把七级数据宽度优化为 **24/22/20/18/18/18/18 bit**，并把共享累加器收缩为 38 bit。该版本已经完成 MATLAB 搜索、RTL bit-true、独立综合、完整板级实现、bitstream 生成和四档实板验证。
+当前 Phase 7 候选输入为 **44.1 kHz、24 bit signed PCM**，采用 `2x × 2x × 2x × CIC16 = 128x` 得到 **5.6448 MHz** 输出。CIC 通带补偿折叠进原 11tap Stage3，Stage2/3 继续共享一个 DSP。该候选已完成 MATLAB 搜索、定点验证、RTL 0 LSB、完整四档 XSim、独立综合、完整板级实现和 bitstream 生成；四档实板复测尚待执行。Phase 6 七级全 2x 版本仍保留为已实板验证的稳定回退路径。
 
-## 1. 当前结论
+## 0. Phase 7 折叠补偿 FIR-CIC 候选
+
+### 0.1 为什么从全 FIR 尝试 FIR-CIC
+
+Phase 6 的 Stage4～7 只负责从 352.8 kHz 提升到 5.6448 MHz，而有效音频带宽仍为 20 kHz。Phase 7 使用无乘法 CIC16 替换这四级后端 FIR，并把 CIC 通带逆下垂折叠进原 Stage3：
+
+```text
+44.1 kHz -> Stage1 2x -> Stage2 2x
+          -> Stage3 2x + CIC 补偿 -> CIC16 -> 5.6448 MHz
+```
+
+标准插值 CIC 的顺序为：
+
+```text
+低速 comb -> 16 倍插零 -> 高速 integrator
+```
+
+独立 15tap 补偿 FIR 方案虽然数学和 RTL 均通过，但增加到 3 DSP，资源 Stop/Go 失败；折叠方案不增加 Stage3 taps、MAC 次数或历史深度，最终保留 2 DSP。
+
+### 0.2 最终数学与定点参数
+
+| 项目 | Phase 7 N=3 结果 | 验收门槛 | 判定 |
+|---|---:|---:|---|
+| 结构 | `2x × 2x × 2x × CIC16` | 128x | 通过 |
+| CIC 参数 | `R=16, M=1, N=3` | - | - |
+| Stage3 | 11tap Q15 折叠补偿 | 线性相位 | 通过 |
+| 通带最大绝对误差 | **0.00303062 dB** | <0.01 dB | 通过 |
+| 总阻带衰减 | **72.349 dB** | >70 dB | 通过 |
+| 随机 PCM Delta-SNR | **96.403 dB** | >=94 dB | 通过 |
+| 15 kHz / 20 kHz SINAD | **78.550 / 70.912 dB** | 记录项 | 通过 |
+| CIC 溢出 / 饱和 | **0 / 0** | 0 / 0 | 通过 |
+| MATLAB/RTL | **冲激与随机 PCM 均 0 LSB** | 0 LSB | 通过 |
+
+最终 Stage3 Q15 系数：
+
+```text
+561, 137, -4234, -1555, 20057, 35604,
+20057, -1555, -4234, 137, 561
+```
+
+中心系数 `35604` 在 RTL 中严格等价拆为 `-29932 + 65536`，恢复 25x16 signed DSP 乘法器。直通项预装进现有累加器，输出保持 0 LSB 不变。
+
+![Phase 7 Stage3 折叠补偿频响](matlab_fir/alt_all2x_v7/figures/folded_stage3_response.png)
+
+![Phase 7 折叠方案 bit-true](matlab_fir/alt_all2x_v7/figures/folded_stage3_bittrue.png)
+
+### 0.3 资源 Stop/Go
+
+统一 48 MHz 约束的独立链结果：
+
+| 版本 | LUT | FF | DSP | BRAM | WNS | 结论 |
+|---|---:|---:|---:|---:|---:|---|
+| Phase 6 基线 | 1222 | 868 | 2 | 1 | +9.107 ns | 基线 |
+| 独立补偿 N3 | 1199 | 1154 | 3 | 1 | +7.889 ns | No-Go |
+| 独立补偿 N4 | 1366 | 1243 | 3 | 1 | +6.876 ns | No-Go |
+| **折叠补偿 N3** | **957** | **791** | **2** | **1** | **+9.107 ns** | **Go** |
+| 折叠补偿 N4 | 1116 | 876 | 2 | 1 | +7.625 ns | No-Go，LUT 降幅不足 15% |
+
+最终 N=3 相对 Phase 6 独立链减少 **265 LUT（21.69%）** 和 **77 FF（8.87%）**，DSP/BRAM 不变。
+
+完整四档板级实现：
+
+| 项目 | Phase 6 | Phase 7 N3 | 变化 |
+|---|---:|---:|---:|
+| LUT | 1395 | **1135** | -260，-18.64% |
+| FF | 1040 | **962** | -78，-7.50% |
+| DSP / BRAM | 2 / 1 | **2 / 1** | 不变 |
+| WNS / WHS | +45.145 / +0.121 ns | **+44.704 / +0.107 ns** | 均通过 |
+| DRC Error | 0 | **0** | 通过 |
+
+![Phase 7 独立链与板级资源对比](matlab_fir/alt_all2x_v7/figures/phase7_resource_comparison.png)
+
+### 0.4 RTL、工程与 bitstream
+
+Phase 7 已完成两段严格 RTL 对拍：
+
+- `tb_phase7_folded_front3_bittrue.v`：原始 24bit 输入到 Stage3，N3/N4 × 冲激/随机四条流均 0 LSB；
+- `tb_cic_interp16_folded_core.v`：Stage3 20bit 输入到 CIC16，N3/N4 冲激/随机均 0 LSB。
+
+完整板级公共模块也通过四档 XSim 回归。在相同观察窗内，`1x / 4x / 8x / 128x` 的 DA_CLK 边沿分别为 `32 / 128 / 256 / 4096`，与理论倍率完全一致；DAC 数据分别变化 `32 / 127 / 253 / 3306` 次，确认四档并非只有时钟翻转，而是都有有效数据输出。
+
+Vivado 工程已正式登记 Phase 7 源文件；`demo_interp_dac8_audio_pcm_common.v` 默认使用 Phase 7，同时保留 `USE_PHASE7_FOLDED=0` 的 Phase 6 generate 回退路径。四档接口仍为 `1x / 4x / 8x / 128x`，15 kHz ROM、矩阵按键、单 DAC 和引脚均不改变。
+
+Phase 7 bitstream：
+
+```text
+matlab_fir/alt_all2x_v7/vivado_results/board_folded_n3/
+board_demo_competition_dac8_top_phase7_folded_n3.bit
+```
+
+```text
+SHA256: 2EA1E1A8462B3E83D25412E32B7D5175B88390DCBCC885452DD5F93142C5BC11
+```
+
+当前只剩人工下载后的四档实板复测。完整设计推导、候选淘汰原因、位真和综合证据见 [Phase 7 执行报告](matlab_fir/all2x_phase7_fir_cic_execution_report.md)。
+
+## 1. Phase 6 已实板验证回退结论
 
 ### 1.1 核心指标
 
-| 项目 | 赛题要求 | 当前 Phase 6 MATLAB / RTL 结果 | 判定 |
+| 项目 | 赛题要求 | Phase 6 MATLAB / RTL 结果 | 判定 |
 |---|---:|---:|---|
 | 输入格式 | 24 bit signed | 24 bit signed PCM | 通过 |
 | 输入采样率 | 44.1 kHz | 44.1 kHz | 通过 |
@@ -534,6 +631,7 @@ Phase 6 用完整板级公共模块重新运行四档仿真；每档预热后，
 | **Phase 5 ACC40** | **Q15 紧凑舍入 + ACC40** | **1379** | **1015** | **2** | **1** | **+165.332** | **是** |
 | Phase 6 三 DSP 候选 | Stage2/3 各用独立 DSP | 1431 | 1052 | 3 | 1 | +165.937 | 是 |
 | **Phase 6 混合字长** | **24/22/20/18 bit + ACC38** | **1224** | **867** | **2** | **1** | **+165.427** | **是** |
+| **Phase 7 折叠 FIR-CIC N3** | **Stage3 补偿 + CIC16** | **957** | **791** | **2** | **1** | **+9.107 @ 48MHz** | **是** |
 
 Phase 3 BRAM 相对全 2x 稳定基线：
 
@@ -578,6 +676,7 @@ BRAM Tile：1 -> 1
 | V4 四档板测基线 | 1817 | 1182 | 2 | 1 | 1x/4x/8x/128x 均正常，提交 `e9882fc` |
 | **Phase 5 ACC40 四档板级** | **1536** | **1181** | **2** | **1** | **实现与 bitstream 通过，待实板复测** |
 | **Phase 6 混合字长四档板级** | **1395** | **1040** | **2** | **1** | **1x/4x/8x/128x 实板验证通过** |
+| **Phase 7 折叠 FIR-CIC 四档板级** | **1135** | **962** | **2** | **1** | **实现与 bitstream 通过，待实板复测** |
 
 V3 相对全 2x 初始稳定板级：
 
@@ -760,6 +859,12 @@ SHA256：E122FC402FB10E43954BDC5E9E134BD2789F1645F138D6FFAAD83C52581612C3
 | `matlab_fir/alt_all2x_v6/phase6_03_plot_resource_comparison.m` | 生成 Phase 5/6 独立链与板级资源对比图 |
 | `matlab_fir/all2x_phase6_execution_plan.md` | Phase 6 执行计划与逐项状态 |
 | `matlab_fir/all2x_phase6_execution_report.md` | 指导采纳、Pareto、字长搜索、RTL 和实现完整报告 |
+| `matlab_fir/alt_all2x_v7/search_cic_order.m` | CIC N=3/4/5 频响与位增长搜索 |
+| `matlab_fir/alt_all2x_v7/search_cic_compensation.m` | 独立低速补偿 FIR Pareto 搜索 |
+| `matlab_fir/alt_all2x_v7/phase7_05_search_folded_stage3.m` | 11tap Stage3 折叠补偿搜索 |
+| `matlab_fir/alt_all2x_v7/phase7_06_validate_folded_bittrue.m` | 折叠方案定点与剪枝验证 |
+| `matlab_fir/all2x_phase7_cic_execution_plan.md` | Phase 7 Stop/Go 计划和最终状态 |
+| `matlab_fir/all2x_phase7_fir_cic_execution_report.md` | Phase 7 数学、RTL、资源和板级完整报告 |
 | `audio_data/generate_demo_sine_15k_44k1.m` | 生成 44.1 kHz / 24 bit / 15 kHz 示波器对比 ROM |
 
 ### 12.2 RTL
@@ -767,7 +872,7 @@ SHA256：E122FC402FB10E43954BDC5E9E134BD2789F1645F138D6FFAAD83C52581612C3
 | 文件 / 模块 | 作用 |
 |---|---|
 | `board_demo_competition_dac8_top.v` | 板级顶层、时钟、复位、按键与 DAC 接口 |
-| `demo_interp_dac8_audio_pcm_common.v` | PCM 输入、Phase 6 混合字长链实例、节点选择与 DAC 数据转换 |
+| `demo_interp_dac8_audio_pcm_common.v` | PCM 输入、Phase 7 默认实例、Phase 6 generate 回退与 DAC 转换 |
 | `audio_pcm_rom_source.v` | 24 bit signed PCM ROM 输入源 |
 | `demo_sine_15k_44k1_24bit_147.mem` | 147 点、50 周期、0.80FS 的 15 kHz 单正弦 |
 | `all2x_v3/interp2_stage1_strict_halfband_bram_ce.v` | Stage1 strict-halfband 双口 BRAM 单 DSP MAC |
@@ -781,12 +886,15 @@ SHA256：E122FC402FB10E43954BDC5E9E134BD2789F1645F138D6FFAAD83C52581612C3
 | `all2x_v6/interp128_all2x_v6_mixed_width_top_ce.v` | 当前 Phase 6 七级混合字长 128x 顶层 |
 | `all2x_v6/interp2_stage23_independent_dsp_ce.v` | 仅用于 3-DSP Pareto 的 Stage2/3 独立 DSP 候选 |
 | `all2x_v6/interp128_all2x_v6_three_dsp_top_ce.v` | 仅用于 No-Go 对照的 3-DSP 包装顶层 |
+| `all2x_v7/interp2_stage23_folded_cic_dsp_ce.v` | Stage2/3 共享 DSP 与 Stage3 折叠补偿 |
+| `all2x_v7/cic_interp16_core_ce.v` | 低速 comb、16 倍插零、高速 integrator CIC 核 |
+| `all2x_v7/interp128_all2x_v7_folded_fir_cic_top_ce.v` | 当前 Phase 7 N=3 候选 128x 顶层 |
 | `all2x_v2/interp2_stage23_polyphase_ce.v` | Stage2/3 true-polyphase 实现 |
 | `all2x_v2/interp2_halfband7_shiftadd_ce.v` | Stage4～7 canonical shift-add 实现 |
 | `all2x_v2/bridge_valid_only_to_interp2_ce.v` | 级间轻量 valid 桥 |
 | `round_sat_q16_to24.v` | 舍入与 24 bit 饱和 |
 
-### 12.3 Phase 6 仿真与 Vivado 脚本
+### 12.3 Phase 6 / Phase 7 仿真与 Vivado 脚本
 
 | 文件 | 作用 |
 |---|---|
@@ -801,6 +909,11 @@ SHA256：E122FC402FB10E43954BDC5E9E134BD2789F1645F138D6FFAAD83C52581612C3
 | `alt_all2x_v6/vivado/synth_phase6_three_dsp_pareto.tcl` | 3-DSP 候选独立综合与 DSP 映射报告 |
 | `alt_all2x_v6/vivado/synth_phase6_mixed_width.tcl` | 混合字长独立链综合 |
 | `alt_all2x_v6/vivado/build_board_phase6_mixed_width.tcl` | Reset 工程 run、完整实现、报告和 bitstream 导出 |
+| `sim_1/new/all2x_v7/tb_phase7_folded_front3_bittrue.v` | Phase 7 前三级 N3/N4 冲激/随机 0 LSB |
+| `sim_1/new/all2x_v7/tb_cic_interp16_folded_core.v` | Phase 7 CIC 核 N3/N4 冲激/随机 0 LSB |
+| `alt_all2x_v7/vivado/synth_phase7_folded_fir_cic.tcl` | Phase 7 N3/N4 同口径独立综合 |
+| `alt_all2x_v7/vivado/register_phase7_board_sources.tcl` | Phase 7 工程源文件登记 |
+| `alt_all2x_v7/vivado/build_board_phase7_folded_n3.tcl` | Phase 7 板级完整实现与 bitstream 导出 |
 
 ---
 
@@ -852,6 +965,19 @@ run('phase6_02_export_mixed_width_golden.m');
 run('phase6_03_plot_resource_comparison.m');
 ```
 
+Phase 7 FIR-CIC 搜索与折叠补偿按以下顺序执行：
+
+```matlab
+cd('matlab_fir/alt_all2x_v7');
+run('search_cic_order.m');
+run('search_cic_compensation.m');
+run('phase7_03_validate_bittrue.m');
+run('phase7_04_search_hogenauer_pruning.m');
+run('phase7_05_search_folded_stage3.m');
+run('phase7_06_validate_folded_bittrue.m');
+run('phase7_07_plot_resource_comparison.m');
+```
+
 搜索结果写入 `wordlength_results/`，混合字长 golden 写入 `mixed_width_golden/`。CSV 属于可再生中间结果，仓库以 summary、RTL、图和最终报告为主要追踪对象。
 
 生成当前 15 kHz 示波器对比 ROM：
@@ -871,7 +997,7 @@ run('generate_demo_sine_15k_44k1.m');
 XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.xpr
 ```
 
-当前 `XC7A35T_interp.xpr` 已正式登记 V4/Phase 5 RTL、Phase 6 三个板级必需 RTL、`all2x_v2`～`all2x_v6` include 目录和 15 kHz `.mem` 文件，不需要再次手动 Add Sources。Phase 6 构建脚本已经 Reset 并重跑 `synth_1`、`impl_1` 与 bitstream；后续手动复现时可依次执行：
+当前 `XC7A35T_interp.xpr` 已正式登记 V4/Phase 5、Phase 6 和 Phase 7 板级 RTL、`all2x_v2`～`all2x_v7` include 目录、Phase 7 测试平台和 15 kHz `.mem` 文件，不需要再次手动 Add Sources。Phase 7 构建脚本已经 Reset 并重跑 `synth_1`、`impl_1` 与 bitstream；后续手动复现时可依次执行：
 
 ```text
 Run Synthesis
@@ -884,17 +1010,18 @@ Program Device
 为避免看到旧报告，在运行前应 Reset `synth_1` 与 `impl_1`，运行后关闭旧 Utilization 标签页并从最新 run 重新打开报告。可在综合后确认层次结构包含：
 
 ```text
-u_interp128_all2x_v6_mixed_width_top_ce
-u_interp2_stage23_shared_dsp_ce
+gen_phase7_folded
+u_interp128_all2x_v7_folded_fir_cic_top_ce
+u_interp2_stage23_folded_cic_dsp_ce
+u_cic_interp16_core_ce
 u_bridge_2_to_4_quantized
 u_bridge_4_to_8_quantized
-u_bridge_8_to_16_quantized
 ```
 
 也可以在 Vivado Tcl Console 执行完整构建脚本；该脚本会统一导出利用率、时序、功耗、DRC 和 bitstream：
 
 ```tcl
-source matlab_fir/alt_all2x_v6/vivado/build_board_phase6_mixed_width.tcl
+source matlab_fir/alt_all2x_v7/vivado/build_board_phase7_folded_n3.tcl
 ```
 
 下载新 bitstream 后依次按下 1x、4x、8x、128x 按键，测量 `DA_CLK` 并观察 AD9708 模拟输出波形。预期频率为 44.1 kHz、176.4 kHz、352.8 kHz、5.6448 MHz，四档模拟波形应呈现从粗糙阶梯到平滑正弦的渐进差异。
@@ -929,6 +1056,12 @@ codex/phase5-q15-single-rounder
 codex/phase6-three-dsp-pareto
 ```
 
+当前 Phase 7 工作分支：
+
+```text
+codex/phase7-fir-cic-hybrid
+```
+
 Phase 4 已增加第 2 个 DSP，由 Stage 2/3 共享，并完成以下 Stop/Go 闭环：
 
 1. FIR 系数和 MATLAB 指标不变。
@@ -939,3 +1072,5 @@ Phase 4 已增加第 2 个 DSP，由 Stage 2/3 共享，并完成以下 Stop/Go 
 6. post-route WNS +44.960 ns、WHS +0.121 ns，时序全部通过。
 
 V4 四档版本已完成 bitstream 和实板回归。Phase 5 在此基础上完成 Q15 单舍入、紧凑饱和和 ACC40，作为提交 `d8f4946` 的稳定优化基线。Phase 6 先证明 3-DSP 候选资源反而增加，再选择 `24/22/20/18/18/18/18 bit + ACC38` 的两 DSP 混合字长方案；独立链达到 1224 LUT / 867 FF，完整四档板级达到 1395 LUT / 1040 FF。bit-true、四档仿真、综合、实现、bitstream 和实板四档展示均已通过，实测 `DA_CLK` 为 176.37 kHz、352.86 kHz 和 5.64 MHz，DA 波形从 1x 到 128x 呈现清晰的逐级平滑变化。详细过程见 `matlab_fir/all2x_phase6_execution_report.md`。
+
+Phase 7 在正确 CIC 插值结构上先完成独立低速补偿 FIR，确认其资源 No-Go 后，把补偿折叠进原 11tap Stage3。最终 N=3 独立链为 957 LUT / 791 FF / 2 DSP / 1 BRAM，完整板级为 1135 LUT / 962 FF；MATLAB/RTL 0 LSB、滤波指标、时序、实现和 bitstream 均通过。当前 Phase 7 仍待实板四档复测，通过前继续把 Phase 6 视为稳定回退版本。

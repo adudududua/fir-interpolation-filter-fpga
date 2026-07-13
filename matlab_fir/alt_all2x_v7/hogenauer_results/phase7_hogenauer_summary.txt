@@ -1,0 +1,6 @@
+Phase 7-C Hogenauer-style LSB pruning
+========================================
+Limits: pass<0.01dB, stop>70dB, random delta SNR>=94dB, saturation=0
+
+aggressive_n3 N=3 profile=0-0-0-0-0-3 fullCost=192 prunedCost=189 saved=3 deltaSNR=94.578dB pass=0.00332604dB stop=72.34047692dB SINAD15=78.537dB SINAD20=70.969dB sat=0 result=1
+robust_n4 N=4 profile=0-0-0-0-0-0-0-6 fullCost=288 prunedCost=282 saved=6 deltaSNR=96.173dB pass=0.00445519dB stop=78.71466628dB SINAD15=88.860dB SINAD20=82.151dB sat=0 result=1

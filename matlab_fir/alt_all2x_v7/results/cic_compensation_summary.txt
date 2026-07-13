@@ -1,0 +1,22 @@
+Phase 7-B CIC compensation search
+==================================
+Compensation location = 352.8kHz before CIC
+Phase6 pass abs max = 0.00523192 dB
+Phase6 stop attenuation = 78.61965812 dB
+Limits: pass abs < 0.01000 dB, stop > 70.00 dB
+
+Total candidates = 648
+Passing candidates = 356
+Decision = GO_TO_BITTRUE
+
+Selected CIC order = 3
+Selected taps = 15
+Selected format = Q12 / 14bit
+Selected design stop = 156400.0 Hz
+Selected stop weight = 0.01
+Final pass abs max = 0.00327979 dB
+Final ripple pp = 0.00628333 dB
+Final stop attenuation = 72.36612094 dB
+Final DC gain = 127.960940361023
+Final symmetry error = 1.11022302463e-16
+Final group delay ripple = 1.09139364213e-11 sample

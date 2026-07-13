@@ -1,0 +1,11 @@
+* text=auto eol=crlf
+
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+*.bit binary
+*.dcp binary
+*.png binary
+*.pdf binary
+*.wdb binary

@@ -94,6 +94,13 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PSRCDIR/sources_1/new/all2x_v7/cic_interp16_core_ce.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PSRCDIR/sources_1/new/demo_interp_dac8_audio_pcm_common.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -122,6 +129,13 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PSRCDIR/sources_1/new/all2x_v7/interp128_all2x_v7_folded_fir_cic_top_ce.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PSRCDIR/sources_1/new/all2x_v2/interp2_all2x_v2_stage_select.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -144,6 +158,13 @@
         </FileInfo>
       </File>
       <File Path="$PSRCDIR/sources_1/new/all2x_v3/interp2_stage1_strict_halfband_bram_ce.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/new/all2x_v7/interp2_stage23_folded_cic_dsp_ce.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -342,6 +363,7 @@
         <Option Name="VerilogDir" Val="$PSRCDIR/sources_1/new/all2x_v4"/>
         <Option Name="VerilogDir" Val="$PSRCDIR/sources_1/new/all2x_v5"/>
         <Option Name="VerilogDir" Val="$PSRCDIR/sources_1/new/all2x_v6"/>
+        <Option Name="VerilogDir" Val="$PSRCDIR/sources_1/new/all2x_v7"/>
       </Config>
     </FileSet>
     <FileSet Name="constrs_1" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1">
@@ -367,6 +389,22 @@
       <File Path="$PSRCDIR/sim_1/new/tb_interp128_all2x_random_ce.v">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sim_1/new/all2x_v7/tb_cic_interp16_folded_core.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sim_1/new/all2x_v7/tb_phase7_folded_front3_bittrue.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>

@@ -1,0 +1,3 @@
+DSP48E1 count = 2
+CELL = u_interp2_stage1_strict_halfband_bram_ce/acc_reg0
+CELL = u_interp2_stage23_shared_dsp_ce/mac_sum_comb0
