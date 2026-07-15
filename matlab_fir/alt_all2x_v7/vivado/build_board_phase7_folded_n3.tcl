@@ -3,8 +3,8 @@
 # 脚本名       : build_board_phase7_folded_n3
 # 功能简述     : 重置并重跑 Phase 7 N=3 折叠补偿 FIR-CIC 四档
 #                板级工程的
-#                综合、实现和 bitstream，导出资源、时序、功耗
-#                与 DRC 报告。
+#                综合、实现和 bitstream，导出资源、时序、时钟交互、
+#                DSP 利用率、功耗与 DRC 报告。
 #
 #                本脚本直接打开现有 XC7A35T Vivado 工程，先检查
 #                三个 Phase 7 板级源文件均已登记，再清除 synth_1
@@ -41,6 +41,20 @@ set required_files [list \
 set result_dir [file normalize [file join $script_dir .. \
     vivado_results board_folded_n3]]
 
+proc write_phase7_dsp_report {report_file} {
+    set dsp_cells [get_cells -hierarchical -filter {REF_NAME =~ DSP48*}]
+    set report_handle [open $report_file w]
+    puts $report_handle "Phase 7 implemented DSP utilization"
+    puts $report_handle "=================================="
+    puts $report_handle "DSP48 cell count: [llength $dsp_cells]"
+    foreach dsp_cell $dsp_cells {
+        puts $report_handle [format "%s | %s | %s" $dsp_cell \
+            [get_property REF_NAME $dsp_cell] \
+            [get_property LOC $dsp_cell]]
+    }
+    close $report_handle
+}
+
 file mkdir $result_dir
 open_project $project_file
 
@@ -74,6 +88,10 @@ report_utilization -file \
     [file join $result_dir utilization_placed.rpt]
 report_timing_summary -delay_type min_max -max_paths 20 -file \
     [file join $result_dir timing_summary_routed.rpt]
+report_clock_interaction -delay_type min_max -file \
+    [file join $result_dir clock_interaction_routed.rpt]
+write_phase7_dsp_report \
+    [file join $result_dir dsp_utilization_routed.rpt]
 report_power -file [file join $result_dir power_routed.rpt]
 report_drc -file [file join $result_dir drc_routed.rpt]
 

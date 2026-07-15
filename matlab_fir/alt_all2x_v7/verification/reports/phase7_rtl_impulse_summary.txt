@@ -1,0 +1,28 @@
+Phase 7 formal RTL impulse verification
+=======================================
+Source: XSim output of interp128_all2x_v7_folded_fir_cic_top_ce
+Formal parameters: CIC_ORDER=3, FINAL_PRUNE_LSB=0
+Impulse lengths: 4x=225, 8x=459, 128x=7374
+
+4x pass abs max       = 0.0030112468 dB
+4x stop attenuation   = 78.6704216357 dB
+4x hard spec pass     = 1
+
+8x node scope         = CIC pre-emphasis internal node
+8x gain at 15 kHz     = +0.0757315920 dB
+8x gain at 20 kHz     = +0.1342927690 dB
+8x final +/-0.05 dB   = not applicable
+
+128x pass abs max     = 0.0030306183 dB
+128x pass peak/min    = +0.0029182884 / -0.0030306183 dB
+128x ripple pp        = 0.0059489067 dB
+128x stop attenuation = 72.3492897102 dB
+128x DC gain          = 127.975921630859
+128x DC gain error    = -0.001634076020 dB
+128x symmetry error   = 0 output LSB
+128x group delay mean = 3686.500000000000 samples
+128x group delay pp   = 9.01218299987e-09 samples
+128x block-fit GD pp  = 6.45741238259e-11 samples
+128x phase residual   = 2.84217094304e-14 rad
+128x hard spec pass   = 1
+128x release pass     = 1

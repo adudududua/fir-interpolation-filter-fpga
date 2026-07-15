@@ -1,0 +1,17 @@
+Phase 7 CIC modulo and DC verification
+=====================================
+Formal configuration: R=16 M=1 N=3 FULL_W=32 PRUNE=0
+RTL directed match: 656 valid inputs / 10496 outputs / 0 LSB
+
+Directed comb wrap       = 0
+Directed integrator wrap = 0
+Directed total wrap      = 0
+Directed output sat      = 0
+Positive DC total wrap   = 0
+Negative DC total wrap   = 0
+Positive DC phase diff   = 0 LSB
+Negative DC phase diff   = 0 LSB
+Positive DC gain error   = +9.64327466553e-15 dB
+Negative DC gain error   = +9.64327466553e-15 dB
+Positive DC stage wrap   = [0 0 0 0 0 0]
+Negative DC stage wrap   = [0 0 0 0 0 0]

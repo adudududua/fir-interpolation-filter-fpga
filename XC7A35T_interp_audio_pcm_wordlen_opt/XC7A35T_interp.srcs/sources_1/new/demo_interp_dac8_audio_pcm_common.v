@@ -32,6 +32,8 @@
 //                            24/22/20/18/18/18/18bit 结构。
 //                2026-07-13：增加 Phase 7 N=3 折叠补偿 FIR-CIC
 //                            分支，并保留 Phase 6 常量回退路径。
+//                2026-07-14：模式请求仅在候选 DAC 时钟公共低电平
+//                            窗口提交，消除运行中切档窄脉冲。
 //=============================================================
 
 module demo_interp_dac8_audio_pcm_common #(
@@ -60,24 +62,25 @@ module demo_interp_dac8_audio_pcm_common #(
     localparam [1:0] MODE_8X   = 2'b10;
     localparam [1:0] MODE_128X = 2'b11;
 
+    reg [1:0] mode_request;
     reg [1:0] mode_state;
 
     always @(*) begin
         case (mode_sel)
             2'b00: begin
-                mode_state = MODE_1X;
+                mode_request = MODE_1X;
             end
 
             2'b01: begin
-                mode_state = MODE_4X;
+                mode_request = MODE_4X;
             end
 
             2'b10: begin
-                mode_state = MODE_8X;
+                mode_request = MODE_8X;
             end
 
             default: begin
-                mode_state = MODE_128X;
+                mode_request = MODE_128X;
             end
         endcase
     end
@@ -119,6 +122,16 @@ module demo_interp_dac8_audio_pcm_common #(
             ce_cnt <= 7'd0;
         else
             ce_cnt <= ce_cnt + 7'd1;
+    end
+
+    // 只在所有候选 DAC 时钟均为低电平时切换时钟源。
+    // 这样 mode_sel 即使在任意基准时钟上升沿更新，也不会让
+    // 组合时钟选择器产生零宽或不足半个基准周期的脉冲。
+    always @(negedge clk_audio_128x or negedge rst_n) begin
+        if (!rst_n)
+            mode_state <= MODE_128X;
+        else if (!ce_cnt[6] && !ce_cnt[4] && !ce_cnt[3])
+            mode_state <= mode_request;
     end
 
     //=========================================================

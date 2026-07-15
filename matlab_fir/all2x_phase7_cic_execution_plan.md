@@ -88,21 +88,26 @@ Stage3 Q15 系数为：
 | 7-C2：Stage3 折叠补偿 | 已完成 | 11tap Q15，N3/N4 数学与定点通过 |
 | 7-D：CIC RTL 与 bit-true | 已完成 | 前三级四条流和 CIC 两组激励均 0 LSB |
 | 7-D2：板级四档 XSim 回归 | 已完成 | 1x/4x/8x/128x 边沿数为 32/128/256/4096，数据持续变化 |
+| 7-D3：正式顶层长序列 | 已完成 | 冲激、daily 4×1024、nightly 10×4096，4x/8x/128x 全部 0 LSB |
+| 7-D4：CIC 定向与复位 | 已完成 | comb、burst、模回绕、pending 负向、CIC 4 场景和顶层 8 场景全部通过 |
+| 7-D5：RTL 冲激验收 | 已完成 | 128x 最大偏差 0.00303062 dB、阻带 72.349 dB、对称误差 0 LSB |
+| 7-D6：动态切档 | 已完成 | 首轮发现 0 ns 脉冲并修复；最终 10 次切换无毛刺和 X |
 | 7-E：独立综合 Pareto | 已完成 | 最终 N3 957 LUT / 791 FF / 2 DSP / 1 BRAM |
-| 7-F：板级接入 | 已完成 | 已登记工程、重跑实现并生成 Phase 7 bitstream |
-| 7-G：报告与 README | 已完成 | 执行报告、资源图与 README 已同步 |
-| 7-H：实板复测 | 待人工下载 | 复测 1x/4x/8x/128x DA_CLK 与波形平滑度 |
+| 7-F：板级接入 | 已完成 | 安全切档修正版已重跑实现并生成 Phase 7 bitstream |
+| 7-G：报告与 README | 已完成 | 执行报告、验证补全报告、资源图与 README 已同步 |
+| 7-H1：Phase 7 静态板测 | 已完成 | 4x/8x/128x 实测 176.37 kHz / 352.86 kHz / 5.64 MHz，DA 正常 |
+| 7-H2：修正版动态板测 | 待人工下载 | 下载本轮 SHA256 对应 bitstream，复测无毛刺动态切档并补记 1x 频率 |
 
 ## 7. 板级构建结果
 
 | 资源 / 时序 | Phase 6 | Phase 7 N=3 | 变化 |
 |---|---:|---:|---:|
-| LUT | 1395 | 1135 | -260，-18.64% |
-| FF | 1040 | 962 | -78，-7.50% |
+| LUT | 1395 | 1128 | -267，-19.14% |
+| FF | 1040 | 964 | -76，-7.31% |
 | DSP | 2 | 2 | 不变 |
 | BRAM Tile | 1 | 1 | 不变 |
-| WNS | +45.145 ns | +44.704 ns | 均通过 |
-| WHS | +0.121 ns | +0.107 ns | 均通过 |
+| WNS | +45.145 ns | +45.113 ns | 均通过 |
+| WHS | +0.121 ns | +0.142 ns | 均通过 |
 | DRC Error | 0 | 0 | 通过 |
 
 Phase 7 bitstream：
@@ -111,3 +116,21 @@ Phase 7 bitstream：
 matlab_fir/alt_all2x_v7/vivado_results/board_folded_n3/
 board_demo_competition_dac8_top_phase7_folded_n3.bit
 ```
+
+本轮安全切档修正版 SHA256：
+
+```text
+91C3108B7EDB8CD35F5E31C3881FC045CB70FB3A4B88AE6B2187808584962CD5
+```
+
+## 8. 验证补全结论
+
+指导文件提出的正式顶层 0 LSB、CIC burst、补码模运算、长随机、RTL 冲激频谱、复位恢复和动态档位切换均已落地。自动化验证详情见：
+
+```text
+matlab_fir/alt_all2x_v7/verification/
+phase7_verification_guide_assessment.md
+reports/phase7_verification_final_summary.md
+```
+
+当前剩余项只涉及当前修正版 bitstream 的人工动态板测。SAIF 功耗、post-synthesis 功能仿真和 post-route timing simulation 属于材料增强项，不影响本轮 RTL 功能与实现通过结论。

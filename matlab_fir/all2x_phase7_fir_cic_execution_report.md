@@ -24,7 +24,7 @@
 - MATLAB 与 RTL 冲激、随机 PCM 均 `0 LSB`；
 - 独立链 LUT 从 1222 降至 957，下降 `21.69%`；
 - DSP/BRAM 保持 `2/1`；
-- 板级实现 LUT 从 1395 降至 1135，下降 `18.64%`；
+- 安全切档修正版板级实现 LUT 从 1395 降至 1128，下降 `19.14%`；
 - 综合、实现、bitstream 均成功，setup/hold 均无失败端点。
 
 因此 Phase 7 折叠补偿 N=3 判定为 **Go**。N=4 和独立补偿 FIR 方案判定为 **No-Go**。
@@ -258,18 +258,20 @@ Vivado 工程现已登记三个 Phase 7 综合源和两个测试平台，不需�
 
 | 项目 | Phase 6 | Phase 7 N3 | 变化 |
 |---|---:|---:|---:|
-| LUT | 1395 | 1135 | -260，-18.64% |
-| FF | 1040 | 962 | -78，-7.50% |
+| LUT | 1395 | 1128 | -267，-19.14% |
+| FF | 1040 | 964 | -76，-7.31% |
 | DSP | 2 | 2 | 不变 |
 | BRAM Tile | 1 | 1 | 不变 |
 | IO | 19 | 19 | 不变 |
 | MMCM | 1 | 1 | 不变 |
-| WNS | +45.145 ns | +44.704 ns | 均通过 |
-| WHS | +0.121 ns | +0.107 ns | 均通过 |
+| WNS | +45.145 ns | +45.113 ns | 均通过 |
+| WHS | +0.121 ns | +0.142 ns | 均通过 |
 | Vectorless power | 0.168 W | 0.168 W | 仅估算 |
 | DRC Error | 0 | 0 | 通过 |
 
 Phase 7 有 31 个 DRC Warning，类别为 DSP 未使用内部流水和 Stage1 BRAM 异步控制检查，与当前低速时序余量不冲突；无 DRC Error。后续若改变 DSP 流水，必须重新调整共享调度并重跑 0 LSB。
+
+时钟交互报告确认 `clk_20M` 和 `clk_audio_128x_44k1` 域内路径均为 `Clean / Timed`；5 条控制域跨音频域路径按 XDC 归入异步时钟组。实现网表只包含 2 个 `DSP48E1`，分别位于 `DSP48_X1Y0` 和 `DSP48_X1Y1`，对应 Stage1 与共享 Stage2/3。
 
 Bitstream：
 
@@ -279,7 +281,7 @@ board_demo_competition_dac8_top_phase7_folded_n3.bit
 ```
 
 ```text
-SHA256: 2EA1E1A8462B3E83D25412E32B7D5175B88390DCBCC885452DD5F93142C5BC11
+SHA256: 91C3108B7EDB8CD35F5E31C3881FC045CB70FB3A4B88AE6B2187808584962CD5
 Size  : 2192139 bytes
 ```
 
@@ -294,7 +296,7 @@ Size  : 2192139 bytes
 | 8x | 折叠 Stage3 输出 | 352.8 kHz |
 | 128x | CIC16 输出 | 5.6448 MHz |
 
-下载新 bitstream 后仍需人工复测四档频率、DA 波形和逐级平滑度。若出现任何板级异常，可把 `USE_PHASE7_FOLDED` 设为 0 回退 Phase 6，或直接使用已验证的 Phase 6 bitstream。
+上一版 Phase 7 已完成静态板测，4x/8x/128x 分别实测 `176.37 kHz / 352.86 kHz / 5.64 MHz`，DA 波形正常且能够观察到从 1x 到 128x 逐级变光滑。本轮安全切档修复没有改变滤波数据通路和分频值，但仍需下载当前 SHA256 对应的 bitstream，补做一次运行中动态切档复测。若出现任何板级异常，可把 `USE_PHASE7_FOLDED` 设为 0 回退 Phase 6，或直接使用已验证的 Phase 6 bitstream。
 
 ## 12. 关键文件
 
@@ -310,6 +312,8 @@ Size  : 2192139 bytes
 | `alt_all2x_v7/phase7_05_search_folded_stage3.m` | Stage3 折叠补偿搜索 |
 | `alt_all2x_v7/phase7_06_validate_folded_bittrue.m` | 折叠方案定点与剪枝 |
 | `alt_all2x_v7/phase7_07_plot_resource_comparison.m` | 资源对比图 |
+| `alt_all2x_v7/verification/phase7_generate_verification_vectors.m` | 正式顶层 daily/nightly golden |
+| `alt_all2x_v7/verification/phase7_analyze_full_rtl_impulse.m` | 正式 RTL 频率与线性相位验收 |
 
 ### RTL 与 Vivado
 
@@ -320,6 +324,7 @@ Size  : 2192139 bytes
 | `all2x_v7/interp128_all2x_v7_folded_fir_cic_top_ce.v` | 128x 实验顶层 |
 | `sim_1/new/all2x_v7/tb_phase7_folded_front3_bittrue.v` | 前三级 0 LSB |
 | `sim_1/new/all2x_v7/tb_cic_interp16_folded_core.v` | CIC 核 0 LSB |
+| `sim_1/new/all2x_v7/verification/` | 正式顶层、CIC、复位、模回绕和动态切档补全测试 |
 | `alt_all2x_v7/vivado/synth_phase7_folded_fir_cic.tcl` | N3/N4 独立综合 |
 | `alt_all2x_v7/vivado/register_phase7_board_sources.tcl` | 工程源文件登记 |
 | `alt_all2x_v7/vivado/build_board_phase7_folded_n3.tcl` | 板级完整重建 |
@@ -330,4 +335,4 @@ Phase 7 已完成从数学到 bitstream 的工程闭环，创新点也比单纯�
 
 > 前三级 FIR 负责严格音频频谱重构，后级 CIC 负责高倍率无乘法采样扩展；CIC 通带补偿被折叠进现有 Stage3，并通过中心系数代数拆分继续复用 16 位共享 DSP，从而在保持 0 LSB 和滤波指标的同时降低 LUT。
 
-当前应以 Phase 7 N=3 bitstream 进行四档实板复测。实板通过后，再把 Phase 7 标记为新的比赛展示稳定版；在此之前，Phase 6 仍是已实测回退版本。
+当前自动化验证已经完成，详细结果见 `alt_all2x_v7/verification/reports/phase7_verification_final_summary.md`。下一步应以本报告 SHA256 对应的 Phase 7 N=3 bitstream 进行动态切档实板复测。该项通过后，可把当前安全切档修正版标记为新的比赛展示稳定版；在此之前，Phase 6 仍是稳定回退版本。

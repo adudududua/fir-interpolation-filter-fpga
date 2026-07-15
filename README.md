@@ -1,6 +1,6 @@
 # 高阶数字插值滤波器设计与 FPGA 验证
 
-> 当前候选版本：44.1 kHz 专用、Phase 7 折叠补偿 FIR-CIC、2 DSP<br>
+> 当前候选版本：44.1 kHz 专用、Phase 7 折叠补偿 FIR-CIC、2 DSP，自动化验证通过<br>
 > 已实板验证回退：Phase 6 混合数据字长、7 级全 2x、2 DSP、ACC38<br>
 > FPGA：Xilinx Artix-7 `XC7A35T-FGG484-2`<br>
 > 工具：MATLAB R2023a、Vivado 2018.3<br>
@@ -10,7 +10,7 @@
 
 本项目面向“高阶数字插值滤波器设计与验证”赛题，完成了从 MATLAB 数学建模、等波纹 FIR 设计、定点量化、bit-true 验证、RTL 编码、功能仿真、综合实现到 FPGA 板级测试的完整闭环。
 
-当前 Phase 7 候选输入为 **44.1 kHz、24 bit signed PCM**，采用 `2x × 2x × 2x × CIC16 = 128x` 得到 **5.6448 MHz** 输出。CIC 通带补偿折叠进原 11tap Stage3，Stage2/3 继续共享一个 DSP。该候选已完成 MATLAB 搜索、定点验证、RTL 0 LSB、完整四档 XSim、独立综合、完整板级实现和 bitstream 生成；四档实板复测尚待执行。Phase 6 七级全 2x 版本仍保留为已实板验证的稳定回退路径。
+当前 Phase 7 候选输入为 **44.1 kHz、24 bit signed PCM**，采用 `2x × 2x × 2x × CIC16 = 128x` 得到 **5.6448 MHz** 输出。CIC 通带补偿折叠进原 11tap Stage3，Stage2/3 继续共享一个 DSP。该候选已完成 MATLAB 搜索、正式顶层 daily/nightly 逐点对拍、CIC 定向与复位测试、RTL 冲激频率/相位验收、动态切档回归、完整实现和 bitstream 生成。上一版 Phase 7 已完成静态实板演示；本轮又修复了运行中切档的窄脉冲风险，因此当前 SHA256 对应的新 bitstream 仍需补做一次动态板测。Phase 6 七级全 2x 版本继续作为已实板验证的稳定回退路径。
 
 ## 0. Phase 7 折叠补偿 FIR-CIC 候选
 
@@ -43,7 +43,7 @@ Phase 6 的 Stage4～7 只负责从 352.8 kHz 提升到 5.6448 MHz，而有效�
 | 随机 PCM Delta-SNR | **96.403 dB** | >=94 dB | 通过 |
 | 15 kHz / 20 kHz SINAD | **78.550 / 70.912 dB** | 记录项 | 通过 |
 | CIC 溢出 / 饱和 | **0 / 0** | 0 / 0 | 通过 |
-| MATLAB/RTL | **冲激与随机 PCM 均 0 LSB** | 0 LSB | 通过 |
+| 正式顶层 MATLAB/RTL | **冲激、4×1024 和 10×4096 随机 PCM 均 0 LSB** | 0 LSB | 通过 |
 
 最终 Stage3 Q15 系数：
 
@@ -76,37 +76,82 @@ Phase 6 的 Stage4～7 只负责从 352.8 kHz 提升到 5.6448 MHz，而有效�
 
 | 项目 | Phase 6 | Phase 7 N3 | 变化 |
 |---|---:|---:|---:|
-| LUT | 1395 | **1135** | -260，-18.64% |
-| FF | 1040 | **962** | -78，-7.50% |
+| LUT | 1395 | **1128** | -267，-19.14% |
+| FF | 1040 | **964** | -76，-7.31% |
 | DSP / BRAM | 2 / 1 | **2 / 1** | 不变 |
-| WNS / WHS | +45.145 / +0.121 ns | **+44.704 / +0.107 ns** | 均通过 |
+| WNS / WHS | +45.145 / +0.121 ns | **+45.113 / +0.142 ns** | 均通过 |
 | DRC Error | 0 | **0** | 通过 |
 
 ![Phase 7 独立链与板级资源对比](matlab_fir/alt_all2x_v7/figures/phase7_resource_comparison.png)
 
-### 0.4 RTL、工程与 bitstream
+### 0.4 正式顶层 RTL 验证补全
 
-Phase 7 已完成两段严格 RTL 对拍：
+原有前三级和 CIC 分段测试继续保留；本轮新增的正式顶层测试直接实例化 `interp128_all2x_v7_folded_fir_cic_top_ce`，从 24 bit 输入一直比较到 4x、8x 和 128x 三个正式输出节点：
 
-- `tb_phase7_folded_front3_bittrue.v`：原始 24bit 输入到 Stage3，N3/N4 × 冲激/随机四条流均 0 LSB；
-- `tb_cic_interp16_folded_core.v`：Stage3 20bit 输入到 CIC16，N3/N4 冲激/随机均 0 LSB。
+| 测试 | 规模 | 结果 |
+|---|---:|---|
+| 冲激 | 256 输入；4x/8x/128x 为 1245/2499/40032 输出 | 全部 0 LSB |
+| daily 随机 | 4 seed × 1024 输入 | 三节点全部 0 LSB |
+| nightly 随机 | 10 seed × 4096 输入 | 三节点全部 0 LSB |
+| nightly 128x | 5,315,520 个随机输出点 | 0 mismatch |
+| CIC 定向 | 656 输入、10496 输出 | comb、16 拍 burst、数据全部通过 |
+| 补码边界 | 三级积分器 6 组正负回绕 | 精确模 `2^32` |
+| Stage3 中心拆分 | 4107 组边界/随机值 | 精确相等 |
+| CIC / 完整顶层复位 | 4 / 8 个内部阶段场景 | 与冷启动参考一致 |
 
-完整板级公共模块也通过四档 XSim 回归。在相同观察窗内，`1x / 4x / 8x / 128x` 的 DA_CLK 边沿分别为 `32 / 128 / 256 / 4096`，与理论倍率完全一致；DAC 数据分别变化 `32 / 127 / 253 / 3306` 次，确认四档并非只有时钟翻转，而是都有有效数据输出。
+正常合法输入下，32 bit 全精度 CIC 的回绕和输出饱和均为 0；独立边界单测专门覆盖了通常不会触发的补码模回绕。另有预期失败测试故意连续送入两个样点，在 65 ns 命中 `pending overwrite` 断言，确认输入速率约束不会静默覆盖数据。
 
-Vivado 工程已正式登记 Phase 7 源文件；`demo_interp_dac8_audio_pcm_common.v` 默认使用 Phase 7，同时保留 `USE_PHASE7_FOLDED=0` 的 Phase 6 generate 回退路径。四档接口仍为 `1x / 4x / 8x / 128x`，15 kHz ROM、矩阵按键、单 DAC 和引脚均不改变。
+### 0.5 直接由 RTL 冲激提取频响和相位
+
+下面两图读取正式顶层 XSim 导出的 RTL 冲激 CSV，而不是仅画 MATLAB 设计系数：
+
+![Phase 7 正式 RTL 冲激频响](matlab_fir/alt_all2x_v7/verification/figures/phase7_rtl_impulse_response.png)
+
+![Phase 7 正式 RTL 线性相位](matlab_fir/alt_all2x_v7/verification/figures/phase7_rtl_linear_phase.png)
+
+| RTL 指标 | 结果 | 判定 |
+|---|---:|---|
+| 4x 通带最大绝对偏差 | 0.00301125 dB | 通过 |
+| 4x 阻带衰减 | 78.67042 dB | 通过 |
+| 128x 通带最大绝对偏差 | 0.00303062 dB | 通过 |
+| 128x 阻带衰减 | 72.34929 dB | 通过 |
+| 128x 冲激对称误差 | 0 output LSB | 严格对称 |
+| 128x 群延迟 | 3686.5 sample | 符合理论 |
+| 分块拟合群延迟峰峰值 | `6.457e-11` sample | 线性相位 |
+| 相位拟合残差 | `2.842e-14 rad` | 线性相位 |
+
+8x 是为后级 CIC 预加重的内部展示节点，其 15 kHz / 20 kHz 增益约为 `+0.0757 / +0.1343 dB`，不能误套最终 128x 的 ±0.05 dB 门槛。分赛区验收的最终 128x 输出已经由 CIC 下垂把该预加重抵消。
+
+### 0.6 动态切档修复、实现和板级边界
+
+首轮动态相位压力测试捕获到组合时钟切换产生的 4 个 `0 ns` 窄脉冲。板级包装层现已把 `mode_request` 与 `mode_state` 分开，只在 1x、4x、8x 候选时钟同时为低电平的 128x 下降沿提交模式。修复后连续完成 10 次无复位切换，`DA_CLK` 无毛刺、无 X，边沿数仍为 `32 / 128 / 256 / 4096`。
+
+Vivado 工程继续默认使用 Phase 7，同时保留 `USE_PHASE7_FOLDED=0` 的 Phase 6 generate 回退路径。当前实现层次明确包含 `gen_phase7_folded`、折叠 Stage2/3 和 CIC16：
+
+| 项目 | 当前修正版 |
+|---|---:|
+| LUT / FF | 1128 / 964 |
+| DSP / BRAM Tile | 2 / 1 |
+| WNS / WHS | +45.113 / +0.142 ns |
+| TNS / THS | 0 / 0 ns |
+| DRC | 0 Error、31 Warning |
+| Vectorless 功耗 | 0.168 W，Low confidence |
+
+补充实现报告确认两个域内路径均为 `Clean / Timed`，5 条 20 MHz 控制域到音频域的路径按 XDC 归入异步时钟组。实现网表只有 2 个 `DSP48E1`：Stage1 使用 `DSP48_X1Y0`，共享 Stage2/3 使用 `DSP48_X1Y1`，没有误综合出额外乘法器。
 
 Phase 7 bitstream：
 
 ```text
 matlab_fir/alt_all2x_v7/vivado_results/board_folded_n3/
 board_demo_competition_dac8_top_phase7_folded_n3.bit
+
+SHA256:
+91C3108B7EDB8CD35F5E31C3881FC045CB70FB3A4B88AE6B2187808584962CD5
 ```
 
-```text
-SHA256: 2EA1E1A8462B3E83D25412E32B7D5175B88390DCBCC885452DD5F93142C5BC11
-```
+上一版 Phase 7 已实测 `4x=176.37 kHz`、`8x=352.86 kHz`、`128x=5.64 MHz`，DA 波形正常并能看到从 1x 到 128x 逐级变光滑。本轮没有改动滤波数据通路或分频值，只修复模式提交时机；为使板级证据严格对应上述 SHA256，仍需下载当前 bitstream，再补做一次运行中动态切档复测，并在条件允许时记录 1x 的实测频率。
 
-当前只剩人工下载后的四档实板复测。完整设计推导、候选淘汰原因、位真和综合证据见 [Phase 7 执行报告](matlab_fir/all2x_phase7_fir_cic_execution_report.md)。
+详细证据见 [Phase 7 验证汇总](matlab_fir/alt_all2x_v7/verification/reports/phase7_verification_final_summary.md)、[指导采纳反馈](matlab_fir/alt_all2x_v7/verification/phase7_verification_guide_assessment.md) 和 [Phase 7 执行报告](matlab_fir/all2x_phase7_fir_cic_execution_report.md)。
 
 ## 1. Phase 6 已实板验证回退结论
 
@@ -676,7 +721,7 @@ BRAM Tile：1 -> 1
 | V4 四档板测基线 | 1817 | 1182 | 2 | 1 | 1x/4x/8x/128x 均正常，提交 `e9882fc` |
 | **Phase 5 ACC40 四档板级** | **1536** | **1181** | **2** | **1** | **实现与 bitstream 通过，待实板复测** |
 | **Phase 6 混合字长四档板级** | **1395** | **1040** | **2** | **1** | **1x/4x/8x/128x 实板验证通过** |
-| **Phase 7 折叠 FIR-CIC 四档板级** | **1135** | **962** | **2** | **1** | **实现与 bitstream 通过，待实板复测** |
+| **Phase 7 折叠 FIR-CIC 四档板级** | **1128** | **964** | **2** | **1** | **静态板测通过；安全切档修正版待动态复测** |
 
 V3 相对全 2x 初始稳定板级：
 
@@ -863,6 +908,9 @@ SHA256：E122FC402FB10E43954BDC5E9E134BD2789F1645F138D6FFAAD83C52581612C3
 | `matlab_fir/alt_all2x_v7/search_cic_compensation.m` | 独立低速补偿 FIR Pareto 搜索 |
 | `matlab_fir/alt_all2x_v7/phase7_05_search_folded_stage3.m` | 11tap Stage3 折叠补偿搜索 |
 | `matlab_fir/alt_all2x_v7/phase7_06_validate_folded_bittrue.m` | 折叠方案定点与剪枝验证 |
+| `matlab_fir/alt_all2x_v7/verification/phase7_generate_verification_vectors.m` | 生成 daily/nightly 正式顶层与 CIC golden |
+| `matlab_fir/alt_all2x_v7/verification/phase7_analyze_cic_wrap.m` | CIC 逐级动态范围、回绕和直流相位统计 |
+| `matlab_fir/alt_all2x_v7/verification/phase7_analyze_full_rtl_impulse.m` | 从正式 RTL 冲激 CSV 提取频率和线性相位指标 |
 | `matlab_fir/all2x_phase7_cic_execution_plan.md` | Phase 7 Stop/Go 计划和最终状态 |
 | `matlab_fir/all2x_phase7_fir_cic_execution_report.md` | Phase 7 数学、RTL、资源和板级完整报告 |
 | `audio_data/generate_demo_sine_15k_44k1.m` | 生成 44.1 kHz / 24 bit / 15 kHz 示波器对比 ROM |
@@ -911,9 +959,16 @@ SHA256：E122FC402FB10E43954BDC5E9E134BD2789F1645F138D6FFAAD83C52581612C3
 | `alt_all2x_v6/vivado/build_board_phase6_mixed_width.tcl` | Reset 工程 run、完整实现、报告和 bitstream 导出 |
 | `sim_1/new/all2x_v7/tb_phase7_folded_front3_bittrue.v` | Phase 7 前三级 N3/N4 冲激/随机 0 LSB |
 | `sim_1/new/all2x_v7/tb_cic_interp16_folded_core.v` | Phase 7 CIC 核 N3/N4 冲激/随机 0 LSB |
+| `sim_1/new/all2x_v7/verification/tb_phase7_full_chain_bittrue.v` | 正式顶层冲激与 daily/nightly 三节点 0 LSB |
+| `sim_1/new/all2x_v7/verification/tb_phase7_cic_directed.v` | comb、16 输出 burst、valid 和 CIC 逐点对拍 |
+| `sim_1/new/all2x_v7/verification/tb_phase7_cic_modulo_boundary.v` | 三级积分器 32 bit 正负模回绕边界 |
+| `sim_1/new/all2x_v7/verification/tb_phase7_cic_reset_recovery.v` | CIC pending/burst 中途复位与冷启动恢复 |
+| `sim_1/new/all2x_v7/verification/tb_phase7_full_chain_reset_recovery.v` | 完整顶层 8 个内部阶段复位恢复 |
+| `sim_1/new/all2x_v7/verification/tb_phase7_mode_switch_dynamic.v` | 无复位动态切档、频率、毛刺和 X 检查 |
 | `alt_all2x_v7/vivado/synth_phase7_folded_fir_cic.tcl` | Phase 7 N3/N4 同口径独立综合 |
 | `alt_all2x_v7/vivado/register_phase7_board_sources.tcl` | Phase 7 工程源文件登记 |
 | `alt_all2x_v7/vivado/build_board_phase7_folded_n3.tcl` | Phase 7 板级完整实现与 bitstream 导出 |
+| `alt_all2x_v7/vivado/report_phase7_implementation_verification.tcl` | 从当前实现补导出时钟交互和 DSP 单元报告 |
 
 ---
 
@@ -977,6 +1032,18 @@ run('phase7_05_search_folded_stage3.m');
 run('phase7_06_validate_folded_bittrue.m');
 run('phase7_07_plot_resource_comparison.m');
 ```
+
+Phase 7 验证补全的 MATLAB 入口：
+
+```matlab
+cd('matlab_fir/alt_all2x_v7/verification');
+phase7_generate_verification_vectors('daily');
+phase7_generate_verification_vectors('nightly');
+phase7_analyze_cic_wrap();
+phase7_analyze_full_rtl_impulse();
+```
+
+其中 `phase7_analyze_full_rtl_impulse` 需要先运行 `tb_phase7_full_chain_bittrue.v`，把冲激输出 CSV 放到 `verification/rtl_outputs/`。大型 `.mem` golden 和 RTL CSV 均可由脚本重建，已排除在 Git 追踪之外；摘要、测试平台、频响图和最终报告保留在仓库中。
 
 搜索结果写入 `wordlength_results/`，混合字长 golden 写入 `mixed_width_golden/`。CSV 属于可再生中间结果，仓库以 summary、RTL、图和最终报告为主要追踪对象。
 
@@ -1073,4 +1140,4 @@ Phase 4 已增加第 2 个 DSP，由 Stage 2/3 共享，并完成以下 Stop/Go 
 
 V4 四档版本已完成 bitstream 和实板回归。Phase 5 在此基础上完成 Q15 单舍入、紧凑饱和和 ACC40，作为提交 `d8f4946` 的稳定优化基线。Phase 6 先证明 3-DSP 候选资源反而增加，再选择 `24/22/20/18/18/18/18 bit + ACC38` 的两 DSP 混合字长方案；独立链达到 1224 LUT / 867 FF，完整四档板级达到 1395 LUT / 1040 FF。bit-true、四档仿真、综合、实现、bitstream 和实板四档展示均已通过，实测 `DA_CLK` 为 176.37 kHz、352.86 kHz 和 5.64 MHz，DA 波形从 1x 到 128x 呈现清晰的逐级平滑变化。详细过程见 `matlab_fir/all2x_phase6_execution_report.md`。
 
-Phase 7 在正确 CIC 插值结构上先完成独立低速补偿 FIR，确认其资源 No-Go 后，把补偿折叠进原 11tap Stage3。最终 N=3 独立链为 957 LUT / 791 FF / 2 DSP / 1 BRAM，完整板级为 1135 LUT / 962 FF；MATLAB/RTL 0 LSB、滤波指标、时序、实现和 bitstream 均通过。当前 Phase 7 仍待实板四档复测，通过前继续把 Phase 6 视为稳定回退版本。
+Phase 7 在正确 CIC 插值结构上先完成独立低速补偿 FIR，确认其资源 No-Go 后，把补偿折叠进原 11tap Stage3。最终 N=3 独立链为 957 LUT / 791 FF / 2 DSP / 1 BRAM；安全切档修正版完整板级为 1128 LUT / 964 FF。正式顶层冲激、daily 4×1024 和 nightly 10×4096 在 4x/8x/128x 均为 0 LSB，RTL 冲激直接测得最终通带最大偏差 0.00303062 dB、阻带衰减 72.349 dB、冲激对称误差 0 LSB。上一版 Phase 7 静态板测为 176.37 kHz、352.86 kHz、5.64 MHz 且 DA 正常；当前只差把安全切档修正版 bitstream 下载后再做一次动态切档确认。完成前，Phase 6 继续作为稳定回退版本。

@@ -101,3 +101,19 @@ matlab_fir/alt_all2x_v6/vivado_work/
 
 matlab_fir/alt_all2x_v7/*.mat
 matlab_fir/alt_all2x_v7/**/*.mat
+
+#============================================================
+# Phase 7 generated verification data
+#============================================================
+
+# Daily/nightly golden vectors and RTL CSV files are reproducible from
+# the checked-in MATLAB generators. Keep them local to avoid committing
+# tens of megabytes of generated data.
+matlab_fir/alt_all2x_v7/verification/vectors/
+matlab_fir/alt_all2x_v7/verification/rtl_outputs/
+
+#============================================================
+# Local competition submission materials
+#============================================================
+
+/submit/

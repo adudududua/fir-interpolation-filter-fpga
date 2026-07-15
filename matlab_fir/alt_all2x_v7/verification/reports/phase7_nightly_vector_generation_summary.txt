@@ -1,0 +1,28 @@
+Phase 7 verification vector generation
+======================================
+Profile              : nightly
+Random seeds         : 10
+Random input / seed  : 4096
+Expected shift 4x/8x : 3 / 7
+Expected shift 128x  : 112
+IR length 4x/8x/128x: 225 / 459 / 7374
+Directed CIC vector  : 653
+Directed CIC flush   : 3 valid zero samples
+Directed CIC actual  : 656 valid input samples
+Directed CIC output  : 10496
+Directed CIC wraps   : 0
+Directed CIC sat     : 0
+CIC stage widths     : [32 32 32 32 32 32]
+CIC stage max abs    : [1048575 2097150 4194300 2097150 16777200 129546400]
+
+impulse input=256 y4=1245 y8=2499 y128=40032 sat=0
+random_seed01 input=4096 y4=16605 y8=33219 y128=531552 sat=0
+random_seed02 input=4096 y4=16605 y8=33219 y128=531552 sat=0
+random_seed03 input=4096 y4=16605 y8=33219 y128=531552 sat=0
+random_seed04 input=4096 y4=16605 y8=33219 y128=531552 sat=0
+random_seed05 input=4096 y4=16605 y8=33219 y128=531552 sat=0
+random_seed06 input=4096 y4=16605 y8=33219 y128=531552 sat=0
+random_seed07 input=4096 y4=16605 y8=33219 y128=531552 sat=0
+random_seed08 input=4096 y4=16605 y8=33219 y128=531552 sat=0
+random_seed09 input=4096 y4=16605 y8=33219 y128=531552 sat=0
+random_seed10 input=4096 y4=16605 y8=33219 y128=531552 sat=0

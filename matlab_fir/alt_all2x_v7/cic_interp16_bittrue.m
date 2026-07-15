@@ -55,6 +55,7 @@ function [y, stat, trace] = cic_interp16_bittrue( ...
     round_count = 0;
     stage_width = zeros(1, 2*cic_order);
     stage_max_abs = zeros(1, 2*cic_order);
+    stage_wrap_count = zeros(1, 2*cic_order);
 
     for stage_idx = 1:cic_order
         delayed = [zeros(1, diff_delay, 'int64'), ...
@@ -68,6 +69,7 @@ function [y, stat, trace] = cic_interp16_bittrue( ...
         [low_data, one_wrap_count] = wrap_signed( ...
             difference, full_w-target_lsb);
         wrap_count = wrap_count+one_wrap_count;
+        stage_wrap_count(stage_idx) = one_wrap_count;
         current_lsb = target_lsb;
         stage_width(stage_idx) = full_w-current_lsb;
         stage_max_abs(stage_idx) = max(abs(double(low_data)));
@@ -92,6 +94,7 @@ function [y, stat, trace] = cic_interp16_bittrue( ...
             integrator_output(sample_idx) = state;
         end
         wrap_count = wrap_count+one_wrap_count;
+        stage_wrap_count(profile_idx) = one_wrap_count;
         high_data = integrator_output;
         current_lsb = target_lsb;
         stage_width(profile_idx) = full_w-current_lsb;
@@ -107,6 +110,9 @@ function [y, stat, trace] = cic_interp16_bittrue( ...
     stat.normalization_shift = normalization_shift;
     stat.output_shift = output_shift;
     stat.modulo_wrap_count = wrap_count;
+    stat.comb_modulo_wrap_count = sum(stage_wrap_count(1:cic_order));
+    stat.integrator_modulo_wrap_count = ...
+        sum(stage_wrap_count(cic_order+1:end));
     stat.internal_round_count = round_count;
     stat.output_sat_count = output_stat.output_sat_count;
     stat.max_abs_output = max(abs(double(y)));
@@ -116,6 +122,7 @@ function [y, stat, trace] = cic_interp16_bittrue( ...
     trace.prune_lsb = prune_lsb;
     trace.stage_width = stage_width;
     trace.stage_max_abs = stage_max_abs;
+    trace.stage_wrap_count = stage_wrap_count;
 end
 
 

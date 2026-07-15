@@ -35,8 +35,8 @@ chain_name = {'Phase 6', '独立 N3', '独立 N4', '折叠 N3', '折叠 N4'};
 chain_lut = [1222 1199 1366 957 1116];
 chain_ff = [868 1154 1243 791 876];
 board_name = {'Phase 6', 'Phase 7 N3'};
-board_lut = [1395 1135];
-board_ff = [1040 962];
+board_lut = [1395 1128];
+board_ff = [1040 964];
 
 figure('Color', 'w', 'Position', [80 80 1500 720]);
 tiledlayout(1, 2, 'TileSpacing', 'compact', 'Padding', 'compact');
@@ -66,7 +66,7 @@ legend('LUT', 'FF', 'Location', 'northwest');
 ylim([0 1550]);
 style_axes(gca);
 add_bar_labels(board_bar);
-text(1.5, 1450, sprintf('LUT -18.64%%\nFF -7.50%%\nDSP/BRAM 不变'), ...
+text(1.5, 1450, sprintf('LUT -19.14%%\nFF -7.31%%\nDSP/BRAM 不变'), ...
     'HorizontalAlignment', 'center', 'Color', color_green, ...
     'FontWeight', 'bold', 'FontSize', 12);
 
