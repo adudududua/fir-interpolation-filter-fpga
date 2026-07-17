@@ -26,6 +26,8 @@
 // 开发工具     : Vivado
 // 修订记录     :
 //                2026-07-11：新增 Stage 1 strict-halfband BRAM 版本。
+//                2026-07-17：通用宽位偏置舍入改为紧凑余数进位结构，
+//                            保持可达累加范围内逐位等价并缩短进位链。
 //=============================================================
 
 module interp2_stage1_strict_halfband_bram_ce #(
@@ -144,13 +146,13 @@ module interp2_stage1_strict_halfband_bram_ce #(
         endcase
     end
 
-    round_sat_q16_to24 #(
+    round_sat_shift_compact #(
         .IN_W   (ACC_W),
         .OUT_W  (DATA_W),
-        .FRAC_W (FRAC_W)
+        .SHIFT_N(FRAC_W)
     ) u_round_sat_q15_to_data (
-        .din_full (filter_result),
-        .dout_24  (filter_rounded)
+        .din  (filter_result),
+        .dout (filter_rounded)
     );
 
     // Port A：phase0 写入，其余周期作为第一个同步读端口。

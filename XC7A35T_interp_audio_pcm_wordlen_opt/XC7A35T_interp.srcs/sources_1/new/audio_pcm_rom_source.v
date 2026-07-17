@@ -22,6 +22,8 @@
 //                2026-06-20：新增音频 PCM ROM 输入源。
 //                2026-07-12：默认数据切换为 44.1kHz 采样的
 //                            15kHz 单正弦示波器对比信号。
+//                2026-07-17：在 0.50FS 板测基线下重新启用
+//                            Block RAM ROM 推断试验。
 //=============================================================
 
 module audio_pcm_rom_source #(
@@ -78,8 +80,6 @@ module audio_pcm_rom_source #(
     reg [ADDR_W-1:0]        rd_addr;
     reg signed [DATA_W-1:0] rom_data_q;
 
-    integer i;
-
     //=========================================================
     // 3）ROM 初始化
     //
@@ -94,13 +94,15 @@ module audio_pcm_rom_source #(
     //   MEM_FILE 对应的 .mem 文件需要添加进 Vivado 工程。
     //=========================================================
     initial begin
-        // 先清零，避免仿真时未初始化位置出现 X
-        for (i = 0; i < DEPTH; i = i + 1) begin
-            pcm_rom[i] = {DATA_W{1'b0}};
-        end
-
-        // 读取 MATLAB 生成的音频 PCM 数据
+        // .mem 覆盖 0 至 DEPTH-1 的全部地址。不要增加逐项清零
+        // 循环，否则 Vivado 2018.3 会放弃 Block RAM ROM 推断。
         $readmemh(MEM_FILE, pcm_rom);
+    end
+
+    // 同步读位于无异步复位的独立进程中，使 Vivado 2018.3
+    // 可以把 rom_data_q 吸收到 RAMB18E1 的输出寄存器。
+    always @(posedge clk) begin
+        rom_data_q <= pcm_rom[rd_addr];
     end
 
     //=========================================================
@@ -118,7 +120,6 @@ module audio_pcm_rom_source #(
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             rd_addr         <= {ADDR_W{1'b0}};
-            rom_data_q      <= {DATA_W{1'b0}};
             sample_out      <= {DATA_W{1'b0}};
             sample_update   <= 1'b0;
             sample_addr_dbg <= {ADDR_W{1'b0}};
@@ -126,9 +127,6 @@ module audio_pcm_rom_source #(
         else begin
             // 默认 sample_update 只保持 1 个周期
             sample_update <= 1'b0;
-
-            // 同步 ROM 读
-            rom_data_q <= pcm_rom[rd_addr];
 
             // 到达输入采样节拍时，输出一个新的 PCM 采样点
             if (sample_ce) begin

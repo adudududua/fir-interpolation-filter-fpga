@@ -1,6 +1,6 @@
 # 高阶数字插值滤波器设计与 FPGA 验证
 
-> 当前候选版本：44.1 kHz 专用、Phase 7 折叠补偿 FIR-CIC、2 DSP，自动化验证通过<br>
+> 当前候选版本：44.1 kHz 专用、Phase 7 折叠补偿 FIR-CIC、Stage 1 紧凑舍入、941 LUT / 2 DSP，自动化验证通过<br>
 > 已实板验证回退：Phase 6 混合数据字长、7 级全 2x、2 DSP、ACC38<br>
 > FPGA：Xilinx Artix-7 `XC7A35T-FGG484-2`<br>
 > 工具：MATLAB R2023a、Vivado 2018.3<br>
@@ -130,28 +130,130 @@ Vivado 工程继续默认使用 Phase 7，同时保留 `USE_PHASE7_FOLDED=0` 的
 
 | 项目 | 当前修正版 |
 |---|---:|
-| LUT / FF | 1128 / 964 |
+| LUT / FF | 1120 / 962 |
 | DSP / BRAM Tile | 2 / 1 |
-| WNS / WHS | +45.113 / +0.142 ns |
+| WNS / WHS | +44.752 / +0.071 ns |
 | TNS / THS | 0 / 0 ns |
 | DRC | 0 Error、31 Warning |
 | Vectorless 功耗 | 0.168 W，Low confidence |
 
 补充实现报告确认两个域内路径均为 `Clean / Timed`，5 条 20 MHz 控制域到音频域的路径按 XDC 归入异步时钟组。实现网表只有 2 个 `DSP48E1`：Stage1 使用 `DSP48_X1Y0`，共享 Stage2/3 使用 `DSP48_X1Y1`，没有误综合出额外乘法器。
 
-Phase 7 bitstream：
+Phase 7 0.50FS 削顶诊断 bitstream：
 
 ```text
 matlab_fir/alt_all2x_v7/vivado_results/board_folded_n3/
-board_demo_competition_dac8_top_phase7_folded_n3.bit
+board_demo_competition_dac8_top_phase7_folded_n3_amp050.bit
 
 SHA256:
-91C3108B7EDB8CD35F5E31C3881FC045CB70FB3A4B88AE6B2187808584962CD5
+EEF8679066B27CE55055705737DC85A28309CF494F2363AFF0FFF1E3816EB5E9
 ```
 
-上一版 Phase 7 已实测 `4x=176.37 kHz`、`8x=352.86 kHz`、`128x=5.64 MHz`，DA 波形正常并能看到从 1x 到 128x 逐级变光滑。本轮没有改动滤波数据通路或分频值，只修复模式提交时机；为使板级证据严格对应上述 SHA256，仍需下载当前 bitstream，再补做一次运行中动态切档复测，并在条件允许时记录 1x 的实测频率。
+上一版 Phase 7 已实测 `4x=176.37 kHz`、`8x=352.86 kHz`、`128x=5.64 MHz`。针对后续实测出现的平顶、平底梯形波，本轮完成了严格的幅度 A/B：在 RTL、探头、量程、接线和档位不变时，0.80FS 输出梯形波，0.50FS 恢复正弦波，由此确认根因是板上模拟输出链路削顶，而不是 FIR 数字溢出。当前正式默认采用 0.50FS；RTL 四档 DAC 码值约为 `1x=64~191`、`4x=64~191`、`8x=63~192`、`128x=64~191`，滤波数据通路、系数、字长和分频均未改变。
 
 详细证据见 [Phase 7 验证汇总](matlab_fir/alt_all2x_v7/verification/reports/phase7_verification_final_summary.md)、[指导采纳反馈](matlab_fir/alt_all2x_v7/verification/phase7_verification_guide_assessment.md) 和 [Phase 7 执行报告](matlab_fir/all2x_phase7_fir_cic_execution_report.md)。
+
+### 0.7 PCM ROM Block RAM 资源优化的 0.50FS 复核
+
+本轮在已经板测恢复正弦的 `0.50FS` 输入基线上重新启用 PCM ROM 资源优化。优化只调整演示信号存储方式：由完整 `.mem` 初始化 ROM，并把 24 bit 同步读寄存器移入无异步复位的独立进程，使 `147 x 24 bit` ROM 稳定映射到一个 `RAMB18E1`；FIR-CIC 滤波数据通路、各级系数、定点字长、舍入饱和和四档输出逻辑均未改动。
+
+复核包含两层 RTL 验证。首先连续检查 300 次 PCM 更新，覆盖两次以上 ROM 地址回绕，优化实现与原始读出序列为 0 LSB；随后运行 `1x/4x/8x/128x` 四档链路，内部峰值分别保持在约 `±4.19M`，DAC 码值范围为 `64~191 / 64~191 / 63~192 / 64~191`，四档均未出现 `0/255` 或近满量程数字削顶。由此可确认优化没有改变 ROM 内容、读出顺序和数字幅度。
+
+| 指标 | Phase 7 稳定版 | PCM ROM BRAM 优化版 | 变化 |
+|---|---:|---:|---:|
+| LUT | 1120 | **1044** | -76，-6.79% |
+| FF | 962 | **940** | -22，-2.29% |
+| RAMB18E1 | 2 | **3** | +1，对应 PCM ROM |
+| DSP48E1 | 2 | **2** | 不变 |
+| WNS / WHS | +44.752 / +0.071 ns | **+44.527 / +0.052 ns** | 仍有充足余量 |
+| TNS / THS | 0 / 0 ns | **0 / 0 ns** | 不变 |
+| Vectorless 功耗 | 0.168 W | **0.168 W** | 不变，Low confidence |
+| DRC | 0 Error、31 Warning | **0 Error、31 Warning** | 未新增违规 |
+
+实现层次确认新增的第三个 `RAMB18E1` 为 `u_audio_pcm_rom_source/rom_data_q_reg`，原有两个 FIR 系数/样本存储 BRAM 和两个 `DSP48E1` 均保持不变。候选 bitstream 为：
+
+```text
+matlab_fir/alt_all2x_v7/vivado_results/board_folded_n3_bram_rom/
+board_demo_competition_dac8_top_phase7_folded_n3_bram_rom_amp050.bit
+
+SHA256:
+D0CC87524B61A5784344E6CF868067FD13F22C540F035A553C742A25A3676B46
+```
+
+当前工作树采用上述 BRAM ROM 候选实现，但其状态仍为“RTL 与实现通过、待实板复测”。已板测正常的非 BRAM、0.50FS 稳定 bitstream 及其 MCS 均原样保留；在候选 bitstream 确认四档频率和正弦波形正常以前，不用候选版替换稳定 MCS。
+
+### 0.8 Stage 1 紧凑舍入资源优化
+
+在 PCM ROM 已映射到 Block RAM 的 1044 LUT 基线上，进一步对实现层次进行热点分析。Stage 1 的通用 round_sat_q16_to24 单独占用 106 LUT；其原实现先在 42 bit 全宽数据上加舍入偏置，再执行算术右移和 24 bit 饱和。优化版保持相同的对称舍入规则，但先截取商和余数，只由符号位、半 LSB 位和低位余数生成一个单比特进位，最终仅在较窄的商上执行加一与符号扩展检查。滤波系数、累加器位宽、级间字长、CIC 和 DAC 逻辑均未改变。
+
+Stage 1 的 26 个非零半带系数绝对值和为 44756。按两个 24 bit 满幅样点组成一个预加和进行保守估计，42 bit 累加器的可达绝对上界为：
+
+    44756 x 2^24 = 750881079296
+
+该值距离 42 bit 正数上限 2^41 仍有约 1.55 bit 余量，因此全宽偏置加法器的最高位溢出区在该 FIR 中不可达。等价验证覆盖舍入中点、24 bit 正负饱和边界、可达累加上下界和 200000 组随机输入，共 200024 组，输出全部为 0 LSB。正式顶层 daily 与 nightly 回归继续比较 4x、8x、128x 三个节点：冲激加 10 组 4096 点随机 PCM 的 nightly 测试中，仅 128x 节点就比较了 5355552 个输出点，所有节点均为 0 LSB。
+
+| 指标 | PCM ROM BRAM 基线 | 紧凑舍入候选 | 变化 |
+|---|---:|---:|---:|
+| LUT | 1044 | **941** | -103，-9.87% |
+| FF | 940 | **940** | 不变 |
+| RAMB18E1 | 3 | **3** | 不变 |
+| DSP48E1 | 2 | **2** | 不变 |
+| WNS / WHS | +44.527 / +0.052 ns | **+44.839 / +0.050 ns** | 时序仍充分满足 |
+| TNS / THS | 0 / 0 ns | **0 / 0 ns** | 不变 |
+| Vectorless 功耗 | 0.168 W | **0.168 W** | 不变，Low confidence |
+| DRC | 0 Error、31 Warning | **0 Error、31 Warning** | 未新增违规 |
+
+由于正式 RTL 输出与原 golden 逐点相同，既有 RTL 冲激测得的 0.00303062 dB 通带最大偏差、72.349 dB 阻带衰减和严格线性相位结论保持不变。候选 bitstream 为：
+
+    matlab_fir/alt_all2x_v7/vivado_results/board_folded_n3_bram_rom_rounder_opt/
+    board_demo_competition_dac8_top_phase7_rounder_compact_amp050.bit
+
+    SHA256:
+    88E67BD36C23A6C3F50880DFADEBF3E97EC58015FDF48A451B6A7825358556A2
+
+对本轮十项优化建议的工程判断如下。系数表进入 BRAM、增加 DSP 级联和继续减少并行度并非当前优先项：Stage 1 只有 26 x 17 bit 系数，Stage 2/3 只有 15 个小型系数选择，强制进入 BRAM 会引入同步读延迟、地址控制和额外 RAMB18；而乘法器、对称预加、多相分解、strict-halfband 零抽头消除、Stage 2/3 单 DSP 折叠和 CIC 无乘法后端已经实现。逐级字长搜索也已在 Phase 6/7 完成，当前阻带只余约 2.35 dB 发布裕量，不再做无证据的激进截位。此次真正采纳的是“舍入逻辑预算”和“综合 A/B”两项，并以 103 LUT 的实测下降确认有效。
+
+| 建议 | 当前工程状态 | 本轮决定 |
+|---|---|---|
+| 系数表搬入 BRAM | 系数总量很小，常量 case 已被综合器有效化简 | 暂不采用，避免新增同步读延迟和 BRAM |
+| MAC 优先 DSP48 | Stage 1 使用 1 个 DSP，Stage 2/3 共享 1 个 DSP | 已实现，保持 2 DSP |
+| 逐节点定点字长 | Phase 6/7 已完成 24/22/20 bit 与 32 bit CIC 搜索 | 已实现，不压缩当前 2.35 dB 阻带裕量 |
+| 多相消除插零计算 | 三个 2x FIR 均为真多相，CIC 后端天然无零值 FIR MAC | 已实现 |
+| 简化控制路径 | 级间桥约 2 LUT，主要热点不在控制桥 | 保持，优先处理 106 LUT 舍入器 |
+| 对称、半带、预加 | Stage 1 为 strict-halfband 对称预加，Stage 2/3 也使用对称样点 | 已实现 |
+| 最小安全并行度 | Stage 1 串行 26 MAC，Stage 2/3 单 DSP 折叠共享 | 已实现 |
+| systolic / DSP cascade | 当前仅 2 个时分复用 DSP，增加级联会改变资源目标 | 暂不采用 |
+| 舍入策略预算 | 42 bit 全宽偏置加法器是明确 LUT 热点 | **采用，顶层减少 103 LUT** |
+| 自动推断与显式实现 A/B | 原基线和候选独立完整实现 | **采用，以 post-route 结果决策** |
+
+该版本状态为“单元等价、daily/nightly 正式顶层对拍、完整实现和 bitstream 均通过，待实板四档复测”。复测前不生成或覆盖稳定 MCS。
+
+### 0.9 配置存储器固化与版本识别
+
+JTAG 下载 `.bit` 只会暂时配置 FPGA 内部 SRAM，掉电、按下配置复位键或触发重新配置后都会失效；板卡随后会从 SPI Flash 重新装载原有固件。因此，若 JTAG 下载后为正弦波，而重新上电后又恢复为梯形波，通常表示板载 Flash 中仍保存着其他工程的固件，并不表示本工程的正弦 ROM 自动改变。
+
+Vivado 2018.3 已使用 `write_cfgmem`、`SPIx1` 和 `128 Mbit` 为回退后的稳定 bitstream 重新生成 MCS。`SPIx1` 是对支持 x1/x2/x4 的 MT25QL128 较保守的启动接口；实际添加 Configuration Memory Device 时，仍须根据板上 Flash 丝印或原理图确认器件型号，不应只依据 Vivado 搜索列表猜测。
+
+| MCS 文件 | 对应版本 | 使用建议 |
+|---|---|---|
+| `phase7_stable_rebuilt_amp050_spi_x1.mcs` | 非 BRAM ROM、0.50FS 正弦稳定版本 | 已通过幅度 A/B，可用于固化 |
+
+文件统一存放在：
+
+```text
+matlab_fir/alt_all2x_v7/vivado_results/config_memory/
+```
+
+推荐的安全烧录顺序如下：
+
+1. 在 Hardware Manager 中先用 **Program Device** 直接下载文件名带 `amp050` 的诊断版 `.bit`。
+2. 不断电立即测量 128x 档 `DA_CLK` 和 DA 波形；应约为 `5.6448 MHz` 且为平滑正弦波。
+3. 确认板上实际 Flash 型号后，执行 **Add Configuration Memory Device**，选择与实物完全一致的器件。
+4. 右键配置存储器并选择 **Program Configuration Memory Device**，配置文件选择稳定版 `.mcs`。
+5. 勾选 `Erase`、`Program` 和 `Verify`，完成后彻底断电再上电。
+6. 再测 128x 档；若仍为约 `5.64 MHz` 且正弦波正常，说明 Flash 固化成功。
+
+`.prm` 是 Vivado 同时生成的地址映射说明文件，Hardware Manager 实际选择的是 `.mcs`。若直接 JTAG 下载指定 `.bit` 后仍立即出现梯形波，应先核对 Program Device 对话框中的 bit 路径和 128x `DA_CLK`：约 `6.25 MHz` 可直接证明当前运行的不是本工程固件；约 `5.64 MHz` 但仍异常时，才继续排查所选 bitstream 与 DAC 数据通路。
 
 ## 1. Phase 6 已实板验证回退结论
 
@@ -722,6 +824,31 @@ BRAM Tile：1 -> 1
 | **Phase 5 ACC40 四档板级** | **1536** | **1181** | **2** | **1** | **实现与 bitstream 通过，待实板复测** |
 | **Phase 6 混合字长四档板级** | **1395** | **1040** | **2** | **1** | **1x/4x/8x/128x 实板验证通过** |
 | **Phase 7 折叠 FIR-CIC 四档板级** | **1128** | **964** | **2** | **1** | **静态板测通过；安全切档修正版待动态复测** |
+| Phase 7 0.50FS 非 BRAM 稳定版 | 1120 | 962 | 2 | 1 | 幅度 A/B 与 bitstream 已通过，可随时回退 |
+| Phase 7 0.50FS PCM ROM BRAM 候选 | 1044 | 940 | 2 | 1.5 | RTL、实现与 bitstream 通过，待实板复测 |
+| **Phase 7 紧凑舍入候选** | **941** | **940** | **2** | **1.5** | **daily/nightly 0 LSB、实现与 bitstream 通过，待实板复测** |
+
+Phase 7 PCM ROM BRAM 优化候选相对 Phase 7 稳定版：
+
+```text
+LUT：1120 -> 1044，减少 76，下降约 6.79%
+FF ： 962 ->  940，减少 22，下降约 2.29%
+RAMB18E1：2 -> 3，增加 1 个；Block RAM Tile：1 -> 1.5
+DSP：2 -> 2
+WNS：+44.752 ns -> +44.527 ns
+```
+
+该变化来自把板级演示 ROM 从 LUT/FF 转为专用块 RAM，不涉及 128 倍 FIR-CIC 滤波数据通路，因此不会改变 MATLAB/RTL 频响、线性相位或定点量化结果。
+
+紧凑舍入候选相对 PCM ROM BRAM 候选：
+
+    LUT：1044 -> 941，减少 103，下降约 9.87%
+    FF ： 940 -> 940，不变
+    RAMB18E1：3 -> 3，不变
+    DSP：2 -> 2，不变
+    WNS：+44.527 ns -> +44.839 ns
+
+该变化来自把 Stage 1 的 42 bit 全宽舍入偏置加法改为截位后的单比特进位。正式顶层 nightly 回归在 4x、8x 和 128x 三个节点均为 0 LSB，因此数字滤波性能与基线逐点一致。
 
 V3 相对全 2x 初始稳定板级：
 
@@ -922,7 +1049,7 @@ SHA256：E122FC402FB10E43954BDC5E9E134BD2789F1645F138D6FFAAD83C52581612C3
 | `board_demo_competition_dac8_top.v` | 板级顶层、时钟、复位、按键与 DAC 接口 |
 | `demo_interp_dac8_audio_pcm_common.v` | PCM 输入、Phase 7 默认实例、Phase 6 generate 回退与 DAC 转换 |
 | `audio_pcm_rom_source.v` | 24 bit signed PCM ROM 输入源 |
-| `demo_sine_15k_44k1_24bit_147.mem` | 147 点、50 周期、0.80FS 的 15 kHz 单正弦 |
+| `demo_sine_15k_44k1_24bit_147.mem` | 147 点、50 周期、0.50FS 的 15 kHz 单正弦 |
 | `all2x_v3/interp2_stage1_strict_halfband_bram_ce.v` | Stage1 strict-halfband 双口 BRAM 单 DSP MAC |
 | `all2x_v3/interp128_all2x_v3_stage1_select_top_ce.v` | V3 七级公共顶层 |
 | `all2x_v3/interp128_all2x_v3_strict_s1_bram_top_ce.v` | 已实板验证的 V3 BRAM 回退包装顶层 |
@@ -968,6 +1095,8 @@ SHA256：E122FC402FB10E43954BDC5E9E134BD2789F1645F138D6FFAAD83C52581612C3
 | `alt_all2x_v7/vivado/synth_phase7_folded_fir_cic.tcl` | Phase 7 N3/N4 同口径独立综合 |
 | `alt_all2x_v7/vivado/register_phase7_board_sources.tcl` | Phase 7 工程源文件登记 |
 | `alt_all2x_v7/vivado/build_board_phase7_folded_n3.tcl` | Phase 7 板级完整实现与 bitstream 导出 |
+| `alt_all2x_v7/vivado/build_board_phase7_rounder_compact_opt.tcl` | Stage 1 紧凑舍入候选的独立实现、报告与 bitstream 导出 |
+| `alt_all2x_v7/vivado/generate_phase7_stable_mcs.tcl` | 回退后稳定版 SPIx1 MCS 导出 |
 | `alt_all2x_v7/vivado/report_phase7_implementation_verification.tcl` | 从当前实现补导出时钟交互和 DSP 单元报告 |
 
 ---
@@ -1126,7 +1255,7 @@ codex/phase6-three-dsp-pareto
 当前 Phase 7 工作分支：
 
 ```text
-codex/phase7-fir-cic-hybrid
+codex/phase7-conservative-resource-opt
 ```
 
 Phase 4 已增加第 2 个 DSP，由 Stage 2/3 共享，并完成以下 Stop/Go 闭环：
@@ -1141,3 +1270,7 @@ Phase 4 已增加第 2 个 DSP，由 Stage 2/3 共享，并完成以下 Stop/Go 
 V4 四档版本已完成 bitstream 和实板回归。Phase 5 在此基础上完成 Q15 单舍入、紧凑饱和和 ACC40，作为提交 `d8f4946` 的稳定优化基线。Phase 6 先证明 3-DSP 候选资源反而增加，再选择 `24/22/20/18/18/18/18 bit + ACC38` 的两 DSP 混合字长方案；独立链达到 1224 LUT / 867 FF，完整四档板级达到 1395 LUT / 1040 FF。bit-true、四档仿真、综合、实现、bitstream 和实板四档展示均已通过，实测 `DA_CLK` 为 176.37 kHz、352.86 kHz 和 5.64 MHz，DA 波形从 1x 到 128x 呈现清晰的逐级平滑变化。详细过程见 `matlab_fir/all2x_phase6_execution_report.md`。
 
 Phase 7 在正确 CIC 插值结构上先完成独立低速补偿 FIR，确认其资源 No-Go 后，把补偿折叠进原 11tap Stage3。最终 N=3 独立链为 957 LUT / 791 FF / 2 DSP / 1 BRAM；安全切档修正版完整板级为 1128 LUT / 964 FF。正式顶层冲激、daily 4×1024 和 nightly 10×4096 在 4x/8x/128x 均为 0 LSB，RTL 冲激直接测得最终通带最大偏差 0.00303062 dB、阻带衰减 72.349 dB、冲激对称误差 0 LSB。上一版 Phase 7 静态板测为 176.37 kHz、352.86 kHz、5.64 MHz 且 DA 正常；当前只差把安全切档修正版 bitstream 下载后再做一次动态切档确认。完成前，Phase 6 继续作为稳定回退版本。
+
+在此基础上把 `147×24 bit` 演示 PCM ROM 从 LUT/FF 映射为一个 `RAMB18E1`。0.50FS 复核候选完整板级为 1044 LUT / 940 FF / 2 DSP / 1.5 BRAM Tile，ROM 连续 300 次更新对拍为 0 LSB，四档 RTL 幅值均无数字削顶，post-route WNS/WHS 为 +44.527/+0.052 ns。先前梯形波已由 0.50FS/0.80FS 同条件 A/B 确认为模拟输出链路削顶，不能归因于 BRAM 映射。候选版已生成独立 bitstream，等待实板四档复测；非 BRAM、0.50FS 稳定版继续保留为回退版本。
+
+随后按实现热点而不是经验猜测继续优化 Stage 1 舍入器：42 bit 全宽偏置加法改为截位值上的单比特进位，可达范围单元测试 200024 组为 0 LSB，正式顶层 nightly 冲激与 10 组长随机 PCM 在 4x/8x/128x 全部为 0 LSB。完整板级达到 941 LUT / 940 FF / 2 DSP / 1.5 BRAM Tile，相对 1044 LUT 基线再减少 103 LUT；WNS/WHS 为 +44.839/+0.050 ns，功耗仍为 0.168 W，DRC 未新增违规。候选 bitstream 已独立导出，当前仍等待实板四档复测，不覆盖稳定 MCS。
