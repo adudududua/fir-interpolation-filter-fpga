@@ -40,7 +40,9 @@
 
 module demo_interp_dac8_audio_pcm_common #(
     parameter integer USE_PHASE7_FOLDED = 1,
-    parameter integer USE_PHASE7_LUTRAM_STAGE23 = 0
+    parameter integer USE_PHASE7_LUTRAM_STAGE23 = 0,
+    parameter integer USE_PHASE7_BRAM_STAGE23_HISTORY = 0,
+    parameter integer USE_PHASE7_BRAM_STAGE23_COEFF = 0
 )(
     input  wire        clk_audio_128x,  // 5.6448MHz 连续音频 128x 时钟
     input  wire        rst_n,           // 低有效复位
@@ -220,7 +222,9 @@ module demo_interp_dac8_audio_pcm_common #(
                 .STAGE23_ACC_W   (38),
                 .CIC_ORDER       (3),
                 .FINAL_PRUNE_LSB (0),
-                .USE_LUTRAM_STAGE23(USE_PHASE7_LUTRAM_STAGE23)
+                .USE_LUTRAM_STAGE23(USE_PHASE7_LUTRAM_STAGE23),
+                .USE_BRAM_STAGE23_HISTORY(USE_PHASE7_BRAM_STAGE23_HISTORY),
+                .USE_BRAM_STAGE23_COEFF(USE_PHASE7_BRAM_STAGE23_COEFF)
             ) u_interp128_all2x_v7_folded_fir_cic_top_ce (
                 .clk(clk_audio_128x), .rst_n(rst_n),
                 .ce2_out(ce2_out), .ce4_out(ce4_out),

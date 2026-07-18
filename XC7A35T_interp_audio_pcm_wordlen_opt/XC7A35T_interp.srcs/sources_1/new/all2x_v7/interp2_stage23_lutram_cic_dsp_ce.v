@@ -30,6 +30,10 @@
 //                2026-07-18：新增 Stage 2/3 LUTRAM 低 LUT 候选。
 //                2026-07-18：串行 MAC 调度改为 Stage 2 优先，保证
 //                            4x 样点在下一次 8x CE 前完成。
+//                2026-07-18：增加可选双口 BRAM 历史缓存；采用任务
+//                            启动预取，保持串行 MAC 周期数不变。
+//                2026-07-18：增加可选顺序系数 BRAM，展开对称系数
+//                            并与历史样点同拍预取。
 //=============================================================
 
 `include "all2x_v2_coeff_pkg.vh"
@@ -40,7 +44,9 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     parameter integer STAGE3_DATA_W = 20,
     parameter integer COEFF_W = 18,
     parameter integer ACC_W = 38,
-    parameter integer CIC_ORDER = 3
+    parameter integer CIC_ORDER = 3,
+    parameter integer USE_BRAM_HISTORY = 0,
+    parameter integer USE_BRAM_COEFF = 0
 )(
     input  wire                              clk,
     input  wire                              rst_n,
@@ -85,6 +91,10 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     reg signed [STAGE2_DATA_W-1:0] stage2_hist_mem [0:MEM_DEPTH-1];
     (* ram_style = "distributed" *)
     reg signed [STAGE3_DATA_W-1:0] stage3_hist_mem [0:MEM_DEPTH-1];
+    (* ram_style = "block" *)
+    reg signed [STAGE2_DATA_W-1:0] stage2_hist_bram [0:MEM_DEPTH-1];
+    (* ram_style = "block" *)
+    reg signed [STAGE3_DATA_W-1:0] stage3_hist_bram [0:MEM_DEPTH-1];
 
     reg [MEM_ADDR_W-1:0] stage2_head;
     reg [MEM_ADDR_W-1:0] stage3_head;
@@ -113,16 +123,27 @@ module interp2_stage23_lutram_cic_dsp_ce #(
 
     (* rom_style = "distributed" *)
     reg signed [COEFF_W-1:0] coeff_rom [0:31];
+    (* rom_style = "block" *)
+    reg signed [COEFF_W-1:0] coeff_sequence_bram [0:63];
 
     reg signed [ACC_W-1:0] acc_reg;
+    reg signed [COEFF_W-1:0] coeff_bram_raw;
 
     wire [MEM_ADDR_W-1:0] stage2_write_addr;
     wire [MEM_ADDR_W-1:0] stage3_write_addr;
     wire [MEM_ADDR_W-1:0] stage2_read_addr;
     wire [MEM_ADDR_W-1:0] stage3_read_addr;
+    wire [MEM_ADDR_W-1:0] stage2_bram_read_index;
+    wire [MEM_ADDR_W-1:0] stage3_bram_read_index;
+    wire [MEM_ADDR_W-1:0] stage2_bram_read_addr;
+    wire [MEM_ADDR_W-1:0] stage3_bram_read_addr;
 
     wire signed [STAGE2_DATA_W-1:0] stage2_x_current;
     wire signed [STAGE3_DATA_W-1:0] stage3_x_current;
+    wire signed [STAGE2_DATA_W-1:0] stage2_lutram_raw;
+    wire signed [STAGE3_DATA_W-1:0] stage3_lutram_raw;
+    reg signed [STAGE2_DATA_W-1:0] stage2_bram_raw;
+    reg signed [STAGE3_DATA_W-1:0] stage3_bram_raw;
     wire signed [STAGE2_DATA_W-1:0] stage2_mem_raw;
     wire signed [STAGE3_DATA_W-1:0] stage3_mem_raw;
     wire signed [STAGE2_DATA_W-1:0] stage2_mem;
@@ -141,8 +162,13 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     wire signed [ROUND_W-1:0] rounded_value;
     wire stage2_upper_is_sign_extension;
     wire stage3_upper_is_sign_extension;
+    wire coeff_bram_stage3;
+    wire coeff_bram_phase;
+    wire [3:0] coeff_bram_next_index;
+    wire [5:0] coeff_bram_read_addr;
 
     integer coeff_init_idx;
+    integer coeff_sequence_init_idx;
 
     assign stage2_x_current = stage2_x_in_valid ?
                               stage2_x_in : {STAGE2_DATA_W{1'b0}};
@@ -162,11 +188,30 @@ module interp2_stage23_lutram_cic_dsp_ce #(
                          coeff_index[2:0]};
     assign coeff_comb = coeff_rom[coeff_addr];
 
+    assign coeff_bram_stage3 = job_active ? (job_stage == 2'd3) :
+        (!stage2_pending && stage3_pending);
+    assign coeff_bram_phase = job_active ? job_phase :
+        (stage2_pending ? stage2_pending_phase : stage3_pending_phase);
+    assign coeff_bram_next_index = job_active ?
+        job_mac_index + 4'd1 : 4'd0;
+    assign coeff_bram_read_addr = {coeff_bram_stage3,
+                                   coeff_bram_phase,
+                                   coeff_bram_next_index};
+
     assign stage2_read_addr = stage2_head + hist_index;
     assign stage3_read_addr = stage3_head + hist_index;
 
-    assign stage2_mem_raw = stage2_hist_mem[stage2_read_addr];
-    assign stage3_mem_raw = stage3_hist_mem[stage3_read_addr];
+    // BRAM 为同步读。任务空闲且 pending 时读取 index0；任务活动时，
+    // 在当前抽头进入 DSP 的同时预取下一个抽头，避免额外空拍。
+    assign stage2_bram_read_index =
+        (job_active && job_stage == 2'd2) ? hist_index + 4'd1 : 4'd0;
+    assign stage3_bram_read_index =
+        (job_active && job_stage == 2'd3) ? hist_index + 4'd1 : 4'd0;
+    assign stage2_bram_read_addr = stage2_head + stage2_bram_read_index;
+    assign stage3_bram_read_addr = stage3_head + stage3_bram_read_index;
+
+    assign stage2_lutram_raw = stage2_hist_mem[stage2_read_addr];
+    assign stage3_lutram_raw = stage3_hist_mem[stage3_read_addr];
 
     assign stage2_mem = (hist_index < stage2_fill_count) ?
                         stage2_mem_raw : {STAGE2_DATA_W{1'b0}};
@@ -180,7 +225,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         {{(30-STAGE2_DATA_W){selected_sample[STAGE2_DATA_W-1]}},
          selected_sample};
     assign dsp_input_d = 25'sd0;
-    assign dsp_coeff_b = coeff_comb;
+    assign dsp_coeff_b = (USE_BRAM_COEFF != 0) ?
+                         coeff_bram_raw : coeff_comb;
     assign dsp_acc_c = (job_mac_index == 4'd0) ? 48'sd0 :
         {{(48-ACC_W){acc_reg[ACC_W-1]}}, acc_reg};
 
@@ -292,6 +338,10 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         for (coeff_init_idx = 0; coeff_init_idx < 32;
              coeff_init_idx = coeff_init_idx + 1)
             coeff_rom[coeff_init_idx] = {COEFF_W{1'b0}};
+        for (coeff_sequence_init_idx = 0; coeff_sequence_init_idx < 64;
+             coeff_sequence_init_idx = coeff_sequence_init_idx + 1)
+            coeff_sequence_bram[coeff_sequence_init_idx] =
+                {COEFF_W{1'b0}};
 
         coeff_rom[0]  = `V2_S2_P0_C0;
         coeff_rom[1]  = `V2_S2_P0_C1;
@@ -303,6 +353,25 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         coeff_rom[10] = `V2_S2_P1_C2;
         coeff_rom[11] = `V2_S2_P1_C3;
 
+        coeff_sequence_bram[0] = `V2_S2_P0_C0;
+        coeff_sequence_bram[1] = `V2_S2_P0_C1;
+        coeff_sequence_bram[2] = `V2_S2_P0_C2;
+        coeff_sequence_bram[3] = `V2_S2_P0_C3;
+        coeff_sequence_bram[4] = `V2_S2_P0_C4;
+        coeff_sequence_bram[5] = `V2_S2_P0_C3;
+        coeff_sequence_bram[6] = `V2_S2_P0_C2;
+        coeff_sequence_bram[7] = `V2_S2_P0_C1;
+        coeff_sequence_bram[8] = `V2_S2_P0_C0;
+
+        coeff_sequence_bram[16] = `V2_S2_P1_C0;
+        coeff_sequence_bram[17] = `V2_S2_P1_C1;
+        coeff_sequence_bram[18] = `V2_S2_P1_C2;
+        coeff_sequence_bram[19] = `V2_S2_P1_C3;
+        coeff_sequence_bram[20] = `V2_S2_P1_C3;
+        coeff_sequence_bram[21] = `V2_S2_P1_C2;
+        coeff_sequence_bram[22] = `V2_S2_P1_C1;
+        coeff_sequence_bram[23] = `V2_S2_P1_C0;
+
         if (CIC_ORDER == 3) begin
             coeff_rom[16] = 18'sd561;
             coeff_rom[17] = -18'sd4234;
@@ -310,6 +379,18 @@ module interp2_stage23_lutram_cic_dsp_ce #(
             coeff_rom[24] = 18'sd137;
             coeff_rom[25] = -18'sd1555;
             coeff_rom[26] = 18'sd35604;
+
+            coeff_sequence_bram[32] = 18'sd561;
+            coeff_sequence_bram[33] = -18'sd4234;
+            coeff_sequence_bram[34] = 18'sd20057;
+            coeff_sequence_bram[35] = 18'sd20057;
+            coeff_sequence_bram[36] = -18'sd4234;
+            coeff_sequence_bram[37] = 18'sd561;
+            coeff_sequence_bram[48] = 18'sd137;
+            coeff_sequence_bram[49] = -18'sd1555;
+            coeff_sequence_bram[50] = 18'sd35604;
+            coeff_sequence_bram[51] = -18'sd1555;
+            coeff_sequence_bram[52] = 18'sd137;
         end
         else begin
             coeff_rom[16] = 18'sd624;
@@ -318,19 +399,62 @@ module interp2_stage23_lutram_cic_dsp_ce #(
             coeff_rom[24] = 18'sd153;
             coeff_rom[25] = -18'sd1971;
             coeff_rom[26] = 18'sd36402;
+
+            coeff_sequence_bram[32] = 18'sd624;
+            coeff_sequence_bram[33] = -18'sd4587;
+            coeff_sequence_bram[34] = 18'sd20348;
+            coeff_sequence_bram[35] = 18'sd20348;
+            coeff_sequence_bram[36] = -18'sd4587;
+            coeff_sequence_bram[37] = 18'sd624;
+            coeff_sequence_bram[48] = 18'sd153;
+            coeff_sequence_bram[49] = -18'sd1971;
+            coeff_sequence_bram[50] = 18'sd36402;
+            coeff_sequence_bram[51] = -18'sd1971;
+            coeff_sequence_bram[52] = 18'sd153;
         end
     end
 
-    // LUTRAM 不进行全阵列复位。复位时清空已写深度计数，未重写的
-    // 槽位在读出端被强制为零，因此功能等价于历史数组清零。
-    always @(posedge clk) begin
-        if (rst_n) begin
-            if (stage2_ce_out && stage2_phase == 1'b0)
-                stage2_hist_mem[stage2_write_addr] <= stage2_x_current;
-            if (stage3_ce_out && stage3_phase == 1'b0)
-                stage3_hist_mem[stage3_write_addr] <= stage3_x_current;
+    // 两种 RAM 都不复位全阵列。复位时清空已写深度计数，读出端会
+    // 屏蔽尚未重写的槽位，因此外部行为等价于历史数组清零。
+    generate
+        if (USE_BRAM_HISTORY != 0) begin : gen_bram_history
+            assign stage2_mem_raw = stage2_bram_raw;
+            assign stage3_mem_raw = stage3_bram_raw;
+
+            always @(posedge clk) begin
+                stage2_bram_raw <= stage2_hist_bram[stage2_bram_read_addr];
+                stage3_bram_raw <= stage3_hist_bram[stage3_bram_read_addr];
+
+                if (rst_n) begin
+                    if (stage2_ce_out && stage2_phase == 1'b0)
+                        stage2_hist_bram[stage2_write_addr] <= stage2_x_current;
+                    if (stage3_ce_out && stage3_phase == 1'b0)
+                        stage3_hist_bram[stage3_write_addr] <= stage3_x_current;
+                end
+            end
         end
-    end
+        else begin : gen_lutram_history
+            assign stage2_mem_raw = stage2_lutram_raw;
+            assign stage3_mem_raw = stage3_lutram_raw;
+
+            always @(posedge clk) begin
+                if (rst_n) begin
+                    if (stage2_ce_out && stage2_phase == 1'b0)
+                        stage2_hist_mem[stage2_write_addr] <= stage2_x_current;
+                    if (stage3_ce_out && stage3_phase == 1'b0)
+                        stage3_hist_mem[stage3_write_addr] <= stage3_x_current;
+                end
+            end
+        end
+    endgenerate
+
+    generate
+        if (USE_BRAM_COEFF != 0) begin : gen_bram_coeff
+            always @(posedge clk) begin
+                coeff_bram_raw <= coeff_sequence_bram[coeff_bram_read_addr];
+            end
+        end
+    endgenerate
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -429,6 +553,10 @@ module interp2_stage23_lutram_cic_dsp_ce #(
             $fatal(1, "LUTRAM Stage 2/3 candidate requires 18bit coefficients");
         if (CIC_ORDER != 3 && CIC_ORDER != 4)
             $fatal(1, "CIC_ORDER must be 3 or 4");
+        if (USE_BRAM_HISTORY != 0 && USE_BRAM_HISTORY != 1)
+            $fatal(1, "USE_BRAM_HISTORY must be 0 or 1");
+        if (USE_BRAM_COEFF != 0 && USE_BRAM_COEFF != 1)
+            $fatal(1, "USE_BRAM_COEFF must be 0 or 1");
     end
 
     always @(posedge clk) begin

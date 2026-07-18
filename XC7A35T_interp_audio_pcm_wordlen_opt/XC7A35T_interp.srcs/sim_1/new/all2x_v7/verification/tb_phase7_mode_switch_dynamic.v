@@ -54,7 +54,17 @@ module tb_phase7_mode_switch_dynamic;
 
     demo_interp_dac8_audio_pcm_common #(
         .USE_PHASE7_FOLDED(1),
-        .USE_PHASE7_LUTRAM_STAGE23(1)
+        .USE_PHASE7_LUTRAM_STAGE23(1),
+`ifdef PHASE7_USE_BRAM_STAGE23_HISTORY
+        .USE_PHASE7_BRAM_STAGE23_HISTORY(1),
+`else
+        .USE_PHASE7_BRAM_STAGE23_HISTORY(0),
+`endif
+`ifdef PHASE7_USE_BRAM_STAGE23_COEFF
+        .USE_PHASE7_BRAM_STAGE23_COEFF(1)
+`else
+        .USE_PHASE7_BRAM_STAGE23_COEFF(0)
+`endif
     ) u_dut (
         .clk_audio_128x(clk),
         .rst_n(rst_n),

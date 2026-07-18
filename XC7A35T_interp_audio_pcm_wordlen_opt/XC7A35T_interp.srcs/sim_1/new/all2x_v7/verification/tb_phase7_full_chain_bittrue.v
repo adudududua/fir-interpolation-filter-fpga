@@ -108,9 +108,19 @@ module tb_phase7_full_chain_bittrue;
         .CIC_ORDER       (3),
         .FINAL_PRUNE_LSB (0),
 `ifdef PHASE7_USE_LUTRAM_STAGE23
-        .USE_LUTRAM_STAGE23(1)
+        .USE_LUTRAM_STAGE23(1),
 `else
-        .USE_LUTRAM_STAGE23(0)
+        .USE_LUTRAM_STAGE23(0),
+`endif
+`ifdef PHASE7_USE_BRAM_STAGE23_HISTORY
+        .USE_BRAM_STAGE23_HISTORY(1),
+`else
+        .USE_BRAM_STAGE23_HISTORY(0),
+`endif
+`ifdef PHASE7_USE_BRAM_STAGE23_COEFF
+        .USE_BRAM_STAGE23_COEFF(1)
+`else
+        .USE_BRAM_STAGE23_COEFF(0)
 `endif
     ) u_dut (
         .clk(clk), .rst_n(rst_n),

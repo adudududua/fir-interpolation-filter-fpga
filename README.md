@@ -1,7 +1,8 @@
 # 高阶数字插值滤波器设计与 FPGA 验证
 
-> 当前最低 LUT 候选：44.1 kHz 专用、Phase 7 折叠补偿 FIR-CIC、Stage 2/3 单读 LUTRAM 串行 MAC、578 LUT / 9 DSP，自动化验证通过<br>
-> 上一低 LUT 候选：相同算法与逐点输出、CIC DSP48 映射、729 LUT / 9 DSP<br>
+> 当前最低 LUT 候选：44.1 kHz 专用、Phase 7 折叠补偿 FIR-CIC、Stage 2/3 BRAM 历史/系数、共享按键扫描、478 LUT / 9 DSP，自动化验证与完整实现通过<br>
+> 默认综合策略对照：相同 RTL 与顶层参数、496 LUT / 565 FF / 9 DSP / 3 BRAM Tile<br>
+> 已推送低 LUT 回退基线：Stage 2/3 单读 LUTRAM 串行 MAC、578 LUT / 619 FF / 9 DSP / 1.5 BRAM Tile<br>
 > 低 DSP 回退候选：相同算法与逐点输出、941 LUT / 2 DSP / 1.5 BRAM Tile<br>
 > 已实板验证回退：Phase 6 混合数据字长、7 级全 2x、2 DSP、ACC38<br>
 > FPGA：Xilinx Artix-7 `XC7A35T-FGG484-2`<br>
@@ -12,7 +13,7 @@
 
 本项目面向“高阶数字插值滤波器设计与验证”赛题，完成了从 MATLAB 数学建模、等波纹 FIR 设计、定点量化、bit-true 验证、RTL 编码、功能仿真、综合实现到 FPGA 板级测试的完整闭环。
 
-当前 Phase 7 候选输入为 **44.1 kHz、24 bit signed PCM**，采用 `2x × 2x × 2x × CIC16 = 128x` 得到 **5.6448 MHz** 输出。CIC 通带补偿折叠进原 11tap Stage3，Stage2/3 共享一个 DSP；低 LUT 路线先用 7 个 DSP48E1 承担 CIC 宽位加减法，再把 Stage2/3 的历史移位寄存器改为单读 LUTRAM 环形缓存，并利用系统时钟余量串行执行对称抽头 MAC。当前最低 LUT 候选已完成模块等价、正式顶层 daily/nightly 逐点对拍、8 场景复位恢复、四档动态切换、完整实现和 bitstream 生成。上一版 Phase 7 已完成静态实板演示；578 LUT bitstream 仍需补做一次四档板测。Phase 6 七级全 2x 版本、Phase 7 的 941 LUT / 2 DSP 版本和 729 LUT / 9 DSP 版本继续作为独立回退路径。
+当前 Phase 7 候选输入为 **44.1 kHz、24 bit signed PCM**，采用 `2x × 2x × 2x × CIC16 = 128x` 得到 **5.6448 MHz** 输出。CIC 通带补偿折叠进原 11tap Stage3，Stage2/3 共享一个 DSP；低 LUT 路线先用 7 个 DSP48E1 承担 CIC 宽位加减法，再利用系统时钟余量串行执行对称抽头 MAC，随后把 Stage2/3 历史与顺序系数迁入 BRAM，并复用上电计数器产生矩阵键盘扫描使能。当前最低 LUT 候选在相同 RTL 上使用 `AreaOptimized_high` 综合指令与 `ExploreArea` 逻辑优化指令，布局布线后为 478 LUT。该候选已完成模块等价、正式顶层 daily/nightly 逐点对拍、8 场景复位恢复、四档动态切换、板级控制仿真、完整实现和 bitstream 生成。上一版 Phase 7 已完成静态实板演示；478 LUT bitstream 仍需补做一次四档板测。Phase 6 七级全 2x 版本、Phase 7 的 941 LUT / 2 DSP、729 LUT / 9 DSP 和已推送的 578 LUT 版本继续作为独立回退路径。
 
 ## 0. Phase 7 折叠补偿 FIR-CIC 候选
 
@@ -919,6 +920,9 @@ BRAM Tile：1 -> 1
 | **Phase 7 紧凑舍入候选** | **941** | **940** | **2** | **1.5** | **daily/nightly 0 LSB、实现与 bitstream 通过，待实板复测** |
 | **Phase 7 CIC DSP48 低 LUT 候选** | **729** | **920** | **9** | **1.5** | **输出逐点不变；实现与 bitstream 通过，待实板复测** |
 | **Phase 7 Stage2/3 LUTRAM 最低 LUT 候选** | **578** | **619** | **9** | **1.5** | **nightly、复位、动态切换与实现通过，待实板复测** |
+| Phase 7 Stage2/3 BRAM + 紧凑键盘候选 | 506 | 579 | 9 | 3 | Stage2/3 历史与系数迁入 BRAM，完整回归通过 |
+| Phase 7 共享扫描默认策略候选 | 496 | 565 | 9 | 3 | 相同 RTL 的默认综合/优化指令对照，完整回归通过 |
+| **Phase 7 面积策略最低 LUT 候选** | **478** | **565** | **9** | **3** | **完整实现、bit-true、复位、切档与板级控制仿真通过，待实板复测** |
 
 Phase 7 PCM ROM BRAM 优化候选相对 Phase 7 稳定版：
 
@@ -962,6 +966,42 @@ Stage2/3 单读 LUTRAM 候选相对 CIC DSP48 低 LUT 候选：
     WNS/WHS：+44.853/+0.077 ns -> +44.153/+0.095 ns
 
 该变化利用 48 MHz 系统时钟相对音频采样使能的周期余量，把对称抽头双读预加改成单读串行 MAC。模块等价、正式顶层 nightly、8 场景复位恢复和四档动态切换均通过，证明资源下降没有改变样点值、复位语义或板级切档时序。
+
+Stage2/3 BRAM 与共享扫描候选继续针对实现热点做局部优化，演进结果如下：
+
+| 迭代 | LUT | FF | LUTRAM | BRAM Tile | DSP | WNS/WHS / ns | 主要变化 |
+|---|---:|---:|---:|---:|---:|---:|---|
+| 578 LUT 基线 | 578 | 619 | 32 | 1.5 | 9 | +44.153/+0.095 | Stage2/3 单读 LUTRAM |
+| 紧凑键盘 | 557 | 579 | 32 | 1.5 | 9 | +46.451/+0.105 | 仅实现 SW1～SW8 的四档映射 |
+| BRAM 历史 | 521 | 579 | 0 | 2.5 | 9 | +46.169/+0.118 | Stage2/3 两个历史环迁入 RAMB18E1 |
+| BRAM 历史与系数 | 506 | 579 | 0 | 3 | 9 | +45.995/+0.050 | 顺序系数预取替代组合系数选择网络 |
+| 共享扫描默认策略 | 496 | 565 | 0 | 3 | 9 | +45.414/+0.120 | 复用上电计数器产生 16384 拍扫描使能 |
+| **面积策略最终候选** | **478** | **565** | **0** | **3** | **9** | **+46.612/+0.121** | **相同 RTL，综合使用 `AreaOptimized_high`，逻辑优化使用 `ExploreArea`** |
+
+面积策略最终候选相对 578 LUT 基线减少 100 LUT（17.30%）和 54 FF（8.72%），增加 1.5 BRAM Tile；相对最初 6426 LUT 板级版本累计减少 5948 LUT（92.56%）。完整设计仅使用 2.30% LUT、1.36% FF、10.00% DSP 和 6.00% BRAM，post-route 功耗估计为 0.169 W。6 个 RAMB18E1 分别承担 PCM ROM、Stage1 双读历史复制、Stage2/3 历史及顺序系数存储，没有把滤波乘加重新映射回 LUT。与 496 LUT 对照相比，478 LUT 结果没有修改 RTL、系数、字长或时序协议，只改变 Vivado 的面积优化搜索方向，因此共用同一套逐样本验证结论；同时仍以独立实现报告确认资源、时序和 bitstream。
+
+最终候选的验证覆盖不是只看综合是否通过：
+
+| 验证层级 | 激励或场景 | 结果 |
+|---|---|---|
+| Stage2/3 单元等价 | Stage2 336 点、Stage3 671 点 | 全部 0 LSB |
+| 正式顶层 daily | 冲激 + 4 组随机，各 1024 输入点 | 4x/8x/128x 全部 0 LSB |
+| 正式顶层 nightly | 冲激 + 10 组随机，各 4096 输入点 | 5,355,552 个 128x 输出点及中间节点全部 0 LSB |
+| 完整链复位恢复 | 8 个 FIR/CIC 内部状态，每场景比较 4096 点 | 全部通过 |
+| 动态档位切换 | 10 次无复位 1x/4x/8x/128x 切换 | 无窄脉冲、X、停顿或计数错误 |
+| 紧凑键盘等价 | SW1～SW8、抖动、多键优先级、SW9～SW16 忽略 | 与原控制器要求一致 |
+| 板级共享扫描 | 65535 拍上电复位、16384 拍扫描周期、SW2 去抖 | 全部通过 |
+
+同时保留了两项 No-Go 对照。独立 16384 分频计数器得到 515 LUT，反而比 506 LUT 版本增加 9 LUT；Stage1 的 26×17 bit 小系数表强制 BRAM 后没有推断出额外 RAMB18E1，Stage1 反而从 1 DSP 增至 2 DSP、整板回升到 506 LUT/10 DSP。因此两项均未进入正式候选，说明优化决策以实现报告和逐样本验证为依据，而不是预设“所有 ROM 都应搬入 BRAM”。
+
+最终候选 bitstream：
+
+```text
+matlab_fir/alt_all2x_v7/vivado_results/board_folded_n3_stage23_bram_coeff_compact_keypad_sharedscan_areaopt/phase7_bram_sharedscan_areaopt_amp050.bit
+SHA256: 26545FE770C1690199F45F9F9E1CA3A5AEBD259D349F30B9E2775EB7AE24147E
+```
+
+该文件仍保持 0.50FS、15 kHz 正弦演示信号和 1x/4x/8x/128x 四档数据路径；当前状态为仿真、实现与 bitstream 通过，实板四档复测尚未完成，因此已推送的 578 LUT 基线、496 LUT 默认策略 bitstream 和既有稳定回退 bitstream 均继续保留。
 
 V3 相对全 2x 初始稳定板级：
 
@@ -1179,6 +1219,7 @@ SHA256：E122FC402FB10E43954BDC5E9E134BD2789F1645F138D6FFAAD83C52581612C3
 | `all2x_v7/cic_interp16_core_ce.v` | 低速 comb、16 倍插零、高速 integrator CIC 核 |
 | `all2x_v7/cic_interp16_core_dsp_ce.v` | 与正式 CIC 逐点等价的 DSP48 优先映射低 LUT 核 |
 | `all2x_v7/interp128_all2x_v7_folded_fir_cic_top_ce.v` | Phase 7 N=3 128x 顶层及 Stage2/3 稳定/LUTRAM 参数化选择 |
+| `matrix_keypad_mode_ctrl_compact.v` | SW1～SW8 四档映射、整轮消抖及共享扫描使能接口 |
 | `all2x_v2/interp2_stage23_polyphase_ce.v` | Stage2/3 true-polyphase 实现 |
 | `all2x_v2/interp2_halfband7_shiftadd_ce.v` | Stage4～7 canonical shift-add 实现 |
 | `all2x_v2/bridge_valid_only_to_interp2_ce.v` | 级间轻量 valid 桥 |
@@ -1210,10 +1251,13 @@ SHA256：E122FC402FB10E43954BDC5E9E134BD2789F1645F138D6FFAAD83C52581612C3
 | `sim_1/new/all2x_v7/verification/tb_phase7_full_chain_reset_recovery.v` | 完整顶层 8 个内部阶段复位恢复 |
 | `sim_1/new/all2x_v7/verification/tb_phase7_mode_switch_dynamic.v` | 无复位动态切档、频率、毛刺和 X 检查 |
 | `sim_1/new/all2x_v7/verification/tb_stage23_lutram_dsp_equiv.v` | Stage2/3 稳定实现与 LUTRAM 候选按 valid 序列 0 LSB 对拍 |
+| `sim_1/new/all2x_v7/verification/tb_matrix_keypad_mode_ctrl_compact.v` | 紧凑键盘与原扫描器的按键、抖动及优先级等价验证 |
+| `sim_1/new/all2x_v7/verification/tb_board_phase7_shared_keypad_scan.v` | 上电复位、共享扫描周期、音频域复位及 SW2 去抖验证 |
 | `alt_all2x_v7/vivado/synth_phase7_folded_fir_cic.tcl` | Phase 7 N3/N4 同口径独立综合 |
 | `alt_all2x_v7/vivado/register_phase7_board_sources.tcl` | Phase 7 工程源文件登记 |
 | `alt_all2x_v7/vivado/build_board_phase7_folded_n3.tcl` | Phase 7 板级完整实现与 bitstream 导出 |
 | `alt_all2x_v7/vivado/build_board_phase7_rounder_compact_opt.tcl` | Stage 1 紧凑舍入候选的独立实现、报告与 bitstream 导出 |
+| `alt_all2x_v7/vivado/build_board_phase7_stage23_lutram_compact_keypad.tcl` | 578～478 LUT 的 LUTRAM/BRAM/紧凑键盘/面积策略候选统一构建脚本 |
 | `alt_all2x_v7/vivado/generate_phase7_stable_mcs.tcl` | 回退后稳定版 SPIx1 MCS 导出 |
 | `alt_all2x_v7/vivado/report_phase7_implementation_verification.tcl` | 从当前实现补导出时钟交互和 DSP 单元报告 |
 
@@ -1311,7 +1355,7 @@ run('generate_demo_sine_15k_44k1.m');
 XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.xpr
 ```
 
-当前 `XC7A35T_interp.xpr` 已正式登记 V4/Phase 5、Phase 6 和 Phase 7 板级 RTL、`all2x_v2`～`all2x_v7` include 目录、Phase 7 测试平台和 15 kHz `.mem` 文件，不需要再次手动 Add Sources。Phase 7 构建脚本已经 Reset 并重跑 `synth_1`、`impl_1` 与 bitstream；后续手动复现时可依次执行：
+当前 `XC7A35T_interp.xpr` 已正式登记 V4/Phase 5、Phase 6、Phase 7 板级 RTL、紧凑键盘控制器、`all2x_v2`～`all2x_v7` include 目录、Phase 7 测试平台和 15 kHz `.mem` 文件，不需要再次手动 Add Sources。顶层 generic 已指向 `478 LUT` 面积策略候选：Stage2/3 历史与系数 BRAM、紧凑键盘、共享扫描均启用；当前 run 同时保存了 `AreaOptimized_high` 综合指令和 `ExploreArea` 逻辑优化指令。Phase 7 构建脚本已经 Reset 并重跑 `synth_1`、`impl_1` 与 bitstream；后续手动复现时可依次执行：
 
 ```text
 Run Synthesis
@@ -1396,3 +1440,5 @@ Phase 7 在正确 CIC 插值结构上先完成独立低速补偿 FIR，确认其
 在低 LUT 目标下，又把 CIC 的 32 bit comb 差分与积分器累加优先映射到 7 个空闲 DSP48E1。完整板级达到 729 LUT / 920 FF / 9 DSP / 1.5 BRAM Tile，相对 941 LUT 候选再减少 212 LUT；WNS/WHS 为 +44.853/+0.077 ns，功耗仍为 0.168 W。冲激、daily 和 nightly 三节点对拍全部为 0 LSB，独立 Stage2/3 双 DSP 候选则因 LUT 反增而被淘汰。729 LUT / 9 DSP 与 941 LUT / 2 DSP 两个 bitstream 均独立保留，等待实板 A/B 后再决定最终提交版本。
 
 最新最低 LUT 候选进一步把 Stage2/3 历史移位寄存器改为两个 16 深度单读 LUTRAM 环形缓存，并将对称抽头改为同一 DSP48E1 上的串行 MAC。完整板级达到 578 LUT / 619 FF / 9 DSP / 1.5 BRAM Tile，相对 729 LUT 候选再减少 151 LUT 和 301 FF；WNS/WHS 为 +44.153/+0.095 ns，功耗仍为 0.168 W。Stage2/3 单元对拍、正式顶层 daily/nightly、8 场景复位恢复和无复位四档动态切换全部通过。该 bitstream 已独立导出并用 SHA256 固定版本，当前仅剩 1x/4x/8x/128x 实板复测，既有三个回退 bitstream 与稳定 MCS 均未覆盖。
+
+在 578 LUT 基线上继续按层级热点收敛：紧凑键盘、Stage2/3 BRAM 历史、同步系数表和上电计数器复用依次把完整板级降到 557、521、506 和 496 LUT。随后保持 RTL、系数、字长、generic 和接口全部不变，仅将 Vivado 综合/逻辑优化指令设为 `AreaOptimized_high`/`ExploreArea`，布局布线结果进一步降至 478 LUT / 565 FF / 9 DSP / 3 BRAM Tile，WNS/WHS 为 +46.612/+0.121 ns，功耗 0.169 W。滤波链 daily/nightly、8 场景复位恢复、10 次动态切档均通过，新增板级控制测试进一步确认第 65535 拍释放复位、16384 拍扫描周期和 SW2 整轮去抖。最终 bitstream SHA256 为 `26545FE770C1690199F45F9F9E1CA3A5AEBD259D349F30B9E2775EB7AE24147E`；当前只差实板四档复测，578 LUT 推送基线与 496 LUT 默认策略候选仍可直接回退。

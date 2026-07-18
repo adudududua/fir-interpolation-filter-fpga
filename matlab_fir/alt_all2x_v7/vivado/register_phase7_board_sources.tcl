@@ -19,6 +19,7 @@
 #                2026-07-13：新增 Phase 7 板级源文件登记脚本。
 #                2026-07-18：登记 CIC DSP、Stage2/3 LUTRAM 候选及
 #                            对应的等价性测试平台。
+#                2026-07-18：登记紧凑键盘、共享扫描及板级控制测试。
 #=============================================================
 
 set script_dir [file dirname [file normalize [info script]]]
@@ -27,11 +28,13 @@ set project_file [file join $repo_dir \
     XC7A35T_interp_audio_pcm_wordlen_opt XC7A35T_interp.xpr]
 set project_src_dir [file join $repo_dir \
     XC7A35T_interp_audio_pcm_wordlen_opt XC7A35T_interp.srcs]
+set common_src_dir [file join $project_src_dir sources_1 new]
 set v7_src_dir [file join $project_src_dir sources_1 new all2x_v7]
 set v7_sim_dir [file join $project_src_dir sim_1 new all2x_v7]
 set v7_verification_dir [file join $v7_sim_dir verification]
 
 set source_files [list \
+    [file join $common_src_dir matrix_keypad_mode_ctrl_compact.v] \
     [file join $v7_src_dir interp2_stage23_folded_cic_dsp_ce.v] \
     [file join $v7_src_dir cic_interp16_core_ce.v] \
     [file join $v7_src_dir cic_interp16_core_dsp_ce.v] \
@@ -43,7 +46,9 @@ set simulation_files [list \
     [file join $v7_verification_dir tb_stage23_lutram_dsp_equiv.v] \
     [file join $v7_verification_dir tb_phase7_full_chain_bittrue.v] \
     [file join $v7_verification_dir tb_phase7_full_chain_reset_recovery.v] \
-    [file join $v7_verification_dir tb_phase7_mode_switch_dynamic.v]]
+    [file join $v7_verification_dir tb_phase7_mode_switch_dynamic.v] \
+    [file join $v7_verification_dir tb_matrix_keypad_mode_ctrl_compact.v] \
+    [file join $v7_verification_dir tb_board_phase7_shared_keypad_scan.v]]
 
 open_project $project_file
 

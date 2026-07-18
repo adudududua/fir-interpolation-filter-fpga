@@ -28,12 +28,23 @@
 // 开发工具     : Vivado Simulator
 // 修订记录     :
 //                2026-07-18：新增 Stage 2/3 资源候选等价性测试。
+//                2026-07-18：增加 BRAM 历史缓存候选选择宏。
 //=============================================================
 
 module tb_stage23_lutram_dsp_equiv;
 
     localparam integer STAGE2_W = 22;
     localparam integer STAGE3_W = 20;
+`ifdef PHASE7_ENABLE_BRAM_HISTORY
+    localparam integer CANDIDATE_USE_BRAM_HISTORY = 1;
+`else
+    localparam integer CANDIDATE_USE_BRAM_HISTORY = 0;
+`endif
+`ifdef PHASE7_ENABLE_BRAM_COEFF
+    localparam integer CANDIDATE_USE_BRAM_COEFF = 1;
+`else
+    localparam integer CANDIDATE_USE_BRAM_COEFF = 0;
+`endif
     localparam integer QUEUE_DEPTH = 8192;
 
     reg clk;
@@ -104,7 +115,9 @@ module tb_stage23_lutram_dsp_equiv;
         .STAGE3_DATA_W(STAGE3_W),
         .COEFF_W(18),
         .ACC_W(38),
-        .CIC_ORDER(3)
+        .CIC_ORDER(3),
+        .USE_BRAM_HISTORY(CANDIDATE_USE_BRAM_HISTORY),
+        .USE_BRAM_COEFF(CANDIDATE_USE_BRAM_COEFF)
     ) u_candidate (
         .clk(clk),
         .rst_n(rst_n),

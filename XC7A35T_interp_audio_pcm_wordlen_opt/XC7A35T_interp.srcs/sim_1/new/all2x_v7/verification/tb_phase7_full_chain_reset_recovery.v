@@ -74,9 +74,19 @@ module tb_phase7_full_chain_reset_recovery;
     interp128_all2x_v7_folded_fir_cic_top_ce #(
         .STAGE23_ACC_W(38), .CIC_ORDER(3), .FINAL_PRUNE_LSB(0),
 `ifdef PHASE7_USE_LUTRAM_STAGE23
-        .USE_LUTRAM_STAGE23(1)
+        .USE_LUTRAM_STAGE23(1),
 `else
-        .USE_LUTRAM_STAGE23(0)
+        .USE_LUTRAM_STAGE23(0),
+`endif
+`ifdef PHASE7_USE_BRAM_STAGE23_HISTORY
+        .USE_BRAM_STAGE23_HISTORY(1),
+`else
+        .USE_BRAM_STAGE23_HISTORY(0),
+`endif
+`ifdef PHASE7_USE_BRAM_STAGE23_COEFF
+        .USE_BRAM_STAGE23_COEFF(1)
+`else
+        .USE_BRAM_STAGE23_COEFF(0)
 `endif
     ) u_dut (
         .clk(clk), .rst_n(rst_dut_n),
@@ -96,9 +106,19 @@ module tb_phase7_full_chain_reset_recovery;
     interp128_all2x_v7_folded_fir_cic_top_ce #(
         .STAGE23_ACC_W(38), .CIC_ORDER(3), .FINAL_PRUNE_LSB(0),
 `ifdef PHASE7_USE_LUTRAM_STAGE23
-        .USE_LUTRAM_STAGE23(1)
+        .USE_LUTRAM_STAGE23(1),
 `else
-        .USE_LUTRAM_STAGE23(0)
+        .USE_LUTRAM_STAGE23(0),
+`endif
+`ifdef PHASE7_USE_BRAM_STAGE23_HISTORY
+        .USE_BRAM_STAGE23_HISTORY(1),
+`else
+        .USE_BRAM_STAGE23_HISTORY(0),
+`endif
+`ifdef PHASE7_USE_BRAM_STAGE23_COEFF
+        .USE_BRAM_STAGE23_COEFF(1)
+`else
+        .USE_BRAM_STAGE23_COEFF(0)
 `endif
     ) u_cold_reference (
         .clk(clk), .rst_n(rst_ref_n),

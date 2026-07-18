@@ -25,13 +25,23 @@
 //                            映射为 1x/4x/8x/128x。
 //                2026-07-18：增加 Stage 2/3 单读 LUTRAM 板级候选参数；
 //                            默认关闭，稳定版本行为保持不变。
+//                2026-07-18：增加紧凑四档矩阵按键候选参数；
+//                            默认关闭，完整 16 键扫描器继续保留。
+//                2026-07-18：增加紧凑键盘扫描分频参数，便于独立比较
+//                            20000 与二次幂 16384 的资源实现。
+//                2026-07-18：增加上电计数器复用扫描候选，默认关闭。
 // 其他描述     :
 //                1. SW1/SW2/SW3/SW4：1x/4x/8x/128x。
 //                2. SW5/SW6/SW7/SW8：重复映射 1x/4x/8x/128x。
 //=============================================================
 
 module board_demo_competition_dac8_top #(
-    parameter integer USE_PHASE7_LUTRAM_STAGE23 = 0
+    parameter integer USE_PHASE7_LUTRAM_STAGE23 = 0,
+    parameter integer USE_COMPACT_KEYPAD = 0,
+    parameter integer COMPACT_KEYPAD_SCAN_DIV = 20000,
+    parameter integer USE_SHARED_KEYPAD_SCAN_TICK = 0,
+    parameter integer USE_PHASE7_BRAM_STAGE23_HISTORY = 0,
+    parameter integer USE_PHASE7_BRAM_STAGE23_COEFF = 0
 )(
     input  wire       clk,       // 板载 20MHz 系统时钟
 
@@ -84,16 +94,31 @@ module board_demo_competition_dac8_top #(
     //   给两个 Clock Wizard 和后级逻辑一个稳定启动过程。
     //=========================================================
     reg [15:0] pwr_rst_cnt = 16'd0;
+    reg        pwr_rst_done = 1'b0;
     wire       rst_n_int;
+    wire       compact_keypad_scan_tick;
 
-    always @(posedge clk_sys_bufg) begin
-        if (pwr_rst_cnt != 16'hFFFF)
-            pwr_rst_cnt <= pwr_rst_cnt + 16'd1;
-        else
-            pwr_rst_cnt <= pwr_rst_cnt;
-    end
+    generate
+        if (USE_SHARED_KEYPAD_SCAN_TICK != 0) begin : gen_shared_scan_counter
+            always @(posedge clk_sys_bufg) begin
+                pwr_rst_cnt <= pwr_rst_cnt + 16'd1;
+                if (pwr_rst_cnt == 16'hFFFE)
+                    pwr_rst_done <= 1'b1;
+            end
+            assign rst_n_int = pwr_rst_done;
+        end
+        else begin : gen_dedicated_power_reset
+            always @(posedge clk_sys_bufg) begin
+                if (pwr_rst_cnt != 16'hFFFF)
+                    pwr_rst_cnt <= pwr_rst_cnt + 16'd1;
+                else
+                    pwr_rst_cnt <= pwr_rst_cnt;
+            end
+            assign rst_n_int = (pwr_rst_cnt == 16'hFFFF);
+        end
+    endgenerate
 
-    assign rst_n_int = (pwr_rst_cnt == 16'hFFFF);
+    assign compact_keypad_scan_tick = &pwr_rst_cnt[13:0];
 
     //=========================================================
     // 3）矩阵按键扫描与模式锁存
@@ -112,16 +137,37 @@ module board_demo_competition_dac8_top #(
     assign key_kr[2] = key_kr_drive_low[2] ? 1'b0 : 1'bz;
     assign key_kr[3] = key_kr_drive_low[3] ? 1'b0 : 1'bz;
 
-    matrix_keypad_mode_ctrl u_matrix_keypad_mode_ctrl (
-        .clk          (clk_sys_bufg),
-        .rst_n        (rst_n_int),
-        .kc           (key_kc),
-        .kr_drive_low (key_kr_drive_low),
-        .family_sel   (key_family_sel_unused),
-        .mode_sel     (key_mode_sel),
-        .key_strobe   (key_strobe_unused),
-        .key_code     (key_code_unused)
-    );
+    generate
+        if (USE_COMPACT_KEYPAD != 0) begin : gen_compact_keypad
+            matrix_keypad_mode_ctrl_compact #(
+                .SCAN_DIV               (COMPACT_KEYPAD_SCAN_DIV),
+                .USE_EXTERNAL_SCAN_TICK (USE_SHARED_KEYPAD_SCAN_TICK)
+            ) u_matrix_keypad_mode_ctrl_compact (
+                .clk          (clk_sys_bufg),
+                .rst_n        (rst_n_int),
+                .scan_tick    (compact_keypad_scan_tick),
+                .kc           (key_kc),
+                .kr_drive_low (key_kr_drive_low),
+                .mode_sel     (key_mode_sel)
+            );
+
+            assign key_family_sel_unused = 1'b0;
+            assign key_strobe_unused = 1'b0;
+            assign key_code_unused = 4'd0;
+        end
+        else begin : gen_full_keypad
+            matrix_keypad_mode_ctrl u_matrix_keypad_mode_ctrl (
+                .clk          (clk_sys_bufg),
+                .rst_n        (rst_n_int),
+                .kc           (key_kc),
+                .kr_drive_low (key_kr_drive_low),
+                .family_sel   (key_family_sel_unused),
+                .mode_sel     (key_mode_sel),
+                .key_strobe   (key_strobe_unused),
+                .key_code     (key_code_unused)
+            );
+        end
+    endgenerate
 
     //=========================================================
     // 4）Clock Wizard：44.1kHz 家族
@@ -202,7 +248,9 @@ module board_demo_competition_dac8_top #(
 
     demo_interp_dac8_audio_pcm_common #(
         .USE_PHASE7_FOLDED(1),
-        .USE_PHASE7_LUTRAM_STAGE23(USE_PHASE7_LUTRAM_STAGE23)
+        .USE_PHASE7_LUTRAM_STAGE23(USE_PHASE7_LUTRAM_STAGE23),
+        .USE_PHASE7_BRAM_STAGE23_HISTORY(USE_PHASE7_BRAM_STAGE23_HISTORY),
+        .USE_PHASE7_BRAM_STAGE23_COEFF(USE_PHASE7_BRAM_STAGE23_COEFF)
     ) u_demo_interp_dac8_audio_pcm_common (
         .clk_audio_128x (clk_audio_128x_44k1),
         .rst_n          (rst_audio_n),

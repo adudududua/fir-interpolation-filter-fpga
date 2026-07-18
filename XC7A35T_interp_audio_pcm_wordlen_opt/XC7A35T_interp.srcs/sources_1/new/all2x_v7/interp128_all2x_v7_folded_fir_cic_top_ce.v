@@ -28,13 +28,16 @@
 //                2026-07-18：CIC 宽位加减法改用 DSP48 优先映射候选。
 //                2026-07-18：增加 Stage 2/3 单读 LUTRAM 资源候选；
 //                            默认关闭，不改变稳定板级版本行为。
+//                2026-07-18：增加 Stage 2/3 BRAM 历史缓存候选参数。
 //=============================================================
 
 module interp128_all2x_v7_folded_fir_cic_top_ce #(
     parameter integer STAGE23_ACC_W = 38,
     parameter integer CIC_ORDER = 3,
     parameter integer FINAL_PRUNE_LSB = 3,
-    parameter integer USE_LUTRAM_STAGE23 = 0
+    parameter integer USE_LUTRAM_STAGE23 = 0,
+    parameter integer USE_BRAM_STAGE23_HISTORY = 0,
+    parameter integer USE_BRAM_STAGE23_COEFF = 0
 )(
     input  wire                         clk,
     input  wire                         rst_n,
@@ -114,7 +117,9 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
                 .STAGE3_DATA_W(20),
                 .COEFF_W(18),
                 .ACC_W(STAGE23_ACC_W),
-                .CIC_ORDER(CIC_ORDER)
+                .CIC_ORDER(CIC_ORDER),
+                .USE_BRAM_HISTORY(USE_BRAM_STAGE23_HISTORY),
+                .USE_BRAM_COEFF(USE_BRAM_STAGE23_COEFF)
             ) u_interp2_stage23_lutram_cic_dsp_ce (
                 .clk(clk), .rst_n(rst_n),
                 .stage2_ce_out(ce4_out),
