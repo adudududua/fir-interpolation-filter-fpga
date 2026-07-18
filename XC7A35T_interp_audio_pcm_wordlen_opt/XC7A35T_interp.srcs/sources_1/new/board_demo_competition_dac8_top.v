@@ -30,6 +30,7 @@
 //                2026-07-18：增加紧凑键盘扫描分频参数，便于独立比较
 //                            20000 与二次幂 16384 的资源实现。
 //                2026-07-18：增加上电计数器复用扫描候选，默认关闭。
+//                2026-07-18：增加 CIC burst 计数器 DSP/LUT 选择参数。
 // 其他描述     :
 //                1. SW1/SW2/SW3/SW4：1x/4x/8x/128x。
 //                2. SW5/SW6/SW7/SW8：重复映射 1x/4x/8x/128x。
@@ -41,7 +42,8 @@ module board_demo_competition_dac8_top #(
     parameter integer COMPACT_KEYPAD_SCAN_DIV = 20000,
     parameter integer USE_SHARED_KEYPAD_SCAN_TICK = 0,
     parameter integer USE_PHASE7_BRAM_STAGE23_HISTORY = 0,
-    parameter integer USE_PHASE7_BRAM_STAGE23_COEFF = 0
+    parameter integer USE_PHASE7_BRAM_STAGE23_COEFF = 0,
+    parameter integer USE_PHASE7_CIC_BURST_COUNTER_DSP = 0
 )(
     input  wire       clk,       // 板载 20MHz 系统时钟
 
@@ -250,7 +252,9 @@ module board_demo_competition_dac8_top #(
         .USE_PHASE7_FOLDED(1),
         .USE_PHASE7_LUTRAM_STAGE23(USE_PHASE7_LUTRAM_STAGE23),
         .USE_PHASE7_BRAM_STAGE23_HISTORY(USE_PHASE7_BRAM_STAGE23_HISTORY),
-        .USE_PHASE7_BRAM_STAGE23_COEFF(USE_PHASE7_BRAM_STAGE23_COEFF)
+        .USE_PHASE7_BRAM_STAGE23_COEFF(USE_PHASE7_BRAM_STAGE23_COEFF),
+        .USE_PHASE7_CIC_BURST_COUNTER_DSP(
+            USE_PHASE7_CIC_BURST_COUNTER_DSP)
     ) u_demo_interp_dac8_audio_pcm_common (
         .clk_audio_128x (clk_audio_128x_44k1),
         .rst_n          (rst_audio_n),

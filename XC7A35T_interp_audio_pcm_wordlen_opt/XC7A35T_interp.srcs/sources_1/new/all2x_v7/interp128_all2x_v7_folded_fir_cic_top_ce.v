@@ -17,7 +17,9 @@
 //                  输出采样率：5.6448MHz
 //                  候选 A    ：N=3，CIC 保持全精度
 //                  候选 B    ：N=4，CIC 最后一级丢弃 7 LSB
-//                  DSP 数目标：2（Stage1 + Stage2/3 共享）
+//                  FIR DSP   ：2（Stage1 + Stage2/3 共享）
+//                  CIC DSP   ：6（三级差分 + 三级积分）
+//                  默认总数  ：8（burst 计数器使用 LUT 进位链）
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-13
@@ -29,6 +31,7 @@
 //                2026-07-18：增加 Stage 2/3 单读 LUTRAM 资源候选；
 //                            默认关闭，不改变稳定板级版本行为。
 //                2026-07-18：增加 Stage 2/3 BRAM 历史缓存候选参数。
+//                2026-07-18：增加 CIC burst 计数器 DSP/LUT 选择参数。
 //=============================================================
 
 module interp128_all2x_v7_folded_fir_cic_top_ce #(
@@ -37,7 +40,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     parameter integer FINAL_PRUNE_LSB = 3,
     parameter integer USE_LUTRAM_STAGE23 = 0,
     parameter integer USE_BRAM_STAGE23_HISTORY = 0,
-    parameter integer USE_BRAM_STAGE23_COEFF = 0
+    parameter integer USE_BRAM_STAGE23_COEFF = 0,
+    parameter integer CIC_BURST_COUNTER_USE_DSP = 0
 )(
     input  wire                         clk,
     input  wire                         rst_n,
@@ -167,7 +171,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     cic_interp16_core_dsp_ce #(
         .DATA_W          (20),
         .CIC_ORDER       (CIC_ORDER),
-        .FINAL_PRUNE_LSB (FINAL_PRUNE_LSB)
+        .FINAL_PRUNE_LSB (FINAL_PRUNE_LSB),
+        .BURST_COUNTER_USE_DSP(CIC_BURST_COUNTER_USE_DSP)
     ) u_cic_interp16_core_dsp_ce (
         .clk                  (clk),
         .rst_n                (rst_n),

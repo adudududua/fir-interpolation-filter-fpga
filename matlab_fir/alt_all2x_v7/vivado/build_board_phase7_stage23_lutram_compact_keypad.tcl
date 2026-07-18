@@ -2,8 +2,9 @@
 # 文件名       : build_board_phase7_stage23_lutram_compact_keypad.tcl
 # 脚本名       : build_board_phase7_stage23_lutram_compact_keypad
 # 功能简述     : 构建 Stage 2/3 单读 LUTRAM 与紧凑矩阵键盘候选。
-#                滤波器算法、0.50FS 正弦、定点字长、CIC DSP 映射
-#                和四档 DAC 数据路径保持不变。矩阵键盘仅保留
+#                滤波器算法、0.50FS 正弦、定点字长和四档 DAC
+#                数据路径保持不变；CIC burst 计数器可在 DSP 与
+#                LUT 进位链之间 A/B。矩阵键盘仅保留
 #                SW1～SW8 的两行重复四档映射，并继续执行输入同步
 #                和整轮扫描消抖，以减少完整 16 键位图控制逻辑。
 #
@@ -24,6 +25,8 @@
 #                  第三参数 1：紧凑键盘扫描分频使用 16384
 #                  第四参数 1：复用上电计数器产生键盘扫描使能
 #                  第五参数 1：启用面积优先综合与逻辑优化 directive
+#                  第六参数 1：CIC burst 计数器使用 LUT 进位链；
+#                              设为 0 可重建原 9-DSP 对照
 #                  目标器件：xc7a35tfgg484-2
 #
 # 设计作者     : kafeizizi
@@ -36,6 +39,7 @@
 #                2026-07-18：增加可选二次幂键盘扫描分频构建参数。
 #                2026-07-18：增加可选上电计数器复用扫描构建参数。
 #                2026-07-18：增加可选 Vivado 面积优先策略 A/B 参数。
+#                2026-07-18：增加 CIC burst 计数器 LUT 候选结果隔离。
 #=============================================================
 
 set script_dir [file dirname [file normalize [info script]]]
@@ -51,6 +55,7 @@ set use_bram_coeff 0
 set use_pow2_keypad_scan 0
 set use_shared_keypad_scan_tick 0
 set use_area_directive 0
+set use_lut_burst_counter_candidate 0
 if {$argc > 0} {
     set use_bram_history [lindex $argv 0]
 }
@@ -65,6 +70,9 @@ if {$argc > 3} {
 }
 if {$argc > 4} {
     set use_area_directive [lindex $argv 4]
+}
+if {$argc > 5} {
+    set use_lut_burst_counter_candidate [lindex $argv 5]
 }
 if {$use_bram_history != 0 && $use_bram_history != 1} {
     error "BRAM history selector must be 0 or 1."
@@ -81,6 +89,12 @@ if {$use_shared_keypad_scan_tick != 0 && $use_shared_keypad_scan_tick != 1} {
 if {$use_area_directive != 0 && $use_area_directive != 1} {
     error "Area directive selector must be 0 or 1."
 }
+if {$use_lut_burst_counter_candidate != 0 &&
+    $use_lut_burst_counter_candidate != 1} {
+    error "LUT burst counter candidate selector must be 0 or 1."
+}
+set cic_burst_counter_use_dsp [expr {
+    $use_lut_burst_counter_candidate != 0 ? 0 : 1}]
 
 if {$use_pow2_keypad_scan != 0} {
     set keypad_scan_div 16384
@@ -95,6 +109,9 @@ if {$use_shared_keypad_scan_tick != 0} {
 if {$use_area_directive != 0} {
     append keypad_suffix _areaopt
 }
+if {$use_lut_burst_counter_candidate != 0} {
+    append keypad_suffix _dsp8
+}
 
 if {$use_bram_history != 0 && $use_bram_coeff != 0} {
     set result_name board_folded_n3_stage23_bram_coeff_compact_keypad${keypad_suffix}
@@ -107,7 +124,11 @@ if {$use_bram_history != 0 && $use_bram_coeff != 0} {
     set bitstream_name board_demo_competition_dac8_top_phase7_stage23_lutram_compact_keypad${keypad_suffix}_amp050.bit
 }
 if {$use_area_directive != 0} {
-    set bitstream_name phase7_bram_sharedscan_areaopt_amp050.bit
+    if {$use_lut_burst_counter_candidate != 0} {
+        set bitstream_name phase7_bram_sharedscan_areaopt_dsp8_amp050.bit
+    } else {
+        set bitstream_name phase7_bram_sharedscan_areaopt_amp050.bit
+    }
 }
 set result_dir [file normalize [file join $script_dir .. vivado_results $result_name]]
 
@@ -141,7 +162,9 @@ set generic_values [list \
     [format "COMPACT_KEYPAD_SCAN_DIV=%d" $keypad_scan_div] \
     [format "USE_SHARED_KEYPAD_SCAN_TICK=%d" $use_shared_keypad_scan_tick] \
     [format "USE_PHASE7_BRAM_STAGE23_HISTORY=%d" $use_bram_history] \
-    [format "USE_PHASE7_BRAM_STAGE23_COEFF=%d" $use_bram_coeff]]
+    [format "USE_PHASE7_BRAM_STAGE23_COEFF=%d" $use_bram_coeff] \
+    [format "USE_PHASE7_CIC_BURST_COUNTER_DSP=%d" \
+        $cic_burst_counter_use_dsp]]
 set_property generic $generic_values [get_filesets sources_1]
 update_compile_order -fileset sources_1
 

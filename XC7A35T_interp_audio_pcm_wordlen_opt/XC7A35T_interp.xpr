@@ -392,6 +392,7 @@
         <Generic Name="USE_SHARED_KEYPAD_SCAN_TICK" Val="1"/>
         <Generic Name="USE_PHASE7_BRAM_STAGE23_HISTORY" Val="1"/>
         <Generic Name="USE_PHASE7_BRAM_STAGE23_COEFF" Val="1"/>
+        <Generic Name="USE_PHASE7_CIC_BURST_COUNTER_DSP" Val="0"/>
       </Config>
     </FileSet>
     <FileSet Name="constrs_1" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1">

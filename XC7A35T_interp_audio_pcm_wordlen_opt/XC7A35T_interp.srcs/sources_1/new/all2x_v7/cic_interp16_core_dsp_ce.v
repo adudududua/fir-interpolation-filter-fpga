@@ -20,13 +20,16 @@
 // 开发工具     : Vivado
 // 修订记录     :
 //                2026-07-18：新增 DSP48 优先映射候选。
+//                2026-07-18：禁止 5bit burst 计数器占用 DSP48E1，
+//                            仅保留 CIC 宽位加减法的 DSP 优先映射。
 //=============================================================
 
 (* use_dsp = "yes" *)
 module cic_interp16_core_dsp_ce #(
     parameter integer DATA_W = 20,
     parameter integer CIC_ORDER = 3,
-    parameter integer FINAL_PRUNE_LSB = 3
+    parameter integer FINAL_PRUNE_LSB = 3,
+    parameter integer BURST_COUNTER_USE_DSP = 0
 )(
     input  wire                         clk,
     input  wire                         rst_n,
@@ -58,6 +61,7 @@ module cic_interp16_core_dsp_ce #(
     reg signed [FULL_W-1:0] burst_sample;
     reg burst_pending;
     reg [4:0] burst_remaining;
+    wire [4:0] burst_remaining_decrement;
 
     wire signed [FULL_W-1:0] x_extended;
     wire output_event;
@@ -83,6 +87,17 @@ module cic_interp16_core_dsp_ce #(
     assign pending_dbg = burst_pending;
 
     generate
+        if (BURST_COUNTER_USE_DSP != 0) begin : gen_dsp_burst_counter
+            (* use_dsp = "yes" *) wire [4:0] decrement_impl;
+            assign decrement_impl = burst_remaining - 5'd1;
+            assign burst_remaining_decrement = decrement_impl;
+        end
+        else begin : gen_lut_burst_counter
+            (* use_dsp = "no" *) wire [4:0] decrement_impl;
+            assign decrement_impl = burst_remaining - 5'd1;
+            assign burst_remaining_decrement = decrement_impl;
+        end
+
         if (FINAL_PRUNE_LSB == 0) begin : gen_no_final_pruning
             assign final_input_rounded = integrator_work;
         end
@@ -170,7 +185,7 @@ module cic_interp16_core_dsp_ce #(
                 else if (burst_remaining == 5'd1)
                     burst_remaining <= 5'd0;
                 else
-                    burst_remaining <= burst_remaining - 1'b1;
+                    burst_remaining <= burst_remaining_decrement;
             end
         end
     end
@@ -183,6 +198,9 @@ module cic_interp16_core_dsp_ce #(
             $fatal(1, "CIC_ORDER must be 3 or 4");
         if (rst_n && OUTPUT_SHIFT < 1)
             $fatal(1, "CIC output normalization shift is invalid");
+        if (rst_n && BURST_COUNTER_USE_DSP != 0 &&
+            BURST_COUNTER_USE_DSP != 1)
+            $fatal(1, "BURST_COUNTER_USE_DSP must be 0 or 1");
     end
 `endif
 
