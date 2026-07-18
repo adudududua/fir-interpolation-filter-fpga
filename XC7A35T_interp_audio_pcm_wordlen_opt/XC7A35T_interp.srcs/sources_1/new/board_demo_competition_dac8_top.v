@@ -23,12 +23,16 @@
 //                2026-07-10：增加 mode_sel 的音频时钟域两级同步器。
 //                2026-07-12：增加 1x 原始 PCM 旁路档，SW1～SW4
 //                            映射为 1x/4x/8x/128x。
+//                2026-07-18：增加 Stage 2/3 单读 LUTRAM 板级候选参数；
+//                            默认关闭，稳定版本行为保持不变。
 // 其他描述     :
 //                1. SW1/SW2/SW3/SW4：1x/4x/8x/128x。
 //                2. SW5/SW6/SW7/SW8：重复映射 1x/4x/8x/128x。
 //=============================================================
 
-module board_demo_competition_dac8_top (
+module board_demo_competition_dac8_top #(
+    parameter integer USE_PHASE7_LUTRAM_STAGE23 = 0
+)(
     input  wire       clk,       // 板载 20MHz 系统时钟
 
     output wire [3:0] key_kr,    // 矩阵按键 KR0~KR3，扫描输出
@@ -196,7 +200,10 @@ module board_demo_competition_dac8_top (
     //=========================================================
     wire [1:0] mode_led_unused;
 
-    demo_interp_dac8_audio_pcm_common u_demo_interp_dac8_audio_pcm_common (
+    demo_interp_dac8_audio_pcm_common #(
+        .USE_PHASE7_FOLDED(1),
+        .USE_PHASE7_LUTRAM_STAGE23(USE_PHASE7_LUTRAM_STAGE23)
+    ) u_demo_interp_dac8_audio_pcm_common (
         .clk_audio_128x (clk_audio_128x_44k1),
         .rst_n          (rst_audio_n),
         .mode_sel       (mode_audio_sync),

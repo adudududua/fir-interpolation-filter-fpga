@@ -94,7 +94,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PSRCDIR/sources_1/new/all2x_v7/cic_interp16_core_ce.v">
+      <File Path="$PSRCDIR/sources_1/new/all2x_v7/cic_interp16_core_dsp_ce.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -171,6 +171,13 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PSRCDIR/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PSRCDIR/sources_1/new/all2x_v4/interp2_stage23_shared_dsp_ce.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -208,6 +215,14 @@
       </File>
       <File Path="$PSRCDIR/sources_1/new/board_demo_competition_dac8_top.v">
         <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/new/all2x_v7/cic_interp16_core_ce.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -364,6 +379,7 @@
         <Option Name="VerilogDir" Val="$PSRCDIR/sources_1/new/all2x_v5"/>
         <Option Name="VerilogDir" Val="$PSRCDIR/sources_1/new/all2x_v6"/>
         <Option Name="VerilogDir" Val="$PSRCDIR/sources_1/new/all2x_v7"/>
+        <Generic Name="USE_PHASE7_LUTRAM_STAGE23" Val="1"/>
       </Config>
     </FileSet>
     <FileSet Name="constrs_1" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1">
@@ -401,6 +417,38 @@
         </FileInfo>
       </File>
       <File Path="$PSRCDIR/sim_1/new/all2x_v7/tb_phase7_folded_front3_bittrue.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sim_1/new/all2x_v7/verification/tb_stage23_lutram_dsp_equiv.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sim_1/new/all2x_v7/verification/tb_phase7_full_chain_bittrue.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sim_1/new/all2x_v7/verification/tb_phase7_full_chain_reset_recovery.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sim_1/new/all2x_v7/verification/tb_phase7_mode_switch_dynamic.v">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>

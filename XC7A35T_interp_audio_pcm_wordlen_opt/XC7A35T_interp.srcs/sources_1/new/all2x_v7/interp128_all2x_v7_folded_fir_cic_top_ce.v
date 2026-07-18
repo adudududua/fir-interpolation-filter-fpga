@@ -25,12 +25,16 @@
 // 开发工具     : Vivado
 // 修订记录     :
 //                2026-07-13：新增 Stage3 折叠补偿 FIR-CIC 顶层。
+//                2026-07-18：CIC 宽位加减法改用 DSP48 优先映射候选。
+//                2026-07-18：增加 Stage 2/3 单读 LUTRAM 资源候选；
+//                            默认关闭，不改变稳定板级版本行为。
 //=============================================================
 
 module interp128_all2x_v7_folded_fir_cic_top_ce #(
     parameter integer STAGE23_ACC_W = 38,
     parameter integer CIC_ORDER = 3,
-    parameter integer FINAL_PRUNE_LSB = 3
+    parameter integer FINAL_PRUNE_LSB = 3,
+    parameter integer USE_LUTRAM_STAGE23 = 0
 )(
     input  wire                         clk,
     input  wire                         rst_n,
@@ -102,35 +106,64 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
         .out_data(y4_to_8_data), .out_valid(y4_to_8_valid)
     );
 
-    interp2_stage23_folded_cic_dsp_ce #(
-        .DATA_W(24),
-        .STAGE2_DATA_W(22),
-        .STAGE3_DATA_W(20),
-        .COEFF_W(16),
-        .ACC_W(STAGE23_ACC_W),
-        .CIC_ORDER(CIC_ORDER)
-    ) u_interp2_stage23_folded_cic_dsp_ce (
-        .clk(clk), .rst_n(rst_n),
-        .stage2_ce_out(ce4_out),
-        .stage2_x_in(y2_to_4_data),
-        .stage2_x_in_valid(y2_to_4_valid),
-        .stage2_y_out(y4_w),
-        .stage2_y_out_valid(y4_valid_w),
-        .stage3_ce_out(ce8_out),
-        .stage3_x_in(y4_to_8_data),
-        .stage3_x_in_valid(y4_to_8_valid),
-        .stage3_y_out(y8_w),
-        .stage3_y_out_valid(y8_valid_w),
-        .stage2_phase_dbg(), .stage3_phase_dbg(),
-        .scheduler_busy_dbg(), .scheduler_stage_dbg(),
-        .scheduler_mac_index_dbg()
-    );
+    generate
+        if (USE_LUTRAM_STAGE23 != 0) begin : gen_lutram_stage23
+            interp2_stage23_lutram_cic_dsp_ce #(
+                .DATA_W(24),
+                .STAGE2_DATA_W(22),
+                .STAGE3_DATA_W(20),
+                .COEFF_W(18),
+                .ACC_W(STAGE23_ACC_W),
+                .CIC_ORDER(CIC_ORDER)
+            ) u_interp2_stage23_lutram_cic_dsp_ce (
+                .clk(clk), .rst_n(rst_n),
+                .stage2_ce_out(ce4_out),
+                .stage2_x_in(y2_to_4_data),
+                .stage2_x_in_valid(y2_to_4_valid),
+                .stage2_y_out(y4_w),
+                .stage2_y_out_valid(y4_valid_w),
+                .stage3_ce_out(ce8_out),
+                .stage3_x_in(y4_to_8_data),
+                .stage3_x_in_valid(y4_to_8_valid),
+                .stage3_y_out(y8_w),
+                .stage3_y_out_valid(y8_valid_w),
+                .stage2_phase_dbg(), .stage3_phase_dbg(),
+                .scheduler_busy_dbg(), .scheduler_stage_dbg(),
+                .scheduler_mac_index_dbg()
+            );
+        end
+        else begin : gen_register_stage23
+            interp2_stage23_folded_cic_dsp_ce #(
+                .DATA_W(24),
+                .STAGE2_DATA_W(22),
+                .STAGE3_DATA_W(20),
+                .COEFF_W(16),
+                .ACC_W(STAGE23_ACC_W),
+                .CIC_ORDER(CIC_ORDER)
+            ) u_interp2_stage23_folded_cic_dsp_ce (
+                .clk(clk), .rst_n(rst_n),
+                .stage2_ce_out(ce4_out),
+                .stage2_x_in(y2_to_4_data),
+                .stage2_x_in_valid(y2_to_4_valid),
+                .stage2_y_out(y4_w),
+                .stage2_y_out_valid(y4_valid_w),
+                .stage3_ce_out(ce8_out),
+                .stage3_x_in(y4_to_8_data),
+                .stage3_x_in_valid(y4_to_8_valid),
+                .stage3_y_out(y8_w),
+                .stage3_y_out_valid(y8_valid_w),
+                .stage2_phase_dbg(), .stage3_phase_dbg(),
+                .scheduler_busy_dbg(), .scheduler_stage_dbg(),
+                .scheduler_mac_index_dbg()
+            );
+        end
+    endgenerate
 
-    cic_interp16_core_ce #(
+    cic_interp16_core_dsp_ce #(
         .DATA_W          (20),
         .CIC_ORDER       (CIC_ORDER),
         .FINAL_PRUNE_LSB (FINAL_PRUNE_LSB)
-    ) u_cic_interp16_core_ce (
+    ) u_cic_interp16_core_dsp_ce (
         .clk                  (clk),
         .rst_n                (rst_n),
         .ce_out               (ce128_out),

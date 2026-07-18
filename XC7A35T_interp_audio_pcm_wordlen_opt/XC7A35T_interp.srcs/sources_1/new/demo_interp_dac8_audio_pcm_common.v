@@ -34,10 +34,13 @@
 //                            分支，并保留 Phase 6 常量回退路径。
 //                2026-07-14：模式请求仅在候选 DAC 时钟公共低电平
 //                            窗口提交，消除运行中切档窄脉冲。
+//                2026-07-18：增加 Stage 2/3 单读 LUTRAM 候选参数；
+//                            默认关闭，不改变稳定板级版本。
 //=============================================================
 
 module demo_interp_dac8_audio_pcm_common #(
-    parameter integer USE_PHASE7_FOLDED = 1
+    parameter integer USE_PHASE7_FOLDED = 1,
+    parameter integer USE_PHASE7_LUTRAM_STAGE23 = 0
 )(
     input  wire        clk_audio_128x,  // 5.6448MHz 连续音频 128x 时钟
     input  wire        rst_n,           // 低有效复位
@@ -216,7 +219,8 @@ module demo_interp_dac8_audio_pcm_common #(
             interp128_all2x_v7_folded_fir_cic_top_ce #(
                 .STAGE23_ACC_W   (38),
                 .CIC_ORDER       (3),
-                .FINAL_PRUNE_LSB (0)
+                .FINAL_PRUNE_LSB (0),
+                .USE_LUTRAM_STAGE23(USE_PHASE7_LUTRAM_STAGE23)
             ) u_interp128_all2x_v7_folded_fir_cic_top_ce (
                 .clk(clk_audio_128x), .rst_n(rst_n),
                 .ce2_out(ce2_out), .ce4_out(ce4_out),

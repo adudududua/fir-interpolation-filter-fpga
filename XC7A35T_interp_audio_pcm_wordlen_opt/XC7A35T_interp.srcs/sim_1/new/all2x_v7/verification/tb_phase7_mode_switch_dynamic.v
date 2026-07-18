@@ -20,6 +20,7 @@
 // 开发工具     : Vivado
 // 修订记录     :
 //                2026-07-14：新增无复位动态档位与时钟毛刺测试。
+//                2026-07-18：动态切换测试改用单读 LUTRAM 候选。
 //=============================================================
 
 module tb_phase7_mode_switch_dynamic;
@@ -52,7 +53,8 @@ module tb_phase7_mode_switch_dynamic;
     reg have_last_transition;
 
     demo_interp_dac8_audio_pcm_common #(
-        .USE_PHASE7_FOLDED(1)
+        .USE_PHASE7_FOLDED(1),
+        .USE_PHASE7_LUTRAM_STAGE23(1)
     ) u_dut (
         .clk_audio_128x(clk),
         .rst_n(rst_n),

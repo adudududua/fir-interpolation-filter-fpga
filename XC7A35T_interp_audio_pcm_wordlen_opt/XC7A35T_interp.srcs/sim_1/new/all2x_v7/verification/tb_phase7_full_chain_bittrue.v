@@ -21,6 +21,7 @@
 // 开发工具     : Vivado
 // 修订记录     :
 //                2026-07-14：新增正式顶层端到端位真回归。
+//                2026-07-18：增加单读 LUTRAM Stage 2/3 候选开关。
 //=============================================================
 
 module tb_phase7_full_chain_bittrue;
@@ -105,7 +106,12 @@ module tb_phase7_full_chain_bittrue;
     interp128_all2x_v7_folded_fir_cic_top_ce #(
         .STAGE23_ACC_W   (38),
         .CIC_ORDER       (3),
-        .FINAL_PRUNE_LSB (0)
+        .FINAL_PRUNE_LSB (0),
+`ifdef PHASE7_USE_LUTRAM_STAGE23
+        .USE_LUTRAM_STAGE23(1)
+`else
+        .USE_LUTRAM_STAGE23(0)
+`endif
     ) u_dut (
         .clk(clk), .rst_n(rst_n),
         .ce2_out(ce2_out), .ce4_out(ce4_out),

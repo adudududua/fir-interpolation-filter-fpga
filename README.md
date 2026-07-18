@@ -1,6 +1,8 @@
 # 高阶数字插值滤波器设计与 FPGA 验证
 
-> 当前候选版本：44.1 kHz 专用、Phase 7 折叠补偿 FIR-CIC、Stage 1 紧凑舍入、941 LUT / 2 DSP，自动化验证通过<br>
+> 当前最低 LUT 候选：44.1 kHz 专用、Phase 7 折叠补偿 FIR-CIC、Stage 2/3 单读 LUTRAM 串行 MAC、578 LUT / 9 DSP，自动化验证通过<br>
+> 上一低 LUT 候选：相同算法与逐点输出、CIC DSP48 映射、729 LUT / 9 DSP<br>
+> 低 DSP 回退候选：相同算法与逐点输出、941 LUT / 2 DSP / 1.5 BRAM Tile<br>
 > 已实板验证回退：Phase 6 混合数据字长、7 级全 2x、2 DSP、ACC38<br>
 > FPGA：Xilinx Artix-7 `XC7A35T-FGG484-2`<br>
 > 工具：MATLAB R2023a、Vivado 2018.3<br>
@@ -10,7 +12,7 @@
 
 本项目面向“高阶数字插值滤波器设计与验证”赛题，完成了从 MATLAB 数学建模、等波纹 FIR 设计、定点量化、bit-true 验证、RTL 编码、功能仿真、综合实现到 FPGA 板级测试的完整闭环。
 
-当前 Phase 7 候选输入为 **44.1 kHz、24 bit signed PCM**，采用 `2x × 2x × 2x × CIC16 = 128x` 得到 **5.6448 MHz** 输出。CIC 通带补偿折叠进原 11tap Stage3，Stage2/3 继续共享一个 DSP。该候选已完成 MATLAB 搜索、正式顶层 daily/nightly 逐点对拍、CIC 定向与复位测试、RTL 冲激频率/相位验收、动态切档回归、完整实现和 bitstream 生成。上一版 Phase 7 已完成静态实板演示；本轮又修复了运行中切档的窄脉冲风险，因此当前 SHA256 对应的新 bitstream 仍需补做一次动态板测。Phase 6 七级全 2x 版本继续作为已实板验证的稳定回退路径。
+当前 Phase 7 候选输入为 **44.1 kHz、24 bit signed PCM**，采用 `2x × 2x × 2x × CIC16 = 128x` 得到 **5.6448 MHz** 输出。CIC 通带补偿折叠进原 11tap Stage3，Stage2/3 共享一个 DSP；低 LUT 路线先用 7 个 DSP48E1 承担 CIC 宽位加减法，再把 Stage2/3 的历史移位寄存器改为单读 LUTRAM 环形缓存，并利用系统时钟余量串行执行对称抽头 MAC。当前最低 LUT 候选已完成模块等价、正式顶层 daily/nightly 逐点对拍、8 场景复位恢复、四档动态切换、完整实现和 bitstream 生成。上一版 Phase 7 已完成静态实板演示；578 LUT bitstream 仍需补做一次四档板测。Phase 6 七级全 2x 版本、Phase 7 的 941 LUT / 2 DSP 版本和 729 LUT / 9 DSP 版本继续作为独立回退路径。
 
 ## 0. Phase 7 折叠补偿 FIR-CIC 候选
 
@@ -211,7 +213,7 @@ Stage 1 的 26 个非零半带系数绝对值和为 44756。按两个 24 bit 满
     SHA256:
     88E67BD36C23A6C3F50880DFADEBF3E97EC58015FDF48A451B6A7825358556A2
 
-对本轮十项优化建议的工程判断如下。系数表进入 BRAM、增加 DSP 级联和继续减少并行度并非当前优先项：Stage 1 只有 26 x 17 bit 系数，Stage 2/3 只有 15 个小型系数选择，强制进入 BRAM 会引入同步读延迟、地址控制和额外 RAMB18；而乘法器、对称预加、多相分解、strict-halfband 零抽头消除、Stage 2/3 单 DSP 折叠和 CIC 无乘法后端已经实现。逐级字长搜索也已在 Phase 6/7 完成，当前阻带只余约 2.35 dB 发布裕量，不再做无证据的激进截位。此次真正采纳的是“舍入逻辑预算”和“综合 A/B”两项，并以 103 LUT 的实测下降确认有效。
+在“暂不增加 DSP/BRAM”的紧凑舍入阶段，对十项优化建议的工程判断如下。Stage 1 只有 26 x 17 bit 系数，Stage 2/3 只有 15 个小型系数选择，强制进入 BRAM 会引入同步读延迟、地址控制和额外 RAMB18；而乘法器、对称预加、多相分解、strict-halfband 零抽头消除和 Stage 2/3 单 DSP 折叠已经实现。逐级字长搜索也已在 Phase 6/7 完成，当前阻带只余约 2.35 dB 发布裕量，不再做无证据的激进截位。该阶段真正采纳的是“舍入逻辑预算”和“综合 A/B”两项，并以 103 LUT 的实测下降确认有效。
 
 | 建议 | 当前工程状态 | 本轮决定 |
 |---|---|---|
@@ -228,7 +230,95 @@ Stage 1 的 26 个非零半带系数绝对值和为 44756。按两个 24 bit 满
 
 该版本状态为“单元等价、daily/nightly 正式顶层对拍、完整实现和 bitstream 均通过，待实板四档复测”。复测前不生成或覆盖稳定 MCS。
 
-### 0.9 配置存储器固化与版本识别
+随后在 0.9 节针对“最低 LUT”目标重新放宽 DSP 约束，把 CIC 宽位运算映射到空闲 DSP48E1；这不是推翻上述判断，而是在资源优化目标由“维持 2 DSP”改为“优先降低 LUT”后形成的另一 Pareto 候选。
+
+### 0.9 CIC 宽位运算 DSP48 资源迁移
+
+紧凑舍入候选达到 941 LUT 后，完整实现层次显示 CIC16 仍占用 245 LUT，主要来源为 32 bit comb 差分和积分器累加。XC7A35T 共有 90 个 DSP48E1，而前三级 FIR 只使用 2 个，因此本轮采用“专用算术资源换取通用逻辑”的低 LUT 路线：保持 CIC 的 `R=16、M=1、N=3`、32 bit 模运算、末级剪枝、valid 时序和输出舍入完全不变，仅对 CIC 内部宽位加减法施加 `use_dsp` 映射约束。
+
+完整布线后的 CIC 层级由 245 LUT / 216 FF / 0 DSP 变为 49 LUT / 195 FF / 7 DSP。整板结果如下：
+
+| 指标 | 紧凑舍入低 DSP 候选 | CIC DSP48 低 LUT 候选 | 变化 |
+|---|---:|---:|---:|
+| Slice LUT | 941 | **729** | -212，-22.53% |
+| Slice Registers | 940 | **920** | -20，-2.13% |
+| DSP48E1 | 2 | **9** | +7，使用率 10.00% |
+| RAMB18E1 / BRAM Tile | 3 / 1.5 | **3 / 1.5** | 不变 |
+| WNS / WHS | +44.839 / +0.050 ns | **+44.853 / +0.077 ns** | 均满足时序 |
+| TNS / THS | 0 / 0 ns | **0 / 0 ns** | 不变 |
+| Vectorless 功耗 | 0.168 W | **0.168 W** | 不变，Low confidence |
+| DRC Error | 0 | **0** | 通过 |
+
+验证不是只比较模块接口：正式 128 倍顶层先完成冲激和 4 组 daily 随机 PCM 对拍，再完成冲激和 10 组 4096 点 nightly 随机 PCM 对拍，4x、8x、128x 三个节点均为 0 LSB。由于候选输出逐点等于原 golden，既有 RTL 冲激得到的 0.00303062 dB 通带最大偏差、72.349 dB 阻带衰减和严格线性相位结论保持不变。
+
+同时评估了让 Stage2 与 Stage3 各自独占 DSP48 的方案。该候选因复制系数选择、舍入和状态逻辑，OOC 结果为 464 LUT / 453 FF / 2 DSP，高于当前共享核在完整工程中的 401 LUT / 416 FF / 1 DSP，因此判定 No-Go。由此可见，DSP 资源迁移只在宽位连续累加等匹配 DSP48 数据通路的热点上有效，不能机械地增加 DSP 数量。
+
+低 LUT 候选 bitstream：
+
+```text
+matlab_fir/alt_all2x_v7/vivado_results/board_folded_n3_cic_dsp_low_lut/
+board_demo_competition_dac8_top_phase7_cic_dsp_low_lut_amp050.bit
+
+SHA256:
+98E9612B3D7D5D773303CCC7AF42077A6D687CDC7F4069559E5B5B38088FDCE7
+```
+
+该版本状态为“daily/nightly 逐点对拍、完整综合实现、时序、DRC 和 bitstream 均通过，待实板四档复测”。已生成并验证的 941 LUT / 2 DSP bitstream 原样保留；在低 LUT 候选完成板测以前，不覆盖稳定 MCS。
+
+### 0.10 Stage 2/3 单读 LUTRAM 与串行 MAC 优化
+
+729 LUT 候选完成后，路由后层级报告显示 Stage2/3 共享 FIR 仍占用 401 LUT、416 FF 和 1 DSP。主要原因不是 FIR 阶数，而是两级历史样点采用带异步复位的移位寄存器：每接收一个新样点都要搬移整条历史链，同时对称抽头并行读取还需要较宽的选择和预加逻辑。
+
+本轮保持 MATLAB 系数、Stage2/3 的 22/20 bit 数据格式、38 bit 模累加、Q15 舍入饱和及 CIC 完全不变，只改变硬件调度：
+
+1. Stage2 和 Stage3 各使用一个 16 深度单读口分布式 RAM 环形缓存，写入新样点时只移动头指针，不搬移历史数据。
+2. 对称抽头由“同周期双读并预加”改为“逐抽头单读并串行 MAC”。Stage2 两相分别执行 9/8 次 MAC，Stage3 两相分别执行 6/5 次 MAC。
+3. 两级继续共享一颗 DSP48E1，显式使用 `A×B+C` 数据通路；系数和累加顺序改变，但每个抽头只计算一次，结果严格等价。
+4. 当 Stage2/3 请求同周期到达时改为 Stage2 优先，保证新的 4x 样点在下一次 8x CE 之前完成。早期 Stage3 优先实验在整链测试中被检测出越过 CE 边界，已判定 No-Go，没有进入板级工程。
+5. LUTRAM 不做全阵列异步复位，使用“已写历史深度”屏蔽复位后的未写槽位，因此既保持运行中复位语义，又避免存储器退化为大量触发器。
+
+完整布局布线后的资源结果如下：
+
+| 指标 | 729 LUT CIC-DSP 候选 | Stage2/3 单读 LUTRAM 候选 | 变化 |
+|---|---:|---:|---:|
+| Slice LUT | 729 | **578** | -151，-20.71% |
+| LUT as Logic | 729 | **546** | -183，-25.10% |
+| LUT as Distributed RAM | 0 | **32** | +32，用于两级历史环形缓存 |
+| Slice Registers | 920 | **619** | -301，-32.72% |
+| DSP48E1 | 9 | **9** | 不变 |
+| RAMB18E1 / BRAM Tile | 3 / 1.5 | **3 / 1.5** | 不变 |
+| WNS / WHS | +44.853 / +0.077 ns | **+44.153 / +0.095 ns** | 均满足时序 |
+| TNS / THS | 0 / 0 ns | **0 / 0 ns** | 不变 |
+| Vectorless 功耗 | 0.168 W | **0.168 W** | 不变，Low confidence |
+
+候选 Stage2/3 在完整实现层级中为 245 LUT、115 FF、1 DSP，其中 32 LUT 为分布式 RAM；相对原 401 LUT、416 FF、1 DSP 分别减少 156 LUT 和 301 FF。整板仍保留 90 个 DSP 中的 81 个和 50 个 BRAM Tile 中的 48.5 个，因此该版本是在资源余量范围内用专用 DSP 与少量 LUTRAM 换取更低通用逻辑的 Pareto 点。
+
+验证采用由局部到系统的分层门槛：
+
+| 验证层级 | 覆盖内容 | 结果 |
+|---|---|---|
+| Stage2/3 单元等价 | 冲激、满幅伪随机、同周期请求、中途异步复位 | Stage2 336 点、Stage3 671 点，全部 0 LSB |
+| 正式顶层 daily | 冲激 + 4 组 × 1024 点随机 PCM | 4x、8x、128x 全部 0 LSB |
+| 正式顶层 nightly | 冲激 + 10 组 × 4096 点随机 PCM | 4x、8x、128x 全部 0 LSB；最终端合计核对 5,355,552 个输出点 |
+| 整链复位恢复 | Stage1 MAC、Stage2/3 pending/job、CIC burst 的 8 种内部状态 | 每种复位后比较 4096 个 128x 样点，全部通过 |
+| 四档动态切换 | 1x/4x/8x/128x 往返 10 次，全程不复位 | 边沿数正确，无 runt pulse、X 或数据停滞 |
+| 完整 Vivado 实现 | 综合、布局布线、bitstream、时序、功耗、DRC | 生成成功，WNS/WHS 均为正，DRC Error=0 |
+
+由于 nightly 三节点输出逐点等于既有 MATLAB golden，既有 RTL 冲激验收的 `0.00303062 dB` 通带最大偏差、`72.349 dB` 阻带衰减和严格线性相位结论不变。路由后 DRC 报告包含未流水 DSP、异步复位驱动和 BRAM 异步控制等优化建议，但没有 Error；在 5.6448 MHz 音频时钟下仍有 44.153 ns 的最差建立余量，因此本轮不为消除建议性告警而增加流水延迟或改变复位语义。
+
+最低 LUT 候选 bitstream：
+
+```text
+matlab_fir/alt_all2x_v7/vivado_results/board_folded_n3_stage23_lutram_low_lut/
+board_demo_competition_dac8_top_phase7_stage23_lutram_low_lut_amp050.bit
+
+SHA256:
+7345B6D1852B65A31EE121884AD41E28528F7C979B72F0911B5F38570E363AE1
+```
+
+该版本已完成自动化验证和实现，当前边界是“待实板 1x/4x/8x/128x 四档复测”。稳定 MCS、941 LUT / 2 DSP bitstream 和 729 LUT / 9 DSP bitstream 均未覆盖。
+
+### 0.11 配置存储器固化与版本识别
 
 JTAG 下载 `.bit` 只会暂时配置 FPGA 内部 SRAM，掉电、按下配置复位键或触发重新配置后都会失效；板卡随后会从 SPI Flash 重新装载原有固件。因此，若 JTAG 下载后为正弦波，而重新上电后又恢复为梯形波，通常表示板载 Flash 中仍保存着其他工程的固件，并不表示本工程的正弦 ROM 自动改变。
 
@@ -827,6 +917,8 @@ BRAM Tile：1 -> 1
 | Phase 7 0.50FS 非 BRAM 稳定版 | 1120 | 962 | 2 | 1 | 幅度 A/B 与 bitstream 已通过，可随时回退 |
 | Phase 7 0.50FS PCM ROM BRAM 候选 | 1044 | 940 | 2 | 1.5 | RTL、实现与 bitstream 通过，待实板复测 |
 | **Phase 7 紧凑舍入候选** | **941** | **940** | **2** | **1.5** | **daily/nightly 0 LSB、实现与 bitstream 通过，待实板复测** |
+| **Phase 7 CIC DSP48 低 LUT 候选** | **729** | **920** | **9** | **1.5** | **输出逐点不变；实现与 bitstream 通过，待实板复测** |
+| **Phase 7 Stage2/3 LUTRAM 最低 LUT 候选** | **578** | **619** | **9** | **1.5** | **nightly、复位、动态切换与实现通过，待实板复测** |
 
 Phase 7 PCM ROM BRAM 优化候选相对 Phase 7 稳定版：
 
@@ -849,6 +941,27 @@ WNS：+44.752 ns -> +44.527 ns
     WNS：+44.527 ns -> +44.839 ns
 
 该变化来自把 Stage 1 的 42 bit 全宽舍入偏置加法改为截位后的单比特进位。正式顶层 nightly 回归在 4x、8x 和 128x 三个节点均为 0 LSB，因此数字滤波性能与基线逐点一致。
+
+CIC DSP48 低 LUT 候选相对紧凑舍入候选：
+
+    LUT：941 -> 729，减少 212，下降约 22.53%
+    FF ：940 -> 920，减少 20，下降约 2.13%
+    RAMB18E1：3 -> 3，不变
+    DSP：2 -> 9，增加 7 个，使用率仍为 10.00%
+    WNS/WHS：+44.839/+0.050 ns -> +44.853/+0.077 ns
+
+该变化只把 CIC 的 32 bit comb 与积分器宽位运算迁移到 DSP48E1；daily/nightly 三节点 0 LSB 对拍证明算法、字长和输出时序均未改变。它与 941 LUT / 2 DSP 版共同形成两个可复现的 Pareto 点，分别适合“最低 LUT”和“最低 DSP”目标。
+
+Stage2/3 单读 LUTRAM 候选相对 CIC DSP48 低 LUT 候选：
+
+    LUT：729 -> 578，减少 151，下降约 20.71%
+    FF ：920 -> 619，减少 301，下降约 32.72%
+    LUTRAM：0 -> 32，作为 Stage2/3 环形历史缓存
+    RAMB18E1：3 -> 3，不变
+    DSP：9 -> 9，不变
+    WNS/WHS：+44.853/+0.077 ns -> +44.153/+0.095 ns
+
+该变化利用 48 MHz 系统时钟相对音频采样使能的周期余量，把对称抽头双读预加改成单读串行 MAC。模块等价、正式顶层 nightly、8 场景复位恢复和四档动态切换均通过，证明资源下降没有改变样点值、复位语义或板级切档时序。
 
 V3 相对全 2x 初始稳定板级：
 
@@ -1062,8 +1175,10 @@ SHA256：E122FC402FB10E43954BDC5E9E134BD2789F1645F138D6FFAAD83C52581612C3
 | `all2x_v6/interp2_stage23_independent_dsp_ce.v` | 仅用于 3-DSP Pareto 的 Stage2/3 独立 DSP 候选 |
 | `all2x_v6/interp128_all2x_v6_three_dsp_top_ce.v` | 仅用于 No-Go 对照的 3-DSP 包装顶层 |
 | `all2x_v7/interp2_stage23_folded_cic_dsp_ce.v` | Stage2/3 共享 DSP 与 Stage3 折叠补偿 |
+| `all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v` | Stage2/3 单读 LUTRAM 环形缓存与共享串行 DSP 候选 |
 | `all2x_v7/cic_interp16_core_ce.v` | 低速 comb、16 倍插零、高速 integrator CIC 核 |
-| `all2x_v7/interp128_all2x_v7_folded_fir_cic_top_ce.v` | 当前 Phase 7 N=3 候选 128x 顶层 |
+| `all2x_v7/cic_interp16_core_dsp_ce.v` | 与正式 CIC 逐点等价的 DSP48 优先映射低 LUT 核 |
+| `all2x_v7/interp128_all2x_v7_folded_fir_cic_top_ce.v` | Phase 7 N=3 128x 顶层及 Stage2/3 稳定/LUTRAM 参数化选择 |
 | `all2x_v2/interp2_stage23_polyphase_ce.v` | Stage2/3 true-polyphase 实现 |
 | `all2x_v2/interp2_halfband7_shiftadd_ce.v` | Stage4～7 canonical shift-add 实现 |
 | `all2x_v2/bridge_valid_only_to_interp2_ce.v` | 级间轻量 valid 桥 |
@@ -1084,6 +1199,8 @@ SHA256：E122FC402FB10E43954BDC5E9E134BD2789F1645F138D6FFAAD83C52581612C3
 | `alt_all2x_v6/vivado/synth_phase6_three_dsp_pareto.tcl` | 3-DSP 候选独立综合与 DSP 映射报告 |
 | `alt_all2x_v6/vivado/synth_phase6_mixed_width.tcl` | 混合字长独立链综合 |
 | `alt_all2x_v6/vivado/build_board_phase6_mixed_width.tcl` | Reset 工程 run、完整实现、报告和 bitstream 导出 |
+| `alt_all2x_v7/vivado/build_board_phase7_cic_dsp_low_lut.tcl` | CIC DSP48 低 LUT 候选完整实现、报告与 bitstream 导出 |
+| `alt_all2x_v7/vivado/build_board_phase7_stage23_lutram_low_lut.tcl` | 578 LUT Stage2/3 单读 LUTRAM 候选完整构建与报告导出 |
 | `sim_1/new/all2x_v7/tb_phase7_folded_front3_bittrue.v` | Phase 7 前三级 N3/N4 冲激/随机 0 LSB |
 | `sim_1/new/all2x_v7/tb_cic_interp16_folded_core.v` | Phase 7 CIC 核 N3/N4 冲激/随机 0 LSB |
 | `sim_1/new/all2x_v7/verification/tb_phase7_full_chain_bittrue.v` | 正式顶层冲激与 daily/nightly 三节点 0 LSB |
@@ -1092,6 +1209,7 @@ SHA256：E122FC402FB10E43954BDC5E9E134BD2789F1645F138D6FFAAD83C52581612C3
 | `sim_1/new/all2x_v7/verification/tb_phase7_cic_reset_recovery.v` | CIC pending/burst 中途复位与冷启动恢复 |
 | `sim_1/new/all2x_v7/verification/tb_phase7_full_chain_reset_recovery.v` | 完整顶层 8 个内部阶段复位恢复 |
 | `sim_1/new/all2x_v7/verification/tb_phase7_mode_switch_dynamic.v` | 无复位动态切档、频率、毛刺和 X 检查 |
+| `sim_1/new/all2x_v7/verification/tb_stage23_lutram_dsp_equiv.v` | Stage2/3 稳定实现与 LUTRAM 候选按 valid 序列 0 LSB 对拍 |
 | `alt_all2x_v7/vivado/synth_phase7_folded_fir_cic.tcl` | Phase 7 N3/N4 同口径独立综合 |
 | `alt_all2x_v7/vivado/register_phase7_board_sources.tcl` | Phase 7 工程源文件登记 |
 | `alt_all2x_v7/vivado/build_board_phase7_folded_n3.tcl` | Phase 7 板级完整实现与 bitstream 导出 |
@@ -1274,3 +1392,7 @@ Phase 7 在正确 CIC 插值结构上先完成独立低速补偿 FIR，确认其
 在此基础上把 `147×24 bit` 演示 PCM ROM 从 LUT/FF 映射为一个 `RAMB18E1`。0.50FS 复核候选完整板级为 1044 LUT / 940 FF / 2 DSP / 1.5 BRAM Tile，ROM 连续 300 次更新对拍为 0 LSB，四档 RTL 幅值均无数字削顶，post-route WNS/WHS 为 +44.527/+0.052 ns。先前梯形波已由 0.50FS/0.80FS 同条件 A/B 确认为模拟输出链路削顶，不能归因于 BRAM 映射。候选版已生成独立 bitstream，等待实板四档复测；非 BRAM、0.50FS 稳定版继续保留为回退版本。
 
 随后按实现热点而不是经验猜测继续优化 Stage 1 舍入器：42 bit 全宽偏置加法改为截位值上的单比特进位，可达范围单元测试 200024 组为 0 LSB，正式顶层 nightly 冲激与 10 组长随机 PCM 在 4x/8x/128x 全部为 0 LSB。完整板级达到 941 LUT / 940 FF / 2 DSP / 1.5 BRAM Tile，相对 1044 LUT 基线再减少 103 LUT；WNS/WHS 为 +44.839/+0.050 ns，功耗仍为 0.168 W，DRC 未新增违规。候选 bitstream 已独立导出，当前仍等待实板四档复测，不覆盖稳定 MCS。
+
+在低 LUT 目标下，又把 CIC 的 32 bit comb 差分与积分器累加优先映射到 7 个空闲 DSP48E1。完整板级达到 729 LUT / 920 FF / 9 DSP / 1.5 BRAM Tile，相对 941 LUT 候选再减少 212 LUT；WNS/WHS 为 +44.853/+0.077 ns，功耗仍为 0.168 W。冲激、daily 和 nightly 三节点对拍全部为 0 LSB，独立 Stage2/3 双 DSP 候选则因 LUT 反增而被淘汰。729 LUT / 9 DSP 与 941 LUT / 2 DSP 两个 bitstream 均独立保留，等待实板 A/B 后再决定最终提交版本。
+
+最新最低 LUT 候选进一步把 Stage2/3 历史移位寄存器改为两个 16 深度单读 LUTRAM 环形缓存，并将对称抽头改为同一 DSP48E1 上的串行 MAC。完整板级达到 578 LUT / 619 FF / 9 DSP / 1.5 BRAM Tile，相对 729 LUT 候选再减少 151 LUT 和 301 FF；WNS/WHS 为 +44.153/+0.095 ns，功耗仍为 0.168 W。Stage2/3 单元对拍、正式顶层 daily/nightly、8 场景复位恢复和无复位四档动态切换全部通过。该 bitstream 已独立导出并用 SHA256 固定版本，当前仅剩 1x/4x/8x/128x 实板复测，既有三个回退 bitstream 与稳定 MCS 均未覆盖。

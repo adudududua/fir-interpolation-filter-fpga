@@ -21,9 +21,17 @@
 // 开发工具     : Vivado
 // 修订记录     :
 //                2026-07-14：新增正式完整顶层中途复位回归。
+//                2026-07-18：增加单读 LUTRAM Stage 2/3 候选开关。
 //=============================================================
 
 module tb_phase7_full_chain_reset_recovery;
+
+`ifdef PHASE7_USE_LUTRAM_STAGE23
+`define DUT_STAGE23 u_dut.gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce
+`else
+`define DUT_STAGE23 u_dut.gen_register_stage23.u_interp2_stage23_folded_cic_dsp_ce
+`endif
+`define DUT_CIC u_dut.u_cic_interp16_core_dsp_ce
 
     localparam integer SCENARIO_COUNT = 8;
     localparam integer COMPARE_Y128_COUNT = 4096;
@@ -64,7 +72,12 @@ module tb_phase7_full_chain_reset_recovery;
     integer compare_enable;
 
     interp128_all2x_v7_folded_fir_cic_top_ce #(
-        .STAGE23_ACC_W(38), .CIC_ORDER(3), .FINAL_PRUNE_LSB(0)
+        .STAGE23_ACC_W(38), .CIC_ORDER(3), .FINAL_PRUNE_LSB(0),
+`ifdef PHASE7_USE_LUTRAM_STAGE23
+        .USE_LUTRAM_STAGE23(1)
+`else
+        .USE_LUTRAM_STAGE23(0)
+`endif
     ) u_dut (
         .clk(clk), .rst_n(rst_dut_n),
         .ce2_out(ce2_out), .ce4_out(ce4_out),
@@ -81,7 +94,12 @@ module tb_phase7_full_chain_reset_recovery;
     );
 
     interp128_all2x_v7_folded_fir_cic_top_ce #(
-        .STAGE23_ACC_W(38), .CIC_ORDER(3), .FINAL_PRUNE_LSB(0)
+        .STAGE23_ACC_W(38), .CIC_ORDER(3), .FINAL_PRUNE_LSB(0),
+`ifdef PHASE7_USE_LUTRAM_STAGE23
+        .USE_LUTRAM_STAGE23(1)
+`else
+        .USE_LUTRAM_STAGE23(0)
+`endif
     ) u_cold_reference (
         .clk(clk), .rst_n(rst_ref_n),
         .ce2_out(ce2_out), .ce4_out(ce4_out),
@@ -166,21 +184,21 @@ module tb_phase7_full_chain_reset_recovery;
                 1: ready_value =
                     u_dut.u_interp2_stage1_strict_halfband_bram_ce.mac_active;
                 2: ready_value =
-                    u_dut.u_interp2_stage23_folded_cic_dsp_ce.stage2_pending;
+                    `DUT_STAGE23.stage2_pending;
                 3: ready_value =
-                    u_dut.u_interp2_stage23_folded_cic_dsp_ce.job_active &&
-                    u_dut.u_interp2_stage23_folded_cic_dsp_ce.job_stage == 2'd2;
+                    `DUT_STAGE23.job_active &&
+                    `DUT_STAGE23.job_stage == 2'd2;
                 4: ready_value =
-                    u_dut.u_interp2_stage23_folded_cic_dsp_ce.job_active &&
-                    u_dut.u_interp2_stage23_folded_cic_dsp_ce.job_stage == 2'd3;
+                    `DUT_STAGE23.job_active &&
+                    `DUT_STAGE23.job_stage == 2'd3;
                 5: ready_value =
-                    u_dut.u_cic_interp16_core_ce.burst_pending;
+                    `DUT_CIC.burst_pending;
                 6: ready_value =
-                    u_dut.u_cic_interp16_core_ce.burst_remaining == 5'd15;
+                    `DUT_CIC.burst_remaining == 5'd15;
                 7: ready_value =
-                    u_dut.u_cic_interp16_core_ce.burst_remaining == 5'd8;
+                    `DUT_CIC.burst_remaining == 5'd8;
                 8: ready_value =
-                    u_dut.u_cic_interp16_core_ce.burst_remaining == 5'd1;
+                    `DUT_CIC.burst_remaining == 5'd1;
                 default: ready_value = 1'b0;
             endcase
         end
@@ -191,9 +209,9 @@ module tb_phase7_full_chain_reset_recovery;
     task assert_pipeline_reset;
         begin
             #1;
-            if (u_dut.u_cic_interp16_core_ce.burst_pending !== 1'b0 ||
-                    u_dut.u_cic_interp16_core_ce.burst_remaining !== 5'd0 ||
-                    u_dut.u_cic_interp16_core_ce.final_integrator_state !== 32'sd0)
+            if (`DUT_CIC.burst_pending !== 1'b0 ||
+                    `DUT_CIC.burst_remaining !== 5'd0 ||
+                    `DUT_CIC.final_integrator_state !== 32'sd0)
                 $fatal(1, "CIC asynchronous reset failed scenario=%0d",
                     scenario_index);
             repeat (2) @(posedge clk);
@@ -201,9 +219,9 @@ module tb_phase7_full_chain_reset_recovery;
             if (dut_y4_valid !== 1'b0 || dut_y8_valid !== 1'b0 ||
                     dut_y128_valid !== 1'b0 ||
                     u_dut.u_interp2_stage1_strict_halfband_bram_ce.mac_active !== 1'b0 ||
-                    u_dut.u_interp2_stage23_folded_cic_dsp_ce.stage2_pending !== 1'b0 ||
-                    u_dut.u_interp2_stage23_folded_cic_dsp_ce.stage3_pending !== 1'b0 ||
-                    u_dut.u_interp2_stage23_folded_cic_dsp_ce.job_active !== 1'b0)
+                    `DUT_STAGE23.stage2_pending !== 1'b0 ||
+                    `DUT_STAGE23.stage3_pending !== 1'b0 ||
+                    `DUT_STAGE23.job_active !== 1'b0)
                 $fatal(1, "Full pipeline reset failed scenario=%0d",
                     scenario_index);
         end
@@ -281,4 +299,7 @@ module tb_phase7_full_chain_reset_recovery;
     end
 
 endmodule
+
+`undef DUT_STAGE23
+`undef DUT_CIC
 
