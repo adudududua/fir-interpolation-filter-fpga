@@ -212,6 +212,7 @@ write_summary(fullfile(result_dir, 'phase7_bittrue_summary.txt'), ...
     result_table);
 plot_result(fullfile(figure_dir, 'phase7_bittrue_response.png'), ...
     candidate_result, result_table, F_PASS_HIGH, F_STOP_BEGIN);
+drawnow;
 
 disp(result_table);
 if all(result_table.PASS)
@@ -219,6 +220,40 @@ if all(result_table.PASS)
 else
     error('Phase 7-C 存在未通过的候选，请检查结果表。');
 end
+
+formal_index = find(strcmp(result_table.CANDIDATE, 'aggressive_n3'), 1);
+if isempty(formal_index)
+    error('结果表中缺少正式提交候选 aggressive_n3。');
+end
+acceptance_figure_path = fullfile(figure_dir, ...
+    'phase7_independent_comp_128x_acceptance.png');
+plot_full_chain_acceptance(acceptance_figure_path, ...
+    candidate_result(formal_index).response_metric, ...
+    result_table(formal_index, :), FS_OUT, F_PASS_HIGH, F_STOP_BEGIN);
+drawnow;
+fprintf('\n================ Phase 7-C 正式提交结论 ================\n');
+fprintf('正式候选       = aggressive_n3（CIC N=3）\n');
+fprintf('通带最大偏差   = %.8f dB\n', ...
+    result_table.PASS_ABS_MAX_DB(formal_index));
+fprintf('阻带衰减       = %.8f dB\n', ...
+    result_table.STOP_ATTN_DB(formal_index));
+fprintf('随机PCM误差SNR = %.3f dB\n', ...
+    result_table.RANDOM_DELTA_SNR_DB(formal_index));
+fprintf('累加器溢出     = %d\n', ...
+    result_table.ACC_OVERFLOW(formal_index));
+fprintf('输出饱和       = %d\n', ...
+    result_table.SATURATION(formal_index));
+fprintf('最终判定       = PASS\n');
+fprintf('CSV : %s\n', fullfile(result_dir, ...
+    'phase7_bittrue_candidates.csv'));
+fprintf('TXT : %s\n', fullfile(result_dir, ...
+    'phase7_bittrue_summary.txt'));
+fprintf('MAT : %s\n', fullfile(result_dir, ...
+    'phase7_bittrue_candidates.mat'));
+fprintf('PNG1: %s\n', fullfile(figure_dir, ...
+    'phase7_bittrue_response.png'));
+fprintf('PNG2: %s\n', acceptance_figure_path);
+fprintf('========================================================\n');
 
 
 function [y, stat] = simulate_front3( ...
@@ -375,7 +410,9 @@ function plot_result(filename, candidate_result, result_table, ...
     color_green = [0.10 0.60 0.49];
     color_yellow = [0.82 0.88 0.05];
     line_color = {color_blue, color_purple};
-    figure('Color', 'w', 'Position', [80 60 1500 900]);
+    figure('Name', 'Phase 7-C - 全精度Bit-True验证', ...
+        'NumberTitle', 'off', 'Color', 'w', ...
+        'Position', [80 60 1500 900]);
     tiledlayout(2, 2, 'TileSpacing', 'compact', 'Padding', 'compact');
 
     nexttile;
@@ -421,6 +458,85 @@ function plot_result(filename, candidate_result, result_table, ...
     style_axes(gca);
     sgtitle('Phase 7-C FIR-CIC 全精度位真验证');
     exportgraphics(gcf, filename, 'Resolution', 180);
+end
+
+
+function plot_full_chain_acceptance(filename, metric, result_row, ...
+        fs_out, pass_edge, stop_begin)
+    color_blue = [0.20 0.39 0.63];
+    color_purple = [0.28 0.15 0.49];
+    color_green = [0.10 0.60 0.49];
+    color_yellow = [0.82 0.88 0.05];
+    figure('Name', 'Phase 7 - 独立补偿候选128x频响验收', ...
+        'NumberTitle', 'off', 'Color', 'w', ...
+        'Position', [70 45 1540 900]);
+    tiledlayout(2, 2, 'TileSpacing', 'compact', 'Padding', 'compact');
+
+    nexttile;
+    plot(metric.f/1e3, metric.H_db, 'Color', color_purple, ...
+        'LineWidth', 1.8); hold on;
+    yline(0.05, '--', 'Color', color_yellow, 'LineWidth', 1.1);
+    yline(-0.05, '--', 'Color', color_yellow, 'LineWidth', 1.1);
+    xline(pass_edge/1e3, '--', 'Color', color_green, 'LineWidth', 1.1);
+    xlim([0 22]); ylim([-0.06 0.06]);
+    title('128x 完整链路通带纹波');
+    xlabel('频率 / kHz'); ylabel('相对幅度 / dB');
+    legend('正式 N=3 链路', '+0.05 dB', '-0.05 dB', '20 kHz', ...
+        'Location', 'southwest'); style_axes(gca);
+
+    nexttile;
+    plot(metric.f/1e3, metric.H_db, 'Color', color_blue, ...
+        'LineWidth', 1.55); hold on;
+    yline(-70, '--', 'Color', color_yellow, 'LineWidth', 1.1);
+    xline(stop_begin/1e3, '--', 'Color', color_green, 'LineWidth', 1.1);
+    xlim([20 80]); ylim([-140 5]);
+    title('通带至阻带入口');
+    xlabel('频率 / kHz'); ylabel('相对幅度 / dB');
+    legend('正式 N=3 链路', '-70 dB', '24.1 kHz', ...
+        'Location', 'southwest'); style_axes(gca);
+
+    nexttile;
+    plot(metric.f/1e6, metric.H_db, 'Color', color_blue, ...
+        'LineWidth', 1.05); hold on;
+    yline(-70, '--', 'Color', color_yellow, 'LineWidth', 1.0);
+    xline(stop_begin/1e6, '--', 'Color', color_green, 'LineWidth', 1.0);
+    xlim([0 fs_out/2/1e6]); ylim([-160 5]);
+    title('128x 输出全奈奎斯特频带');
+    xlabel('频率 / MHz'); ylabel('相对幅度 / dB');
+    legend('0 ~ 2.8224 MHz', '-70 dB', '24.1 kHz', ...
+        'Location', 'southwest'); style_axes(gca);
+
+    nexttile;
+    axis off;
+    pass_text = 'PASS';
+    if ~result_row.PASS
+        pass_text = 'FAIL';
+    end
+    summary_text = {
+        '正式 128x 完整链路验收结果'
+        ' '
+        sprintf('采样率：44.1 kHz -> %.4f MHz', fs_out/1e6)
+        '倍率分解：2 x 2 x 2 x 16 = 128'
+        sprintf('通带最大偏差：%.8f dB  (要求 <= 0.05 dB)', ...
+            result_row.PASS_ABS_MAX_DB)
+        sprintf('通带峰峰纹波：%.8f dB', result_row.RIPPLE_PP_DB)
+        sprintf('阻带衰减：%.8f dB  (要求 >= 70 dB)', ...
+            result_row.STOP_ATTN_DB)
+        sprintf('群延迟波动：%.3g sample', ...
+            result_row.GD_RIPPLE_SAMPLE)
+        sprintf('随机 PCM 误差 SNR：%.3f dB', ...
+            result_row.RANDOM_DELTA_SNR_DB)
+        sprintf('累加器溢出 / 输出饱和：%d / %d', ...
+            result_row.ACC_OVERFLOW, result_row.SATURATION)
+        sprintf('最终判定：%s', pass_text)};
+    text(0.04, 0.95, summary_text, 'Units', 'normalized', ...
+        'VerticalAlignment', 'top', 'FontName', 'Microsoft YaHei', ...
+        'FontSize', 13, 'Color', color_purple);
+    rectangle('Position', [0.015 0.05 0.97 0.90], ...
+        'EdgeColor', color_green, 'LineWidth', 1.4, 'Curvature', 0.02);
+
+    sgtitle('44.1 kHz -> 5.6448 MHz：独立补偿候选 128x 频响验收');
+    exportgraphics(gcf, filename, 'Resolution', 220);
 end
 
 

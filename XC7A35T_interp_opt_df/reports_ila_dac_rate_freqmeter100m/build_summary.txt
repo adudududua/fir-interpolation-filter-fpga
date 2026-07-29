@@ -1,0 +1,11 @@
+bitstream=reports_ila_dac_rate_freqmeter100m/board_demo_competition_dac8_top_ila_dac_rate_freqmeter100m.bit
+debug_probes=reports_ila_dac_rate_freqmeter100m/board_demo_competition_dac8_top_ila_dac_rate_freqmeter100m.ltx
+part=xc7a35tfgg484-2
+ila_depth=4096
+ila_probes=26
+demo_key=SW9
+debug_hub_clock_net=clk_debug_100m
+debug_hub_clock_hz=100000000
+dac_frequency_reference_hz=100000000
+dac_frequency_window_ms=100
+dac_frequency_resolution_hz=10

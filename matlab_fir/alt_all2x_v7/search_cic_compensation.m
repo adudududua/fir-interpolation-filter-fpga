@@ -260,6 +260,16 @@ fprintf('Stop atten   = %.8f dB\n', selected_metric.stop_attn_db);
 fprintf('GD ripple    = %.12g sample\n', selected_metric.gd_pp);
 fprintf('Passing rows = %d / %d\n', sum(result_table.PASS), ...
     height(result_table));
+fprintf('CSV summary  = %s\n', fullfile(result_dir, ...
+    'cic_compensation_candidates.csv'));
+fprintf('TXT summary  = %s\n', fullfile(result_dir, ...
+    'cic_compensation_summary.txt'));
+fprintf('TXT coeff    = %s\n', fullfile(result_dir, ...
+    'cic_compensation_coefficients.txt'));
+fprintf('PNG response = %s\n', fullfile(figure_dir, ...
+    'cic_compensation_response.png'));
+fprintf('====================================================\n');
+drawnow;
 
 
 function magnitude = cic_normalized_magnitude(frequency_hz, ...
@@ -454,7 +464,8 @@ function plot_selected(file_path, phase6_metric, selected_metric, ...
     color_purple = [0.28 0.15 0.49];
     color_green = [0.10 0.60 0.49];
     color_yellow = [0.82 0.88 0.05];
-    figure('Color', 'w', 'Position', [80 60 1500 980]);
+    figure('Name', 'Phase 7-B - CIC补偿FIR设计', 'NumberTitle', 'off', ...
+        'Color', 'w', 'Position', [80 60 1500 980]);
     tiledlayout(2, 2, 'TileSpacing', 'compact', 'Padding', 'compact');
 
     nexttile;

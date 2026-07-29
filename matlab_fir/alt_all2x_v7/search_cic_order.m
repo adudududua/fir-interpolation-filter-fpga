@@ -153,6 +153,15 @@ fprintf(fid, '\nAll CIC orders require passband compensation before RTL.\n');
 
 plot_order_search(fullfile(figure_dir, 'cic_order_search.png'), ...
     metric_list, result_table, F_PASS_HIGH, F_STOP_BEGIN);
+drawnow;
+
+fprintf('\n================ Phase 7-A 正式结论 ================\n');
+fprintf('N=3 具有最低位增长和最小全精度位宽，进入补偿 FIR 设计。\n');
+fprintf('未补偿 CIC 均不直接满足通带门槛，后续必须进行下垂补偿。\n');
+fprintf('CSV : %s\n', fullfile(result_dir, 'cic_order_search.csv'));
+fprintf('TXT : %s\n', summary_path);
+fprintf('PNG : %s\n', fullfile(figure_dir, 'cic_order_search.png'));
+fprintf('====================================================\n');
 
 
 function magnitude = cic_passband_magnitude(frequency_hz, ...
@@ -173,7 +182,8 @@ function plot_order_search(file_path, metric_list, result_table, ...
         pass_edge, stop_begin)
     colors = [0.20 0.39 0.63; 0.10 0.60 0.49; 0.28 0.15 0.49];
     color_yellow = [0.82 0.88 0.05];
-    figure('Color', 'w', 'Position', [80 80 1480 900]);
+    figure('Name', 'Phase 7-A - CIC阶数搜索', 'NumberTitle', 'off', ...
+        'Color', 'w', 'Position', [80 80 1480 900]);
     tiledlayout(2, 2, 'TileSpacing', 'compact', 'Padding', 'compact');
 
     nexttile;

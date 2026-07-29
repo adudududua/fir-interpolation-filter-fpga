@@ -27,6 +27,8 @@
 #                  第五参数 1：启用面积优先综合与逻辑优化 directive
 #                  第六参数 1：CIC burst 计数器使用 LUT 进位链；
 #                              设为 0 可重建原 9-DSP 对照
+#                  第七参数 1：Stage2/3 历史与交叉级系数打包进
+#                              两个 BRAM 存储银行
 #                  目标器件：xc7a35tfgg484-2
 #
 # 设计作者     : kafeizizi
@@ -40,6 +42,7 @@
 #                2026-07-18：增加可选上电计数器复用扫描构建参数。
 #                2026-07-18：增加可选 Vivado 面积优先策略 A/B 参数。
 #                2026-07-18：增加 CIC burst 计数器 LUT 候选结果隔离。
+#                2026-07-18：增加 Phase 8 交叉系数 BRAM 打包候选。
 #=============================================================
 
 set script_dir [file dirname [file normalize [info script]]]
@@ -56,6 +59,7 @@ set use_pow2_keypad_scan 0
 set use_shared_keypad_scan_tick 0
 set use_area_directive 0
 set use_lut_burst_counter_candidate 0
+set use_packed_stage23_bram 0
 if {$argc > 0} {
     set use_bram_history [lindex $argv 0]
 }
@@ -73,6 +77,9 @@ if {$argc > 4} {
 }
 if {$argc > 5} {
     set use_lut_burst_counter_candidate [lindex $argv 5]
+}
+if {$argc > 6} {
+    set use_packed_stage23_bram [lindex $argv 6]
 }
 if {$use_bram_history != 0 && $use_bram_history != 1} {
     error "BRAM history selector must be 0 or 1."
@@ -93,6 +100,9 @@ if {$use_lut_burst_counter_candidate != 0 &&
     $use_lut_burst_counter_candidate != 1} {
     error "LUT burst counter candidate selector must be 0 or 1."
 }
+if {$use_packed_stage23_bram != 0 && $use_packed_stage23_bram != 1} {
+    error "Packed Stage 2/3 BRAM selector must be 0 or 1."
+}
 set cic_burst_counter_use_dsp [expr {
     $use_lut_burst_counter_candidate != 0 ? 0 : 1}]
 
@@ -112,6 +122,9 @@ if {$use_area_directive != 0} {
 if {$use_lut_burst_counter_candidate != 0} {
     append keypad_suffix _dsp8
 }
+if {$use_packed_stage23_bram != 0} {
+    append keypad_suffix _packedbram
+}
 
 if {$use_bram_history != 0 && $use_bram_coeff != 0} {
     set result_name board_folded_n3_stage23_bram_coeff_compact_keypad${keypad_suffix}
@@ -124,7 +137,9 @@ if {$use_bram_history != 0 && $use_bram_coeff != 0} {
     set bitstream_name board_demo_competition_dac8_top_phase7_stage23_lutram_compact_keypad${keypad_suffix}_amp050.bit
 }
 if {$use_area_directive != 0} {
-    if {$use_lut_burst_counter_candidate != 0} {
+    if {$use_packed_stage23_bram != 0} {
+        set bitstream_name phase8_packed_bram_dsp8_amp050.bit
+    } elseif {$use_lut_burst_counter_candidate != 0} {
         set bitstream_name phase7_bram_sharedscan_areaopt_dsp8_amp050.bit
     } else {
         set bitstream_name phase7_bram_sharedscan_areaopt_amp050.bit
@@ -163,6 +178,7 @@ set generic_values [list \
     [format "USE_SHARED_KEYPAD_SCAN_TICK=%d" $use_shared_keypad_scan_tick] \
     [format "USE_PHASE7_BRAM_STAGE23_HISTORY=%d" $use_bram_history] \
     [format "USE_PHASE7_BRAM_STAGE23_COEFF=%d" $use_bram_coeff] \
+    [format "USE_PHASE8_PACKED_BRAM_STAGE23=%d" $use_packed_stage23_bram] \
     [format "USE_PHASE7_CIC_BURST_COUNTER_DSP=%d" \
         $cic_burst_counter_use_dsp]]
 set_property generic $generic_values [get_filesets sources_1]

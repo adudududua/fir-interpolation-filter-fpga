@@ -10,11 +10,20 @@
 > 工具：MATLAB R2023a、Vivado 2018.3<br>
 > V3 实板回退提交：`6132cbb`<br>
 > V3 实板回退标签：`LUT3676_DSP1_FF1106_board_successful`<br>
-> Phase 5 优化基线提交：`d8f4946`
+> Phase 5 优化基线提交：`d8f4946`<br>
+> 12864 可视化功能版：四档模式 + 1～20kHz 可调正弦 NCO + 动态频率显示，821 LUT / 727 FF / 8 DSP / 4 BRAM Tile
 
 本项目面向“高阶数字插值滤波器设计与验证”赛题，完成了从 MATLAB 数学建模、等波纹 FIR 设计、定点量化、bit-true 验证、RTL 编码、功能仿真、综合实现到 FPGA 板级测试的完整闭环。
 
 当前 Phase 7 实板通过版输入为 **44.1 kHz、24 bit signed PCM**，采用 `2x × 2x × 2x × CIC16 = 128x` 得到 **5.6448 MHz** 输出。CIC 通带补偿折叠进原 11tap Stage3，Stage2/3 共享一个 DSP；低 LUT 路线用 6 个 DSP48E1 承担三级 CIC 的宽位差分与积分，再利用系统时钟余量串行执行对称抽头 MAC，随后把 Stage2/3 历史与顺序系数迁入 BRAM，并复用上电计数器产生矩阵键盘扫描使能。当前最低 LUT 版本使用 `AreaOptimized_high` 综合指令与 `ExploreArea` 逻辑优化指令，并通过局部 `use_dsp="no"` 约束阻止 5 bit burst 计数器误占 DSP，布局布线后为 472 LUT / 8 DSP。该版本已完成正式顶层 daily/nightly 逐点对拍、复位/动态切换回归、板级控制仿真、完整实现、bitstream 生成和四档实板验证；实测 `DA_CLK` 为 44.09 kHz、176.43 kHz、352.86 kHz 和 5.64 MHz，四档 DA 输出均为正常正弦波。Phase 6 七级全 2x 版本、Phase 7 的 941 LUT / 2 DSP、729 LUT / 9 DSP、578 LUT / 9 DSP 和 478 LUT / 9 DSP 版本继续作为独立回退路径。
+
+独立目录 `XC7A35T_interp_audio_pcm_wordlen_opt_display_function` 在该低LUT
+链路上加入了倒装12864T图形界面和1kHz～20kHz可调正弦NCO。SW1～SW4
+选择1x/4x/8x/128x，SW5～SW8分别执行+1kHz、-1kHz、恢复15kHz和
+AUTO扫频；LCD同步显示当前倍率、输出采样率、`IN:xx kHz`及AUTO状态。
+四组定向XSim、完整综合实现和bitstream均已通过，详细接口、资源和
+首次上板步骤见
+[`LCD12864_DISPLAY_README.md`](XC7A35T_interp_audio_pcm_wordlen_opt_display_function/LCD12864_DISPLAY_README.md)。
 
 ## 0. Phase 7 折叠补偿 FIR-CIC 候选
 
@@ -1017,6 +1026,50 @@ SHA256: 8CD7CAEAE949204A4D86875C82379424209E169849E3BEAAD2AC010383C2237C
 
 四档实测采样时钟均与理论倍率一致，最大相对偏差约为 0.085%。结合 MATLAB 指标检查、RTL 逐点对拍、复位和动态切换回归、综合实现、时序检查与本次实板测试，472 LUT / 8 DSP 版本已经完成从数学模型到模拟输出的验证闭环。已推送的 578 LUT 基线、478/496 LUT 候选和既有稳定回退 bitstream 继续保留，便于后续复现和对照。
 
+### 9.8 Phase 8 存储打包与尾级架构边界搜索
+
+Phase 8 首先保持 FIR 系数、CIC 阶数、字长和 valid 协议不变，只利用 Stage2/3 计算互斥关系，把两级历史和交叉级系数打包进两个双用途 `RAMB18E1`。该候选通过 Stage2/3 单元对拍、正式顶层 daily/nightly、8 场景复位恢复、10 次动态切档以及完整实现，nightly 的 5,355,552 个 128x 输出点和全部中间节点均为 0 LSB。
+
+| 指标 | 472 LUT 板测基线 | Phase 8 打包 BRAM 候选 | 变化 |
+|---|---:|---:|---:|
+| LUT | 472 | 484 | +12 |
+| FF | 564 | 564 | 0 |
+| DSP48E1 | 8 | 8 | 0 |
+| BRAM Tile | 3.0 | 2.5 | -0.5 |
+| WNS / WHS | +46.446 / +0.093 ns | +46.156 / +0.113 ns | 均通过 |
+| 功耗估计 | 0.169 W | 0.169 W | 不变 |
+
+该实验形成了有效的存储优先 Pareto 点，但没有降低 LUT，因此工程默认值已经恢复为实板通过的 472 LUT / 8 DSP 基线。打包版由 `USE_PACKED_BRAM_STAGE23` 参数独立启用，候选 bitstream 的 SHA256 为 `842EE7BE734BF7AAE5EDC2F1DF23EAC19E11C5EB135AC7C3E05C476CD788DA57`。
+
+随后对 16 倍尾级进行 CIC/Halfband 联合搜索。对 `CIC16`、`CIC8+1级Halfband` 和 `CIC4+2级Halfband` 的不同排列重新设计 Stage3 折叠补偿 FIR，并统一使用 `<=0.01 dB` 通带误差、`>=72 dB` 阻带和严格对称门槛。通过候选如下：
+
+| 尾级结构 | CIC 阶数 | DSP 共享估算 | DSP 独立估算 | 通带误差 / dB | 阻带 / dB |
+|---|---:|---:|---:|---:|---:|
+| CIC16 | 3 | 8 | 8 | 0.00318129 | 72.3663 |
+| 2x Halfband + CIC8 | 3 | 9 | 9 | 0.00292962 | 78.5921 |
+| 2x Halfband + 2x Halfband + CIC4 | 3 | 9 | 10 | 0.00305852 | 78.5912 |
+| 2x Halfband + CIC4 + 2x Halfband | 3 | 9 | 10 | 0.00315603 | 78.5926 |
+
+![Phase 8 尾级架构 Pareto 初筛](matlab_fir/alt_all2x_v8/figures/phase8_tail_architecture_pareto.png)
+
+所有满足 72 dB 门槛的候选仍需 3 阶 CIC；加入 Halfband 只能用额外计算换取约 78.6 dB 阻带，不能减少 DSP。最接近降 DSP 目标的是 `两个2x Halfband + CIC4(N=2)`：若两个 Halfband 共用一颗串行 MAC，理论资源下界为 7 DSP。为避免只凭初筛结果过早否定该路线，又执行了以下四轮定点优化和 `2^20` 点精确复算：
+
+| 7 DSP 数学候选 | 通带最大绝对误差 / dB | 阻带衰减 / dB | 距 72 dB | 结果 |
+|---|---:|---:|---:|---|
+| 初始 7 tap Halfband + 原 Stage3 | 0.00296014 | 71.54678770 | -0.45321230 | NO-GO |
+| 7 tap Halfband 与 Stage3 联合优化 | 0.00319857 | 71.54703673 | -0.45296327 | NO-GO |
+| 两级 Halfband 加长到 11 tap | 0.00689974 | 71.55077836 | -0.44922164 | NO-GO |
+| 既有 Stage1 库复筛最佳项 | 0.00515985 | **71.58790137** | **-0.41209863** | NO-GO |
+| 二阶 CIC 专用 Stage1 重设计 | 0.00425055 | 71.58681595 | -0.41318405 | NO-GO |
+
+![Phase 8 二阶 CIC 与 Halfband 联合优化](matlab_fir/alt_all2x_v8/figures/phase8_cic2_hb_response.png)
+
+![Phase 8 二阶 CIC 专用 Stage1 重设计](matlab_fir/alt_all2x_v8/figures/phase8_cic2_stage1_redesign_response.png)
+
+加长尾部 Halfband 只带来约 `0.004 dB` 的阻带变化，因为 24.1 kHz 阻带入口在这两级 Halfband 中仍位于低频通带，主要限制来自前级半带响应与二阶 CIC 的联合响应。Stage1 复筛虽把阻带提高到 `71.58790137 dB`，仍未达到本轮保守的 `72 dB` 工程门槛。
+
+本轮严格执行 Stop/Go：数学指标未通过，因此没有创建 7 DSP RTL、没有登记 Vivado 源文件，也没有综合、实现或生成 bitstream。表中的 7 DSP 仅是共享调度成立时的理论估算，不能当作实现资源。最终正式版本仍为已完成 MATLAB、RTL 0 LSB 对拍、实现及时序检查和四档板测的 **472 LUT / 564 FF / 8 DSP / 3 BRAM** 基线；484 LUT / 8 DSP / 2.5 BRAM 打包版仅作为存储优先 Pareto 候选。详细过程见 [Phase 8 优化指导评估与执行报告](matlab_fir/alt_all2x_v8/phase8_guidance_assessment_and_execution.md)。
+
 V3 相对全 2x 初始稳定板级：
 
 ```text
@@ -1207,6 +1260,12 @@ SHA256：E122FC402FB10E43954BDC5E9E134BD2789F1645F138D6FFAAD83C52581612C3
 | `matlab_fir/alt_all2x_v7/verification/phase7_analyze_full_rtl_impulse.m` | 从正式 RTL 冲激 CSV 提取频率和线性相位指标 |
 | `matlab_fir/all2x_phase7_cic_execution_plan.md` | Phase 7 Stop/Go 计划和最终状态 |
 | `matlab_fir/all2x_phase7_fir_cic_execution_report.md` | Phase 7 数学、RTL、资源和板级完整报告 |
+| `matlab_fir/alt_all2x_v8/phase8_01_search_tail_architectures.m` | CIC16、CIC8+Halfband、CIC4+两级 Halfband 尾级架构统一搜索 |
+| `matlab_fir/alt_all2x_v8/phase8_02_optimize_cic2_halfband.m` | 二阶 CIC、两级 7 tap Halfband 与 Stage3 定点联合优化 |
+| `matlab_fir/alt_all2x_v8/phase8_03_optimize_cic2_halfband11.m` | 两级 11 tap strict-halfband 加长候选复核 |
+| `matlab_fir/alt_all2x_v8/phase8_04_search_stage1_margin.m` | 既有 Stage1 候选库在二阶 CIC 尾级下的余量复筛 |
+| `matlab_fir/alt_all2x_v8/phase8_05_redesign_stage1_cic2.m` | 保持 32 MAC 对上限的二阶 CIC 专用 Stage1 重设计 |
+| `matlab_fir/alt_all2x_v8/phase8_guidance_assessment_and_execution.md` | Phase 8 存储打包、7 DSP 数学边界与 Stop/Go 完整记录 |
 | `audio_data/generate_demo_sine_15k_44k1.m` | 生成 44.1 kHz / 24 bit / 15 kHz 示波器对比 ROM |
 
 ### 12.2 RTL
@@ -1466,3 +1525,5 @@ Phase 7 在正确 CIC 插值结构上先完成独立低速补偿 FIR，确认其
 最新最低 LUT 候选进一步把 Stage2/3 历史移位寄存器改为两个 16 深度单读 LUTRAM 环形缓存，并将对称抽头改为同一 DSP48E1 上的串行 MAC。完整板级达到 578 LUT / 619 FF / 9 DSP / 1.5 BRAM Tile，相对 729 LUT 候选再减少 151 LUT 和 301 FF；WNS/WHS 为 +44.153/+0.095 ns，功耗仍为 0.168 W。Stage2/3 单元对拍、正式顶层 daily/nightly、8 场景复位恢复和无复位四档动态切换全部通过。该 bitstream 已独立导出并用 SHA256 固定版本，当前仅剩 1x/4x/8x/128x 实板复测，既有三个回退 bitstream 与稳定 MCS 均未覆盖。
 
 在 578 LUT 基线上继续按层级热点收敛：紧凑键盘、Stage2/3 BRAM 历史、同步系数表和上电计数器复用依次把完整板级降到 557、521、506 和 496 LUT。随后保持 RTL、系数、字长、generic 和接口全部不变，仅将 Vivado 综合/逻辑优化指令设为 `AreaOptimized_high`/`ExploreArea`，布局布线结果进一步降至 478 LUT / 565 FF / 9 DSP / 3 BRAM Tile。最后阻止 5 bit CIC burst 计数器误占 DSP48E1，得到 472 LUT / 564 FF / 8 DSP / 3 BRAM Tile，WNS/WHS 为 +46.446/+0.093 ns，功耗 0.169 W。重新编译的 nightly 冲激与 10 组长随机输入在 4x/8x/128x 全部为 0 LSB；既有 8 场景复位恢复、10 次动态切档和板级共享扫描验证继续覆盖未改变的数据/控制协议。最终 bitstream SHA256 为 `8CD7CAEAE949204A4D86875C82379424209E169849E3BEAAD2AC010383C2237C`。实板四档 `DA_CLK` 分别为 44.09 kHz、176.43 kHz、352.86 kHz 和 5.64 MHz，四档 DA 输出均为正常正弦波，至此完成 MATLAB、RTL、实现与板级输出的验证闭环；578 LUT 推送基线与 478/496 LUT 候选仍可直接回退。
+
+Phase 8 进一步验证了两个边界方向。Stage2/3 交叉打包候选以 484 LUT / 564 FF / 8 DSP / 2.5 BRAM 通过完整 RTL 回归与实现，形成节省 0.5 BRAM Tile、增加 12 LUT 的存储优先 Pareto 点，但不替代最低 LUT 基线。随后针对理论 7 DSP 的 `两个2x Halfband + CIC4(N=2)` 路线，完成 Halfband、Stage3 和 Stage1 的多轮定点联合优化；最佳精确结果为 0.00515985 dB 通带误差和 71.58790137 dB 阻带，低于本阶段 72 dB 保守门槛。该路线按 Stop/Go 规则止步于 MATLAB，没有创建 RTL 或 bitstream。无论成功候选还是失败边界均已保留在 `matlab_fir/alt_all2x_v8`，当前正式提交继续采用经过四档实板验证的 472 LUT / 564 FF / 8 DSP / 3 BRAM 版本。

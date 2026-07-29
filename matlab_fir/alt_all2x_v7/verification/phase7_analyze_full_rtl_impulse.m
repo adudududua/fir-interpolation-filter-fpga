@@ -104,6 +104,9 @@ function result = phase7_analyze_full_rtl_impulse()
         metric128);
     plot_phase_result(fullfile(figure_dir, ...
         'phase7_rtl_linear_phase.png'), CFG, metric128, y128);
+    plot_fullband_acceptance(fullfile(figure_dir, ...
+        'phase7_rtl_128x_fullband.png'), CFG, metric128, ...
+        hard_pass_128x, release_pass_128x);
 
     result.CFG = CFG;
     result.metric4 = metric4;
@@ -120,15 +123,36 @@ function result = phase7_analyze_full_rtl_impulse()
     save(fullfile(report_dir, 'phase7_rtl_impulse_result.mat'), ...
         'saved_result');
 
-    fprintf(['RTL impulse: 4x pass=%.8f dB stop=%.3f dB; ' ...
-        '128x pass=%.8f dB stop=%.3f dB symmetry=%g LSB ' ...
-        'GD=%.9f.\n'], metric4.pass_abs_max_db, ...
-        metric4.stop_attn_db, metric128.pass_abs_max_db, ...
-        metric128.stop_attn_db, metric128.impulse_symmetry_lsb, ...
-        metric128.gd_mean);
     if ~hard_pass_128x
         error('Phase 7 RTL 128x 冲激未满足赛题硬门槛。');
     end
+
+    drawnow;
+    disp(metric_table);
+    fprintf('\n================ Phase 7 正式RTL结论 ================\n');
+    fprintf('4x通带最大偏差    = %.8f dB\n', metric4.pass_abs_max_db);
+    fprintf('4x阻带衰减        = %.8f dB\n', metric4.stop_attn_db);
+    fprintf('128x通带最大偏差  = %.8f dB\n', metric128.pass_abs_max_db);
+    fprintf('128x阻带衰减      = %.8f dB\n', metric128.stop_attn_db);
+    fprintf('128x冲激对称误差  = %.0f output LSB\n', ...
+        metric128.impulse_symmetry_lsb);
+    fprintf('128x群延迟        = %.9f samples\n', metric128.gd_mean);
+    fprintf('相位拟合残差      = %.3g rad\n', ...
+        metric128.phase_fit_residual_rad);
+    fprintf('最终判定          = PASS\n');
+    fprintf('CSV : %s\n', fullfile(report_dir, ...
+        'phase7_rtl_impulse_metrics.csv'));
+    fprintf('TXT : %s\n', fullfile(report_dir, ...
+        'phase7_rtl_impulse_summary.txt'));
+    fprintf('MAT : %s\n', fullfile(report_dir, ...
+        'phase7_rtl_impulse_result.mat'));
+    fprintf('PNG1: %s\n', fullfile(figure_dir, ...
+        'phase7_rtl_impulse_response.png'));
+    fprintf('PNG2: %s\n', fullfile(figure_dir, ...
+        'phase7_rtl_linear_phase.png'));
+    fprintf('PNG3: %s\n', fullfile(figure_dir, ...
+        'phase7_rtl_128x_fullband.png'));
+    fprintf('=====================================================\n');
 end
 
 
@@ -268,7 +292,9 @@ function plot_frequency_result(filename, CFG, metric4, metric8, metric128)
     color_purple = [0.28 0.15 0.49];
     color_green = [0.10 0.60 0.49];
     color_yellow = [0.82 0.88 0.05];
-    figure('Color', 'w', 'Position', [80 50 1500 900]);
+    figure('Name', 'Phase 7 - 正式RTL完整冲激频响', ...
+        'NumberTitle', 'off', 'Color', 'w', ...
+        'Position', [80 50 1500 900]);
     tiledlayout(2, 2, 'TileSpacing', 'compact', 'Padding', 'compact');
 
     nexttile;
@@ -318,14 +344,15 @@ function plot_frequency_result(filename, CFG, metric4, metric8, metric128)
 
     sgtitle('Phase 7 正式 RTL 完整冲激频响');
     exportgraphics(gcf, filename, 'Resolution', 200);
-    close(gcf);
 end
 
 
 function plot_phase_result(filename, CFG, metric, y)
     color_purple = [0.28 0.15 0.49];
     color_green = [0.10 0.60 0.49];
-    figure('Color', 'w', 'Position', [100 80 1450 620]);
+    figure('Name', 'Phase 7 - 正式RTL严格线性相位', ...
+        'NumberTitle', 'off', 'Color', 'w', ...
+        'Position', [100 80 1450 620]);
     tiledlayout(1, 2, 'TileSpacing', 'compact', 'Padding', 'compact');
     nexttile;
     plot(0:numel(y)-1, double(y)-fliplr(double(y)), ...
@@ -342,7 +369,88 @@ function plot_phase_result(filename, CFG, metric, y)
     ylabel('偏差 / 最终样点'); style_axes(gca);
     sgtitle('Phase 7 严格线性相位 RTL 证据');
     exportgraphics(gcf, filename, 'Resolution', 200);
-    close(gcf);
+end
+
+
+function plot_fullband_acceptance(filename, CFG, metric, ...
+        hard_pass, release_pass)
+    color_blue = [0.20 0.39 0.63];
+    color_purple = [0.28 0.15 0.49];
+    color_green = [0.10 0.60 0.49];
+    color_yellow = [0.82 0.88 0.05];
+    figure('Name', 'Phase 7 - RTL 128x全频带验收', ...
+        'NumberTitle', 'off', 'Color', 'w', ...
+        'Position', [70 45 1540 900]);
+    tiledlayout(2, 2, 'TileSpacing', 'compact', 'Padding', 'compact');
+
+    nexttile;
+    plot(metric.f/1e3, metric.H_db, 'Color', color_purple, ...
+        'LineWidth', 1.8); hold on;
+    yline(CFG.SPEC_PASS_DB, '--', 'Color', color_yellow, 'LineWidth', 1.1);
+    yline(-CFG.SPEC_PASS_DB, '--', 'Color', color_yellow, 'LineWidth', 1.1);
+    xline(CFG.FPASS_HIGH/1e3, '--', 'Color', color_green, 'LineWidth', 1.1);
+    xlim([0 22]); ylim([-0.06 0.06]);
+    title('RTL 128x 通带纹波'); xlabel('频率 / kHz');
+    ylabel('相对幅度 / dB');
+    legend('RTL 冲激响应', '+0.05 dB', '-0.05 dB', '20 kHz', ...
+        'Location', 'southwest'); style_axes(gca);
+
+    nexttile;
+    plot(metric.f/1e3, metric.H_db, 'Color', color_blue, ...
+        'LineWidth', 1.55); hold on;
+    yline(-CFG.SPEC_STOP_DB, '--', 'Color', color_yellow, 'LineWidth', 1.1);
+    xline(CFG.FSTOP/1e3, '--', 'Color', color_green, 'LineWidth', 1.1);
+    xlim([20 80]); ylim([-140 5]);
+    title('RTL 通带至阻带入口'); xlabel('频率 / kHz');
+    ylabel('相对幅度 / dB');
+    legend('RTL 冲激响应', '-70 dB', '24.1 kHz', ...
+        'Location', 'southwest'); style_axes(gca);
+
+    nexttile;
+    plot(metric.f/1e6, metric.H_db, 'Color', color_blue, ...
+        'LineWidth', 1.05); hold on;
+    yline(-CFG.SPEC_STOP_DB, '--', 'Color', color_yellow, 'LineWidth', 1.0);
+    xline(CFG.FSTOP/1e6, '--', 'Color', color_green, 'LineWidth', 1.0);
+    xlim([0 CFG.FS_128X/2/1e6]); ylim([-160 5]);
+    title('RTL 128x 输出全奈奎斯特频带'); xlabel('频率 / MHz');
+    ylabel('相对幅度 / dB');
+    legend('0 ~ 2.8224 MHz', '-70 dB', '24.1 kHz', ...
+        'Location', 'southwest'); style_axes(gca);
+
+    nexttile;
+    axis off;
+    hard_text = 'FAIL';
+    release_text = 'FAIL';
+    if hard_pass
+        hard_text = 'PASS';
+    end
+    if release_pass
+        release_text = 'PASS';
+    end
+    summary_text = {
+        '正式 RTL 128x 验收结果'
+        ' '
+        sprintf('采样率：44.1 kHz -> %.4f MHz', CFG.FS_128X/1e6)
+        '倍率分解：2 x 2 x 2 x 16 = 128'
+        sprintf('通带最大偏差：%.8f dB  (要求 <= %.2f dB)', ...
+            metric.pass_abs_max_db, CFG.SPEC_PASS_DB)
+        sprintf('通带峰峰纹波：%.8f dB', metric.ripple_pp_db)
+        sprintf('阻带衰减：%.8f dB  (要求 >= %.0f dB)', ...
+            metric.stop_attn_db, CFG.SPEC_STOP_DB)
+        sprintf('冲激对称误差：%.0f output LSB', ...
+            metric.impulse_symmetry_lsb)
+        sprintf('群延迟：%.9f samples', metric.gd_mean)
+        sprintf('相位拟合残差：%.3g rad', metric.phase_fit_residual_rad)
+        sprintf('赛题硬指标：%s；工程发布指标：%s', ...
+            hard_text, release_text)};
+    text(0.04, 0.95, summary_text, 'Units', 'normalized', ...
+        'VerticalAlignment', 'top', 'FontName', 'Microsoft YaHei', ...
+        'FontSize', 13, 'Color', color_purple);
+    rectangle('Position', [0.015 0.05 0.97 0.90], ...
+        'EdgeColor', color_green, 'LineWidth', 1.4, 'Curvature', 0.02);
+
+    sgtitle('44.1 kHz -> 5.6448 MHz：正式 RTL 128x 完整链路验收');
+    exportgraphics(gcf, filename, 'Resolution', 220);
 end
 
 

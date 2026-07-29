@@ -4,6 +4,7 @@
 
 .agents/
 .codex_xvlog_check/
+/-p/
 
 .Xil/
 **/.Xil/
@@ -101,6 +102,7 @@ matlab_fir/alt_all2x_v6/vivado_work/
 
 matlab_fir/alt_all2x_v7/*.mat
 matlab_fir/alt_all2x_v7/**/*.mat
+matlab_fir/alt_all2x_v8/**/*.mat
 
 #============================================================
 # Phase 7 generated verification data
@@ -117,3 +119,12 @@ matlab_fir/alt_all2x_v7/verification/rtl_outputs/
 #============================================================
 
 /submit/
+
+#============================================================
+# Local preferences, backups, and review scratch data
+#============================================================
+
+/.matlab_prefs/
+/matlab_fir_save/
+/tmp/
+/README_save.md

@@ -197,6 +197,36 @@ for idx = 1:numel(pareto)
         pareto(idx).metric.pass_abs_max_db, ...
         pareto(idx).metric.stop_attn_db);
 end
+formal_index = find(strcmp({pareto.name}, 'folded_n3'), 1);
+if isempty(formal_index)
+    error('缺少正式提交候选 folded_n3。');
+end
+formal = pareto(formal_index);
+fprintf('\n================ Stage3 正式折叠补偿结论 ================\n');
+fprintf('正式结构：%d taps 线性相位 FIR，Q%d，%d bit 系数\n', ...
+    formal.row.STAGE3_TAPS, formal.row.FRAC_W, formal.row.COEFF_W);
+fprintf('作用：同时完成第三级 2x 插值镜像抑制与 CIC16 通带补偿\n');
+fprintf('完整 128x 通带最大偏差 = %.8f dB\n', ...
+    formal.metric.pass_abs_max_db);
+fprintf('完整 128x 通带峰峰纹波 = %.8f dB\n', ...
+    formal.metric.ripple_pp_db);
+fprintf('完整 128x 阻带衰减     = %.8f dB\n', ...
+    formal.metric.stop_attn_db);
+fprintf('整数系数：');
+fprintf('%d ', formal.coeff_int);
+fprintf('\n最终判定：PASS\n');
+fprintf('CSV : %s\n', fullfile(result_dir, ...
+    'folded_stage3_candidates.csv'));
+fprintf('CSV2: %s\n', fullfile(result_dir, ...
+    'folded_stage3_pareto.csv'));
+fprintf('TXT : %s\n', fullfile(result_dir, ...
+    'folded_stage3_summary.txt'));
+fprintf('MAT : %s\n', fullfile(result_dir, ...
+    'folded_stage3_pareto.mat'));
+fprintf('PNG : %s\n', fullfile(figure_dir, ...
+    'folded_stage3_response.png'));
+fprintf('========================================================\n');
+drawnow;
 
 
 function h_total = append_interp2_stage(h_previous, h_stage)
@@ -304,7 +334,9 @@ function plot_pareto(filename, pareto, pass_edge, stop_begin)
     color_green = [0.10 0.60 0.49];
     color_yellow = [0.82 0.88 0.05];
     line_color = {color_blue, color_purple};
-    figure('Color', 'w', 'Position', [80 60 1500 760]);
+    figure('Name', 'Stage3 - 11抽头折叠CIC补偿设计', ...
+        'NumberTitle', 'off', 'Color', 'w', ...
+        'Position', [80 60 1500 760]);
     tiledlayout(1, 2, 'TileSpacing', 'compact', 'Padding', 'compact');
     nexttile;
     for idx = 1:numel(pareto)
