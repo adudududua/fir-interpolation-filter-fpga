@@ -4,10 +4,8 @@
 // 模块名       : matrix_keypad_mode_ctrl_compact
 // 功能简述     : 赛方板 4x4 矩阵按键的紧凑四档模式控制器。
 //                仅保留演示实际使用的 SW1～SW8：
-//                  SW1/SW5：1x
-//                  SW2/SW6：4x
-//                  SW3/SW7：8x
-//                  SW4/SW8：128x
+//                  SW1～SW4：44.1 kHz 的 1x/4x/8x/128x
+//                  SW5～SW8：48 kHz 的 1x/4x/8x/128x
 //                KC2/KC3 对应的 SW9～SW16 不改变模式。
 //                相比完整 16 键位图实现，本模块直接保存每轮扫描
 //                的候选模式，并保留输入同步、整轮消抖和行优先级。
@@ -32,6 +30,7 @@ module matrix_keypad_mode_ctrl_compact #(
     input  wire       scan_tick,
     input  wire [3:0] kc,
     output reg  [3:0] kr_drive_low,
+    output reg        family_sel,
     output reg  [1:0] mode_sel
 );
 
@@ -65,6 +64,7 @@ module matrix_keypad_mode_ctrl_compact #(
     reg [1:0] row1_mode;
 
     reg       raw_valid;
+    reg       raw_family;
     reg [1:0] raw_mode;
     reg [STABLE_W-1:0] stable_cnt;
 
@@ -75,6 +75,7 @@ module matrix_keypad_mode_ctrl_compact #(
     wire [1:0] row0_mode_now;
     wire [1:0] row1_mode_now;
     wire scan_valid_now;
+    wire scan_family_now;
     wire [1:0] scan_mode_now;
     wire scan_same_as_raw;
     wire scan_advance;
@@ -89,9 +90,12 @@ module matrix_keypad_mode_ctrl_compact #(
 
     // 完全沿用原扫描器的键码优先顺序：SW1～SW4 优先于 SW5～SW8。
     assign scan_valid_now = row0_found_now | row1_found_now;
+    assign scan_family_now = !row0_found_now && row1_found_now;
     assign scan_mode_now = row0_found_now ? row0_mode_now : row1_mode_now;
     assign scan_same_as_raw = (scan_valid_now == raw_valid) &&
-                              (!scan_valid_now || (scan_mode_now == raw_mode));
+                              (!scan_valid_now ||
+                               (scan_family_now == raw_family &&
+                                scan_mode_now == raw_mode));
     assign scan_advance = (USE_EXTERNAL_SCAN_TICK != 0) ? scan_tick :
                           (scan_cnt == SCAN_DIV - 1);
 
@@ -128,8 +132,10 @@ module matrix_keypad_mode_ctrl_compact #(
             row1_mode     <= 2'd0;
 
             raw_valid     <= 1'b0;
+            raw_family    <= 1'b0;
             raw_mode      <= 2'd0;
             stable_cnt    <= {STABLE_W{1'b0}};
+            family_sel    <= 1'b0;
             mode_sel      <= 2'b11;
         end
         else if (scan_advance) begin
@@ -153,11 +159,14 @@ module matrix_keypad_mode_ctrl_compact #(
                 if (scan_same_as_raw) begin
                     if (stable_cnt < DEBOUNCE_SCANS)
                         stable_cnt <= stable_cnt + {{(STABLE_W-1){1'b0}}, 1'b1};
-                    else if (scan_valid_now)
+                    else if (scan_valid_now) begin
+                        family_sel <= scan_family_now;
                         mode_sel <= scan_mode_now;
+                    end
                 end
                 else begin
                     raw_valid  <= scan_valid_now;
+                    raw_family <= scan_family_now;
                     raw_mode   <= scan_mode_now;
                     stable_cnt <= {STABLE_W{1'b0}};
                 end

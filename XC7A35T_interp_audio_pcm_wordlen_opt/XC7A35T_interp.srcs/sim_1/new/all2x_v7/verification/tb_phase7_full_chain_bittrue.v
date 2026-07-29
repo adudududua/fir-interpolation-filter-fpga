@@ -27,7 +27,17 @@
 
 module tb_phase7_full_chain_bittrue;
 
-`ifdef PHASE7_NIGHTLY
+`ifdef NATIONAL_FINALS
+    localparam integer MAX_INPUT_COUNT = 1024;
+    localparam integer MAX_Y4_COUNT = 4317;
+    localparam integer MAX_Y8_COUNT = 8643;
+    localparam integer MAX_Y128_COUNT = 138368;
+    localparam integer RANDOM_INPUT_COUNT = 1024;
+    localparam integer RANDOM_Y4_COUNT = 4317;
+    localparam integer RANDOM_Y8_COUNT = 8643;
+    localparam integer RANDOM_Y128_COUNT = 138368;
+    localparam integer CASE_COUNT = 2;
+`elsif PHASE7_NIGHTLY
     localparam integer MAX_INPUT_COUNT = 4096;
     localparam integer MAX_Y4_COUNT = 16605;
     localparam integer MAX_Y8_COUNT = 33219;
@@ -51,13 +61,25 @@ module tb_phase7_full_chain_bittrue;
     localparam integer IMPULSE_INPUT_COUNT = 256;
     localparam integer IMPULSE_Y4_COUNT = 1245;
     localparam integer IMPULSE_Y8_COUNT = 2499;
+`ifdef NATIONAL_FINALS
+    localparam integer IMPULSE_Y128_COUNT = 40064;
+`else
     localparam integer IMPULSE_Y128_COUNT = 40032;
+`endif
     localparam integer SHIFT_4X = 3;
     localparam integer SHIFT_8X = 7;
+`ifdef NATIONAL_FINALS
     localparam integer SHIFT_128X = 112;
+`else
+    localparam integer SHIFT_128X = 112;
+`endif
     localparam integer IR_LEN_4X = 225;
     localparam integer IR_LEN_8X = 459;
+`ifdef NATIONAL_FINALS
+    localparam integer IR_LEN_128X = 7406;
+`else
     localparam integer IR_LEN_128X = 7374;
+`endif
 
     reg clk;
     reg rst_n;
@@ -108,6 +130,10 @@ module tb_phase7_full_chain_bittrue;
         .STAGE23_ACC_W   (38),
         .CIC_ORDER       (3),
         .FINAL_PRUNE_LSB (0),
+`ifdef NATIONAL_FINALS
+        .STAGE3_FLAT(1),
+        .USE_CIC3_SHIFTADD_COMPENSATOR(1),
+`endif
 `ifdef PHASE7_USE_LUTRAM_STAGE23
         .USE_LUTRAM_STAGE23(1),
 `else

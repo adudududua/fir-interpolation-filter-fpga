@@ -46,10 +46,12 @@ module demo_interp_dac8_audio_pcm_common #(
     parameter integer USE_PHASE7_BRAM_STAGE23_HISTORY = 0,
     parameter integer USE_PHASE7_BRAM_STAGE23_COEFF = 0,
     parameter integer USE_PHASE8_PACKED_BRAM_STAGE23 = 0,
-    parameter integer USE_PHASE7_CIC_BURST_COUNTER_DSP = 0
+    parameter integer USE_PHASE7_CIC_BURST_COUNTER_DSP = 0,
+    parameter integer USE_NATIONAL_FINALS_DATAPATH = 0
 )(
     input  wire        clk_audio_128x,  // 5.6448MHz 连续音频 128x 时钟
     input  wire        rst_n,           // 低有效复位
+    input  wire        family_48k,      // 0=44.1kHz，1=48kHz
     input  wire [1:0]  mode_sel,        // 00=1x，01=4x，10=8x，11=128x
 
     output wire        dac_clk,         // 输出给 AD9708 的 DAC 采样时钟
@@ -154,20 +156,37 @@ module demo_interp_dac8_audio_pcm_common #(
     wire               audio_sample_update_w;
     wire [7:0] audio_sample_addr_dbg_w;
 
-    audio_pcm_rom_source #(
-        .DATA_W   (24),
-        .ADDR_W   (8),
-        .DEPTH    (147),
-        .MEM_FILE ("demo_sine_15k_44k1_24bit_147.mem")
-    ) u_audio_pcm_rom_source (
-        .clk             (clk_audio_128x),
-        .rst_n           (rst_n),
-        .sample_ce       (x_in_update_ce),
-
-        .sample_out      (audio_sample_w),
-        .sample_update   (audio_sample_update_w),
-        .sample_addr_dbg (audio_sample_addr_dbg_w)
-    );
+    generate
+        if (USE_NATIONAL_FINALS_DATAPATH != 0) begin :
+                gen_dual_rate_test_tone
+            dual_rate_test_tone_rom_source #(
+                .MEM_FILE("nf_sine_15k_dual_rate_24bit_256.mem")
+            ) u_dual_rate_test_tone_rom_source (
+                .clk(clk_audio_128x),
+                .rst_n(rst_n),
+                .sample_ce(x_in_update_ce),
+                .family_48k(family_48k),
+                .sample_out(audio_sample_w),
+                .sample_update(audio_sample_update_w),
+                .sample_addr_dbg(audio_sample_addr_dbg_w)
+            );
+        end
+        else begin : gen_regional_test_tone
+            audio_pcm_rom_source #(
+                .DATA_W   (24),
+                .ADDR_W   (8),
+                .DEPTH    (147),
+                .MEM_FILE ("demo_sine_15k_44k1_24bit_147.mem")
+            ) u_audio_pcm_rom_source (
+                .clk             (clk_audio_128x),
+                .rst_n           (rst_n),
+                .sample_ce       (x_in_update_ce),
+                .sample_out      (audio_sample_w),
+                .sample_update   (audio_sample_update_w),
+                .sample_addr_dbg (audio_sample_addr_dbg_w)
+            );
+        end
+    endgenerate
 
     //=========================================================
     // 4）送入插值链的输入样本
@@ -227,6 +246,9 @@ module demo_interp_dac8_audio_pcm_common #(
                 .CIC_ORDER       (3),
                 .FINAL_PRUNE_LSB (0),
                 .USE_LUTRAM_STAGE23(USE_PHASE7_LUTRAM_STAGE23),
+                .STAGE3_FLAT(USE_NATIONAL_FINALS_DATAPATH),
+                .USE_CIC3_SHIFTADD_COMPENSATOR(
+                    USE_NATIONAL_FINALS_DATAPATH),
                 .USE_BRAM_STAGE23_HISTORY(USE_PHASE7_BRAM_STAGE23_HISTORY),
                 .USE_BRAM_STAGE23_COEFF(USE_PHASE7_BRAM_STAGE23_COEFF),
                 .USE_PACKED_BRAM_STAGE23(USE_PHASE8_PACKED_BRAM_STAGE23),

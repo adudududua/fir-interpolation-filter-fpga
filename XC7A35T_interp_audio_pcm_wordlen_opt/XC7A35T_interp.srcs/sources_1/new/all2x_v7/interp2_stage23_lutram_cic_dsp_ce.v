@@ -47,6 +47,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     parameter integer COEFF_W = 18,
     parameter integer ACC_W = 38,
     parameter integer CIC_ORDER = 3,
+    parameter integer STAGE3_FLAT = 0,
     parameter integer USE_BRAM_HISTORY = 0,
     parameter integer USE_BRAM_COEFF = 0,
     parameter integer USE_PACKED_BRAM = 0
@@ -407,7 +408,29 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         coeff_sequence_bram[22] = `V2_S2_P1_C1;
         coeff_sequence_bram[23] = `V2_S2_P1_C0;
 
-        if (CIC_ORDER == 3) begin
+        if (STAGE3_FLAT != 0) begin
+            // 全国赛独立 8x 输出使用原 Phase 6 平坦 Stage3。
+            // CIC 的通带下垂由后接三抽头移位加法器单独补偿。
+            coeff_rom[16] = 18'sd202;
+            coeff_rom[17] = -18'sd1636;
+            coeff_rom[18] = 18'sd9625;
+            coeff_rom[24] = -18'sd74;
+            coeff_rom[25] = 18'sd261;
+            coeff_rom[26] = 18'sd16008;
+
+            coeff_sequence_bram[32] = 18'sd202;
+            coeff_sequence_bram[33] = -18'sd1636;
+            coeff_sequence_bram[34] = 18'sd9625;
+            coeff_sequence_bram[35] = 18'sd9625;
+            coeff_sequence_bram[36] = -18'sd1636;
+            coeff_sequence_bram[37] = 18'sd202;
+            coeff_sequence_bram[48] = -18'sd74;
+            coeff_sequence_bram[49] = 18'sd261;
+            coeff_sequence_bram[50] = 18'sd16008;
+            coeff_sequence_bram[51] = 18'sd261;
+            coeff_sequence_bram[52] = -18'sd74;
+        end
+        else if (CIC_ORDER == 3) begin
             coeff_rom[16] = 18'sd561;
             coeff_rom[17] = -18'sd4234;
             coeff_rom[18] = 18'sd20057;
@@ -626,6 +649,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
             $fatal(1, "Packed BRAM banks must be at least COEFF_W wide");
         if (CIC_ORDER != 3 && CIC_ORDER != 4)
             $fatal(1, "CIC_ORDER must be 3 or 4");
+        if (STAGE3_FLAT != 0 && STAGE3_FLAT != 1)
+            $fatal(1, "STAGE3_FLAT must be 0 or 1");
         if (USE_BRAM_HISTORY != 0 && USE_BRAM_HISTORY != 1)
             $fatal(1, "USE_BRAM_HISTORY must be 0 or 1");
         if (USE_BRAM_COEFF != 0 && USE_BRAM_COEFF != 1)

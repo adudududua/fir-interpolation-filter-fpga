@@ -1,8 +1,8 @@
 #=============================================================
 # 文件名       : board_demo_competition_dac8_top.xdc
 # 对应顶层     : board_demo_competition_dac8_top
-# 功能简述     : Artix-7 XC7A35T 赛方板 AD9708 DAC 的 44.1kHz
-#                专用全 2x 插值演示约束文件。
+# 功能简述     : Artix-7 XC7A35T 全国赛 44.1/48 kHz 双采样率、
+#                4x/8x/128x AD9708 插值演示约束文件。
 #                本文件用于约束板上 20MHz 系统时钟、矩阵按键
 #                以及 AD9708 8bit 并行 DAC 接口。
 #
@@ -36,8 +36,8 @@
 #                   DA_D6  = E17；
 #                   DA_D7  = C17。
 #                4. BEEP-IO = AB18，低电平响，高电平关闭。
-#                5. SW1/SW2/SW3 和 SW5/SW6/SW7 均映射为
-#                   44.1kHz 家族 4x/8x/128x 模式选择。
+#                5. SW1～SW4 映射 44.1 kHz 的 1x/4x/8x/128x；
+#                   SW5～SW8 映射 48 kHz 的 1x/4x/8x/128x。
 #=============================================================
 
 
@@ -50,7 +50,8 @@
 # 说明：
 #   顶层内部结构为：
 #     clk -> IBUF -> BUFG -> clk_sys_bufg
-#   然后 clk_sys_bufg 送入 44.1kHz Clock Wizard。
+#   然后 clk_sys_bufg 同时送入两颗 MMCM，专用 BUFGMUX_CTRL
+#   选择当前 5.6448/6.144 MHz 音频时钟。
 #=============================================================
 set_property PACKAGE_PIN Y18 [get_ports clk]
 set_property IOSTANDARD LVCMOS33 [get_ports clk]
@@ -181,12 +182,20 @@ set_false_path -from [get_ports {key_kc[*]}]
 #=============================================================
 # 7）控制域与音频域异步时钟组
 #
-# 当前只保留由 20MHz 输入经 clk_wiz_audio_44k1 派生的
-# 5.6448MHz 音频时钟。模式控制使用两级同步器跨入音频域，
-# 上电复位使用异步置位、同步释放结构，因此两个逻辑时钟域
-# 之间不做同步时序收敛。
+# 两个音频时钟由独立 MMCM 产生，在 BUFGMUX_CTRL 后物理互斥。
+# 模式控制使用两级同步器跨入当前音频域；采样率家族切换期间
+# 数据通路保持异步复位，切换后同步释放。因此 20 MHz 控制域
+# 与两个音频域之间均按异步时钟组处理。
 #=============================================================
 
+# 使用自动派生时钟的稳定名称，避免 Vivado 2018.3 在 XDC 解析期间通过
+# get_clocks -of_objects 递归构造 timing graph 时触发内部异常。
+# 20 MHz 控制域与音频域之间均由同步器/异步复位保护；BUFGMUX_CTRL 下游的
+# 44.1 kHz 与 48 kHz 家族逻辑互斥，不应分析两路时钟之间的伪路径。
 set_clock_groups -asynchronous \
     -group [get_clocks clk_20M] \
-    -group [get_clocks clk_audio_128x_44k1]
+    -group [get_clocks {clk_44k1_raw clk_48k_raw}]
+
+set_clock_groups -logically_exclusive \
+    -group [get_clocks clk_44k1_raw] \
+    -group [get_clocks clk_48k_raw]

@@ -1,0 +1,14 @@
+National finals shared FIR-CIC equalizer search
+===============================================
+Selected K = 1 / 2^3 = 0.125000000000
+RTL form: y[n]=x[n-1]+K*(2*x[n-1]-x[n]-x[n-2])
+Limits: pass <= +/-0.050 dB, stop >= 70.0 dB
+
+Fs_in=44100 node=4x Fs_out=176400 pass_abs=0.004613007 dB ripple_pp=0.005708917 dB stop=78.566788361 dB symmetry=0 gd=112.0 PASS=1
+Fs_in=44100 node=8x Fs_out=352800 pass_abs=0.005321911 dB ripple_pp=0.006191597 dB stop=78.606594428 dB symmetry=0 gd=229.0 PASS=1
+Fs_in=44100 node=128x Fs_out=5.6448e+06 pass_abs=0.005210271 dB ripple_pp=0.008030218 dB stop=72.366947248 dB symmetry=0 gd=3702.5 PASS=1
+Fs_in=48000 node=4x Fs_out=192000 pass_abs=0.004613007 dB ripple_pp=0.005708917 dB stop=78.566788361 dB symmetry=0 gd=112.0 PASS=1
+Fs_in=48000 node=8x Fs_out=384000 pass_abs=0.005321911 dB ripple_pp=0.005678222 dB stop=78.606594428 dB symmetry=0 gd=229.0 PASS=1
+Fs_in=48000 node=128x Fs_out=6.144e+06 pass_abs=0.005210271 dB ripple_pp=0.005562972 dB stop=72.366947248 dB symmetry=0 gd=3702.5 PASS=1
+
+OVERALL_PASS=1

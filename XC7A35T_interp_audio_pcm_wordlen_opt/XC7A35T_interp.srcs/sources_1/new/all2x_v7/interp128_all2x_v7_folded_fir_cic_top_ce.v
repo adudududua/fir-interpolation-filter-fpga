@@ -40,6 +40,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     parameter integer CIC_ORDER = 3,
     parameter integer FINAL_PRUNE_LSB = 3,
     parameter integer USE_LUTRAM_STAGE23 = 0,
+    parameter integer STAGE3_FLAT = 0,
+    parameter integer USE_CIC3_SHIFTADD_COMPENSATOR = 0,
     parameter integer USE_BRAM_STAGE23_HISTORY = 0,
     parameter integer USE_BRAM_STAGE23_COEFF = 0,
     parameter integer USE_PACKED_BRAM_STAGE23 = 0,
@@ -82,6 +84,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     wire y4_to_8_valid;
     wire signed [19:0] y8_w;
     wire y8_valid_w;
+    wire signed [19:0] cic_x_w;
+    wire cic_x_valid_w;
     wire signed [19:0] y128_w;
     wire y128_valid_w;
 
@@ -124,6 +128,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
                 .COEFF_W(18),
                 .ACC_W(STAGE23_ACC_W),
                 .CIC_ORDER(CIC_ORDER),
+                .STAGE3_FLAT(STAGE3_FLAT),
                 .USE_BRAM_HISTORY(USE_BRAM_STAGE23_HISTORY),
                 .USE_BRAM_COEFF(USE_BRAM_STAGE23_COEFF),
                 .USE_PACKED_BRAM(USE_PACKED_BRAM_STAGE23)
@@ -171,6 +176,26 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
         end
     endgenerate
 
+    generate
+        if (USE_CIC3_SHIFTADD_COMPENSATOR != 0) begin :
+                gen_cic3_shiftadd_compensator
+            cic3_compensator_shiftadd_ce #(
+                .DATA_W(20)
+            ) u_cic3_compensator_shiftadd_ce (
+                .clk(clk),
+                .rst_n(rst_n),
+                .x_in(y8_w),
+                .x_in_valid(y8_valid_w),
+                .y_out(cic_x_w),
+                .y_out_valid(cic_x_valid_w)
+            );
+        end
+        else begin : gen_no_cic3_shiftadd_compensator
+            assign cic_x_w = y8_w;
+            assign cic_x_valid_w = y8_valid_w;
+        end
+    endgenerate
+
     cic_interp16_core_dsp_ce #(
         .DATA_W          (20),
         .CIC_ORDER       (CIC_ORDER),
@@ -180,8 +205,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
         .clk                  (clk),
         .rst_n                (rst_n),
         .ce_out               (ce128_out),
-        .x_in                 (y8_w),
-        .x_in_valid           (y8_valid_w),
+        .x_in                 (cic_x_w),
+        .x_in_valid           (cic_x_valid_w),
         .y_out                (y128_w),
         .y_out_valid          (y128_valid_w),
         .burst_remaining_dbg  (),
@@ -204,6 +229,13 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     assign dbg_y64_valid = 1'b0;
 
 `ifndef SYNTHESIS
+    initial begin
+        if (STAGE3_FLAT != 0 && USE_LUTRAM_STAGE23 == 0)
+            $fatal(1, "STAGE3_FLAT currently requires LUTRAM/BRAM Stage23");
+        if (USE_CIC3_SHIFTADD_COMPENSATOR != 0 && STAGE3_FLAT == 0)
+            $fatal(1, "CIC3 shift-add compensator requires flat Stage3");
+    end
+
     always @(posedge clk) begin
         if (rst_n && unused_ce === 1'bx)
             $fatal(1, "Unused intermediate CE input contains X");

@@ -1,5 +1,13 @@
 # 高阶数字插值滤波器设计与 FPGA 验证
 
+## 全国总决赛双采样率版本（2026-07-29）
+
+全国赛升级版已在分支 `codex/national-finals-configurable` 完成：支持 signed 24 bit、44.1/48 kHz 输入家族以及 4x/8x/128x 正式输出。最终 RTL 六工况的通带最大绝对偏差为 **0.004610～0.006918 dB**，阻带衰减为 **72.348～78.669 dB**，冲激对称误差均为 **0 LSB**；六组 XSim 回归全部通过，全链路 impulse + 随机 PCM 的 4x/8x/128x 三节点均为 **0 LSB mismatch**。
+
+Vivado 2018.3 对 `XC7A35T-FGG484-2` 的最终布局布线结果为 **602 LUT / 616 FF / 8 DSP / 3 BRAM Tile**，WNS/WHS 为 **+46.309/+0.103 ns**，路由错误 0、DRC Error 0；Vectorless 功耗估计为 **0.271 W（Medium confidence）**。最终 bitstream 已生成，SHA-256 为 `28A18B572FC53E816CCB709BAF04DA3129E1F2B2BF51A1749682075A29EB043B`。
+
+软件、RTL 和 FPGA 实现签核已通过；物理开发板下载及示波器/频谱仪验收尚需现场执行。完整架构、指标、RTL 一键回归、bitstream、SW1～SW8 映射和板测清单见 [全国总决赛交付说明](matlab_fir/national_finals/README.md)。
+
 > 当前最低 LUT 实板通过版：44.1 kHz 专用、Phase 7 折叠补偿 FIR-CIC、Stage 2/3 BRAM 历史/系数、共享按键扫描、472 LUT / 8 DSP，自动化验证、完整实现与四档板测通过<br>
 > 上一面积策略候选：相同滤波算法与板级功能、478 LUT / 565 FF / 9 DSP / 3 BRAM Tile<br>
 > 默认综合策略对照：相同 RTL 与顶层参数、496 LUT / 565 FF / 9 DSP / 3 BRAM Tile<br>

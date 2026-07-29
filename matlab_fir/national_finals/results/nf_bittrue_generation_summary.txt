@@ -1,0 +1,8 @@
+National finals bit-true vector generation
+==========================================
+Stage3: flat 11-tap Q15 FIR
+Equalizer: [-1 10 -1]/8, arithmetic shift, 20 bit sat
+CIC: R=16 M=1 N=3, full precision, 20 bit output
+
+impulse input=256 y4=1245 y8=2499 y128=40064 eq_sat=0 cic_sat=0
+random_seed01 input=1024 y4=4317 y8=8643 y128=138368 eq_sat=0 cic_sat=0

@@ -2,11 +2,10 @@
 //=============================================================
 // 文件名       : board_demo_competition_dac8_top.v
 // 模块名       : board_demo_competition_dac8_top
-// 功能简述     : Artix-7 XC7A35T 赛方板 AD9708 DAC 的 44.1kHz
-//                专用全 2x 插值演示顶层。
-//                当前展示版本只保留：
-//                20MHz -> clk_wiz_audio_44k1 -> 5.6448MHz
-//                矩阵按键用于选择 1x、4x、8x 和 128x 输出节点。
+// 功能简述     : Artix-7 XC7A35T 全国总决赛双采样率、三倍率
+//                AD9708 DAC 板级演示顶层。
+//                20 MHz -> 双 MMCM -> 5.6448/6.144 MHz
+//                矩阵按键选择 44.1/48 kHz 与 1x/4x/8x/128x。
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-06-20
@@ -45,7 +44,8 @@ module board_demo_competition_dac8_top #(
     parameter integer USE_PHASE7_BRAM_STAGE23_HISTORY = 0,
     parameter integer USE_PHASE7_BRAM_STAGE23_COEFF = 0,
     parameter integer USE_PHASE8_PACKED_BRAM_STAGE23 = 0,
-    parameter integer USE_PHASE7_CIC_BURST_COUNTER_DSP = 0
+    parameter integer USE_PHASE7_CIC_BURST_COUNTER_DSP = 0,
+    parameter integer USE_NATIONAL_FINALS_DATAPATH = 1
 )(
     input  wire       clk,       // 板载 20MHz 系统时钟
 
@@ -131,7 +131,7 @@ module board_demo_competition_dac8_top #(
     // KC 由板上 10k 电阻上拉，按下时被当前 KR 拉低。
     //=========================================================
     wire [3:0] key_kr_drive_low;
-    wire       key_family_sel_unused;
+    wire       key_family_sel;
     wire [1:0] key_mode_sel;
     wire       key_strobe_unused;
     wire [3:0] key_code_unused;
@@ -152,10 +152,10 @@ module board_demo_competition_dac8_top #(
                 .scan_tick    (compact_keypad_scan_tick),
                 .kc           (key_kc),
                 .kr_drive_low (key_kr_drive_low),
+                .family_sel   (key_family_sel),
                 .mode_sel     (key_mode_sel)
             );
 
-            assign key_family_sel_unused = 1'b0;
             assign key_strobe_unused = 1'b0;
             assign key_code_unused = 4'd0;
         end
@@ -165,7 +165,7 @@ module board_demo_competition_dac8_top #(
                 .rst_n        (rst_n_int),
                 .kc           (key_kc),
                 .kr_drive_low (key_kr_drive_low),
-                .family_sel   (key_family_sel_unused),
+                .family_sel   (key_family_sel),
                 .mode_sel     (key_mode_sel),
                 .key_strobe   (key_strobe_unused),
                 .key_code     (key_code_unused)
@@ -174,27 +174,50 @@ module board_demo_competition_dac8_top #(
     endgenerate
 
     //=========================================================
-    // 4）Clock Wizard：44.1kHz 家族
+    // 4）全国赛双采样率时钟与受控家族切换
     //
     // 输入：
     //   clk_sys_bufg = 20MHz
     //
-    // 输出：
-    //   clk_audio_128x_44k1 = 5.6448MHz
+    //   family=0 -> 5.6448 MHz -> 44.1 kHz 输入家族
+    //   family=1 -> 6.1440 MHz -> 48.0 kHz 输入家族
     //
-    // 同样恢复原先已验证的反馈连接方式。
+    // 家族改变时先把音频数据通路保持复位，再切 BUFGMUX_CTRL，
+    // 最后在新时钟域同步释放复位，防止跨采样率遗留滤波状态。
     //=========================================================
-    wire clk_audio_128x_44k1;
-    wire mmcm_locked_44k1;
-    wire clkfb_44k1;
+    reg [11:0] family_switch_cnt = 12'd0;
+    reg        family_active = 1'b0;
+    wire       family_switch_busy;
+    wire       clk_audio_128x;
+    wire       mmcm_locked_selected;
+    wire       mmcm_locked_44k1_unused;
+    wire       mmcm_locked_48k_unused;
 
-    clk_wiz_audio_44k1 u_clk_wiz_audio_44k1 (
-        .clk_out1  (clk_audio_128x_44k1),
-        .reset     (~rst_n_int),
-        .locked    (mmcm_locked_44k1),
-        .clk_in1   (clk_sys_bufg),
-        .clkfb_in  (clkfb_44k1),
-        .clkfb_out (clkfb_44k1)
+    assign family_switch_busy = |family_switch_cnt;
+
+    always @(posedge clk_sys_bufg) begin
+        if (!rst_n_int) begin
+            family_switch_cnt <= 12'd0;
+            family_active <= 1'b0;
+        end
+        else if (family_switch_cnt != 12'd0) begin
+            family_switch_cnt <= family_switch_cnt - 12'd1;
+            if (family_switch_cnt == 12'd3072)
+                family_active <= key_family_sel;
+        end
+        else if (key_family_sel != family_active) begin
+            family_switch_cnt <= 12'd4095;
+        end
+    end
+
+    dual_family_audio_clock u_dual_family_audio_clock (
+        .clk_20m(clk_sys_bufg),
+        .reset(~rst_n_int),
+        .family_48k(family_active),
+        .clk_audio_128x(clk_audio_128x),
+        .locked_selected(mmcm_locked_selected),
+        .locked_44k1(mmcm_locked_44k1_unused),
+        .locked_48k(mmcm_locked_48k_unused)
     );
 
     //=========================================================
@@ -208,11 +231,13 @@ module board_demo_competition_dac8_top #(
     //=========================================================
     (* ASYNC_REG = "TRUE" *) reg [2:0] rst_audio_sync = 3'b000;
 
-    always @(posedge clk_audio_128x_44k1 or negedge rst_n_int) begin
-        if (!rst_n_int) begin
-            rst_audio_sync <= 3'b000;
-        end
-        else if (!mmcm_locked_44k1) begin
+    wire rst_audio_async_n;
+    assign rst_audio_async_n = rst_n_int &&
+                               !family_switch_busy &&
+                               mmcm_locked_selected;
+
+    always @(posedge clk_audio_128x or negedge rst_audio_async_n) begin
+        if (!rst_audio_async_n) begin
             rst_audio_sync <= 3'b000;
         end
         else begin
@@ -234,7 +259,7 @@ module board_demo_competition_dac8_top #(
     (* ASYNC_REG = "TRUE" *) reg [1:0] mode_audio_meta = 2'b11;
     (* ASYNC_REG = "TRUE" *) reg [1:0] mode_audio_sync = 2'b11;
 
-    always @(posedge clk_audio_128x_44k1 or negedge rst_audio_n) begin
+    always @(posedge clk_audio_128x or negedge rst_audio_n) begin
         if (!rst_audio_n) begin
             mode_audio_meta <= 2'b11;
             mode_audio_sync <= 2'b11;
@@ -257,10 +282,12 @@ module board_demo_competition_dac8_top #(
         .USE_PHASE7_BRAM_STAGE23_COEFF(USE_PHASE7_BRAM_STAGE23_COEFF),
         .USE_PHASE8_PACKED_BRAM_STAGE23(USE_PHASE8_PACKED_BRAM_STAGE23),
         .USE_PHASE7_CIC_BURST_COUNTER_DSP(
-            USE_PHASE7_CIC_BURST_COUNTER_DSP)
+            USE_PHASE7_CIC_BURST_COUNTER_DSP),
+        .USE_NATIONAL_FINALS_DATAPATH(USE_NATIONAL_FINALS_DATAPATH)
     ) u_demo_interp_dac8_audio_pcm_common (
-        .clk_audio_128x (clk_audio_128x_44k1),
+        .clk_audio_128x (clk_audio_128x),
         .rst_n          (rst_audio_n),
+        .family_48k     (family_active),
         .mode_sel       (mode_audio_sync),
 
         .dac_clk        (dac_clk),

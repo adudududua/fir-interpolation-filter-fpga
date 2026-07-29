@@ -1,0 +1,185 @@
+# National-finals board build for XC7A35T / Vivado 2018.3.
+#
+# The script updates the existing project with the national-finals sources,
+# keeps the resource-minimized Phase-7 configuration, runs area-optimized
+# synthesis/implementation, writes a bitstream, and exports acceptance reports
+# without overwriting the regionals result directory.
+
+set script_dir [file dirname [file normalize [info script]]]
+set repo_dir [file normalize [file join $script_dir .. .. ..]]
+set project_dir [file join $repo_dir XC7A35T_interp_audio_pcm_wordlen_opt]
+set project_file [file join $project_dir XC7A35T_interp.xpr]
+set src_dir [file join $project_dir XC7A35T_interp.srcs sources_1 new]
+set nf_src_dir [file join $src_dir national_finals]
+set sim_dir [file join $project_dir XC7A35T_interp.srcs sim_1 new]
+set nf_sim_dir [file join $sim_dir national_finals]
+set result_dir [file normalize [file join $script_dir .. vivado_results board_dual_rate_areaopt]]
+set reuse_current_synthesis 0
+set synthesis_only 0
+if {$argc > 0} {
+    set reuse_current_synthesis [lindex $argv 0]
+}
+if {$argc > 1} {
+    set synthesis_only [lindex $argv 1]
+}
+if {$reuse_current_synthesis != 0 && $reuse_current_synthesis != 1} {
+    error "reuse_current_synthesis must be 0 or 1"
+}
+if {$synthesis_only != 0 && $synthesis_only != 1} {
+    error "synthesis_only must be 0 or 1"
+}
+
+set nf_sources [list \
+    [file join $nf_src_dir cic3_compensator_shiftadd_ce.v] \
+    [file join $nf_src_dir dual_family_audio_clock.v] \
+    [file join $nf_src_dir dual_rate_test_tone_rom_source.v] \
+    [file join $nf_src_dir nf_sine_15k_dual_rate_24bit_256.mem]]
+
+set nf_sim_sources [list \
+    [file join $nf_sim_dir tb_cic3_compensator_shiftadd_ce.v] \
+    [file join $nf_sim_dir tb_dual_family_audio_clock.v]]
+
+proc require_file {filename} {
+    if {![file exists $filename]} {
+        error "Required file does not exist: $filename"
+    }
+}
+
+proc write_primitive_report {report_file pattern title} {
+    set primitive_cells [get_cells -hierarchical \
+        -filter [format {REF_NAME =~ %s} $pattern]]
+    set report_handle [open $report_file w]
+    puts $report_handle $title
+    puts $report_handle [string repeat "=" [string length $title]]
+    puts $report_handle "Cell count: [llength $primitive_cells]"
+    foreach primitive_cell $primitive_cells {
+        puts $report_handle [format "%s | %s | %s" \
+            $primitive_cell \
+            [get_property REF_NAME $primitive_cell] \
+            [get_property LOC $primitive_cell]]
+    }
+    close $report_handle
+}
+
+require_file $project_file
+foreach source_file [concat $nf_sources $nf_sim_sources] {
+    require_file $source_file
+}
+file mkdir $result_dir
+
+open_project $project_file
+
+foreach source_file $nf_sources {
+    if {[llength [get_files -quiet $source_file]] == 0} {
+        add_files -fileset sources_1 -norecurse $source_file
+    }
+}
+set mem_file [file join $nf_src_dir nf_sine_15k_dual_rate_24bit_256.mem]
+set_property file_type {Memory Initialization Files} [get_files $mem_file]
+
+foreach source_file $nf_sim_sources {
+    if {[llength [get_files -quiet $source_file]] == 0} {
+        add_files -fileset sim_1 -norecurse $source_file
+    }
+}
+
+set_property top board_demo_competition_dac8_top [get_filesets sources_1]
+set_property generic [list \
+    USE_PHASE7_LUTRAM_STAGE23=1 \
+    USE_COMPACT_KEYPAD=1 \
+    COMPACT_KEYPAD_SCAN_DIV=20000 \
+    USE_SHARED_KEYPAD_SCAN_TICK=1 \
+    USE_PHASE7_BRAM_STAGE23_HISTORY=1 \
+    USE_PHASE7_BRAM_STAGE23_COEFF=1 \
+    USE_PHASE8_PACKED_BRAM_STAGE23=0 \
+    USE_PHASE7_CIC_BURST_COUNTER_DSP=0 \
+    USE_NATIONAL_FINALS_DATAPATH=1] [get_filesets sources_1]
+
+update_compile_order -fileset sources_1
+update_compile_order -fileset sim_1
+
+set_property STEPS.SYNTH_DESIGN.ARGS.DIRECTIVE AreaOptimized_high \
+    [get_runs synth_1]
+set_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE ExploreArea [get_runs impl_1]
+
+reset_run impl_1
+if {$reuse_current_synthesis == 0} {
+    reset_run synth_1
+    launch_runs synth_1 -jobs 4
+    wait_on_run synth_1
+    if {[get_property PROGRESS [get_runs synth_1]] != "100%"} {
+        error "National-finals synthesis did not complete."
+    }
+} elseif {[get_property PROGRESS [get_runs synth_1]] != "100%"} {
+    error "Requested synthesis reuse, but synth_1 is not complete."
+}
+
+if {$synthesis_only != 0} {
+    puts "NATIONAL_FINALS_SYNTHESIS_PASS"
+    close_project
+    return
+}
+
+launch_runs impl_1 -to_step write_bitstream -jobs 4
+wait_on_run impl_1
+if {[get_property PROGRESS [get_runs impl_1]] != "100%"} {
+    error "National-finals implementation did not complete."
+}
+
+open_run impl_1
+report_utilization -file [file join $result_dir utilization_placed.rpt]
+report_utilization -hierarchical \
+    -file [file join $result_dir utilization_hierarchical.rpt]
+report_timing_summary -delay_type min_max -max_paths 30 \
+    -file [file join $result_dir timing_summary_routed.rpt]
+report_clock_interaction -delay_type min_max \
+    -file [file join $result_dir clock_interaction_routed.rpt]
+report_power -file [file join $result_dir power_vectorless_routed.rpt]
+report_drc -file [file join $result_dir drc_routed.rpt]
+catch {
+    report_methodology \
+        -file [file join $result_dir methodology_routed.rpt]
+}
+catch {
+    report_cdc -details -file [file join $result_dir cdc_routed.rpt]
+}
+
+write_primitive_report \
+    [file join $result_dir dsp_utilization_routed.rpt] \
+    "DSP48*" "National-finals DSP utilization"
+write_primitive_report \
+    [file join $result_dir bram_utilization_routed.rpt] \
+    "RAMB*" "National-finals BRAM utilization"
+write_primitive_report \
+    [file join $result_dir mmcm_utilization_routed.rpt] \
+    "MMCME2*" "National-finals MMCM utilization"
+
+write_checkpoint -force \
+    [file join $result_dir national_finals_board_routed.dcp]
+
+set bitstream_src [file join $project_dir XC7A35T_interp.runs impl_1 \
+    board_demo_competition_dac8_top.bit]
+if {![file exists $bitstream_src]} {
+    error "National-finals bitstream was not generated."
+}
+set bitstream_dst [file join $result_dir \
+    national_finals_dual_rate_4x8x128x_areaopt.bit]
+file copy -force $bitstream_src $bitstream_dst
+
+set manifest_handle [open [file join $result_dir build_manifest.txt] w]
+puts $manifest_handle "National-finals dual-rate board build"
+puts $manifest_handle "Project: $project_file"
+puts $manifest_handle "Part: [get_property PART [current_project]]"
+puts $manifest_handle "Top: board_demo_competition_dac8_top"
+puts $manifest_handle "Bitstream: $bitstream_dst"
+puts $manifest_handle "44.1-kHz family 128x clock: 5.644796 MHz (-0.64 ppm nominal)"
+puts $manifest_handle "48-kHz family 128x clock: 6.144068 MHz (+11.03 ppm nominal)"
+puts $manifest_handle "Architecture: shared 2x/2x/2x FIR + shift-add CIC equalizer + CIC16"
+puts $manifest_handle "Synthesis directive: AreaOptimized_high"
+puts $manifest_handle "Implementation opt directive: ExploreArea"
+close $manifest_handle
+
+puts "NATIONAL_FINALS_BOARD_BUILD_PASS"
+puts "RESULT_DIR=$result_dir"
+puts "BITSTREAM=$bitstream_dst"
+close_project

@@ -32,11 +32,13 @@ module tb_board_phase7_shared_keypad_scan;
     reg clk;
     reg [3:0] key_kc;
     reg press_sw2;
+    reg press_sw6;
     integer cycle_count;
     integer reset_release_cycle;
     integer last_scan_cycle;
     integer scan_interval_count;
     integer mode_wait_count;
+    integer family_wait_count;
 
     wire [3:0] key_kr;
     wire dac_clk;
@@ -68,6 +70,8 @@ module tb_board_phase7_shared_keypad_scan;
         key_kc = 4'hF;
         if (press_sw2 && key_kr[1] === 1'b0)
             key_kc[0] = 1'b0;
+        if (press_sw6 && key_kr[1] === 1'b0)
+            key_kc[1] = 1'b0;
     end
 
     always @(posedge clk) begin
@@ -90,7 +94,9 @@ module tb_board_phase7_shared_keypad_scan;
         last_scan_cycle = -1;
         scan_interval_count = 0;
         mode_wait_count = 0;
+        family_wait_count = 0;
         press_sw2 = 1'b0;
+        press_sw6 = 1'b0;
 
         wait (u_dut.rst_n_int === 1'b1);
         reset_release_cycle = cycle_count;
@@ -117,8 +123,29 @@ module tb_board_phase7_shared_keypad_scan;
             $fatal(1, "Too few shared scan intervals were observed");
 
         press_sw2 = 1'b0;
-        $display("PHASE7 BOARD SHARED SCAN PASS: reset=%0d scan=%0d mode_wait=%0d",
-                 reset_release_cycle, EXPECTED_SCAN_CYCLES, mode_wait_count);
+        press_sw6 = 1'b1;
+        while (u_dut.key_family_sel !== 1'b1 &&
+               family_wait_count < MODE_TIMEOUT_CYCLES) begin
+            @(posedge clk);
+            family_wait_count = family_wait_count + 1;
+        end
+
+        if (u_dut.key_family_sel !== 1'b1)
+            $fatal(1, "SW6 did not select the 48 kHz family before timeout");
+        wait (u_dut.family_switch_busy === 1'b1);
+        wait (u_dut.rst_audio_n === 1'b0);
+        wait (u_dut.family_active === 1'b1);
+        if (!u_dut.family_switch_busy)
+            $fatal(1, "Family clock changed outside the protected reset window");
+        wait (u_dut.family_switch_busy === 1'b0);
+        wait (u_dut.rst_audio_n === 1'b1);
+        if (u_dut.key_mode_sel !== 2'b01)
+            $fatal(1, "SW6 did not retain 4x mode");
+
+        press_sw6 = 1'b0;
+        $display("NATIONAL FINALS BOARD INTEGRATION PASS: reset=%0d scan=%0d mode_wait=%0d family_wait=%0d",
+                 reset_release_cycle, EXPECTED_SCAN_CYCLES,
+                 mode_wait_count, family_wait_count);
         $finish;
     end
 
@@ -151,14 +178,33 @@ module clk_wiz_audio_44k1(
     assign clkfb_out = clkfb_in;
 endmodule
 
+module dual_family_audio_clock(
+    input  wire clk_20m,
+    input  wire reset,
+    input  wire family_48k,
+    output wire clk_audio_128x,
+    output wire locked_selected,
+    output wire locked_44k1,
+    output wire locked_48k
+);
+    assign clk_audio_128x = clk_20m;
+    assign locked_selected = ~reset;
+    assign locked_44k1 = ~reset;
+    assign locked_48k = ~reset;
+endmodule
+
 module demo_interp_dac8_audio_pcm_common #(
     parameter integer USE_PHASE7_FOLDED = 1,
     parameter integer USE_PHASE7_LUTRAM_STAGE23 = 0,
     parameter integer USE_PHASE7_BRAM_STAGE23_HISTORY = 0,
-    parameter integer USE_PHASE7_BRAM_STAGE23_COEFF = 0
+    parameter integer USE_PHASE7_BRAM_STAGE23_COEFF = 0,
+    parameter integer USE_PHASE8_PACKED_BRAM_STAGE23 = 0,
+    parameter integer USE_PHASE7_CIC_BURST_COUNTER_DSP = 0,
+    parameter integer USE_NATIONAL_FINALS_DATAPATH = 1
 )(
     input  wire       clk_audio_128x,
     input  wire       rst_n,
+    input  wire       family_48k,
     input  wire [1:0] mode_sel,
     output wire       dac_clk,
     output wire [7:0] dac_data,

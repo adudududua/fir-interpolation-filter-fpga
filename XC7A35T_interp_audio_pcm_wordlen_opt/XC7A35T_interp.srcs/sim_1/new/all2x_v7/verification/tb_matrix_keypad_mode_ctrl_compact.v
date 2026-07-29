@@ -32,8 +32,9 @@ module tb_matrix_keypad_mode_ctrl_compact;
     wire [3:0] kr_compact;
     wire [1:0] mode_full;
     wire [1:0] mode_compact;
+    wire family_full;
+    wire family_compact;
     wire external_scan_tick = (external_scan_cnt == SCAN_DIV - 1);
-    wire family_unused;
     wire strobe_unused;
     wire [3:0] code_unused;
 
@@ -49,7 +50,7 @@ module tb_matrix_keypad_mode_ctrl_compact;
         .rst_n        (rst_n),
         .kc           (kc_full),
         .kr_drive_low (kr_full),
-        .family_sel   (family_unused),
+        .family_sel   (family_full),
         .mode_sel     (mode_full),
         .key_strobe   (strobe_unused),
         .key_code     (code_unused)
@@ -65,6 +66,7 @@ module tb_matrix_keypad_mode_ctrl_compact;
         .scan_tick    (external_scan_tick),
         .kc           (kc_compact),
         .kr_drive_low (kr_compact),
+        .family_sel   (family_compact),
         .mode_sel     (mode_compact)
     );
 
@@ -110,9 +112,20 @@ module tb_matrix_keypad_mode_ctrl_compact;
     endtask
 
     task check_modes;
+        input expected_family;
         input [1:0] expected;
         input [127:0] label_text;
         begin
+            if (family_full !== expected_family) begin
+                $display("FAIL full keypad %0s expected_family=%0d actual=%0d",
+                         label_text, expected_family, family_full);
+                $fatal(1);
+            end
+            if (family_compact !== expected_family) begin
+                $display("FAIL compact keypad %0s expected_family=%0d actual=%0d",
+                         label_text, expected_family, family_compact);
+                $fatal(1);
+            end
             if (mode_full !== expected) begin
                 $display("FAIL full keypad %0s expected=%0d actual=%0d",
                          label_text, expected, mode_full);
@@ -123,9 +136,11 @@ module tb_matrix_keypad_mode_ctrl_compact;
                          label_text, expected, mode_compact);
                 $fatal(1);
             end
-            if (mode_compact !== mode_full) begin
-                $display("FAIL keypad mismatch %0s full=%0d compact=%0d",
-                         label_text, mode_full, mode_compact);
+            if (family_compact !== family_full ||
+                mode_compact !== mode_full) begin
+                $display("FAIL keypad mismatch %0s full=%0d/%0d compact=%0d/%0d",
+                         label_text, family_full, mode_full,
+                         family_compact, mode_compact);
                 $fatal(1);
             end
         end
@@ -133,14 +148,15 @@ module tb_matrix_keypad_mode_ctrl_compact;
 
     task press_and_check;
         input integer key_index;
+        input expected_family;
         input [1:0] expected;
         begin
             pressed_bitmap = (16'b1 << key_index);
             wait_full_scans(DEBOUNCE_SCANS + 5);
-            check_modes(expected, "stable single key");
+            check_modes(expected_family, expected, "stable single key");
             pressed_bitmap = 16'd0;
             wait_full_scans(DEBOUNCE_SCANS + 4);
-            check_modes(expected, "released key holds mode");
+            check_modes(expected_family, expected, "released key holds mode");
         end
     endtask
 
@@ -152,17 +168,17 @@ module tb_matrix_keypad_mode_ctrl_compact;
         repeat (5) @(posedge clk);
         rst_n = 1'b1;
         wait_full_scans(2);
-        check_modes(2'b11, "reset default");
+        check_modes(1'b0, 2'b11, "reset default");
 
         for (test_idx = 0; test_idx < 8; test_idx = test_idx + 1)
-            press_and_check(test_idx, test_idx[1:0]);
+            press_and_check(test_idx, (test_idx >= 4), test_idx[1:0]);
 
         // SW9～SW16 在原实现中仅改变完整键位图，不改变演示模式。
-        press_and_check(1, 2'b01);
+        press_and_check(1, 1'b0, 2'b01);
         for (test_idx = 8; test_idx < 16; test_idx = test_idx + 1) begin
             pressed_bitmap = (16'b1 << test_idx);
             wait_full_scans(DEBOUNCE_SCANS + 5);
-            check_modes(2'b01, "unused key ignored");
+            check_modes(1'b0, 2'b01, "unused key ignored");
             pressed_bitmap = 16'd0;
             wait_full_scans(DEBOUNCE_SCANS + 4);
         end
@@ -175,16 +191,16 @@ module tb_matrix_keypad_mode_ctrl_compact;
             repeat (SCAN_DIV) @(posedge clk);
         end
         wait_full_scans(DEBOUNCE_SCANS + 3);
-        check_modes(2'b01, "bounce rejected");
+        check_modes(1'b0, 2'b01, "bounce rejected");
 
         // 同时按 SW2 与 SW5，原扫描器优先 SW2；紧凑版保持相同优先级。
         pressed_bitmap = (16'b1 << 1) | (16'b1 << 4);
         wait_full_scans(DEBOUNCE_SCANS + 5);
-        check_modes(2'b01, "row priority");
+        check_modes(1'b0, 2'b01, "row priority");
         pressed_bitmap = 16'd0;
         wait_full_scans(DEBOUNCE_SCANS + 4);
 
-        $display("PASS: compact keypad matches required SW1-SW8 behavior");
+        $display("PASS: compact keypad matches SW1-SW8 family/mode behavior");
         $finish;
     end
 
