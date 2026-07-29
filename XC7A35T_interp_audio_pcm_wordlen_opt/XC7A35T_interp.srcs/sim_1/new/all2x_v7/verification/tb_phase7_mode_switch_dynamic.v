@@ -66,13 +66,18 @@ module tb_phase7_mode_switch_dynamic;
         .USE_PHASE7_BRAM_STAGE23_COEFF(0),
 `endif
 `ifdef PHASE8_USE_PACKED_BRAM_STAGE23
-        .USE_PHASE8_PACKED_BRAM_STAGE23(1)
+        .USE_PHASE8_PACKED_BRAM_STAGE23(1),
 `else
-        .USE_PHASE8_PACKED_BRAM_STAGE23(0)
+        .USE_PHASE8_PACKED_BRAM_STAGE23(0),
 `endif
+        .USE_NATIONAL_FINALS_DATAPATH(1),
+        .USE_NATIONAL_FINALS_SERIAL_CIC_COMB(1),
+        .USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER(0),
+        .USE_NATIONAL_FINALS_NARROW_STAGE23(1)
     ) u_dut (
         .clk_audio_128x(clk),
         .rst_n(rst_n),
+        .family_48k(1'b0),
         .mode_sel(mode_sel),
         .dac_clk(dac_clk),
         .dac_data(dac_data),

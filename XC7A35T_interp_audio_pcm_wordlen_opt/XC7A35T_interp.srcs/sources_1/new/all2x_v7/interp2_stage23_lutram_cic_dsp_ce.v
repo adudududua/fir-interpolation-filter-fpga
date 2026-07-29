@@ -642,8 +642,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     initial begin
         if (STAGE2_DATA_W > 24 || STAGE2_DATA_W < STAGE3_DATA_W)
             $fatal(1, "Invalid Stage 2/3 data widths");
-        if (COEFF_W != 18)
-            $fatal(1, "LUTRAM Stage 2/3 candidate requires 18bit coefficients");
+        if (COEFF_W != 18 && !(STAGE3_FLAT != 0 && COEFF_W == 16))
+            $fatal(1, "Stage 2/3 coefficients require 18bit, or 16bit in flat Stage3 mode");
         if (USE_PACKED_BRAM != 0 &&
             (STAGE2_DATA_W < COEFF_W || STAGE3_DATA_W < COEFF_W))
             $fatal(1, "Packed BRAM banks must be at least COEFF_W wide");

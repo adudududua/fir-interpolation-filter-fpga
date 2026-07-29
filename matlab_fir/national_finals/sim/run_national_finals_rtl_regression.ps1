@@ -122,6 +122,17 @@ $equalizerDir = Invoke-RtlCase -Name 'equalizer' `
     -Snapshot 'tb_nf_equalizer_sim' `
     -ExpectedPassText 'NF CIC3 SHIFTADD COMPENSATOR PASS samples=2009'
 
+$cicSerialDir = Invoke-RtlCase -Name 'cic_serial_equivalence' `
+    -VerilogFiles @(
+        (Join-Path $sourceRoot 'all2x_v6\round_sat_shift_compact.v'),
+        (Join-Path $v7Source 'cic_interp16_core_dsp_ce.v'),
+        (Join-Path $nfSource 'cic_interp16_serial_comb_dsp_ce.v'),
+        (Join-Path $nfSim 'tb_cic_interp16_serial_comb_equiv.v')
+    ) `
+    -Top 'tb_cic_interp16_serial_comb_equiv' `
+    -Snapshot 'tb_nf_cic_serial_equiv_sim' `
+    -ExpectedPassText 'CIC SERIAL COMB EQUIVALENCE PASS'
+
 $clockDir = Invoke-RtlCase -Name 'clock' `
     -VerilogFiles @(
         (Join-Path $nfSource 'dual_family_audio_clock.v'),
@@ -166,6 +177,7 @@ $fullDir = Invoke-RtlCase -Name 'full_chain_bittrue' `
         (Join-Path $v7Source 'interp2_stage23_lutram_cic_dsp_ce.v'),
         (Join-Path $nfSource 'cic3_compensator_shiftadd_ce.v'),
         (Join-Path $v7Source 'cic_interp16_core_dsp_ce.v'),
+        (Join-Path $nfSource 'cic_interp16_serial_comb_dsp_ce.v'),
         (Join-Path $v7Source 'interp128_all2x_v7_folded_fir_cic_top_ce.v'),
         (Join-Path $v7Sim 'tb_phase7_full_chain_bittrue.v'),
         $glbl
@@ -175,12 +187,72 @@ $fullDir = Invoke-RtlCase -Name 'full_chain_bittrue' `
     -ExpectedPassText 'PHASE7 FULL CHAIN BITTRUE PASS: impulse + 1 seeds, all nodes 0 LSB.' `
     -XvlogOptions @(
         '-d', 'NATIONAL_FINALS',
+        '-d', 'NATIONAL_FINALS_USE_SERIAL_CIC_COMB',
+        '-d', 'NATIONAL_FINALS_NARROW_STAGE23',
         '-d', 'PHASE7_USE_LUTRAM_STAGE23',
         '-d', 'PHASE7_USE_BRAM_STAGE23_HISTORY',
         '-d', 'PHASE7_USE_BRAM_STAGE23_COEFF'
     ) `
     -XelabOptions @('glbl', '-L', 'unisims_ver') `
     -Assets (@($coeffHeader) + $vectorFiles)
+
+$resetDir = Invoke-RtlCase -Name 'full_chain_reset_recovery' `
+    -VerilogFiles @(
+        (Join-Path $sourceRoot 'all2x_v6\round_sat_shift_compact.v'),
+        (Join-Path $sourceRoot 'all2x_v3\interp2_stage1_strict_halfband_bram_ce.v'),
+        (Join-Path $sourceRoot 'all2x_v6\bridge_valid_quantized_to_interp2_ce.v'),
+        (Join-Path $sourceRoot 'all2x_v5\round_sat_q15_compact_to24.v'),
+        (Join-Path $v7Source 'interp2_stage23_folded_cic_dsp_ce.v'),
+        (Join-Path $v7Source 'interp2_stage23_lutram_cic_dsp_ce.v'),
+        (Join-Path $nfSource 'cic3_compensator_shiftadd_ce.v'),
+        (Join-Path $v7Source 'cic_interp16_core_dsp_ce.v'),
+        (Join-Path $nfSource 'cic_interp16_serial_comb_dsp_ce.v'),
+        (Join-Path $v7Source 'interp128_all2x_v7_folded_fir_cic_top_ce.v'),
+        (Join-Path $v7Sim 'tb_phase7_full_chain_reset_recovery.v'),
+        $glbl
+    ) `
+    -Top 'tb_phase7_full_chain_reset_recovery' `
+    -Snapshot 'tb_nf_full_reset_sim' `
+    -ExpectedPassText 'PHASE7 FULL RESET RECOVERY PASS: 8 internal-state scenarios clean.' `
+    -XvlogOptions @(
+        '-d', 'NATIONAL_FINALS',
+        '-d', 'NATIONAL_FINALS_USE_SERIAL_CIC_COMB',
+        '-d', 'PHASE7_USE_LUTRAM_STAGE23',
+        '-d', 'PHASE7_USE_BRAM_STAGE23_HISTORY',
+        '-d', 'PHASE7_USE_BRAM_STAGE23_COEFF'
+    ) `
+    -XelabOptions @('glbl', '-L', 'unisims_ver') `
+    -Assets @($coeffHeader)
+
+$dynamicDir = Invoke-RtlCase -Name 'dynamic_mode_switch' `
+    -VerilogFiles @(
+        (Join-Path $sourceRoot 'all2x_v6\round_sat_shift_compact.v'),
+        (Join-Path $sourceRoot 'all2x_v3\interp2_stage1_strict_halfband_bram_ce.v'),
+        (Join-Path $sourceRoot 'all2x_v6\bridge_valid_quantized_to_interp2_ce.v'),
+        (Join-Path $sourceRoot 'all2x_v5\round_sat_q15_compact_to24.v'),
+        (Join-Path $v7Source 'interp2_stage23_folded_cic_dsp_ce.v'),
+        (Join-Path $v7Source 'interp2_stage23_lutram_cic_dsp_ce.v'),
+        (Join-Path $nfSource 'cic3_compensator_shiftadd_ce.v'),
+        (Join-Path $v7Source 'cic_interp16_core_dsp_ce.v'),
+        (Join-Path $nfSource 'cic_interp16_serial_comb_dsp_ce.v'),
+        (Join-Path $v7Source 'interp128_all2x_v7_folded_fir_cic_top_ce.v'),
+        (Join-Path $nfSource 'dual_rate_test_tone_rom_source.v'),
+        (Join-Path $sourceRoot 'demo_interp_dac8_audio_pcm_common.v'),
+        (Join-Path $v7Sim 'tb_phase7_mode_switch_dynamic.v'),
+        $glbl
+    ) `
+    -Top 'tb_phase7_mode_switch_dynamic' `
+    -Snapshot 'tb_nf_dynamic_mode_sim' `
+    -ExpectedPassText 'PHASE7 DYNAMIC MODE PASS: 10 switches, no reset, no runt pulse or X.' `
+    -XvlogOptions @(
+        '-d', 'PHASE7_USE_BRAM_STAGE23_HISTORY',
+        '-d', 'PHASE7_USE_BRAM_STAGE23_COEFF'
+    ) `
+    -XelabOptions @('glbl', '-L', 'unisims_ver') `
+    -Assets @(
+        $coeffHeader,
+        (Join-Path $nfSource 'nf_sine_15k_dual_rate_24bit_256.mem')
+    )
 
 if ($PublishImpulseOutputs) {
     $publishDir = Join-Path $nfRoot 'rtl_outputs'
@@ -192,5 +264,5 @@ if ($PublishImpulseOutputs) {
 }
 
 Write-Host ''
-Write-Host 'NATIONAL FINALS RTL REGRESSION PASS (6/6)'
+Write-Host 'NATIONAL FINALS RTL REGRESSION PASS (9/9)'
 Write-Host "Run directory: $runRoot"

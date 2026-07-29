@@ -31,7 +31,11 @@ module tb_phase7_full_chain_reset_recovery;
 `else
 `define DUT_STAGE23 u_dut.gen_register_stage23.u_interp2_stage23_folded_cic_dsp_ce
 `endif
-`define DUT_CIC u_dut.u_cic_interp16_core_dsp_ce
+`ifdef NATIONAL_FINALS_USE_SERIAL_CIC_COMB
+`define DUT_CIC u_dut.gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce
+`else
+`define DUT_CIC u_dut.gen_parallel_cic_comb.u_cic_interp16_core_dsp_ce
+`endif
 
     localparam integer SCENARIO_COUNT = 8;
     localparam integer COMPARE_Y128_COUNT = 4096;
@@ -89,9 +93,23 @@ module tb_phase7_full_chain_reset_recovery;
         .USE_BRAM_STAGE23_COEFF(0),
 `endif
 `ifdef PHASE8_USE_PACKED_BRAM_STAGE23
-        .USE_PACKED_BRAM_STAGE23(1)
+        .USE_PACKED_BRAM_STAGE23(1),
 `else
-        .USE_PACKED_BRAM_STAGE23(0)
+        .USE_PACKED_BRAM_STAGE23(0),
+`endif
+`ifdef NATIONAL_FINALS
+        .STAGE3_FLAT(1),
+        .USE_CIC3_SHIFTADD_COMPENSATOR(1),
+        .USE_NATIONAL_FINALS_NARROW_STAGE23(1),
+`else
+        .STAGE3_FLAT(0),
+        .USE_CIC3_SHIFTADD_COMPENSATOR(0),
+        .USE_NATIONAL_FINALS_NARROW_STAGE23(0),
+`endif
+`ifdef NATIONAL_FINALS_USE_SERIAL_CIC_COMB
+        .USE_SERIAL_CIC_COMB(1)
+`else
+        .USE_SERIAL_CIC_COMB(0)
 `endif
     ) u_dut (
         .clk(clk), .rst_n(rst_dut_n),
@@ -126,9 +144,23 @@ module tb_phase7_full_chain_reset_recovery;
         .USE_BRAM_STAGE23_COEFF(0),
 `endif
 `ifdef PHASE8_USE_PACKED_BRAM_STAGE23
-        .USE_PACKED_BRAM_STAGE23(1)
+        .USE_PACKED_BRAM_STAGE23(1),
 `else
-        .USE_PACKED_BRAM_STAGE23(0)
+        .USE_PACKED_BRAM_STAGE23(0),
+`endif
+`ifdef NATIONAL_FINALS
+        .STAGE3_FLAT(1),
+        .USE_CIC3_SHIFTADD_COMPENSATOR(1),
+        .USE_NATIONAL_FINALS_NARROW_STAGE23(1),
+`else
+        .STAGE3_FLAT(0),
+        .USE_CIC3_SHIFTADD_COMPENSATOR(0),
+        .USE_NATIONAL_FINALS_NARROW_STAGE23(0),
+`endif
+`ifdef NATIONAL_FINALS_USE_SERIAL_CIC_COMB
+        .USE_SERIAL_CIC_COMB(1)
+`else
+        .USE_SERIAL_CIC_COMB(0)
 `endif
     ) u_cold_reference (
         .clk(clk), .rst_n(rst_ref_n),

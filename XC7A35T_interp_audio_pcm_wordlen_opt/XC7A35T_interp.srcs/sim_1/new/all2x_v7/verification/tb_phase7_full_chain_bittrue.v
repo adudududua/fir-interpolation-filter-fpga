@@ -150,9 +150,24 @@ module tb_phase7_full_chain_bittrue;
         .USE_BRAM_STAGE23_COEFF(0),
 `endif
 `ifdef PHASE8_USE_PACKED_BRAM_STAGE23
-        .USE_PACKED_BRAM_STAGE23(1)
+        .USE_PACKED_BRAM_STAGE23(1),
 `else
-        .USE_PACKED_BRAM_STAGE23(0)
+        .USE_PACKED_BRAM_STAGE23(0),
+`endif
+`ifdef NATIONAL_FINALS_USE_SERIAL_CIC_COMB
+        .USE_SERIAL_CIC_COMB(1),
+`else
+        .USE_SERIAL_CIC_COMB(0),
+`endif
+`ifdef NATIONAL_FINALS_USE_STAGE1_DSP48_PREADDER
+        .USE_STAGE1_DSP48_PREADDER(1),
+`else
+        .USE_STAGE1_DSP48_PREADDER(0),
+`endif
+`ifdef NATIONAL_FINALS_NARROW_STAGE23
+        .USE_NATIONAL_FINALS_NARROW_STAGE23(1)
+`else
+        .USE_NATIONAL_FINALS_NARROW_STAGE23(0)
 `endif
     ) u_dut (
         .clk(clk), .rst_n(rst_n),

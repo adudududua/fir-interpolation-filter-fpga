@@ -13,14 +13,29 @@ set src_dir [file join $project_dir XC7A35T_interp.srcs sources_1 new]
 set nf_src_dir [file join $src_dir national_finals]
 set sim_dir [file join $project_dir XC7A35T_interp.srcs sim_1 new]
 set nf_sim_dir [file join $sim_dir national_finals]
-set result_dir [file normalize [file join $script_dir .. vivado_results board_dual_rate_areaopt]]
 set reuse_current_synthesis 0
 set synthesis_only 0
+set synth_directive AreaOptimized_high
+set flatten_hierarchy rebuilt
+set resource_sharing auto
+set result_tag board_dual_rate_areaopt
 if {$argc > 0} {
     set reuse_current_synthesis [lindex $argv 0]
 }
 if {$argc > 1} {
     set synthesis_only [lindex $argv 1]
+}
+if {$argc > 2} {
+    set synth_directive [lindex $argv 2]
+}
+if {$argc > 3} {
+    set flatten_hierarchy [lindex $argv 3]
+}
+if {$argc > 4} {
+    set resource_sharing [lindex $argv 4]
+}
+if {$argc > 5} {
+    set result_tag [lindex $argv 5]
 }
 if {$reuse_current_synthesis != 0 && $reuse_current_synthesis != 1} {
     error "reuse_current_synthesis must be 0 or 1"
@@ -28,9 +43,14 @@ if {$reuse_current_synthesis != 0 && $reuse_current_synthesis != 1} {
 if {$synthesis_only != 0 && $synthesis_only != 1} {
     error "synthesis_only must be 0 or 1"
 }
+if {![regexp {^[A-Za-z0-9_-]+$} $result_tag]} {
+    error "result_tag may contain only letters, digits, underscore, and dash"
+}
+set result_dir [file normalize [file join $script_dir .. vivado_results $result_tag]]
 
 set nf_sources [list \
     [file join $nf_src_dir cic3_compensator_shiftadd_ce.v] \
+    [file join $nf_src_dir cic_interp16_serial_comb_dsp_ce.v] \
     [file join $nf_src_dir dual_family_audio_clock.v] \
     [file join $nf_src_dir dual_rate_test_tone_rom_source.v] \
     [file join $nf_src_dir nf_sine_15k_dual_rate_24bit_256.mem]]
@@ -93,12 +113,19 @@ set_property generic [list \
     USE_PHASE7_BRAM_STAGE23_COEFF=1 \
     USE_PHASE8_PACKED_BRAM_STAGE23=0 \
     USE_PHASE7_CIC_BURST_COUNTER_DSP=0 \
-    USE_NATIONAL_FINALS_DATAPATH=1] [get_filesets sources_1]
+    USE_NATIONAL_FINALS_DATAPATH=1 \
+    USE_NATIONAL_FINALS_SERIAL_CIC_COMB=1 \
+    USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER=0 \
+    USE_NATIONAL_FINALS_NARROW_STAGE23=1] [get_filesets sources_1]
 
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
 
-set_property STEPS.SYNTH_DESIGN.ARGS.DIRECTIVE AreaOptimized_high \
+set_property STEPS.SYNTH_DESIGN.ARGS.DIRECTIVE $synth_directive \
+    [get_runs synth_1]
+set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY $flatten_hierarchy \
+    [get_runs synth_1]
+set_property STEPS.SYNTH_DESIGN.ARGS.RESOURCE_SHARING $resource_sharing \
     [get_runs synth_1]
 set_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE ExploreArea [get_runs impl_1]
 
@@ -115,6 +142,18 @@ if {$reuse_current_synthesis == 0} {
 }
 
 if {$synthesis_only != 0} {
+    open_run synth_1
+    report_utilization \
+        -file [file join $result_dir utilization_synthesized.rpt]
+    report_utilization -hierarchical \
+        -file [file join $result_dir utilization_hierarchical_synthesized.rpt]
+    write_primitive_report \
+        [file join $result_dir dsp_utilization_synthesized.rpt] \
+        "DSP48*" "National-finals synthesized DSP utilization"
+    write_primitive_report \
+        [file join $result_dir bram_utilization_synthesized.rpt] \
+        "RAMB*" "National-finals synthesized BRAM utilization"
+    close_design
     puts "NATIONAL_FINALS_SYNTHESIS_PASS"
     close_project
     return

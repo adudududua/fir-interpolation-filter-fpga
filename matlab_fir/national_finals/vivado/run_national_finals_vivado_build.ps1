@@ -2,7 +2,15 @@
 param(
     [string]$VivadoExe = 'E:\app\Xilinx2018.3\Vivado\2018.3\bin\vivado.bat',
     [ValidateSet('all', 'synth', 'implement')]
-    [string]$Step = 'all'
+    [string]$Step = 'all',
+    [ValidateSet('Default', 'AreaOptimized_high', 'AreaOptimized_medium')]
+    [string]$SynthesisDirective = 'AreaOptimized_high',
+    [ValidateSet('rebuilt', 'full', 'none')]
+    [string]$FlattenHierarchy = 'rebuilt',
+    [ValidateSet('auto', 'on', 'off')]
+    [string]$ResourceSharing = 'auto',
+    [ValidatePattern('^[A-Za-z0-9_-]+$')]
+    [string]$ResultTag = 'board_dual_rate_areaopt'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -62,7 +70,14 @@ function Invoke-VivadoStep {
 
 if ($Step -eq 'all' -or $Step -eq 'synth') {
     Invoke-VivadoStep -Name 'synthesis' -TclPath $synthTcl `
-        -TclArguments @('0', '1')
+        -TclArguments @(
+            '0',
+            '1',
+            $SynthesisDirective,
+            $FlattenHierarchy,
+            $ResourceSharing,
+            $ResultTag
+        )
 }
 
 if ($Step -eq 'all' -or $Step -eq 'implement') {

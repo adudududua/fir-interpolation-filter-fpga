@@ -100,6 +100,7 @@ puts $manifest_handle "44.1-kHz family 128x clock: 5.644796 MHz (-0.64 ppm nomin
 puts $manifest_handle "48-kHz family 128x clock: 6.144068 MHz (+11.03 ppm nominal)"
 puts $manifest_handle "Architecture: shared 2x/2x/2x FIR + shift-add CIC equalizer + CIC16"
 puts $manifest_handle "Synthesis directive: AreaOptimized_high"
+puts $manifest_handle "Synthesis resource sharing: on"
 puts $manifest_handle "Implementation opt directive: ExploreArea"
 close $manifest_handle
 

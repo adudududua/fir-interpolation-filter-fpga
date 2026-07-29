@@ -47,7 +47,10 @@ module demo_interp_dac8_audio_pcm_common #(
     parameter integer USE_PHASE7_BRAM_STAGE23_COEFF = 0,
     parameter integer USE_PHASE8_PACKED_BRAM_STAGE23 = 0,
     parameter integer USE_PHASE7_CIC_BURST_COUNTER_DSP = 0,
-    parameter integer USE_NATIONAL_FINALS_DATAPATH = 0
+    parameter integer USE_NATIONAL_FINALS_DATAPATH = 0,
+    parameter integer USE_NATIONAL_FINALS_SERIAL_CIC_COMB = 0,
+    parameter integer USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER = 0,
+    parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 0
 )(
     input  wire        clk_audio_128x,  // 5.6448MHz 连续音频 128x 时钟
     input  wire        rst_n,           // 低有效复位
@@ -253,7 +256,13 @@ module demo_interp_dac8_audio_pcm_common #(
                 .USE_BRAM_STAGE23_COEFF(USE_PHASE7_BRAM_STAGE23_COEFF),
                 .USE_PACKED_BRAM_STAGE23(USE_PHASE8_PACKED_BRAM_STAGE23),
                 .CIC_BURST_COUNTER_USE_DSP(
-                    USE_PHASE7_CIC_BURST_COUNTER_DSP)
+                    USE_PHASE7_CIC_BURST_COUNTER_DSP),
+                .USE_SERIAL_CIC_COMB(
+                    USE_NATIONAL_FINALS_SERIAL_CIC_COMB),
+                .USE_STAGE1_DSP48_PREADDER(
+                    USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER),
+                .USE_NATIONAL_FINALS_NARROW_STAGE23(
+                    USE_NATIONAL_FINALS_NARROW_STAGE23)
             ) u_interp128_all2x_v7_folded_fir_cic_top_ce (
                 .clk(clk_audio_128x), .rst_n(rst_n),
                 .ce2_out(ce2_out), .ce4_out(ce4_out),

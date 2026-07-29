@@ -38,7 +38,8 @@ module interp2_stage1_strict_halfband_bram_ce #(
     parameter integer HISTORY_LEN = `V3_S1_HISTORY_LEN,
     parameter integer PAIR_COUNT  = `V3_S1_PAIR_COUNT,
     parameter integer DELAY_INDEX = `V3_S1_DELAY_INDEX,
-    parameter integer RAM_DEPTH   = 64
+    parameter integer RAM_DEPTH   = 64,
+    parameter integer USE_DSP48_PREADDER = 0
 )(
     input  wire                         clk,
     input  wire                         rst_n,
@@ -98,6 +99,12 @@ module interp2_stage1_strict_halfband_bram_ce #(
     (* use_dsp = "yes" *)
     wire signed [PROD_W-1:0] product_comb;
     wire signed [ACC_W-1:0] product_ext;
+    wire signed [24:0] dsp_preadd_a;
+    wire signed [24:0] dsp_preadd_d;
+    wire signed [17:0] dsp_coeff_b;
+    wire signed [47:0] dsp_acc_c;
+    wire signed [47:0] dsp_mac_full;
+    wire signed [ACC_W-1:0] mac_sum_comb;
     wire signed [DATA_W-1:0] filter_rounded;
 
     assign x_current = x_in_valid ? x_in : {DATA_W{1'b0}};
@@ -107,6 +114,98 @@ module interp2_stage1_strict_halfband_bram_ce #(
     assign product_comb = pair_sum_comb * coeff_comb;
     assign product_ext = {{(ACC_W-PROD_W){product_comb[PROD_W-1]}},
                           product_comb};
+    assign dsp_preadd_a = read_mask_a ?
+        {{(25-DATA_W){read_data_a[DATA_W-1]}}, read_data_a} : 25'sd0;
+    assign dsp_preadd_d = read_mask_b ?
+        {{(25-DATA_W){read_data_b[DATA_W-1]}}, read_data_b} : 25'sd0;
+    assign dsp_coeff_b =
+        {{(18-COEFF_W){coeff_comb[COEFF_W-1]}}, coeff_comb};
+    assign dsp_acc_c = {{(48-ACC_W){acc_reg[ACC_W-1]}}, acc_reg};
+
+    generate
+        if (USE_DSP48_PREADDER != 0) begin : gen_explicit_dsp48_preadder
+            // One combinational DSP48E1 implements
+            // (sample_a + sample_b) * coefficient + accumulator.
+            // INMODE=00100 selects D+A at the 25-bit pre-adder.
+            DSP48E1 #(
+                .A_INPUT("DIRECT"),
+                .B_INPUT("DIRECT"),
+                .USE_DPORT("TRUE"),
+                .USE_MULT("MULTIPLY"),
+                .USE_SIMD("ONE48"),
+                .AREG(0),
+                .ACASCREG(0),
+                .BREG(0),
+                .BCASCREG(0),
+                .CREG(0),
+                .DREG(0),
+                .ADREG(0),
+                .MREG(0),
+                .PREG(0),
+                .INMODEREG(0),
+                .OPMODEREG(0),
+                .ALUMODEREG(0),
+                .CARRYINREG(0),
+                .CARRYINSELREG(0)
+            ) u_stage1_dsp48e1 (
+                .P(dsp_mac_full),
+                .A({5'b00000, dsp_preadd_a}),
+                .B(dsp_coeff_b),
+                .C(dsp_acc_c),
+                .D(dsp_preadd_d),
+                .INMODE(5'b00100),
+                .OPMODE(7'b0110101),
+                .ALUMODE(4'b0000),
+                .CARRYINSEL(3'b000),
+                .CARRYIN(1'b0),
+                .ACIN(30'd0),
+                .BCIN(18'd0),
+                .PCIN(48'd0),
+                .CARRYCASCIN(1'b0),
+                .MULTSIGNIN(1'b0),
+                .CLK(clk),
+                .CEA1(1'b0),
+                .CEA2(1'b0),
+                .CEAD(1'b0),
+                .CEALUMODE(1'b0),
+                .CEB1(1'b0),
+                .CEB2(1'b0),
+                .CEC(1'b0),
+                .CECARRYIN(1'b0),
+                .CECTRL(1'b0),
+                .CED(1'b0),
+                .CEINMODE(1'b0),
+                .CEM(1'b0),
+                .CEP(1'b0),
+                .RSTA(1'b0),
+                .RSTALLCARRYIN(1'b0),
+                .RSTALUMODE(1'b0),
+                .RSTB(1'b0),
+                .RSTC(1'b0),
+                .RSTCTRL(1'b0),
+                .RSTD(1'b0),
+                .RSTINMODE(1'b0),
+                .RSTM(1'b0),
+                .RSTP(1'b0),
+                .ACOUT(),
+                .BCOUT(),
+                .CARRYCASCOUT(),
+                .CARRYOUT(),
+                .MULTSIGNOUT(),
+                .OVERFLOW(),
+                .PATTERNBDETECT(),
+                .PATTERNDETECT(),
+                .PCOUT(),
+                .UNDERFLOW()
+            );
+        end
+        else begin : gen_inferred_stage1_mac
+            assign dsp_mac_full = 48'sd0;
+        end
+    endgenerate
+
+    assign mac_sum_comb = (USE_DSP48_PREADDER != 0) ?
+        dsp_mac_full[ACC_W-1:0] : acc_reg + product_ext;
 
     always @(*) begin
         pair_sum_comb =
@@ -224,12 +323,12 @@ module interp2_stage1_strict_halfband_bram_ce #(
                     delay_ready <= 1'b1;
                 end
                 else if (read_coeff_index == PAIR_COUNT-1) begin
-                    filter_result <= acc_reg + product_ext;
+                    filter_result <= mac_sum_comb;
                     filter_ready <= 1'b1;
                     mac_active <= 1'b0;
                 end
                 else begin
-                    acc_reg <= acc_reg + product_ext;
+                    acc_reg <= mac_sum_comb;
                 end
             end
 

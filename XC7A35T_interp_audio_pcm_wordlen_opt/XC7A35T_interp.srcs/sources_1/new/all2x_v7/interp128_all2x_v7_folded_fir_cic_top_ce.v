@@ -45,7 +45,10 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     parameter integer USE_BRAM_STAGE23_HISTORY = 0,
     parameter integer USE_BRAM_STAGE23_COEFF = 0,
     parameter integer USE_PACKED_BRAM_STAGE23 = 0,
-    parameter integer CIC_BURST_COUNTER_USE_DSP = 0
+    parameter integer CIC_BURST_COUNTER_USE_DSP = 0,
+    parameter integer USE_SERIAL_CIC_COMB = 0,
+    parameter integer USE_STAGE1_DSP48_PREADDER = 0,
+    parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 0
 )(
     input  wire                         clk,
     input  wire                         rst_n,
@@ -93,7 +96,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     assign unused_ce = ce16_out ^ ce32_out ^ ce64_out;
 
     interp2_stage1_strict_halfband_bram_ce #(
-        .DATA_W (24)
+        .DATA_W (24),
+        .USE_DSP48_PREADDER(USE_STAGE1_DSP48_PREADDER)
     ) u_interp2_stage1_strict_halfband_bram_ce (
         .clk(clk), .rst_n(rst_n), .ce_out(ce2_out),
         .x_in(x_in), .x_in_valid(x_in_valid),
@@ -125,7 +129,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
                 .DATA_W(24),
                 .STAGE2_DATA_W(22),
                 .STAGE3_DATA_W(20),
-                .COEFF_W(18),
+                .COEFF_W((USE_NATIONAL_FINALS_NARROW_STAGE23 != 0) ?
+                         16 : 18),
                 .ACC_W(STAGE23_ACC_W),
                 .CIC_ORDER(CIC_ORDER),
                 .STAGE3_FLAT(STAGE3_FLAT),
@@ -196,22 +201,44 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
         end
     endgenerate
 
-    cic_interp16_core_dsp_ce #(
-        .DATA_W          (20),
-        .CIC_ORDER       (CIC_ORDER),
-        .FINAL_PRUNE_LSB (FINAL_PRUNE_LSB),
-        .BURST_COUNTER_USE_DSP(CIC_BURST_COUNTER_USE_DSP)
-    ) u_cic_interp16_core_dsp_ce (
-        .clk                  (clk),
-        .rst_n                (rst_n),
-        .ce_out               (ce128_out),
-        .x_in                 (cic_x_w),
-        .x_in_valid           (cic_x_valid_w),
-        .y_out                (y128_w),
-        .y_out_valid          (y128_valid_w),
-        .burst_remaining_dbg  (),
-        .pending_dbg          ()
-    );
+    generate
+        if (USE_SERIAL_CIC_COMB != 0) begin : gen_serial_cic_comb
+            cic_interp16_serial_comb_dsp_ce #(
+                .DATA_W          (20),
+                .FINAL_PRUNE_LSB (FINAL_PRUNE_LSB),
+                .BURST_COUNTER_USE_DSP(CIC_BURST_COUNTER_USE_DSP)
+            ) u_cic_interp16_serial_comb_dsp_ce (
+                .clk                  (clk),
+                .rst_n                (rst_n),
+                .ce_out               (ce128_out),
+                .x_in                 (cic_x_w),
+                .x_in_valid           (cic_x_valid_w),
+                .y_out                (y128_w),
+                .y_out_valid          (y128_valid_w),
+                .burst_remaining_dbg  (),
+                .pending_dbg          (),
+                .comb_busy_dbg        ()
+            );
+        end
+        else begin : gen_parallel_cic_comb
+            cic_interp16_core_dsp_ce #(
+                .DATA_W          (20),
+                .CIC_ORDER       (CIC_ORDER),
+                .FINAL_PRUNE_LSB (FINAL_PRUNE_LSB),
+                .BURST_COUNTER_USE_DSP(CIC_BURST_COUNTER_USE_DSP)
+            ) u_cic_interp16_core_dsp_ce (
+                .clk                  (clk),
+                .rst_n                (rst_n),
+                .ce_out               (ce128_out),
+                .x_in                 (cic_x_w),
+                .x_in_valid           (cic_x_valid_w),
+                .y_out                (y128_w),
+                .y_out_valid          (y128_valid_w),
+                .burst_remaining_dbg  (),
+                .pending_dbg          ()
+            );
+        end
+    endgenerate
 
     assign y_out = {y128_w, 4'b0};
     assign y_out_valid = y128_valid_w;
@@ -234,6 +261,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
             $fatal(1, "STAGE3_FLAT currently requires LUTRAM/BRAM Stage23");
         if (USE_CIC3_SHIFTADD_COMPENSATOR != 0 && STAGE3_FLAT == 0)
             $fatal(1, "CIC3 shift-add compensator requires flat Stage3");
+        if (USE_SERIAL_CIC_COMB != 0 && CIC_ORDER != 3)
+            $fatal(1, "Serial CIC comb candidate requires CIC_ORDER=3");
     end
 
     always @(posedge clk) begin
