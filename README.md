@@ -6,7 +6,50 @@
 
 Vivado 2018.3 对 `XC7A35T-FGG484-2` 的最终布局布线结果为 **602 LUT / 616 FF / 8 DSP / 3 BRAM Tile**，WNS/WHS 为 **+46.309/+0.103 ns**，路由错误 0、DRC Error 0；Vectorless 功耗估计为 **0.271 W（Medium confidence）**。最终 bitstream 已生成，SHA-256 为 `28A18B572FC53E816CCB709BAF04DA3129E1F2B2BF51A1749682075A29EB043B`。
 
+### 全国赛版主要改进与优化方法
+
+1. **双采样率共用滤波数据通路**：44.1 kHz 和 48 kHz 共用同一套 FIR、CIC、DSP、BRAM、定点舍入及饱和逻辑，仅用两路 MMCM 产生两组音频主时钟，再由 `BUFGMUX_CTRL` 完成无毛刺家族切换，避免复制整条插值链。
+2. **三级 2x FIR 加 16x CIC 的 128x 分级结构**：前三级采用 `105 tap 严格半带 FIR -> 17 tap FIR -> 11 tap FIR`，分别形成 4x、8x 正式输出；后端以三级 CIC16 代替四级 2x FIR，把高倍率部分的乘法运算改为加减和累加。
+3. **严格半带、多相和对称抽头优化**：利用半带零系数、线性相位对称性和多相分解，只计算有效抽头；利用 48 MHz 系统时钟相对音频采样使能的周期余量进行串行 MAC，减少并行乘法器和加法树。
+4. **Stage 2/3 共享 DSP 与 BRAM 存储**：Stage 2/3 时分复用一颗 DSP48E1；历史样本和顺序系数采用同步 BRAM 环形存储，避免大规模移位寄存器、LUTRAM 多读网络及组合系数选择器。
+5. **CIC 宽位运算定向映射 DSP**：将 CIC 的三组 32 bit comb 差分和三组积分累加映射到 6 个 DSP48E1；5 bit burst 控制计数器显式使用 `use_dsp="no"`，防止控制减法误占第 9 个 DSP。连同前级 FIR 的 2 个 DSP，最终为 8 DSP。
+6. **128x 无乘法通带均衡**：在 8x 与 CIC16 之间加入 `[-1, 10, -1]/8` 三抽头对称均衡器，使用加减和算术右移实现，不增加 DSP；4x/8x 节点仍保持平坦 FIR 响应。
+7. **逐级字长与舍入饱和优化**：按各级动态范围保留必要位宽，在输出边界统一执行对称舍入和 24 bit 饱和；所有优化均通过最终 RTL 与 MATLAB golden 的逐点 bit-true 对拍，4x/8x/128x 均为 0 LSB mismatch。
+8. **面积优先实现策略**：Vivado 综合使用 `AreaOptimized_high`，逻辑优化使用 `ExploreArea`，并复用上电计数器产生矩阵键盘扫描使能。相对 44.1 kHz 专用的 472 LUT / 564 FF / 8 DSP / 3 BRAM 基线，全国赛双速率版只增加 130 LUT 和 52 FF，DSP 与 BRAM 不增加。
+
+### 4x / 8x / 128x 分级滤波指标
+
+下表来自 **最终定点 RTL 的 XSim 冲激响应**。赛题的“通带纹波不超过 ±0.05 dB”按“相对 0 dB 的最大绝对偏差”判定；同时给出通带内最大值与最小值之差，即峰峰纹波，避免两种口径混淆。阻带入口按正式验收频带计算。
+
+| 输入采样率 | 正式输出节点 | 输出采样率 | 通带最大绝对偏差 | 通带峰峰纹波 | 阻带衰减 | 线性相位/对称性 | 结果 |
+|---:|---:|---:|---:|---:|---:|---:|---|
+| 44.1 kHz | 4x | 176.4 kHz | 0.004610 dB | 0.005703 dB | 78.669 dB | 0 LSB | PASS |
+| 44.1 kHz | 8x | 352.8 kHz | 0.005495 dB | 0.006274 dB | 78.161 dB | 0 LSB | PASS |
+| 44.1 kHz | 128x | 5.6448 MHz | 0.006918 dB | 0.008111 dB | 72.348 dB | 0 LSB | PASS |
+| 48 kHz | 4x | 192 kHz | 0.004610 dB | 0.005703 dB | 78.669 dB | 0 LSB | PASS |
+| 48 kHz | 8x | 384 kHz | 0.005495 dB | 0.005738 dB | 78.161 dB | 0 LSB | PASS |
+| 48 kHz | 128x | 6.144 MHz | 0.006918 dB | 0.006917 dB | 72.348 dB | 0 LSB | PASS |
+
+六个工况均满足 10 Hz～20 kHz 通带、最大绝对偏差不超过 0.05 dB、阻带衰减不低于 70 dB 和严格线性相位要求。原始精度数据见 [`nf_rtl_impulse_summary.txt`](matlab_fir/national_finals/results/nf_rtl_impulse_summary.txt)，完整频响图见 [`nf_rtl_impulse_response.png`](matlab_fir/national_finals/figures/nf_rtl_impulse_response.png)。
+
+### 全国赛最终 FPGA 资源消耗
+
+以下数据来自 `XC7A35T-FGG484-2` 最终布局布线后的资源报告，不是综合前估算值。
+
+| 资源 | 使用量 | 器件总量 | 利用率 |
+|---|---:|---:|---:|
+| LUT（Slice LUT） | **602** | 20,800 | **2.89%** |
+| FF（Slice Register） | **616** | 41,600 | **1.48%** |
+| DSP（DSP48E1） | **8** | 90 | **8.89%** |
+| BRAM（BRAM Tile） | **3** | 50 | **6.00%** |
+| MMCM（MMCME2_ADV） | **2** | 5 | **40.00%** |
+| BUFGCTRL | 2 | 32 | 6.25% |
+
+最终实现为 1831/1831 个网络全部完成布线，WNS/TNS 为 `+46.309 ns / 0 ns`，WHS/THS 为 `+0.103 ns / 0 ns`，DRC Error 为 0。资源、时序、功耗和 bitstream 签核原始摘要见 [`nf_hardware_signoff_summary.txt`](matlab_fir/national_finals/results/nf_hardware_signoff_summary.txt)。
+
 软件、RTL 和 FPGA 实现签核已通过；物理开发板下载及示波器/频谱仪验收尚需现场执行。完整架构、指标、RTL 一键回归、bitstream、SW1～SW8 映射和板测清单见 [全国总决赛交付说明](matlab_fir/national_finals/README.md)。
+
+> **版本口径说明**：以上 602 LUT / 616 FF / 8 DSP / 3 BRAM / 2 MMCM 及六工况指标是当前全国总决赛双采样率正式版本。下面的 472 LUT 单采样率版及 Phase 6/7/8 内容是区域赛优化过程、Pareto 候选和回退版本，不能替代全国赛最终资源数据。
 
 > 当前最低 LUT 实板通过版：44.1 kHz 专用、Phase 7 折叠补偿 FIR-CIC、Stage 2/3 BRAM 历史/系数、共享按键扫描、472 LUT / 8 DSP，自动化验证、完整实现与四档板测通过<br>
 > 上一面积策略候选：相同滤波算法与板级功能、478 LUT / 565 FF / 9 DSP / 3 BRAM Tile<br>
