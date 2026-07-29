@@ -1,0 +1,17 @@
+National-finals dual-rate board build
+Synthesis checkpoint: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.runs/synth_1/board_demo_competition_dac8_top.dcp
+Part: xc7a35tfgg484-2
+Top: board_demo_competition_dac8_top
+Bitstream: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/vivado_results/board_dual_rate_all2x_3dsp_areaopt/national_finals_dual_rate_4x8x128x_all2x_areaopt.bit
+Routed setup slack: 46.438 ns
+Routed hold slack: 0.105 ns
+44.1-kHz family 128x clock: 5.644796 MHz (-0.64 ppm nominal)
+48-kHz family 128x clock: 6.144068 MHz (+11.03 ppm nominal)
+Architecture: seven 2x FIR stages with shared Stage2/3 DSP and shared Stage4-7 shift-add datapath
+All-2x shared Stage4-7 datapath: 1
+All-2x Stage4-7 DSP48 pre-adder: 1
+Packed Stage2/3 BRAM: 0
+Synthesis directive: AreaOptimized_high
+Flatten hierarchy: rebuilt
+Synthesis resource sharing: on
+Implementation opt directive: ExploreArea

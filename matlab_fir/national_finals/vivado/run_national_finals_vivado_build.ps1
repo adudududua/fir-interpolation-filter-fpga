@@ -9,6 +9,14 @@ param(
     [string]$FlattenHierarchy = 'rebuilt',
     [ValidateSet('auto', 'on', 'off')]
     [string]$ResourceSharing = 'auto',
+    [ValidateSet('cic', 'all2x')]
+    [string]$Architecture = 'cic',
+    [ValidateSet(0, 1)]
+    [int]$All2xSharedTail = 1,
+    [ValidateSet(0, 1)]
+    [int]$All2xTailDsp48 = 0,
+    [ValidateSet(0, 1)]
+    [int]$PackedStage23 = 0,
     [ValidatePattern('^[A-Za-z0-9_-]+$')]
     [string]$ResultTag = 'board_dual_rate_areaopt'
 )
@@ -69,6 +77,7 @@ function Invoke-VivadoStep {
 }
 
 if ($Step -eq 'all' -or $Step -eq 'synth') {
+    $useAll2x = if ($Architecture -eq 'all2x') { '1' } else { '0' }
     Invoke-VivadoStep -Name 'synthesis' -TclPath $synthTcl `
         -TclArguments @(
             '0',
@@ -76,12 +85,26 @@ if ($Step -eq 'all' -or $Step -eq 'synth') {
             $SynthesisDirective,
             $FlattenHierarchy,
             $ResourceSharing,
-            $ResultTag
+            $ResultTag,
+            $useAll2x,
+            [string]$All2xSharedTail,
+            [string]$PackedStage23,
+            [string]$All2xTailDsp48
         )
 }
 
 if ($Step -eq 'all' -or $Step -eq 'implement') {
-    Invoke-VivadoStep -Name 'implementation' -TclPath $implementTcl
+    Invoke-VivadoStep -Name 'implementation' -TclPath $implementTcl `
+        -TclArguments @(
+            $ResultTag,
+            $Architecture,
+            [string]$All2xSharedTail,
+            [string]$All2xTailDsp48,
+            [string]$PackedStage23,
+            $SynthesisDirective,
+            $FlattenHierarchy,
+            $ResourceSharing
+        )
 }
 
 Write-Host ''

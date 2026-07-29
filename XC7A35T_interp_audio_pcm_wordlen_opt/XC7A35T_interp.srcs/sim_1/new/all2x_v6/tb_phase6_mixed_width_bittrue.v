@@ -36,7 +36,11 @@ module tb_phase6_mixed_width_bittrue;
     localparam integer RANDOM_FULL_COUNT = 23675;
     localparam integer STAGE2_FIXED_SHIFT = 3;
     localparam integer STAGE3_FIXED_SHIFT = 7;
+`ifdef NATIONAL_FINALS_ALL2X
+    localparam integer FULL_FIXED_SHIFT = 143;
+`else
     localparam integer FULL_FIXED_SHIFT = 127;
+`endif
 
     reg clk;
     reg rst_n;
@@ -61,6 +65,9 @@ module tb_phase6_mixed_width_bittrue;
     integer random_stage3_index;
     integer impulse_full_index;
     integer random_full_index;
+`ifdef ALL2X_SHIFT_DISCOVERY
+    integer impulse_trace_file;
+`endif
 
     wire ce2_out = (ce_cnt[5:0] == 6'b000000);
     wire ce4_out = (ce_cnt[4:0] == 5'b00000);
@@ -83,7 +90,15 @@ module tb_phase6_mixed_width_bittrue;
     wire random_y8_valid;
     wire random_y128_valid;
 
-    interp128_all2x_v6_mixed_width_top_ce u_impulse (
+`ifdef NATIONAL_FINALS_ALL2X
+    interp128_all2x_nf_optimized_top_ce #(
+        .USE_SHARED_TAIL(1),
+        .USE_SHARED_TAIL_DSP48(1)
+    )
+`else
+    interp128_all2x_v6_mixed_width_top_ce
+`endif
+    u_impulse (
         .clk(clk), .rst_n(rst_n),
         .ce2_out(ce2_out), .ce4_out(ce4_out), .ce8_out(ce8_out),
         .ce16_out(ce16_out), .ce32_out(ce32_out),
@@ -98,7 +113,15 @@ module tb_phase6_mixed_width_bittrue;
         .dbg_y64(), .dbg_y64_valid()
     );
 
-    interp128_all2x_v6_mixed_width_top_ce u_random (
+`ifdef NATIONAL_FINALS_ALL2X
+    interp128_all2x_nf_optimized_top_ce #(
+        .USE_SHARED_TAIL(1),
+        .USE_SHARED_TAIL_DSP48(1)
+    )
+`else
+    interp128_all2x_v6_mixed_width_top_ce
+`endif
+    u_random (
         .clk(clk), .rst_n(rst_n),
         .ce2_out(ce2_out), .ce4_out(ce4_out), .ce8_out(ce8_out),
         .ce16_out(ce16_out), .ce32_out(ce32_out),
@@ -215,6 +238,10 @@ module tb_phase6_mixed_width_bittrue;
             end
 
             if (impulse_y128_valid) begin
+`ifdef ALL2X_SHIFT_DISCOVERY
+                $fdisplay(impulse_trace_file, "%0d,%0d",
+                          impulse_full_index, impulse_y128);
+`else
                 if (impulse_full_index < FULL_FIXED_SHIFT) begin
                     if (impulse_y128 !== 24'sd0)
                         $fatal(1, "impulse full nonzero before fixed shift");
@@ -225,13 +252,15 @@ module tb_phase6_mixed_width_bittrue;
                              impulse_full_index-FULL_FIXED_SHIFT])
                     $fatal(1, "impulse full mismatch index=%0d ref=%0d dut=%0d",
                            impulse_full_index-FULL_FIXED_SHIFT,
-                           impulse_full_golden[
-                               impulse_full_index-FULL_FIXED_SHIFT],
-                           impulse_y128);
+                               impulse_full_golden[
+                                   impulse_full_index-FULL_FIXED_SHIFT],
+                               impulse_y128);
+`endif
                 impulse_full_index <= impulse_full_index + 1;
             end
 
             if (random_y128_valid) begin
+`ifndef ALL2X_SHIFT_DISCOVERY
                 if (random_full_index < FULL_FIXED_SHIFT) begin
                     if (random_y128 !== 24'sd0)
                         $fatal(1, "random full nonzero before fixed shift");
@@ -242,9 +271,10 @@ module tb_phase6_mixed_width_bittrue;
                              random_full_index-FULL_FIXED_SHIFT])
                     $fatal(1, "random full mismatch index=%0d ref=%0d dut=%0d",
                            random_full_index-FULL_FIXED_SHIFT,
-                           random_full_golden[
-                               random_full_index-FULL_FIXED_SHIFT],
-                           random_y128);
+                               random_full_golden[
+                                   random_full_index-FULL_FIXED_SHIFT],
+                               random_y128);
+`endif
                 random_full_index <= random_full_index + 1;
             end
         end
@@ -272,6 +302,9 @@ module tb_phase6_mixed_width_bittrue;
         random_stage3_index = 0;
         impulse_full_index = 0;
         random_full_index = 0;
+`ifdef ALL2X_SHIFT_DISCOVERY
+        impulse_trace_file = $fopen("all2x_impulse_y128_trace.csv", "w");
+`endif
         rst_n = 1'b0;
         repeat (20) @(posedge clk);
         @(negedge clk);
@@ -290,11 +323,18 @@ module tb_phase6_mixed_width_bittrue;
             random_full_index < FULL_FIXED_SHIFT + RANDOM_FULL_COUNT)
             $fatal(1, "Phase 6 mixed-width output count is insufficient");
 
+`ifdef NATIONAL_FINALS_ALL2X
+        $display("NATIONAL FINALS ALL2X BITTRUE PASS: impulse/random, all nodes 0 LSB.");
+`else
         $display("PASS: Phase 6 mixed-width impulse/random bit-true test");
+`endif
         $display("S2 imp=%0d rnd=%0d S3 imp=%0d rnd=%0d full imp=%0d rnd=%0d",
                  IMPULSE_STAGE2_COUNT, RANDOM_STAGE2_COUNT,
                  IMPULSE_STAGE3_COUNT, RANDOM_STAGE3_COUNT,
                  IMPULSE_FULL_COUNT, RANDOM_FULL_COUNT);
+`ifdef ALL2X_SHIFT_DISCOVERY
+        $fclose(impulse_trace_file);
+`endif
         $finish;
     end
 

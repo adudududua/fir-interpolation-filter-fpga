@@ -1,5 +1,52 @@
 # 全国总决赛：双采样率可配置插值滤波器
 
+## 2026-07-30 最终优化结论
+
+当前提供两个已全面优化、可独立生成 bitstream 的分支：
+
+- `codex/national-finals-cic-6dsp-opt`：推荐 FIR-CIC 主方案。
+- `codex/national-finals-all2x-opt`：全 2x 低 DSP 对照方案。
+
+| 架构 | 布局后 LUT | FF | DSP | BRAM | MMCM | WNS/WHS | 功耗 | 结论 |
+|---|---:|---:|---:|---:|---:|---:|---:|---|
+| **FIR-CIC 6-DSP** | **573** | **621** | 6 | 3 | 2 | +46.339/+0.072 ns | 0.271 W | 最低 LUT，推荐 |
+| 全 2x 3-DSP | 714 | 662 | 3 | 3 | 2 | +46.438/+0.105 ns | 0.271 W | 全 2x 最低 LUT |
+| **全 2x 2-DSP** | 728 | 662 | **2** | 3 | 2 | +46.441/+0.105 ns | 0.271 W | 最低 DSP |
+
+FIR-CIC 通过串行复用 comb DSP 将整链从 8 DSP 降到 6 DSP。全 2x 则把
+Stage 4～7 的四份半带算术合并为共享数据通路，并对尾级是否使用 DSP48
+预加器保留 2-DSP/3-DSP 两个 Pareto 点。全 2x 的滤波性能稍高，128x
+阻带为 78.447/78.881 dB；FIR-CIC 为 72.348 dB，但两者都超过 70 dB。
+完整六工况表、否决方案与 bitstream 哈希见仓库根
+[README](../../README.md) 和
+[架构比较摘要](results/architecture_comparison_summary.txt)。
+
+全 2x 一键 RTL 回归：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
+  .\matlab_fir\national_finals\sim\run_national_finals_all2x_rtl_regression.ps1
+```
+
+全 2x 2-DSP 一键实现：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
+  .\matlab_fir\national_finals\vivado\run_national_finals_vivado_build.ps1 `
+  -Step all -Architecture all2x -All2xSharedTail 1 -All2xTailDsp48 0 `
+  -SynthesisDirective AreaOptimized_high -FlattenHierarchy rebuilt `
+  -ResourceSharing on -ResultTag board_dual_rate_all2x_2dsp_areaopt
+```
+
+全 2x 3-DSP 只需把 `-All2xTailDsp48` 改为 `1`，并使用不同
+`-ResultTag`。FIR-CIC 对应 `-Architecture cic`。
+
+> 注意：两种架构均已通过 MATLAB、RTL、实现和 bitstream 工具链签核；
+> 物理板卡下载、DA_CLK 与频谱仪测量仍需执行本文第 8 节，不能把
+> “bitstream 已生成”写成“实物板级已经通过”。
+
+## 2026-07-29 基线交付记录
+
 当前版本已完成 MATLAB 建模、24 bit 定点模型、RTL、六组 XSim 回归、Vivado 综合/布局布线/时序/DRC/功耗评估和 bitstream 生成。所有软件与 FPGA 工具验收均已通过；由于当前环境无法接触实物开发板，物理板下载和仪器测量仍需按本文最后一节执行，不能把 bitstream 成功等同于实板通过。
 
 开发分支：`codex/national-finals-configurable`

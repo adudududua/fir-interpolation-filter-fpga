@@ -1,6 +1,12 @@
 [CmdletBinding()]
 param(
-    [string]$VivadoExe = 'E:\app\Xilinx2018.3\Vivado\2018.3\bin\vivado.bat'
+    [string]$VivadoExe = 'E:\app\Xilinx2018.3\Vivado\2018.3\bin\vivado.bat',
+    [ValidateSet('cic', 'all2x')]
+    [string]$Architecture = 'cic',
+    [ValidateSet(0, 1)]
+    [int]$All2xTailDsp48 = 0,
+    [ValidateSet(0, 1)]
+    [int]$PackedStage23 = 0
 )
 
 $ErrorActionPreference = 'Stop'
@@ -8,35 +14,41 @@ Set-StrictMode -Version Latest
 
 $wrapper = Join-Path $PSScriptRoot 'run_national_finals_vivado_build.ps1'
 $resultRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\vivado_results')).Path
-$summaryPath = Join-Path $resultRoot 'synthesis_strategy_scan.csv'
+$tagPrefix = if ($Architecture -eq 'all2x') {
+    "scan_all2x_dsp${All2xTailDsp48}"
+}
+else {
+    'scan_cic'
+}
+$summaryPath = Join-Path $resultRoot "${tagPrefix}_strategy_scan.csv"
 
 $candidates = @(
     [pscustomobject]@{
-        Tag = 'scan_area_rebuilt_auto'
+        Tag = "${tagPrefix}_area_rebuilt_auto"
         Directive = 'AreaOptimized_high'
         Flatten = 'rebuilt'
         Sharing = 'auto'
     },
     [pscustomobject]@{
-        Tag = 'scan_area_full_auto'
+        Tag = "${tagPrefix}_area_full_auto"
         Directive = 'AreaOptimized_high'
         Flatten = 'full'
         Sharing = 'auto'
     },
     [pscustomobject]@{
-        Tag = 'scan_area_none_auto'
+        Tag = "${tagPrefix}_area_none_auto"
         Directive = 'AreaOptimized_high'
         Flatten = 'none'
         Sharing = 'auto'
     },
     [pscustomobject]@{
-        Tag = 'scan_area_rebuilt_on'
+        Tag = "${tagPrefix}_area_rebuilt_on"
         Directive = 'AreaOptimized_high'
         Flatten = 'rebuilt'
         Sharing = 'on'
     },
     [pscustomobject]@{
-        Tag = 'scan_default_rebuilt_auto'
+        Tag = "${tagPrefix}_default_rebuilt_auto"
         Directive = 'Default'
         Flatten = 'rebuilt'
         Sharing = 'auto'
@@ -60,6 +72,10 @@ $rows = foreach ($candidate in $candidates) {
     & $wrapper `
         -VivadoExe $VivadoExe `
         -Step synth `
+        -Architecture $Architecture `
+        -All2xSharedTail 1 `
+        -All2xTailDsp48 $All2xTailDsp48 `
+        -PackedStage23 $PackedStage23 `
         -SynthesisDirective $candidate.Directive `
         -FlattenHierarchy $candidate.Flatten `
         -ResourceSharing $candidate.Sharing `
@@ -72,8 +88,17 @@ $rows = foreach ($candidate in $candidates) {
     }
     $reportText = Get-Content -LiteralPath $reportPath -Raw
 
+    $bramMatch = [regex]::Match(
+        $reportText,
+        '\|\s*Block RAM Tile\s*\|\s*([0-9.]+)'
+    )
+    if (-not $bramMatch.Success) {
+        throw 'Unable to parse Block RAM Tile utilization'
+    }
+
     [pscustomobject]@{
         tag = $candidate.Tag
+        architecture = $Architecture
         directive = $candidate.Directive
         flatten_hierarchy = $candidate.Flatten
         resource_sharing = $candidate.Sharing
@@ -83,8 +108,7 @@ $rows = foreach ($candidate in $candidates) {
             '\|\s*Slice Registers\s*\|\s*(\d+)'
         dsp48e1 = Read-UtilizationCount $reportText `
             '\|\s*DSPs\s*\|\s*(\d+)'
-        bram_tile = Read-UtilizationCount $reportText `
-            '\|\s*Block RAM Tile\s*\|\s*(\d+)'
+        bram_tile = [double]$bramMatch.Groups[1].Value
     }
 }
 

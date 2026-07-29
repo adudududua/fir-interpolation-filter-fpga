@@ -1,0 +1,58 @@
+National-finals optimized architecture comparison
+=================================================
+Date: 2026-07-30
+Tool/device: Vivado 2018.3 / xc7a35tfgg484-2
+Top: board_demo_competition_dac8_top
+Constraint and board wrapper: identical for all rows
+
+Placed/routed signoff
+----------------------
+Architecture                 LUT  FF   DSP  BRAM  MMCM  WNS(ns)  WHS(ns)  Power(W)
+FIR-CIC serial-comb          573  621    6   3.0     2   46.339    0.072     0.271
+All-2x shared-tail DSP48     714  662    3   3.0     2   46.438    0.105     0.271
+All-2x shared-tail shiftadd  728  662    2   3.0     2   46.441    0.105     0.271
+
+All designs are fully routed, have zero routing errors, zero DRC errors,
+meet setup and hold timing, and generated a bitstream.  Vectorless power is
+an estimate and is identical at the report precision; it is not a physical
+power comparison.
+
+Recommendation
+--------------
+Use FIR-CIC when LUT/overall logic area is the priority.
+Use all-2x 2-DSP when DSP count is the priority.
+Use all-2x 3-DSP when selecting the minimum-LUT point inside the all-2x family.
+
+RTL/filter acceptance
+---------------------
+FIR-CIC: 9/9 national-finals regression PASS; impulse/random 4x/8x/128x
+zero-LSB; 8 reset scenarios; 10 dynamic switches.
+
+All-2x: isolated clean-directory 4/4 regression PASS; impulse counts
+1245/2499/40059 and random counts 733/1475/23675 at 4x/8x/128x all zero-LSB;
+shared Stage4-7 tail equals four independent stages for 33949 compared samples;
+8 reset scenarios x 4096 y128 samples; 10 dynamic switches without reset,
+runt pulse, or X.
+
+All six 44.1/48-kHz x 4x/8x/128x operating points pass:
+passband 10 Hz to 20 kHz, max absolute deviation <= 0.05 dB,
+stopband attenuation >= 70 dB, and strict linear phase.
+
+Bitstreams
+----------
+FIR-CIC:
+  vivado_results/board_dual_rate_areaopt/
+  national_finals_dual_rate_4x8x128x_areaopt.bit
+  SHA256 70F198CFDA23C40939F1F8F907DF357CB11813327A1CA0C94F027EFB06ABA6EC
+
+All-2x 3-DSP:
+  vivado_results/board_dual_rate_all2x_3dsp_areaopt/
+  national_finals_dual_rate_4x8x128x_all2x_areaopt.bit
+  SHA256 0DB04A07C2CC750E4CEA58D00A898941DFC7E96E3C5ECB5284CBF4B6BA1FEFD6
+
+All-2x 2-DSP:
+  vivado_results/board_dual_rate_all2x_2dsp_areaopt/
+  national_finals_dual_rate_4x8x128x_all2x_areaopt.bit
+  SHA256 7C6E9B245FAA3D4A53B65165B63571244C453B9569656C500F6498A1A3AA1038
+
+PHYSICAL_BOARD_TESTED=0

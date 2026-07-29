@@ -1,31 +1,31 @@
-National-finals FPGA implementation signoff
-===========================================
-Date: 2026-07-29
+National-finals FIR-CIC FPGA implementation signoff
+===================================================
+Date: 2026-07-30
 Tool: Vivado 2018.3
 Device: xc7a35tfgg484-2
 Top: board_demo_competition_dac8_top
 Design state: fully routed; bitstream generated
 
 Placed utilization
-  Slice LUTs:       602 / 20800 (2.89%)
-  Slice registers:  616 / 41600 (1.48%)
+  Slice LUTs:       573 / 20800 (2.75%)
+  Slice registers:  621 / 41600 (1.49%)
   BRAM tiles:         3 / 50    (6.00%)
-  DSP48E1:            8 / 90    (8.89%)
+  DSP48E1:            6 / 90    (6.67%)
   BUFGCTRL:            2 / 32    (6.25%)
   MMCME2_ADV:          2 / 5    (40.00%)
 
 Routed timing
-  WNS: +46.309 ns
+  WNS: +46.339 ns
   TNS:   0.000 ns
-  WHS:  +0.103 ns
+  WHS:  +0.072 ns
   THS:   0.000 ns
   All user specified timing constraints are met.
 
 Routing and DRC
-  Fully routed nets: 1831 / 1831
+  Fully routed nets: 1652 / 1652
   Nets with routing errors: 0
   DRC errors: 0
-  DRC warnings/advisories: 211
+  DRC warnings/advisories: 142
   The warnings are DSP input/output pipeline recommendations and asynchronous
   DSP/BRAM control checks retained by the area-optimized architecture. They do
   not block bitstream generation; physical-board validation is still required.
@@ -37,7 +37,7 @@ Vectorless power estimate (Medium confidence)
 
 Bitstream
   national_finals_dual_rate_4x8x128x_areaopt.bit
-  SHA256: 28A18B572FC53E816CCB709BAF04DA3129E1F2B2BF51A1749682075A29EB043B
+  SHA256: 70F198CFDA23C40939F1F8F907DF357CB11813327A1CA0C94F027EFB06ABA6EC
 
 IMPLEMENTATION_PASS=1
 PHYSICAL_BOARD_TESTED=0

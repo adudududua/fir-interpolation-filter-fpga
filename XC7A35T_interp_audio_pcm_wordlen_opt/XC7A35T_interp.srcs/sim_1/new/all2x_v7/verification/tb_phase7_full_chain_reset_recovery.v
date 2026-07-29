@@ -26,7 +26,10 @@
 
 module tb_phase7_full_chain_reset_recovery;
 
-`ifdef PHASE7_USE_LUTRAM_STAGE23
+`ifdef NATIONAL_FINALS_ALL2X
+`define DUT_STAGE23 u_dut.u_interp2_stage23_lutram_cic_dsp_ce
+`define DUT_TAIL u_dut.gen_shared_tail.u_interp2_halfband7_shared4_ce
+`elsif PHASE7_USE_LUTRAM_STAGE23
 `define DUT_STAGE23 u_dut.gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce
 `else
 `define DUT_STAGE23 u_dut.gen_register_stage23.u_interp2_stage23_folded_cic_dsp_ce
@@ -75,6 +78,16 @@ module tb_phase7_full_chain_reset_recovery;
     integer wait_count;
     integer compare_enable;
 
+`ifdef NATIONAL_FINALS_ALL2X
+    interp128_all2x_nf_optimized_top_ce #(
+        .STAGE23_ACC_W(38),
+        .USE_SHARED_TAIL(1),
+        .USE_SHARED_TAIL_DSP48(1),
+        .USE_BRAM_STAGE23_HISTORY(1),
+        .USE_BRAM_STAGE23_COEFF(1),
+        .USE_PACKED_BRAM_STAGE23(0)
+    )
+`else
     interp128_all2x_v7_folded_fir_cic_top_ce #(
         .STAGE23_ACC_W(38), .CIC_ORDER(3), .FINAL_PRUNE_LSB(0),
 `ifdef PHASE7_USE_LUTRAM_STAGE23
@@ -111,7 +124,9 @@ module tb_phase7_full_chain_reset_recovery;
 `else
         .USE_SERIAL_CIC_COMB(0)
 `endif
-    ) u_dut (
+    )
+`endif
+    u_dut (
         .clk(clk), .rst_n(rst_dut_n),
         .ce2_out(ce2_out), .ce4_out(ce4_out),
         .ce8_out(ce8_out), .ce16_out(ce16_out),
@@ -126,6 +141,16 @@ module tb_phase7_full_chain_reset_recovery;
         .dbg_y64(), .dbg_y64_valid()
     );
 
+`ifdef NATIONAL_FINALS_ALL2X
+    interp128_all2x_nf_optimized_top_ce #(
+        .STAGE23_ACC_W(38),
+        .USE_SHARED_TAIL(1),
+        .USE_SHARED_TAIL_DSP48(1),
+        .USE_BRAM_STAGE23_HISTORY(1),
+        .USE_BRAM_STAGE23_COEFF(1),
+        .USE_PACKED_BRAM_STAGE23(0)
+    )
+`else
     interp128_all2x_v7_folded_fir_cic_top_ce #(
         .STAGE23_ACC_W(38), .CIC_ORDER(3), .FINAL_PRUNE_LSB(0),
 `ifdef PHASE7_USE_LUTRAM_STAGE23
@@ -162,7 +187,9 @@ module tb_phase7_full_chain_reset_recovery;
 `else
         .USE_SERIAL_CIC_COMB(0)
 `endif
-    ) u_cold_reference (
+    )
+`endif
+    u_cold_reference (
         .clk(clk), .rst_n(rst_ref_n),
         .ce2_out(ce2_out), .ce4_out(ce4_out),
         .ce8_out(ce8_out), .ce16_out(ce16_out),
@@ -245,6 +272,19 @@ module tb_phase7_full_chain_reset_recovery;
             case (test_scenario)
                 1: ready_value =
                     u_dut.u_interp2_stage1_strict_halfband_bram_ce.mac_active;
+`ifdef NATIONAL_FINALS_ALL2X
+                2: ready_value = u_dut.u_bridge_8_to_tail.pending;
+                3: ready_value =
+                    `DUT_STAGE23.job_active &&
+                    `DUT_STAGE23.job_stage == 2'd2;
+                4: ready_value =
+                    `DUT_STAGE23.job_active &&
+                    `DUT_STAGE23.job_stage == 2'd3;
+                5: ready_value = `DUT_TAIL.compute4;
+                6: ready_value = `DUT_TAIL.compute5;
+                7: ready_value = `DUT_TAIL.compute6;
+                8: ready_value = `DUT_TAIL.compute7;
+`else
                 2: ready_value =
                     `DUT_STAGE23.stage2_pending;
                 3: ready_value =
@@ -261,6 +301,7 @@ module tb_phase7_full_chain_reset_recovery;
                     `DUT_CIC.burst_remaining == 5'd8;
                 8: ready_value =
                     `DUT_CIC.burst_remaining == 5'd1;
+`endif
                 default: ready_value = 1'b0;
             endcase
         end
@@ -271,11 +312,24 @@ module tb_phase7_full_chain_reset_recovery;
     task assert_pipeline_reset;
         begin
             #1;
+`ifdef NATIONAL_FINALS_ALL2X
+            if (u_dut.u_bridge_8_to_tail.pending !== 1'b0 ||
+                    `DUT_STAGE23.stage2_pending !== 1'b0 ||
+                    `DUT_STAGE23.stage3_pending !== 1'b0 ||
+                    `DUT_STAGE23.job_active !== 1'b0 ||
+                    `DUT_TAIL.y16_valid !== 1'b0 ||
+                    `DUT_TAIL.y32_valid !== 1'b0 ||
+                    `DUT_TAIL.y64_valid !== 1'b0 ||
+                    `DUT_TAIL.y128_valid !== 1'b0)
+                $fatal(1, "All-2x asynchronous reset failed scenario=%0d",
+                    scenario_index);
+`else
             if (`DUT_CIC.burst_pending !== 1'b0 ||
                     `DUT_CIC.burst_remaining !== 5'd0 ||
                     `DUT_CIC.final_integrator_state !== 32'sd0)
                 $fatal(1, "CIC asynchronous reset failed scenario=%0d",
                     scenario_index);
+`endif
             repeat (2) @(posedge clk);
             @(negedge clk);
             if (dut_y4_valid !== 1'b0 || dut_y8_valid !== 1'b0 ||
@@ -283,7 +337,11 @@ module tb_phase7_full_chain_reset_recovery;
                     u_dut.u_interp2_stage1_strict_halfband_bram_ce.mac_active !== 1'b0 ||
                     `DUT_STAGE23.stage2_pending !== 1'b0 ||
                     `DUT_STAGE23.stage3_pending !== 1'b0 ||
-                    `DUT_STAGE23.job_active !== 1'b0)
+                    `DUT_STAGE23.job_active !== 1'b0
+`ifdef NATIONAL_FINALS_ALL2X
+                    || u_dut.u_bridge_8_to_tail.pending !== 1'b0
+`endif
+                    )
                 $fatal(1, "Full pipeline reset failed scenario=%0d",
                     scenario_index);
         end
@@ -356,12 +414,19 @@ module tb_phase7_full_chain_reset_recovery;
         if (mismatch_count != 0)
             $fatal(1, "PHASE7 FULL RESET RECOVERY FAIL mismatch=%0d",
                 mismatch_count);
+`ifdef NATIONAL_FINALS_ALL2X
+        $display("NATIONAL FINALS ALL2X RESET RECOVERY PASS: 8 internal-state scenarios clean.");
+`else
         $display("PHASE7 FULL RESET RECOVERY PASS: 8 internal-state scenarios clean.");
+`endif
         $finish;
     end
 
 endmodule
 
 `undef DUT_STAGE23
+`ifdef NATIONAL_FINALS_ALL2X
+`undef DUT_TAIL
+`endif
 `undef DUT_CIC
 

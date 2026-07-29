@@ -1,6 +1,116 @@
 # 高阶数字插值滤波器设计与 FPGA 验证
 
-## 全国总决赛双采样率版本（2026-07-29）
+## 全国总决赛最终优化与两种架构对比（2026-07-30）
+
+本轮对 FIR-CIC 与七级全 2x 两条路线采用同一板级顶层、同一
+`XC7A35T-FGG484-2`、同一 XDC 和同一 Vivado 2018.3 验收流程进行了公平优化。
+两条路线均已通过 MATLAB 频响、RTL 位真、复位恢复、动态倍率切换、综合、
+布局布线、setup/hold、完整路由、DRC 和 bitstream 生成。当前结论不是简单的
+“全 2x 一定更省”或“CIC 一定更省”，而是两个清晰的 Pareto 方向：
+
+- **最低 LUT、推荐比赛主方案：FIR-CIC 6-DSP 版**，573 LUT / 621 FF /
+  6 DSP / 3 BRAM / 2 MMCM。
+- **最低 DSP、推荐资源创新备选：全 2x 2-DSP 版**，728 LUT / 662 FF /
+  2 DSP / 3 BRAM / 2 MMCM。
+- **全 2x 最低 LUT 备选：全 2x 3-DSP 版**，714 LUT / 662 FF /
+  3 DSP / 3 BRAM / 2 MMCM；比 2-DSP 版少 14 个布局后 LUT。
+
+因此，如果评分更看重 LUT/总面积，使用 FIR-CIC；如果 DSP 是关键稀缺资源，
+全 2x 仅用 2 个 DSP，代价是比 FIR-CIC 多 155 LUT 和 41 FF。两者的
+vectorless 总功耗估计均为 0.271 W，不能据此宣称某一结构的实测功耗更低。
+
+### 最终布局布线资源、时序与 bitstream
+
+| 架构 | LUT | FF | DSP48E1 | BRAM Tile | MMCM | WNS | WHS | 功耗估计 | 路由/DRC Error |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| **FIR-CIC 6-DSP（推荐）** | **573** | **621** | **6** | **3** | **2** | +46.339 ns | +0.072 ns | 0.271 W | 全布通 / 0 |
+| 全 2x 3-DSP（最低 LUT 全 2x） | 714 | 662 | 3 | 3 | 2 | +46.438 ns | +0.105 ns | 0.271 W | 全布通 / 0 |
+| **全 2x 2-DSP（最低 DSP）** | **728** | **662** | **2** | **3** | **2** | +46.441 ns | +0.105 ns | 0.271 W | 全布通 / 0 |
+
+相对上一版全国赛 602 LUT / 616 FF / 8 DSP 基线，推荐 FIR-CIC 版减少
+29 LUT 和 2 DSP；全 2x 版则通过牺牲 LUT 显著降低 DSP。三份报告中的 DRC
+均无 Error；保留的 Warning/Advisory 主要是面积优先 DSP 未加流水建议和
+BRAM 异步控制检查，已由中途复位回归覆盖功能行为。
+
+bitstream 与 SHA-256：
+
+- FIR-CIC 6-DSP：
+  [`national_finals_dual_rate_4x8x128x_areaopt.bit`](matlab_fir/national_finals/vivado_results/board_dual_rate_areaopt/national_finals_dual_rate_4x8x128x_areaopt.bit)，
+  `70F198CFDA23C40939F1F8F907DF357CB11813327A1CA0C94F027EFB06ABA6EC`
+- 全 2x 3-DSP：
+  [`national_finals_dual_rate_4x8x128x_all2x_areaopt.bit`](matlab_fir/national_finals/vivado_results/board_dual_rate_all2x_3dsp_areaopt/national_finals_dual_rate_4x8x128x_all2x_areaopt.bit)，
+  `0DB04A07C2CC750E4CEA58D00A898941DFC7E96E3C5ECB5284CBF4B6BA1FEFD6`
+- 全 2x 2-DSP：
+  [`national_finals_dual_rate_4x8x128x_all2x_areaopt.bit`](matlab_fir/national_finals/vivado_results/board_dual_rate_all2x_2dsp_areaopt/national_finals_dual_rate_4x8x128x_all2x_areaopt.bit)，
+  `7C6E9B245FAA3D4A53B65165B63571244C453B9569656C500F6498A1A3AA1038`
+
+### FIR-CIC 最终 RTL 六工况指标
+
+| 输入采样率 | 输出节点 | 通带最大绝对偏差 | 通带峰峰纹波 | 阻带衰减 | 对称误差 |
+|---:|---:|---:|---:|---:|---:|
+| 44.1 kHz | 4x | 0.004610 dB | 0.005703 dB | 78.669 dB | 0 LSB |
+| 44.1 kHz | 8x | 0.005495 dB | 0.006274 dB | 78.161 dB | 0 LSB |
+| 44.1 kHz | 128x | 0.006918 dB | 0.008111 dB | 72.348 dB | 0 LSB |
+| 48 kHz | 4x | 0.004610 dB | 0.005703 dB | 78.669 dB | 0 LSB |
+| 48 kHz | 8x | 0.005495 dB | 0.005738 dB | 78.161 dB | 0 LSB |
+| 48 kHz | 128x | 0.006918 dB | 0.006917 dB | 72.348 dB | 0 LSB |
+
+### 全 2x 最终 RTL 六工况指标
+
+| 输入采样率 | 输出节点 | 通带最大绝对偏差 | 通带峰峰纹波 | 阻带衰减 | 对称误差 |
+|---:|---:|---:|---:|---:|---:|
+| 44.1 kHz | 4x | 0.004610 dB | 0.005703 dB | 78.669 dB | 0 LSB |
+| 44.1 kHz | 8x | 0.005395 dB | 0.006183 dB | 78.562 dB | 0 LSB |
+| 44.1 kHz | 128x | 0.005444 dB | 0.007823 dB | 78.447 dB | 0 LSB |
+| 48 kHz | 4x | 0.004610 dB | 0.005703 dB | 78.669 dB | 0 LSB |
+| 48 kHz | 8x | 0.005395 dB | 0.005719 dB | 78.562 dB | 0 LSB |
+| 48 kHz | 128x | 0.005444 dB | 0.005909 dB | 78.881 dB | 0 LSB |
+
+两种架构的六个工况均满足 10 Hz～20 kHz、相对 0 dB 最大偏差不超过
+±0.05 dB、阻带不低于 70 dB和严格线性相位。全 2x 的 128x 阻带约多
+6 dB，但 FIR-CIC 已满足赛题且 LUT 更低。
+
+### 本轮采用与否决的优化
+
+1. FIR-CIC 将三个 comb 差分时分复用到一个 DSP48E1，配合三个积分 DSP，
+   把 CIC 的 6 DSP 降为 4 DSP，整链由 8 DSP 降为 6 DSP。
+2. Stage 2/3 使用全国赛专用系数/位宽、BRAM 环形历史和单 DSP 时分 MAC；
+   18→16 bit 窄化在零 LSB 验证下功能正确，但综合资源不变，只保留有证据的
+   中间结果。
+3. Stage 1 显式 DSP48 预加器候选没有减少 LUT，反而增加 42 FF，因此
+   未作为正式版本。
+4. 全 2x 的 Stage 4～7 利用各级偶相输出互斥，合并为一个共享 7-tap
+   半带算术数据通路；相对四个独立尾级约减少 293 LUT。
+5. 全 2x Stage 2/3 改为正式全增益系数，逐级字长采用
+   `24/22/20/18/18/18/18 bit`；8x 到共享尾级使用显式缓冲桥，消除可变
+   Stage 3 作业长度造成的有效样本空洞。
+6. 全 2x 共享尾级提供 shift-add 2-DSP 总方案和 DSP48 预加器 3-DSP
+   总方案；后者少 14 个布局后 LUT，形成两个都可用的 Pareto 点。
+7. 五组综合策略小范围扫描确认
+   `AreaOptimized_high + rebuilt + resource_sharing=on` 是当前有效最优策略；
+   `flatten_hierarchy=full` 虽综合数字接近，但破坏板级层次约束，不进入实现。
+8. Stage 2/3 打包 BRAM 可再省 0.5 BRAM Tile，但增加约 19 LUT，作为
+   BRAM 紧张时的备选，不作为本器件默认。
+
+### 全面验证结论
+
+- FIR-CIC：全国赛 RTL 回归 9/9；4x/8x/128x impulse 与随机 PCM 均
+  0 LSB；8 个内部状态复位场景和 10 次动态倍率切换通过。
+- 全 2x：独立空目录 RTL 回归 4/4；impulse `1245/2499/40059` 点、
+  random `733/1475/23675` 点均 0 LSB；共享尾级与四个独立尾级比较
+  33,949 点完全相同；8 个复位场景各比较 4,096 个 128x 输出；10 次
+  无复位动态切换无 runt pulse、无 X。
+- 两种架构均成功生成 bitstream。**当前环境没有实物板卡与测量仪器，
+  所以这里只能声明 MATLAB、RTL 和 FPGA 工具链签核通过，不能把它写成
+  已完成物理板级验证。**下载、六档 DA_CLK 和频谱验收步骤见
+  [全国总决赛交付说明](matlab_fir/national_finals/README.md)。
+
+详细证据见
+[`architecture_comparison_summary.txt`](matlab_fir/national_finals/results/architecture_comparison_summary.txt)、
+[`nf_rtl_impulse_summary.txt`](matlab_fir/national_finals/results/nf_rtl_impulse_summary.txt) 和
+[`all2x_rtl_impulse_summary.txt`](matlab_fir/national_finals/results/all2x_rtl_impulse_summary.txt)。
+
+## 历史全国总决赛双采样率基线（2026-07-29，已被上述结果替代）
 
 全国赛升级版已在分支 `codex/national-finals-configurable` 完成：支持 signed 24 bit、44.1/48 kHz 输入家族以及 4x/8x/128x 正式输出。最终 RTL 六工况的通带最大绝对偏差为 **0.004610～0.006918 dB**，阻带衰减为 **72.348～78.669 dB**，冲激对称误差均为 **0 LSB**；六组 XSim 回归全部通过，全链路 impulse + 随机 PCM 的 4x/8x/128x 三节点均为 **0 LSB mismatch**。
 

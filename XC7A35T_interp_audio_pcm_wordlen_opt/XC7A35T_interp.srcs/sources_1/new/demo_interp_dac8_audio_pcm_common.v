@@ -50,7 +50,10 @@ module demo_interp_dac8_audio_pcm_common #(
     parameter integer USE_NATIONAL_FINALS_DATAPATH = 0,
     parameter integer USE_NATIONAL_FINALS_SERIAL_CIC_COMB = 0,
     parameter integer USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER = 0,
-    parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 0
+    parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 0,
+    parameter integer USE_NATIONAL_FINALS_ALL2X_OPT = 0,
+    parameter integer USE_NATIONAL_FINALS_ALL2X_SHARED_TAIL = 1,
+    parameter integer USE_NATIONAL_FINALS_ALL2X_TAIL_DSP48 = 0
 )(
     input  wire        clk_audio_128x,  // 5.6448MHz 连续音频 128x 时钟
     input  wire        rst_n,           // 低有效复位
@@ -243,7 +246,37 @@ module demo_interp_dac8_audio_pcm_common #(
     wire               dbg_y64_valid_w;
 
     generate
-        if (USE_PHASE7_FOLDED != 0) begin : gen_phase7_folded
+        if (USE_NATIONAL_FINALS_ALL2X_OPT != 0) begin :
+                gen_national_finals_all2x
+            interp128_all2x_nf_optimized_top_ce #(
+                .STAGE23_ACC_W(38),
+                .USE_SHARED_TAIL(
+                    USE_NATIONAL_FINALS_ALL2X_SHARED_TAIL),
+                .USE_SHARED_TAIL_DSP48(
+                    USE_NATIONAL_FINALS_ALL2X_TAIL_DSP48),
+                .USE_BRAM_STAGE23_HISTORY(
+                    USE_PHASE7_BRAM_STAGE23_HISTORY),
+                .USE_BRAM_STAGE23_COEFF(
+                    USE_PHASE7_BRAM_STAGE23_COEFF),
+                .USE_PACKED_BRAM_STAGE23(
+                    USE_PHASE8_PACKED_BRAM_STAGE23)
+            ) u_interp128_all2x_nf_optimized_top_ce (
+                .clk(clk_audio_128x), .rst_n(rst_n),
+                .ce2_out(ce2_out), .ce4_out(ce4_out),
+                .ce8_out(ce8_out), .ce16_out(ce16_out),
+                .ce32_out(ce32_out), .ce64_out(ce64_out),
+                .ce128_out(ce128_out),
+                .x_in(x_in), .x_in_valid(x_in_valid),
+                .y_out(y_out_w), .y_out_valid(y_out_valid_w),
+                .dbg_y2(), .dbg_y2_valid(),
+                .dbg_y4(dbg_y4_w), .dbg_y4_valid(dbg_y4_valid_w),
+                .dbg_y8(dbg_y8_w), .dbg_y8_valid(dbg_y8_valid_w),
+                .dbg_y16(), .dbg_y16_valid(),
+                .dbg_y32(dbg_y32_w), .dbg_y32_valid(dbg_y32_valid_w),
+                .dbg_y64(dbg_y64_w), .dbg_y64_valid(dbg_y64_valid_w)
+            );
+        end
+        else if (USE_PHASE7_FOLDED != 0) begin : gen_phase7_folded
             interp128_all2x_v7_folded_fir_cic_top_ce #(
                 .STAGE23_ACC_W   (38),
                 .CIC_ORDER       (3),

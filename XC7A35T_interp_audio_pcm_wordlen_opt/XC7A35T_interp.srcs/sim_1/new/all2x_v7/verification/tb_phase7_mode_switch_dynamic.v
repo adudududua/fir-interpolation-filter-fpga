@@ -73,7 +73,14 @@ module tb_phase7_mode_switch_dynamic;
         .USE_NATIONAL_FINALS_DATAPATH(1),
         .USE_NATIONAL_FINALS_SERIAL_CIC_COMB(1),
         .USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER(0),
-        .USE_NATIONAL_FINALS_NARROW_STAGE23(1)
+        .USE_NATIONAL_FINALS_NARROW_STAGE23(1),
+`ifdef NATIONAL_FINALS_ALL2X
+        .USE_NATIONAL_FINALS_ALL2X_OPT(1),
+        .USE_NATIONAL_FINALS_ALL2X_SHARED_TAIL(1),
+        .USE_NATIONAL_FINALS_ALL2X_TAIL_DSP48(1)
+`else
+        .USE_NATIONAL_FINALS_ALL2X_OPT(0)
+`endif
     ) u_dut (
         .clk_audio_128x(clk),
         .rst_n(rst_n),

@@ -408,7 +408,30 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         coeff_sequence_bram[22] = `V2_S2_P1_C1;
         coeff_sequence_bram[23] = `V2_S2_P1_C0;
 
-        if (STAGE3_FLAT != 0) begin
+        if (STAGE3_FLAT == 2) begin
+            // Full-gain Phase-6 all-2x Stage 3.  The coefficient package
+            // stores this stage in Q14; doubling converts it to the Q15
+            // scale used by the shared Stage2/3 rounder.
+            coeff_rom[16] = 18'sd404;
+            coeff_rom[17] = -18'sd3272;
+            coeff_rom[18] = 18'sd19250;
+            coeff_rom[24] = -18'sd148;
+            coeff_rom[25] = 18'sd522;
+            coeff_rom[26] = 18'sd32016;
+
+            coeff_sequence_bram[32] = 18'sd404;
+            coeff_sequence_bram[33] = -18'sd3272;
+            coeff_sequence_bram[34] = 18'sd19250;
+            coeff_sequence_bram[35] = 18'sd19250;
+            coeff_sequence_bram[36] = -18'sd3272;
+            coeff_sequence_bram[37] = 18'sd404;
+            coeff_sequence_bram[48] = -18'sd148;
+            coeff_sequence_bram[49] = 18'sd522;
+            coeff_sequence_bram[50] = 18'sd32016;
+            coeff_sequence_bram[51] = 18'sd522;
+            coeff_sequence_bram[52] = -18'sd148;
+        end
+        else if (STAGE3_FLAT != 0) begin
             // 全国赛独立 8x 输出使用原 Phase 6 平坦 Stage3。
             // CIC 的通带下垂由后接三抽头移位加法器单独补偿。
             coeff_rom[16] = 18'sd202;
@@ -649,8 +672,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
             $fatal(1, "Packed BRAM banks must be at least COEFF_W wide");
         if (CIC_ORDER != 3 && CIC_ORDER != 4)
             $fatal(1, "CIC_ORDER must be 3 or 4");
-        if (STAGE3_FLAT != 0 && STAGE3_FLAT != 1)
-            $fatal(1, "STAGE3_FLAT must be 0 or 1");
+        if (STAGE3_FLAT < 0 || STAGE3_FLAT > 2)
+            $fatal(1, "STAGE3_FLAT must be 0, 1 (CIC), or 2 (full-gain all-2x)");
         if (USE_BRAM_HISTORY != 0 && USE_BRAM_HISTORY != 1)
             $fatal(1, "USE_BRAM_HISTORY must be 0 or 1");
         if (USE_BRAM_COEFF != 0 && USE_BRAM_COEFF != 1)

@@ -1,0 +1,13 @@
+National-finals all-2x RTL impulse acceptance
+============================================
+Source: Phase-6 MATLAB golden, independently verified by XSim at 0 LSB for impulse and random PCM.
+Limits: pass <= +/-0.050 dB, stop >= 70.0 dB
+
+Fs_in=44100 node=4x Fs_out=176400 len=1245 pass_abs=0.004610111 dB ripple=0.005702880 dB stop=78.668822771 dB sym=0 LSB gd=112.000000 phase_res=5.68e-14 PASS=1
+Fs_in=44100 node=8x Fs_out=352800 len=2499 pass_abs=0.005394745 dB ripple=0.006183027 dB stop=78.561809849 dB sym=0 LSB gd=229.000000 phase_res=9.95e-14 PASS=1
+Fs_in=44100 node=128x Fs_out=5.6448e+06 len=40059 pass_abs=0.005443900 dB ripple=0.007822642 dB stop=78.447143094 dB sym=0 LSB gd=3709.000000 phase_res=2.84e-14 PASS=1
+Fs_in=48000 node=4x Fs_out=192000 len=1245 pass_abs=0.004610111 dB ripple=0.005702880 dB stop=78.668822771 dB sym=0 LSB gd=112.000000 phase_res=5.68e-14 PASS=1
+Fs_in=48000 node=8x Fs_out=384000 len=2499 pass_abs=0.005394745 dB ripple=0.005718829 dB stop=78.561809849 dB sym=0 LSB gd=229.000000 phase_res=5.68e-14 PASS=1
+Fs_in=48000 node=128x Fs_out=6.144e+06 len=40059 pass_abs=0.005443900 dB ripple=0.005908996 dB stop=78.881188589 dB sym=0 LSB gd=3709.000000 phase_res=2.13e-14 PASS=1
+
+OVERALL_PASS=1
