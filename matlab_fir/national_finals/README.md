@@ -78,7 +78,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
   -PublishImpulseOutputs
 ```
 
-脚本每次使用新的 `tmp/nf_rtl_regression/<时间戳>` 空编译目录，任一 PASS 标志缺失或工具退出码非零都会终止。
+脚本每次使用新的 `matlab_fir/national_finals/_work/rtl_regression/<时间戳>` 空编译目录，任一 PASS 标志缺失或工具退出码非零都会终止。Vivado/XSim 的 `.Xil`、`xsim.dir`、journal 和 log 均留在 `_work` 内，不会写入项目根目录。
 
 ## 5. Vivado 实现签核
 
@@ -123,18 +123,15 @@ run('nf_03_generate_bittrue_vectors.m');
 run('nf_04_analyze_rtl_impulse.m');
 ```
 
-Vivado 2018.3：
+Vivado 2018.3 一键综合、实现和 bitstream：
 
 ```powershell
-& 'E:\app\Xilinx2018.3\Vivado\2018.3\bin\vivado.bat' -mode batch `
-  -source '.\matlab_fir\national_finals\vivado\build_national_finals_board.tcl' `
-  -tclargs 0 1
-
-& 'E:\app\Xilinx2018.3\Vivado\2018.3\bin\vivado.bat' -mode batch `
-  -source '.\matlab_fir\national_finals\vivado\implement_national_finals_single_process.tcl'
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
+  .\matlab_fir\national_finals\vivado\run_national_finals_vivado_build.ps1 `
+  -Step all
 ```
 
-第一条命令执行面积优化综合，第二条以低内存单进程完成布局布线、报告和 bitstream。
+包装脚本先执行面积优化综合，再以低内存单进程完成布局布线、报告和 bitstream。日志与 `.Xil` 均写入 `matlab_fir/national_finals/_work/vivado/<时间戳>`，正式报告和 bitstream 仍发布到 `vivado_results/board_dual_rate_areaopt`。
 
 ## 7. SW1～SW8 与预期 DA_CLK
 

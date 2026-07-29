@@ -13,7 +13,7 @@ $sourceRoot = Join-Path $projectRoot 'sources_1\new'
 $simRoot = Join-Path $projectRoot 'sim_1\new'
 $nfRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $timestamp = Get-Date -Format 'yyyyMMdd_HHmmss'
-$runRoot = Join-Path $repoRoot "tmp\nf_rtl_regression\$timestamp"
+$runRoot = Join-Path $nfRoot "_work\rtl_regression\$timestamp"
 
 $xvlog = Join-Path $VivadoBin 'xvlog.bat'
 $xelab = Join-Path $VivadoBin 'xelab.bat'
