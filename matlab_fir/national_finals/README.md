@@ -1,8 +1,8 @@
 # 全国总决赛：双采样率可配置插值滤波器
 
-当前版本已完成 MATLAB 建模、24 bit 定点模型、RTL、六组 XSim 回归、Vivado 综合/布局布线/时序/DRC/功耗评估和 bitstream 生成。所有软件与 FPGA 工具验收均已通过；由于当前环境无法接触实物开发板，物理板下载和仪器测量仍需按本文最后一节执行，不能把 bitstream 成功等同于实板通过。
+当前版本已完成 MATLAB 建模、24 bit 定点模型、RTL、9 项 XSim 回归、Vivado 综合/布局布线/时序/DRC/功耗评估和 bitstream 生成。所有软件与 FPGA 工具验收均已通过；由于当前环境无法接触实物开发板，物理板下载和仪器测量仍需按本文最后一节执行，不能把 bitstream 成功等同于实板通过。
 
-开发分支：`codex/national-finals-configurable`
+开发分支：`codex/national-finals-cic-6dsp-further-opt`
 
 ## 1. 完成状态
 
@@ -36,7 +36,7 @@ y[n] = x[n-1] + (2*x[n-1] - x[n] - x[n-2]) / 8
 
 它仅用加减和算术右移，不增加乘法器；4x/8x 输出保持平坦 FIR 响应。双采样率板级测试正弦也打包在同一个 256×24 bit ROM 中。
 
-与区域赛 44.1 kHz 最低 LUT 版的 472 LUT / 8 DSP / 3 BRAM 相比，本版为 602 LUT / 8 DSP / 3 BRAM：增加约 130 LUT 完成双采样率、安全时钟切换、独立 8x 合规和共享双速率 ROM，DSP 与 BRAM 数量不增加。
+当前正式版布局布线后为 **557 LUT / 536 FF / 228 Slice / 6 DSP / 3 BRAM / 2 MMCM**。相对本轮指定的 573 LUT / 621 FF / 255 Slice / 6 DSP CIC 基线，减少 16 LUT、85 FF 和 27 Slice；DSP、BRAM、MMCM 以及 0.271 W Vectorless 功耗不增加。
 
 ## 3. 正式 RTL 冲激指标
 
@@ -63,12 +63,15 @@ y[n] = x[n-1] + (2*x[n-1] - x[n] - x[n-2]) / 8
 |---|---|---|
 | ROM | 双采样率数据、回卷、同步复位 | PASS |
 | 移位加减均衡器 | 2009 个定向样本 | PASS |
+| 串行 comb CIC 等价性 | 连续、停顿、burst 中复位和 3840 个输出 | PASS |
 | MMCM/BUFGMUX | 双频率、往返切换、无 runt 高脉冲 | PASS |
 | 矩阵键盘 | SW1～SW8 家族/倍率映射 | PASS |
 | 板级顶层 | 上电复位、共享扫描、SW2、SW6、保护切换 | PASS |
 | 全链路 bit-true | impulse + 固定种子随机 PCM；4x/8x/128x | PASS，0 LSB |
+| 全链路复位恢复 | 8 个内部状态场景，每场景比较 4096 个 128x 输出 | PASS，8/8 |
+| 动态倍率切换 | 不复位连续切换 10 次；检查 runt、X、锁死和冻结 | PASS，10/10 |
 
-全链路样本数：impulse 为 `1245 / 2499 / 40064`，随机输入为 `4317 / 8643 / 138368`；所有节点无 X、无丢样、无数值失配。证据摘要见 [nf_rtl_regression_summary.txt](results/nf_rtl_regression_summary.txt)。
+最终一次发布回归目录为 `_work/rtl_regression/20260730_183321`。九项测试全部通过；所有逐点比较节点无 X、无丢样、无数值失配。证据摘要见 [nf_rtl_regression_summary.txt](results/nf_rtl_regression_summary.txt)。
 
 一键重跑：
 
@@ -86,29 +89,48 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
 
 | 项目 | 结果 |
 |---|---:|
-| Slice LUT | 602 / 20800（2.89%） |
-| Slice register | 616 / 41600（1.48%） |
+| Slice | 228 / 8150（2.80%） |
+| Slice LUT | 557 / 20800（2.68%） |
+| Slice register | 536 / 41600（1.29%） |
 | BRAM tile | 3 / 50（6.00%） |
-| DSP48E1 | 8 / 90（8.89%） |
+| DSP48E1 | 6 / 90（6.67%） |
 | BUFGCTRL / MMCM | 2 / 2 |
-| WNS / TNS | +46.309 ns / 0 ns |
-| WHS / THS | +0.103 ns / 0 ns |
-| 路由错误 | 0，1831/1831 可布线网络全部完成 |
+| WNS / TNS | +45.614 ns / 0 ns |
+| WHS / THS | +0.105 ns / 0 ns |
+| 路由错误 | 0，1576/1576 可布线网络全部完成 |
 | DRC Error | 0 |
 | Vectorless 功耗 | 0.271 W（动态 0.199 W，静态 0.072 W，Medium confidence） |
 
-Vivado 报告仍有 211 条 Warning/Advisory，主要是面积优先结构中未加流水的 DSP 性能建议，以及 DSP/BRAM 异步控制检查。当前时序余量很大、路由完整、DRC Error 为 0 且 bitstream 已成功生成；这些警告不是“已物理验证”的替代品，首次上板仍要重点检查复位和采样率切换。
+Vivado DRC 报告仍有 73 条 Warning 和 1 条 Advisory，主要是面积优先结构中未加流水的 DSP 性能建议，以及 DSP/BRAM 异步控制检查。当前时序余量很大、路由完整、DRC Error 为 0 且 bitstream 已成功生成；这些警告不是“已物理验证”的替代品，首次上板仍要重点检查复位和采样率切换。
 
 签核摘要见 [nf_hardware_signoff_summary.txt](results/nf_hardware_signoff_summary.txt)。
 
 bitstream：
 
 ```text
-matlab_fir/national_finals/vivado_results/board_dual_rate_areaopt/
+matlab_fir/national_finals/vivado_results/board_dual_rate_cic6_opt/
 national_finals_dual_rate_4x8x128x_areaopt.bit
 ```
 
-SHA-256：`28A18B572FC53E816CCB709BAF04DA3129E1F2B2BF51A1749682075A29EB043B`
+SHA-256：`4BCCFDC0559E542777F4BE758D85087D7B12E501F9A86EBD19393FB6CDCA0C3F`
+
+### 5.1 本轮 6-DSP CIC 优化结果
+
+固定同一个综合 DCP 对五个 `opt_design` 指令进行了完整实现扫描，每个点均生成 bitstream 并检查时序和 DRC：
+
+| 候选 | LUT | FF | Slice | DSP | WNS / WHS | 结论 |
+|---|---:|---:|---:|---:|---:|---|
+| 原 6-DSP 基线，ExploreArea | 573 | 621 | 255 | 6 | +46.339 / +0.072 ns | 对照 |
+| 基线 RTL，Default | **556** | 621 | 229 | 6 | +45.294 / +0.092 ns | 策略最低 LUT |
+| DSP PREG，Default | **556** | 557 | 231 | 6 | +45.936 / +0.106 ns | 最低 LUT 候选 |
+| **DSP PREG + 组合交接，Default** | **557** | **536** | **228** | **6** | **+45.614 / +0.105 ns** | **正式版本** |
+
+正式版本比最低 LUT 候选只多 1 LUT，但减少 21 FF 和 3 个物理 Slice，因此是更好的整体面积 Pareto 点。本轮保留的两个结构优化是：
+
+1. 两个隐藏 CIC 积分状态采用 DSP48E1 PREG 原生同步复位；所有外部可见控制、最终状态、valid 和输出仍保持异步复位，并已通过 8 个复位恢复场景。
+2. 仅在串行 CIC 模式下取消均衡器冗余输出寄存器，由 CIC 输入事务直接捕获组合结果；均衡器默认的寄存输出兼容接口没有改变。
+
+均衡运算融合进串行 comb DSP 的实验虽然 0 LSB 通过，但实现为 581 LUT / 622 FF，已回退；整个 CIC 改同步复位会破坏异步复位断言，也已回退；均衡器精确缩位综合资源不变，同样不保留。完整策略数据见 [cic6_implementation_strategy_scan.csv](results/cic6_implementation_strategy_scan.csv)，优化记录见 [cic6_further_optimization_summary.txt](results/cic6_further_optimization_summary.txt)。
 
 ## 6. MATLAB 与 Vivado 复现
 
@@ -131,7 +153,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
   -Step all
 ```
 
-包装脚本先执行面积优化综合，再以低内存单进程完成布局布线、报告和 bitstream。日志与 `.Xil` 均写入 `matlab_fir/national_finals/_work/vivado/<时间戳>`，正式报告和 bitstream 仍发布到 `vivado_results/board_dual_rate_areaopt`。
+包装脚本先执行面积优化综合，再以低内存单进程完成布局布线、报告和 bitstream。默认实现指令是本轮扫描选出的 `Default`，默认结果目录为 `vivado_results/board_dual_rate_cic6_opt`。日志与 `.Xil` 均写入 `matlab_fir/national_finals/_work/vivado/<时间戳>`，不会污染项目根目录。
 
 ## 7. SW1～SW8 与预期 DA_CLK
 

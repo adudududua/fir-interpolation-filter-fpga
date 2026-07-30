@@ -18,14 +18,15 @@
 //=============================================================
 
 module cic3_compensator_shiftadd_ce #(
-    parameter integer DATA_W = 20
+    parameter integer DATA_W = 20,
+    parameter integer REGISTER_OUTPUT = 1
 )(
     input  wire                         clk,
     input  wire                         rst_n,
     input  wire signed [DATA_W-1:0]     x_in,
     input  wire                         x_in_valid,
-    output reg  signed [DATA_W-1:0]     y_out,
-    output reg                          y_out_valid
+    output wire signed [DATA_W-1:0]     y_out,
+    output wire                         y_out_valid
 );
 
     localparam integer EXT_W = DATA_W + 3;
@@ -36,6 +37,8 @@ module cic3_compensator_shiftadd_ce #(
 
     reg signed [DATA_W-1:0] x_z1;
     reg signed [DATA_W-1:0] x_z2;
+    reg signed [DATA_W-1:0] y_out_reg;
+    reg y_out_valid_reg;
 
     wire signed [EXT_W-1:0] x_now_ext;
     wire signed [EXT_W-1:0] x_z1_ext;
@@ -60,21 +63,27 @@ module cic3_compensator_shiftadd_ce #(
     assign equalized_sat = upper_is_sign_extension ?
         equalized[DATA_W-1:0] :
         (equalized[EXT_W-1] ? OUT_MIN : OUT_MAX);
+    assign y_out = (REGISTER_OUTPUT != 0) ? y_out_reg :
+                   equalized_sat;
+    assign y_out_valid = (REGISTER_OUTPUT != 0) ?
+                         y_out_valid_reg : x_in_valid;
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             x_z1 <= {DATA_W{1'b0}};
             x_z2 <= {DATA_W{1'b0}};
-            y_out <= {DATA_W{1'b0}};
-            y_out_valid <= 1'b0;
+            y_out_reg <= {DATA_W{1'b0}};
+            y_out_valid_reg <= 1'b0;
         end
         else begin
-            y_out_valid <= 1'b0;
+            y_out_valid_reg <= 1'b0;
             if (x_in_valid) begin
                 x_z2 <= x_z1;
                 x_z1 <= x_in;
-                y_out <= equalized_sat;
-                y_out_valid <= 1'b1;
+                if (REGISTER_OUTPUT != 0) begin
+                    y_out_reg <= equalized_sat;
+                    y_out_valid_reg <= 1'b1;
+                end
             end
         end
     end
@@ -83,6 +92,8 @@ module cic3_compensator_shiftadd_ce #(
     initial begin
         if (DATA_W < 4)
             $fatal(1, "cic3_compensator_shiftadd_ce DATA_W must be >= 4");
+        if (REGISTER_OUTPUT != 0 && REGISTER_OUTPUT != 1)
+            $fatal(1, "REGISTER_OUTPUT must be 0 or 1");
     end
 `endif
 

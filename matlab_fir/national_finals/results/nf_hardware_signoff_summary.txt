@@ -1,31 +1,34 @@
 National-finals FPGA implementation signoff
 ===========================================
-Date: 2026-07-29
+Date: 2026-07-30
 Tool: Vivado 2018.3
 Device: xc7a35tfgg484-2
 Top: board_demo_competition_dac8_top
 Design state: fully routed; bitstream generated
+Branch: codex/national-finals-cic-6dsp-further-opt
+Result tag: board_dual_rate_cic6_opt
 
 Placed utilization
-  Slice LUTs:       602 / 20800 (2.89%)
-  Slice registers:  616 / 41600 (1.48%)
+  Slices:            228 / 8150  (2.80%)
+  Slice LUTs:        557 / 20800 (2.68%)
+  Slice registers:   536 / 41600 (1.29%)
   BRAM tiles:         3 / 50    (6.00%)
-  DSP48E1:            8 / 90    (8.89%)
+  DSP48E1:            6 / 90    (6.67%)
   BUFGCTRL:            2 / 32    (6.25%)
   MMCME2_ADV:          2 / 5    (40.00%)
 
 Routed timing
-  WNS: +46.309 ns
+  WNS: +45.614 ns
   TNS:   0.000 ns
-  WHS:  +0.103 ns
+  WHS:  +0.105 ns
   THS:   0.000 ns
   All user specified timing constraints are met.
 
 Routing and DRC
-  Fully routed nets: 1831 / 1831
+  Fully routed routable nets: 1576 / 1576
   Nets with routing errors: 0
   DRC errors: 0
-  DRC warnings/advisories: 211
+  DRC violations: 73 warnings + 1 advisory
   The warnings are DSP input/output pipeline recommendations and asynchronous
   DSP/BRAM control checks retained by the area-optimized architecture. They do
   not block bitstream generation; physical-board validation is still required.
@@ -36,8 +39,18 @@ Vectorless power estimate (Medium confidence)
   Device static: 0.072 W
 
 Bitstream
+  vivado_results/board_dual_rate_cic6_opt/
   national_finals_dual_rate_4x8x128x_areaopt.bit
-  SHA256: 28A18B572FC53E816CCB709BAF04DA3129E1F2B2BF51A1749682075A29EB043B
+  SHA256: 4BCCFDC0559E542777F4BE758D85087D7B12E501F9A86EBD19393FB6CDCA0C3F
+
+Optimization delta versus the requested 573-LUT/6-DSP CIC baseline
+  Slice LUTs:      573 -> 557 (-16, -2.79%)
+  Slice registers: 621 -> 536 (-85, -13.69%)
+  Slices:          255 -> 228 (-27, -10.59%)
+  DSP/BRAM/MMCM:   unchanged at 6 / 3 / 2
+  Power:           unchanged at 0.271 W
+  Selected over the 556-LUT candidate because it uses 21 fewer FF and
+  3 fewer physical Slices for only one additional LUT.
 
 IMPLEMENTATION_PASS=1
 PHYSICAL_BOARD_TESTED=0

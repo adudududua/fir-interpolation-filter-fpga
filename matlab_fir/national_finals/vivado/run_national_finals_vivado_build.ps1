@@ -9,8 +9,10 @@ param(
     [string]$FlattenHierarchy = 'rebuilt',
     [ValidateSet('auto', 'on', 'off')]
     [string]$ResourceSharing = 'auto',
+    [ValidateSet('Default', 'Explore', 'ExploreWithRemap', 'ExploreArea', 'AddRemap')]
+    [string]$ImplementationOptDirective = 'Default',
     [ValidatePattern('^[A-Za-z0-9_-]+$')]
-    [string]$ResultTag = 'board_dual_rate_areaopt'
+    [string]$ResultTag = 'board_dual_rate_cic6_opt'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -81,7 +83,11 @@ if ($Step -eq 'all' -or $Step -eq 'synth') {
 }
 
 if ($Step -eq 'all' -or $Step -eq 'implement') {
-    Invoke-VivadoStep -Name 'implementation' -TclPath $implementTcl
+    Invoke-VivadoStep -Name 'implementation' -TclPath $implementTcl `
+        -TclArguments @(
+            $ResultTag,
+            $ImplementationOptDirective
+        )
 }
 
 Write-Host ''

@@ -1,25 +1,34 @@
 National-finals RTL regression summary
 ======================================
-Date: 2026-07-29
+Date: 2026-07-30
 Simulator: Vivado Simulator 2018.3
 Command: powershell.exe -NoProfile -ExecutionPolicy Bypass -File matlab_fir/national_finals/sim/run_national_finals_rtl_regression.ps1 -PublishImpulseOutputs
+Run directory: matlab_fir/national_finals/_work/rtl_regression/20260730_183321
 
 1. dual-rate tone ROM
    PASS: 44.1/48 kHz data, address wrap and synchronous family reset
 2. CIC3 shift-add equalizer
-   PASS: 2009 samples
-3. dual-family MMCM/BUFGMUX clock
-   PASS: 5.644806/6.144091 MHz measured in XSim, return switch PASS,
-         no runt high pulse observed
-4. compact keypad
+   PASS: 2009 directed samples; registered compatibility mode preserved
+3. serial-comb CIC equivalence
+   PASS: continuous 160 samples, stalled 240 samples, reset mid-burst,
+         and 3840 output samples agree with the parallel reference
+4. dual-family MMCM/BUFGMUX clock
+   PASS: both frequency families, return switch, no runt high pulse
+5. compact keypad
    PASS: SW1-SW8 family/mode behavior
-5. board integration
-   PASS: reset=65535 scan=16384 mode_wait=442367 family_wait=458752
-6. final full-chain bit-true
-   PASS: impulse y4/y8/y128 = 1245/2499/40064 samples
-   PASS: random  y4/y8/y128 = 4317/8643/138368 samples
-   PASS: all three output nodes, all samples, 0 LSB mismatch
+6. board integration
+   PASS: power-up reset, shared scan, SW2/SW6 and protected family switch
+7. final full-chain bit-true
+   PASS: impulse and fixed-seed random PCM at y4/y8/y128
+   PASS: every compared output sample has 0 LSB mismatch
+8. full-chain reset recovery
+   PASS: 8 internal-state reset scenarios, each followed by 4096 y128 samples
+9. dynamic mode switching
+   PASS: 10 reset-free switches; no runt pulse, X, lock-up or output freeze
+
+Published impulse responses:
+  matlab_fir/national_finals/rtl_outputs
 
 OVERALL_PASS=1
-REGRESSION_COUNT=6
-REGRESSION_PASS=6
+REGRESSION_COUNT=9
+REGRESSION_PASS=9

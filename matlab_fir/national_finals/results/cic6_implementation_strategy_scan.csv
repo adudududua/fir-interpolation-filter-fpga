@@ -1,0 +1,8 @@
+variant,opt_design_directive,slice_lut,slice_register,slice,dsp,bram_tile,mmcm,wns_ns,whs_ns,timing_pass,drc_error,bitstream_pass
+requested_baseline,ExploreArea,573,621,255,6,3,2,46.339,0.072,1,0,1
+strategy_default,Default,556,621,229,6,3,2,45.294,0.092,1,0,1
+strategy_explore,Explore,556,621,229,6,3,2,45.294,0.092,1,0,1
+strategy_explore_with_remap,ExploreWithRemap,556,621,235,6,3,2,45.271,0.072,1,0,1
+strategy_add_remap,AddRemap,556,621,229,6,3,2,45.294,0.092,1,0,1
+dsp_preg_default,Default,556,557,231,6,3,2,45.936,0.106,1,0,1
+selected_preg_eq_comb_default,Default,557,536,228,6,3,2,45.614,0.105,1,0,1

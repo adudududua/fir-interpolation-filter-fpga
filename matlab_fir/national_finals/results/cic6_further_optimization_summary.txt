@@ -1,0 +1,53 @@
+National-finals 6-DSP CIC further optimization
+================================================
+Date: 2026-07-30
+Branch: codex/national-finals-cic-6dsp-further-opt
+Starting point: 573 LUT / 621 FF / 255 Slice / 6 DSP / 3 BRAM / 2 MMCM
+
+Accepted changes
+----------------
+1. Default opt_design strategy
+   The five-directive scan showed that Default/Explore/AddRemap all reached
+   556 LUT on the baseline netlist, versus 573 LUT for ExploreArea.
+2. DSP48E1 PREG state retention
+   The two hidden CIC integrator states use synchronous reset so Vivado can
+   retain them in the existing DSP48E1 PREGs. Externally visible control,
+   final state, valid and output registers retain asynchronous reset.
+3. Combinational equalizer-to-CIC hand-off
+   In serial-CIC mode only, the equalizer result is captured directly by the
+   CIC input transaction, removing an otherwise redundant output register
+   bank. The equalizer's default registered interface remains compatible.
+
+Rejected experiments
+--------------------
+1. Equalizer arithmetic fused into the serial comb DSP
+   RTL was bit-true but implemented at 581 LUT / 622 FF / 6 DSP: worse.
+2. Whole-CIC synchronous reset
+   It saved registers but failed the required asynchronous reset assertion.
+3. Exact equalizer internal-width shrink
+   Unit simulation passed but synthesis remained 584 LUT / 557 FF / 6 DSP,
+   so there was no resource benefit.
+
+Selected result
+---------------
+Placed: 557 LUT / 536 FF / 228 Slice / 6 DSP / 3 BRAM / 2 MMCM
+Timing: WNS +45.614 ns; WHS +0.105 ns; TNS/THS 0
+Routing: 1576/1576 routable nets complete; routing errors 0
+DRC: Error 0
+Power: 0.271 W vectorless, Medium confidence
+Bitstream SHA256:
+4BCCFDC0559E542777F4BE758D85087D7B12E501F9A86EBD19393FB6CDCA0C3F
+
+The selected point uses one more LUT than the 556-LUT PREG candidate, but
+saves 21 FF and 3 physical Slices. It is therefore the better overall
+area Pareto point.
+
+Verification
+------------
+Vivado Simulator 2018.3 regression: PASS 9/9
+Full-chain MATLAB/RTL bit-true mismatch: 0 LSB
+Reset recovery: PASS 8/8 scenarios
+Dynamic mode switching: PASS 10 switches
+MATLAB analysis of six published RTL impulses: PASS 6/6
+Implementation, timing, routing, DRC, power and bitstream: PASS
+Physical FPGA download and instrument measurements: pending

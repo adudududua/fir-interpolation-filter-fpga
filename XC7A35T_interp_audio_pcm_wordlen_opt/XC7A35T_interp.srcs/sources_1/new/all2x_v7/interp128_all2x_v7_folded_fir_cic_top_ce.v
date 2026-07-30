@@ -185,7 +185,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
         if (USE_CIC3_SHIFTADD_COMPENSATOR != 0) begin :
                 gen_cic3_shiftadd_compensator
             cic3_compensator_shiftadd_ce #(
-                .DATA_W(20)
+                .DATA_W(20),
+                .REGISTER_OUTPUT((USE_SERIAL_CIC_COMB != 0) ? 0 : 1)
             ) u_cic3_compensator_shiftadd_ce (
                 .clk(clk),
                 .rst_n(rst_n),
