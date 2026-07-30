@@ -1,10 +1,10 @@
 # 高阶数字插值滤波器设计与 FPGA 验证
 
-## 全国总决赛双采样率版本（2026-07-31，6-DSP CIC 第四轮优化）
+## 全国总决赛双采样率版本（2026-07-31，6-DSP CIC 第五轮优化）
 
-全国赛升级版当前位于分支 `codex/national-finals-cic6-preg-round-opt`：支持 signed 24 bit、44.1/48 kHz 输入家族以及 4x/8x/128x 正式输出。最终 RTL 六工况的通带最大绝对偏差为 **0.004610～0.006918 dB**，阻带衰减为 **72.348～78.669 dB**，冲激对称误差均为 **0 LSB**；完整 XSim 回归 **9/9 PASS**，全链路 impulse + 随机 PCM 的 4x/8x/128x 三节点均为 **0 LSB mismatch**，另通过 8 个内部状态复位场景和 10 次不停机倍率切换。
+全国赛升级版当前位于分支 `codex/national-finals-cic6-gui-fix-round5-opt`：支持 signed 24 bit、44.1/48 kHz 输入家族以及 4x/8x/128x 正式输出。最终 RTL 六工况的通带最大绝对偏差为 **0.004610～0.006918 dB**，阻带衰减为 **72.348～78.669 dB**，冲激对称误差均为 **0 LSB**；完整 XSim 回归 **9/9 PASS**，全链路 impulse + 随机 PCM 的 4x/8x/128x 三节点均为 **0 LSB mismatch**，另通过 8 个内部状态复位场景和 10 次不停机倍率切换。
 
-Vivado 2018.3 对 `XC7A35T-FGG484-2` 的最终布局布线结果为 **461 LUT / 464 FF / 199 Slice / 6 DSP / 3 BRAM Tile / 2 MMCM**，WNS/WHS 为 **+45.405/+0.114 ns**，1355/1355 个可布线网络全部完成、路由错误 0、DRC Error 0；Vectorless 功耗估计为 **0.271 W（Medium confidence）**。最终 bitstream 已生成，SHA-256 为 `7FDAE2FCEA41643658A4DD05BF77C062EAA92C5610A3E6BC12CC1254EBCF36CE`。
+Vivado 2018.3 对 `XC7A35T-FGG484-2` 的最终布局布线结果为 **440 LUT / 464 FF / 191 Slice / 6 DSP / 3 BRAM Tile / 2 MMCM**，WNS/WHS 为 **+46.046/+0.127 ns**，1335/1335 个可布线网络全部完成、路由错误 0、DRC Error 0；Vectorless 功耗估计为 **0.271 W（Medium confidence）**。最终 bitstream 已生成，SHA-256 为 `3E25025717617CEE2CECE32EB1FC16494006793655DBB502888B62CD35220720`。
 
 ### 全国赛版主要改进与优化方法
 
@@ -19,10 +19,12 @@ Vivado 2018.3 对 `XC7A35T-FGG484-2` 的最终布局布线结果为 **461 LUT / 
 9. **复用 DSP48E1 PREG 并消除冗余寄存器边界**：仅将两个内部 CIC 积分状态改为 DSP 原生同步复位，使状态保留在已有 PREG 中；外部可见控制、最终状态、valid 和输出仍保持异步复位。串行 CIC 模式下再把均衡器组合结果直接交给 CIC 事务捕获，默认的均衡器寄存输出兼容模式仍保留。
 10. **第二轮宽位复用器、字长和状态压缩**：三级 comb 历史统一为 22 bit 并在三个串行周期轮转，消除 DSP 输入前的 23 bit 三选一复用器；Stage1 累加器在最坏界证明后由 42 bit 收窄到 41 bit；Stage2/3 级号由 2 bit 压成 1 bit，固定 MAC 次数由状态组合生成。
 11. **第三轮消除 Stage2/3 累加器宽复用器**：调度器在每个 MAC 任务开始时已经把 `acc_reg` 清零，因此首抽头无需再用 `job_mac_index==0` 在 0 和累加器之间选择。DSP48E1 的 C 输入改为恒接 `acc_reg`，OPMODE 固定为 M+C，在不改变运算序列的前提下移除一组 41 bit 级零/累加器复用逻辑，形成 487 LUT / 532 FF 的第三轮中间版本。
-12. **第四轮由 DSP48E1 PREG 直接保存 FIR 累加结果**：Stage1 和共享 Stage2/3 均取消外部 `ACC_W` 累加器及冗余结果寄存器，让同一颗 DSP 的 PREG 在 MAC 周期内执行 `M+P` 反馈并保存最终和；Stage1 仍使用 DSP48 预加器完成对称抽头相加。
-13. **利用 DSP 空闲提交周期完成精确 Q15 舍入**：MAC 结束后的空闲周期把符号相关偏置直接送入 DSP，非负数加 16384、负数加 16383，再执行移位和饱和，删除两级外部宽位舍入加法器，同时保持负半值处理与原 golden 完全一致。
+12. **第四轮由 DSP48E1 PREG 直接保存 FIR 累加结果**：Stage1 和共享 Stage2/3 均取消外部 `ACC_W` 累加器及冗余结果寄存器，让同一颗 DSP 的 PREG 在 MAC 周期内执行 `M+P` 反馈并保存最终和。正式最低 LUT 配置采用织构完成对称样本预加，再使用 DSP48 乘法器/PREG；显式 DSP48 预加器 A/B 综合为 491 LUT，劣于关闭时的 469 LUT，因此保持关闭。
+13. **利用 DSP 空闲提交周期完成精确 Q15 舍入**：MAC 结束后的空闲周期把常数 16383 送入 DSP，并用 `CARRYIN` 仅为非负数再加 1，精确实现“非负 +16384、负数 +16383”。该变换消除了符号驱动的宽常数选择器，保持负半值处理与 golden 完全一致。
 14. **重叠任务快照和共享读头优化**：Stage2/3 延迟增加后，启动任务时锁存环形历史的 `head/fill`，防止下一次写入改变正在执行任务的读地址；随后把两级重复快照选择器合并为一个共享 `history_read_head`。这一修复在完整链回归中真实暴露并修正，不依赖单元测试盲区。
-15. **第四轮实现策略复扫**：同一综合 DCP 分别执行 `Default / ExploreArea / AddRemap`。Default 与 AddRemap 均为 461 LUT / 199 Slice，ExploreArea 为 472 LUT / 194 Slice；以最低 LUT 为首要目标，正式版选择 `Default`。最终相对 **573 LUT / 621 FF / 255 Slice / 6 DSP** 基线减少 **112 LUT / 157 FF / 56 Slice**，DSP、BRAM、MMCM 和功耗均不增加；相对上一轮正式版再减少 **26 LUT / 68 FF / 6 Slice**。
+15. **第五轮实现策略复扫**：在 `CARRYIN` 候选的同一综合 DCP 上分别执行 `Default / AddRemap / ExploreArea`，结果为 451 / 451 / 475 LUT，正式流程继续选择 `Default`。
+16. **Stage 3 可证明字长裁剪**：全国赛平坦 Stage 3 的最大系数绝对值和为 22926，20-bit 输入下 MAC 绝对值小于 `22926 × 2^19 = 12019810304 < 2^34`。因此带符号 35-bit 视图足够，Q15 舍入结果必然落在 signed 20-bit 范围内，可删除永远不会触发的 Stage 3 饱和比较器和选择器。该项把最终结果由 451 LUT 降到 440 LUT。
+17. **GUI 与脚本配置统一**：工程文件现在显式登记串行 comb CIC 源文件，并固定 `SERIAL_CIC_COMB=1`、`NARROW_STAGE23=1`、Stage1 DSP 预加器关闭、`ResourceSharing=on` 和 `opt_design=Default`。GUI 原生 `synth_1/impl_1` 从头重建得到同样的 440 LUT / 6 DSP，修复了此前 GUI 误用旧并行 CIC 而显示 482 LUT / 542 FF / 8 DSP 的问题。
 
 ### 4x / 8x / 128x 分级滤波指标
 
@@ -45,19 +47,19 @@ Vivado 2018.3 对 `XC7A35T-FGG484-2` 的最终布局布线结果为 **461 LUT / 
 
 | 资源 | 使用量 | 器件总量 | 利用率 |
 |---|---:|---:|---:|
-| Slice | **199** | 8,150 | **2.44%** |
-| LUT（Slice LUT） | **461** | 20,800 | **2.22%** |
+| Slice | **191** | 8,150 | **2.34%** |
+| LUT（Slice LUT） | **440** | 20,800 | **2.12%** |
 | FF（Slice Register） | **464** | 41,600 | **1.12%** |
 | DSP（DSP48E1） | **6** | 90 | **6.67%** |
 | BRAM（BRAM Tile） | **3** | 50 | **6.00%** |
 | MMCM（MMCME2_ADV） | **2** | 5 | **40.00%** |
 | BUFGCTRL | 2 | 32 | 6.25% |
 
-最终实现为 1355/1355 个可布线网络全部完成，WNS/TNS 为 `+45.405 ns / 0 ns`，WHS/THS 为 `+0.114 ns / 0 ns`，DRC Error 为 0。第四轮 `Default / ExploreArea / AddRemap` 三种实现均通过，正式版选择 LUT 最低且流程最简单的 `Default`。资源、时序、功耗和 bitstream 签核摘要见 [`nf_hardware_signoff_summary.txt`](matlab_fir/national_finals/results/nf_hardware_signoff_summary.txt)，策略扫描见 [`cic6_implementation_strategy_scan.csv`](matlab_fir/national_finals/results/cic6_implementation_strategy_scan.csv)，优化取舍见 [`cic6_further_optimization_summary.txt`](matlab_fir/national_finals/results/cic6_further_optimization_summary.txt)。
+最终实现为 1335/1335 个可布线网络全部完成，WNS/TNS 为 `+46.046 ns / 0 ns`，WHS/THS 为 `+0.127 ns / 0 ns`，DRC Error 为 0。正式版选择 LUT 最低且 GUI/脚本复现一致的 `Default`。资源、时序、功耗和 bitstream 签核摘要见 [`nf_hardware_signoff_summary.txt`](matlab_fir/national_finals/results/nf_hardware_signoff_summary.txt)，策略扫描见 [`cic6_implementation_strategy_scan.csv`](matlab_fir/national_finals/results/cic6_implementation_strategy_scan.csv)，优化取舍见 [`cic6_further_optimization_summary.txt`](matlab_fir/national_finals/results/cic6_further_optimization_summary.txt)。
 
 软件、RTL 和 FPGA 实现签核已通过；物理开发板下载及示波器/频谱仪验收尚需现场执行。完整架构、指标、RTL 一键回归、bitstream、SW1～SW8 映射和板测清单见 [全国总决赛交付说明](matlab_fir/national_finals/README.md)。
 
-> **版本口径说明**：以上 461 LUT / 464 FF / 6 DSP / 3 BRAM / 2 MMCM 及六工况指标是当前全国总决赛双采样率正式版本。下面的 472 LUT 单采样率版及 Phase 6/7/8 内容是区域赛优化过程、Pareto 候选和回退版本，不能替代全国赛最终资源数据。
+> **版本口径说明**：以上 440 LUT / 464 FF / 6 DSP / 3 BRAM / 2 MMCM 及六工况指标是当前全国总决赛双采样率正式版本。下面的 472 LUT 单采样率版及 Phase 6/7/8 内容是区域赛优化过程、Pareto 候选和回退版本，不能替代全国赛最终资源数据。
 
 > 当前最低 LUT 实板通过版：44.1 kHz 专用、Phase 7 折叠补偿 FIR-CIC、Stage 2/3 BRAM 历史/系数、共享按键扫描、472 LUT / 8 DSP，自动化验证、完整实现与四档板测通过<br>
 > 上一面积策略候选：相同滤波算法与板级功能、478 LUT / 565 FF / 9 DSP / 3 BRAM Tile<br>

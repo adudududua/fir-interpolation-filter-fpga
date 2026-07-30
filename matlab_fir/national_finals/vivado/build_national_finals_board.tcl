@@ -18,7 +18,8 @@ set synthesis_only 0
 set synth_directive AreaOptimized_high
 set flatten_hierarchy rebuilt
 set resource_sharing on
-set result_tag board_dual_rate_cic6_preg_round_snapshot_opt
+set result_tag board_dual_rate_cic6_round5_opt
+set stage1_dsp48_preadder 0
 if {$argc > 0} {
     set reuse_current_synthesis [lindex $argv 0]
 }
@@ -37,11 +38,17 @@ if {$argc > 4} {
 if {$argc > 5} {
     set result_tag [lindex $argv 5]
 }
+if {$argc > 6} {
+    set stage1_dsp48_preadder [lindex $argv 6]
+}
 if {$reuse_current_synthesis != 0 && $reuse_current_synthesis != 1} {
     error "reuse_current_synthesis must be 0 or 1"
 }
 if {$synthesis_only != 0 && $synthesis_only != 1} {
     error "synthesis_only must be 0 or 1"
+}
+if {$stage1_dsp48_preadder != 0 && $stage1_dsp48_preadder != 1} {
+    error "stage1_dsp48_preadder must be 0 or 1"
 }
 if {![regexp {^[A-Za-z0-9_-]+$} $result_tag]} {
     error "result_tag may contain only letters, digits, underscore, and dash"
@@ -115,7 +122,7 @@ set_property generic [list \
     USE_PHASE7_CIC_BURST_COUNTER_DSP=0 \
     USE_NATIONAL_FINALS_DATAPATH=1 \
     USE_NATIONAL_FINALS_SERIAL_CIC_COMB=1 \
-    USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER=0 \
+    USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER=$stage1_dsp48_preadder \
     USE_NATIONAL_FINALS_NARROW_STAGE23=1] [get_filesets sources_1]
 
 update_compile_order -fileset sources_1
@@ -127,7 +134,7 @@ set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY $flatten_hierarchy \
     [get_runs synth_1]
 set_property STEPS.SYNTH_DESIGN.ARGS.RESOURCE_SHARING $resource_sharing \
     [get_runs synth_1]
-set_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE ExploreArea [get_runs impl_1]
+set_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE Default [get_runs impl_1]
 
 reset_run impl_1
 if {$reuse_current_synthesis == 0} {
@@ -215,7 +222,10 @@ puts $manifest_handle "44.1-kHz family 128x clock: 5.644796 MHz (-0.64 ppm nomin
 puts $manifest_handle "48-kHz family 128x clock: 6.144068 MHz (+11.03 ppm nominal)"
 puts $manifest_handle "Architecture: shared 2x/2x/2x FIR + shift-add CIC equalizer + CIC16"
 puts $manifest_handle "Synthesis directive: AreaOptimized_high"
-puts $manifest_handle "Implementation opt directive: ExploreArea"
+puts $manifest_handle "Stage1 DSP48 preadder: $stage1_dsp48_preadder"
+puts $manifest_handle "Rounding: constant 16383 plus DSP48 CARRYIN for non-negative MAC sums"
+puts $manifest_handle "Stage3: proven 35-bit MAC bound removes unreachable 20-bit saturation logic"
+puts $manifest_handle "Implementation opt directive: Default"
 close $manifest_handle
 
 puts "NATIONAL_FINALS_BOARD_BUILD_PASS"

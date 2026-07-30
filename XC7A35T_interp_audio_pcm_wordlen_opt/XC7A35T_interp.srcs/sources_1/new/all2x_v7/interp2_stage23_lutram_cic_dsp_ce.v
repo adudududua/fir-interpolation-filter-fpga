@@ -80,6 +80,11 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     localparam integer SHIFT_W = ACC_W - FRAC_W;
     localparam integer STAGE2_UPPER_W = SHIFT_W - STAGE2_DATA_W;
     localparam integer STAGE3_UPPER_W = SHIFT_W - STAGE3_DATA_W;
+    // National-finals flat Stage3 has max |coefficient sum| 22926.
+    // With a signed 20-bit input its MAC magnitude is below 2^34, so the
+    // rounded Q15 result always fits signed 20 bits.  A 35-bit signed view is
+    // therefore sufficient and the generic saturation mux is provably dead.
+    localparam integer NF_STAGE3_ACC_W = 35;
 
     localparam signed [STAGE2_DATA_W-1:0] STAGE2_OUT_MAX =
         {1'b0, {(STAGE2_DATA_W-1){1'b1}}};
@@ -173,6 +178,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     wire dsp_p_reset;
     wire [6:0] dsp_opmode;
     wire signed [47:0] dsp_round_bias;
+    wire dsp_round_carryin;
     wire signed [STAGE2_DATA_W-1:0] stage2_q15_rounded;
     wire signed [STAGE3_DATA_W-1:0] stage3_q15_rounded;
     wire signed [SHIFT_W-1:0] truncated_value;
@@ -277,8 +283,9 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     assign dsp_p_reset = !rst_n ||
         (!job_active && !job_result_pending && !job_output_pending &&
          (stage2_pending || stage3_pending));
-    assign dsp_round_bias = mac_sum_comb[ACC_W-1] ?
-        48'sd16383 : 48'sd16384;
+    assign dsp_round_bias = 48'sd16383;
+    assign dsp_round_carryin =
+        job_result_pending && !mac_sum_comb[ACC_W-1];
     assign dsp_opmode = job_result_pending ?
         7'b0001110 : 7'b0100101;
 
@@ -314,7 +321,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         .OPMODE(dsp_opmode),
         .ALUMODE(4'b0000),
         .CARRYINSEL(3'b000),
-        .CARRYIN(1'b0),
+        .CARRYIN(dsp_round_carryin),
         .ACIN(30'd0),
         .BCIN(18'd0),
         .PCIN(48'd0),
@@ -365,16 +372,30 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     assign stage2_upper_is_sign_extension =
         truncated_value[SHIFT_W-1:STAGE2_DATA_W] ==
         {STAGE2_UPPER_W{truncated_value[STAGE2_DATA_W-1]}};
-    assign stage3_upper_is_sign_extension =
-        truncated_value[SHIFT_W-1:STAGE3_DATA_W] ==
-        {STAGE3_UPPER_W{truncated_value[STAGE3_DATA_W-1]}};
-
     assign stage2_q15_rounded = stage2_upper_is_sign_extension ?
         truncated_value[STAGE2_DATA_W-1:0] :
         (truncated_value[SHIFT_W-1] ? STAGE2_OUT_MIN : STAGE2_OUT_MAX);
-    assign stage3_q15_rounded = stage3_upper_is_sign_extension ?
-        truncated_value[STAGE3_DATA_W-1:0] :
-        (truncated_value[SHIFT_W-1] ? STAGE3_OUT_MIN : STAGE3_OUT_MAX);
+
+    generate
+        if (STAGE3_FLAT != 0 && COEFF_W == 16 &&
+            STAGE3_DATA_W == NF_STAGE3_ACC_W-FRAC_W) begin :
+                gen_national_finals_stage3_proven_width
+            assign stage3_upper_is_sign_extension = 1'b1;
+            assign stage3_q15_rounded =
+                dsp_mac_full[NF_STAGE3_ACC_W-1:FRAC_W];
+        end
+        else begin : gen_stage3_generic_saturation
+            assign stage3_upper_is_sign_extension =
+                truncated_value[SHIFT_W-1:STAGE3_DATA_W] ==
+                {STAGE3_UPPER_W{
+                    truncated_value[STAGE3_DATA_W-1]}};
+            assign stage3_q15_rounded =
+                stage3_upper_is_sign_extension ?
+                truncated_value[STAGE3_DATA_W-1:0] :
+                (truncated_value[SHIFT_W-1] ?
+                 STAGE3_OUT_MIN : STAGE3_OUT_MAX);
+        end
+    endgenerate
 
     assign stage2_phase_dbg = stage2_phase;
     assign stage3_phase_dbg = stage3_phase;

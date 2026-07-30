@@ -112,6 +112,7 @@ module interp2_stage1_strict_halfband_bram_ce #(
     wire dsp_p_ce;
     wire [6:0] dsp_opmode;
     wire signed [47:0] dsp_round_bias;
+    wire dsp_round_carryin;
     wire signed [QUOT_W-1:0] rounded_quotient;
     wire rounded_upper_is_sign_extension;
 
@@ -134,8 +135,12 @@ module interp2_stage1_strict_halfband_bram_ce #(
         (ce_out && phase_cnt == 1'b0);
     assign dsp_p_ce =
         (read_data_valid && !read_is_delay) || filter_commit_pending;
-    assign dsp_round_bias = mac_sum_comb[ACC_W-1] ?
-        48'sd16383 : 48'sd16384;
+    // Exact symmetric rounding is 16383 + 1 for a non-negative sum.
+    // Keeping C constant and using the DSP carry input avoids a sign-driven
+    // 48-bit constant selector.
+    assign dsp_round_bias = 48'sd16383;
+    assign dsp_round_carryin =
+        filter_commit_pending && !mac_sum_comb[ACC_W-1];
     assign dsp_opmode = filter_commit_pending ?
         7'b0001110 : 7'b0100101;
 
@@ -172,7 +177,7 @@ module interp2_stage1_strict_halfband_bram_ce #(
         .OPMODE(dsp_opmode),
         .ALUMODE(4'b0000),
         .CARRYINSEL(3'b000),
-        .CARRYIN(1'b0),
+        .CARRYIN(dsp_round_carryin),
         .ACIN(30'd0),
         .BCIN(18'd0),
         .PCIN(48'd0),

@@ -11,8 +11,10 @@ param(
     [string]$ResourceSharing = 'on',
     [ValidateSet('Default', 'Explore', 'ExploreWithRemap', 'ExploreArea', 'AddRemap')]
     [string]$ImplementationOptDirective = 'Default',
+    [ValidateSet(0, 1)]
+    [int]$Stage1Dsp48Preadder = 0,
     [ValidatePattern('^[A-Za-z0-9_-]+$')]
-    [string]$ResultTag = 'board_dual_rate_cic6_preg_round_snapshot_opt'
+    [string]$ResultTag = 'board_dual_rate_cic6_round5_opt'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -78,7 +80,8 @@ if ($Step -eq 'all' -or $Step -eq 'synth') {
             $SynthesisDirective,
             $FlattenHierarchy,
             $ResourceSharing,
-            $ResultTag
+            $ResultTag,
+            $Stage1Dsp48Preadder
         )
 }
 

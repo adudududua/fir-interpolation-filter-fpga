@@ -1,26 +1,26 @@
-National-finals 6-DSP CIC fourth-round optimization
-====================================================
+National-finals 6-DSP CIC fifth-round optimization
+===================================================
 Date: 2026-07-31
-Branch: codex/national-finals-cic6-preg-round-opt
+Branch: codex/national-finals-cic6-gui-fix-round5-opt
 Requested baseline: 573 LUT / 621 FF / 255 Slice / 6 DSP / 3 BRAM / 2 MMCM
 Immediate parent synthesis: 519 LUT / 532 FF / 6 DSP / 3 BRAM / 2 MMCM
 Immediate parent placed: 487 LUT / 532 FF / 205 Slice / 6 DSP / 3 BRAM / 2 MMCM
 
-Accepted fourth-round changes
------------------------------
+Accepted fourth/fifth-round changes
+-----------------------------------
 1. Stage1 DSP48E1 PREG accumulation
    The external ACC_W accumulator/result registers were removed. The existing
    DSP48E1 PREG now stores every M+P MAC step and the final sum. The symmetric
-   sample pair still uses the DSP48 preadder. The national-finals configuration
-   remains at the proven-safe 41-bit accumulator bound.
+   sample pair uses a fabric pre-add followed by the DSP multiplier. The
+   national-finals configuration remains at the proven-safe 41-bit bound.
 2. Shared Stage2/3 DSP48E1 PREG accumulation
    The same PREG feedback structure replaces the external shared accumulator
    and result bank while preserving one DSP for both filters.
 3. Exact DSP-resident Q15 rounding
-   The otherwise idle result-commit cycle performs P+C inside the DSP. C is
-   +16384 for a nonnegative result and +16383 for a negative result, exactly
-   matching the original symmetric rounding rule. Only shift and saturation
-   remain outside the DSP.
+   The otherwise idle result-commit cycle performs P+C+CARRYIN inside the DSP.
+   C is fixed at +16383 and CARRYIN is asserted for a nonnegative result,
+   exactly matching +16384/+16383 symmetric rounding without a sign-selected
+   48-bit constant mux. Only shift and saturation remain outside the DSP.
 4. Transaction-local history snapshot
    The longer Stage2/3 PREG schedule can overlap the next Stage3 input write.
    Full-chain regression exposed that reading the live head/fill state could
@@ -29,25 +29,40 @@ Accepted fourth-round changes
 5. Shared Stage2/3 history read head
    After the correctness fix, duplicated stage-specific snapshot muxes were
    reduced to one history_read_head shared by both selected history banks.
+6. Proven-width national-finals Stage3 output
+   The flat Stage3 coefficient absolute sum is 22926. For a signed 20-bit
+   input, 22926*2^19 = 12019810304 < 2^34, so a signed 35-bit MAC view is
+   sufficient and the rounded Q15 value always fits signed 20 bits. The
+   unreachable generic saturation comparator/mux was removed.
+7. GUI/script configuration convergence
+   The XPR now explicitly enables the 4-DSP serial-comb CIC, narrow Stage2/3,
+   ResourceSharing=on and Default opt_design. A native synth_1/impl_1 rebuild
+   matches the scripted 440-LUT/6-DSP result.
 
 Resource progression
 --------------------
   Parent synthesis:                519 LUT / 532 FF
   Fourth-round synthesis:          469 LUT / 464 FF
+  CARRYIN intermediate placed:     451 LUT / 464 FF
+  Fifth-round synthesis:           459 LUT / 464 FF
   Parent placed Default:           487 LUT / 532 FF / 205 Slice
   Fourth-round placed Default:     461 LUT / 464 FF / 199 Slice
   Fourth-round placed AddRemap:    461 LUT / 464 FF / 199 Slice
   Fourth-round placed ExploreArea: 472 LUT / 464 FF / 194 Slice
+  Fifth-round placed Default:      440 LUT / 464 FF / 191 Slice
 
-Default is selected: it ties AddRemap for the lowest LUT count and uses 11
-fewer LUTs than ExploreArea. ExploreArea saves five Slices but is not the
-preferred point for the stated LUT-first objective.
+On the CARRYIN intermediate checkpoint, Default and AddRemap both use 451 LUT
+while ExploreArea uses 475 LUT. Default remained selected. The Stage3 bound
+then reduced the formal Default result to 440 LUT.
 
 Rejected or superseded experiments
 ----------------------------------
 1. Earlier Stage1 preadder-only rewrite
    It did not keep the whole accumulation in PREG and grew to
    586 LUT / 578 FF, so it remains rejected.
+   Re-enabling the DSP48 preadder on the current PREG structure was also
+   measured: 491 synthesized LUT versus 469 with the fabric pair sum. It
+   remains rejected rather than being claimed as an active optimization.
 2. Stage1-only and Stage2/3-only PREG candidates
    They were useful isolation experiments, but the accepted implementation
    combines both blocks and performs rounding in the DSP idle cycle.
@@ -56,28 +71,28 @@ Rejected or superseded experiments
    next input changed the live head during an existing MAC. It was rejected
    and replaced by the transaction snapshot.
 4. ExploreArea as the formal implementation
-   It reached 194 Slices but required 472 LUT. The 461-LUT Default result is
-   selected for the competition deliverable.
+   On the fifth-round CARRYIN checkpoint it required 475 LUT versus 451 for
+   Default, so it remains rejected for the LUT-first competition deliverable.
 
 Selected result
 ---------------
-Synthesis: 469 LUT / 464 FF / 6 DSP / 3 BRAM / 2 MMCM
-Placed: 461 LUT / 464 FF / 199 Slice / 6 DSP / 3 BRAM / 2 MMCM
-Timing: WNS +45.405 ns; WHS +0.114 ns; TNS/THS 0
-Routing: 1355/1355 routable nets complete; routing errors 0
-DRC: Error 0; 70 warnings and 1 advisory
+Synthesis: 459 LUT / 464 FF / 6 DSP / 3 BRAM / 2 MMCM
+Placed: 440 LUT / 464 FF / 191 Slice / 6 DSP / 3 BRAM / 2 MMCM
+Timing: WNS +46.046 ns; WHS +0.127 ns; TNS/THS 0
+Routing: 1335/1335 routable nets complete; routing errors 0
+DRC: Error 0; 68 warnings and 1 advisory
 Power: 0.271 W vectorless, Medium confidence
 Bitstream SHA256:
-7FDAE2FCEA41643658A4DD05BF77C062EAA92C5610A3E6BC12CC1254EBCF36CE
+3E25025717617CEE2CECE32EB1FC16494006793655DBB502888B62CD35220720
 
 Delta versus requested baseline:
-  LUT   573 -> 461 (-112, -19.55%)
+  LUT   573 -> 440 (-133, -23.21%)
   FF    621 -> 464 (-157, -25.28%)
-  Slice 255 -> 199 ( -56, -21.96%)
-Delta versus immediate parent:
-  LUT   487 -> 461 (-26, -5.34%)
-  FF    532 -> 464 (-68, -12.78%)
-  Slice 205 -> 199 ( -6, -2.93%)
+  Slice 255 -> 191 ( -64, -25.10%)
+Delta versus fourth-round formal result:
+  LUT   461 -> 440 (-21, -4.56%)
+  FF    464 -> 464 (  0,  0.00%)
+  Slice 199 -> 191 ( -8, -4.02%)
 DSP / BRAM / MMCM remain 6 / 3 / 2.
 
 Verification
@@ -89,5 +104,6 @@ Full-chain impulse/random y4/y8/y128: 0 LSB mismatch
 Reset recovery: PASS 8/8 scenarios, 4096 y128 outputs per scenario
 Dynamic mode switching: PASS 10 switches
 MATLAB analysis of six published RTL impulses: PASS 6/6
+Native GUI project rebuild: PASS, 440 LUT / 464 FF / 6 DSP
 Implementation, timing, routing, DRC, power and bitstream: PASS
 Physical FPGA download and instrument measurements: pending
