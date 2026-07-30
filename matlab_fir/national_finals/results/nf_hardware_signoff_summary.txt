@@ -5,12 +5,12 @@ Tool: Vivado 2018.3
 Device: xc7a35tfgg484-2
 Top: board_demo_competition_dac8_top
 Design state: fully routed; bitstream generated
-Branch: codex/national-finals-cic-6dsp-further-opt
-Result tag: board_dual_rate_cic6_opt
+Branch: codex/national-finals-cic6-microcode-opt
+Result tag: board_dual_rate_cic6_accmux_opt
 
 Placed utilization
-  Slices:            229 / 8150  (2.81%)
-  Slice LUTs:        528 / 20800 (2.54%)
+  Slices:            205 / 8150  (2.52%)
+  Slice LUTs:        487 / 20800 (2.34%)
   Slice registers:   532 / 41600 (1.28%)
   BRAM tiles:         3 / 50    (6.00%)
   DSP48E1:            6 / 90    (6.67%)
@@ -18,14 +18,14 @@ Placed utilization
   MMCME2_ADV:          2 / 5    (40.00%)
 
 Routed timing
-  WNS: +45.075 ns
+  WNS: +46.420 ns
   TNS:   0.000 ns
-  WHS:  +0.078 ns
+  WHS:  +0.105 ns
   THS:   0.000 ns
   All user specified timing constraints are met.
 
 Routing and DRC
-  Fully routed routable nets: 1547 / 1547
+  Fully routed routable nets: 1504 / 1504
   Nets with routing errors: 0
   DRC errors: 0
   DRC violations: 73 warnings + 1 advisory
@@ -39,26 +39,26 @@ Vectorless power estimate (Medium confidence)
   Device static: 0.072 W
 
 Bitstream
-  vivado_results/board_dual_rate_cic6_opt/
+  vivado_results/board_dual_rate_cic6_accmux_opt/
   national_finals_dual_rate_4x8x128x_areaopt.bit
-  SHA256: C9C9421D07B02D39F90423D83BDC6AE2B1D60C49D43A4FFF4D19C4EF62EB6203
+  SHA256: F0C28ED35732E386A92CBF47A597E0751E32BE4F1172BC0E902FD59EB3A93AF9
 
 Optimization delta versus the requested 573-LUT/6-DSP CIC baseline
-  Slice LUTs:      573 -> 528 (-45, -7.85%)
+  Slice LUTs:      573 -> 487 (-86, -15.01%)
   Slice registers: 621 -> 532 (-89, -14.33%)
-  Slices:          255 -> 229 (-26, -10.20%)
+  Slices:          255 -> 205 (-50, -19.61%)
   DSP/BRAM/MMCM:   unchanged at 6 / 3 / 2
   Power:           unchanged at 0.271 W
 
-Delta versus the previous 557-LUT selected implementation
-  Slice LUTs:      557 -> 528 (-29, -5.21%)
-  Slice registers: 536 -> 532 (-4, -0.75%)
-  Slices:          228 -> 229 (+1, +0.44%)
+Delta versus the previous 528-LUT selected implementation
+  Slice LUTs:      528 -> 487 (-41, -7.77%)
+  Slice registers: 532 -> 532 (0)
+  Slices:          229 -> 205 (-24, -10.48%)
   DSP/BRAM/MMCM and vectorless power: unchanged
 
 Final strategy scan
-  Default / Explore / AddRemap all placed at 528 LUT / 532 FF / 229 Slice,
-  WNS +45.075 ns and WHS +0.078 ns. Default is selected for reproducibility.
+  Default / Explore / AddRemap all placed at 487 LUT / 532 FF / 205 Slice,
+  WNS +46.420 ns and WHS +0.105 ns. Default is selected for reproducibility.
 
 IMPLEMENTATION_PASS=1
 PHYSICAL_BOARD_TESTED=0

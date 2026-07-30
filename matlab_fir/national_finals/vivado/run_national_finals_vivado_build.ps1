@@ -12,7 +12,7 @@ param(
     [ValidateSet('Default', 'Explore', 'ExploreWithRemap', 'ExploreArea', 'AddRemap')]
     [string]$ImplementationOptDirective = 'Default',
     [ValidatePattern('^[A-Za-z0-9_-]+$')]
-    [string]$ResultTag = 'board_dual_rate_cic6_opt'
+    [string]$ResultTag = 'board_dual_rate_cic6_accmux_opt'
 )
 
 $ErrorActionPreference = 'Stop'

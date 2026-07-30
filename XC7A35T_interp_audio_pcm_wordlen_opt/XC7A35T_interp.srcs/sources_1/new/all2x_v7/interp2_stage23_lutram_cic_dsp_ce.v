@@ -259,8 +259,11 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         stage3_packed_raw[COEFF_W-1:0];
     assign dsp_coeff_b = (USE_PACKED_BRAM != 0) ? packed_coeff_raw :
         ((USE_BRAM_COEFF != 0) ? coeff_bram_raw : coeff_comb);
-    assign dsp_acc_c = (job_mac_index == 4'd0) ? 48'sd0 :
+    assign dsp_acc_c =
         {{(48-ACC_W){acc_reg[ACC_W-1]}}, acc_reg};
+    // acc_reg is cleared whenever a job starts, so the first tap already
+    // observes C=0.  Keeping M+C selected for every tap avoids the former
+    // ACC_W-wide zero/accumulator mux without requiring mode decode logic.
 
     // 显式使用一颗 DSP48E1，避免综合器把预加、乘法和累加拆成多颗 DSP。
     // 不使用预加器，OPMODE=0110101 实现 A*B+C。

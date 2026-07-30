@@ -1,7 +1,7 @@
 National-finals 6-DSP CIC further optimization
 ================================================
 Date: 2026-07-30
-Branch: codex/national-finals-cic-6dsp-further-opt
+Branch: codex/national-finals-cic6-microcode-opt
 Starting point: 573 LUT / 621 FF / 255 Slice / 6 DSP / 3 BRAM / 2 MMCM
 Previous selected point: 557 LUT / 536 FF / 228 Slice / 6 DSP / 3 BRAM / 2 MMCM
 
@@ -34,6 +34,12 @@ Accepted changes
 7. Compact Stage2/3 scheduler
    The two-bit stage value 2/3 became one-bit job_stage3, and the fixed MAC
    count is derived combinationally from stage and phase instead of stored.
+8. Stage2/3 DSP accumulator-input mux removal
+   acc_reg is synchronously cleared at every new MAC job, so it already equals
+   zero for the first tap. Driving DSP48E1 C directly from acc_reg and keeping
+   OPMODE at M+C removes the ACC_W-wide zero/accumulator mux without changing
+   any arithmetic result. Independent Stage2/3 equivalence and full-chain RTL
+   regression both report 0-LSB mismatch.
 
 Rejected experiments
 --------------------
@@ -52,30 +58,38 @@ Rejected experiments
 6. Merge burst_pending into the four-bit count
    Independent CIC equivalence failed at output sample 16, so the robust
    pending flag plus four-bit remaining count was restored.
+7. Stage2/3 BRAM microcode
+   Independent equivalence passed at 0 LSB, but synthesis remained
+   554 LUT / 532 FF and Stage2/3 changed by only one LUT.
+8. Stage1 direct rounding and reduced result registers
+   Both unit simulations passed, but implementations were 555 LUT / 491 FF
+   and 563 LUT / 515 FF respectively, so both were reverted.
+9. Equalizer width tightening
+   All 2009 directed samples passed, but synthesis stayed at 519 LUT / 532 FF.
 
 Selected result
 ---------------
-Synthesis: 554 LUT / 532 FF / 6 DSP / 3 BRAM / 2 MMCM
-Placed: 528 LUT / 532 FF / 229 Slice / 6 DSP / 3 BRAM / 2 MMCM
-Timing: WNS +45.075 ns; WHS +0.078 ns; TNS/THS 0
-Routing: 1547/1547 routable nets complete; routing errors 0
+Synthesis: 519 LUT / 532 FF / 6 DSP / 3 BRAM / 2 MMCM
+Placed: 487 LUT / 532 FF / 205 Slice / 6 DSP / 3 BRAM / 2 MMCM
+Timing: WNS +46.420 ns; WHS +0.105 ns; TNS/THS 0
+Routing: 1504/1504 routable nets complete; routing errors 0
 DRC: Error 0
 Power: 0.271 W vectorless, Medium confidence
 Bitstream SHA256:
-C9C9421D07B02D39F90423D83BDC6AE2B1D60C49D43A4FFF4D19C4EF62EB6203
+F0C28ED35732E386A92CBF47A597E0751E32BE4F1172BC0E902FD59EB3A93AF9
 
-Default, Explore and AddRemap all produced 528 LUT / 532 FF / 229 Slice and
+Default, Explore and AddRemap all produced 487 LUT / 532 FF / 205 Slice and
 identical routed timing. Default is selected because it is the simplest and
 most reproducible implementation flow.
 
 Delta versus requested baseline:
-  LUT 573 -> 528 (-45, -7.85%)
+  LUT 573 -> 487 (-86, -15.01%)
   FF  621 -> 532 (-89, -14.33%)
-  Slice 255 -> 229 (-26, -10.20%)
+  Slice 255 -> 205 (-50, -19.61%)
 Delta versus previous selected point:
-  LUT 557 -> 528 (-29, -5.21%)
-  FF  536 -> 532 (-4, -0.75%)
-  Slice 228 -> 229 (+1, +0.44%)
+  LUT 528 -> 487 (-41, -7.77%)
+  FF  532 -> 532 (0)
+  Slice 229 -> 205 (-24, -10.48%)
 
 Verification
 ------------

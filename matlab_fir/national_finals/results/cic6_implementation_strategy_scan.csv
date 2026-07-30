@@ -9,3 +9,6 @@ selected_preg_eq_comb_default,Default,557,536,228,6,3,2,45.614,0.105,1,0,1
 rotate22_acc41_schedcompact_default,Default,528,532,229,6,3,2,45.075,0.078,1,0,1
 rotate22_acc41_schedcompact_explore,Explore,528,532,229,6,3,2,45.075,0.078,1,0,1
 rotate22_acc41_schedcompact_addremap,AddRemap,528,532,229,6,3,2,45.075,0.078,1,0,1
+accmux_invariant_default,Default,487,532,205,6,3,2,46.420,0.105,1,0,1
+accmux_invariant_explore,Explore,487,532,205,6,3,2,46.420,0.105,1,0,1
+accmux_invariant_addremap,AddRemap,487,532,205,6,3,2,46.420,0.105,1,0,1

@@ -12,7 +12,7 @@ set synth_dcp [file join $project_dir XC7A35T_interp.runs synth_1 \
     board_demo_competition_dac8_top.dcp]
 set board_xdc [file join $project_dir XC7A35T_interp.srcs constrs_1 new \
     board_demo_competition_dac8_top.xdc]
-set result_tag board_dual_rate_cic6_opt
+set result_tag board_dual_rate_cic6_accmux_opt
 set implementation_opt_directive Default
 if {$argc > 0} {
     set result_tag [lindex $argv 0]
@@ -122,7 +122,7 @@ puts $manifest_handle "CIC state optimization: hidden integrators use DSP48E1 PR
 puts $manifest_handle "Equalizer optimization: combinational hand-off into serial CIC input capture"
 puts $manifest_handle "Serial-comb optimization: rotating uniform 22-bit history removes the wide 3:1 DSP-input mux"
 puts $manifest_handle "Stage1 optimization: proven-safe 41-bit accumulator in national-finals mode"
-puts $manifest_handle "Stage2/3 optimization: one-bit stage state and derived MAC-count control"
+puts $manifest_handle "Stage2/3 optimization: one-bit stage state, derived MAC count, and cleared-accumulator invariant removes the DSP C-input mux"
 puts $manifest_handle "Synthesis directive: AreaOptimized_high"
 puts $manifest_handle "Synthesis resource sharing: on"
 puts $manifest_handle "Implementation opt directive: $implementation_opt_directive"
