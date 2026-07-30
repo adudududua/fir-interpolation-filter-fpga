@@ -12,8 +12,38 @@ set synth_dcp [file join $project_dir XC7A35T_interp.runs synth_1 \
     board_demo_competition_dac8_top.dcp]
 set board_xdc [file join $project_dir XC7A35T_interp.srcs constrs_1 new \
     board_demo_competition_dac8_top.xdc]
+set result_tag board_dual_rate_areaopt
+set cic_low_dsp_profile 0
+set synthesis_directive AreaOptimized_high
+set flatten_hierarchy rebuilt
+set resource_sharing on
+set implementation_opt_directive Default
+if {$argc > 0} {
+    set result_tag [lindex $argv 0]
+}
+if {$argc > 1} {
+    set cic_low_dsp_profile [lindex $argv 1]
+}
+if {$argc > 2} {
+    set synthesis_directive [lindex $argv 2]
+}
+if {$argc > 3} {
+    set flatten_hierarchy [lindex $argv 3]
+}
+if {$argc > 4} {
+    set resource_sharing [lindex $argv 4]
+}
+if {$argc > 5} {
+    set implementation_opt_directive [lindex $argv 5]
+}
+if {![regexp {^[A-Za-z0-9_-]+$} $result_tag]} {
+    error "result_tag may contain only letters, digits, underscore, and dash"
+}
+if {$cic_low_dsp_profile < 0 || $cic_low_dsp_profile > 2} {
+    error "cic_low_dsp_profile must be 0, 1, or 2"
+}
 set result_dir [file normalize [file join $script_dir .. vivado_results \
-    board_dual_rate_areaopt]]
+    $result_tag]]
 
 proc require_file {filename} {
     if {![file exists $filename]} {
@@ -44,7 +74,7 @@ file mkdir $result_dir
 open_checkpoint $synth_dcp
 read_xdc $board_xdc
 
-opt_design -directive ExploreArea
+opt_design -directive $implementation_opt_directive
 place_design
 route_design
 
@@ -62,8 +92,14 @@ if {$setup_slack < 0.0 || $hold_slack < 0.0} {
         $setup_slack $hold_slack]
 }
 
-set bitstream_dst [file join $result_dir \
-    national_finals_dual_rate_4x8x128x_areaopt.bit]
+if {$cic_low_dsp_profile == 1} {
+    set bitstream_name national_finals_dual_rate_4x8x128x_cic_2dsp_areaopt.bit
+} elseif {$cic_low_dsp_profile == 2} {
+    set bitstream_name national_finals_dual_rate_4x8x128x_cic_3dsp_areaopt.bit
+} else {
+    set bitstream_name national_finals_dual_rate_4x8x128x_areaopt.bit
+}
+set bitstream_dst [file join $result_dir $bitstream_name]
 write_bitstream -force $bitstream_dst
 
 report_clocks -file [file join $result_dir clock_report_routed.rpt]
@@ -99,9 +135,11 @@ puts $manifest_handle [format "Routed hold slack: %.3f ns" $hold_slack]
 puts $manifest_handle "44.1-kHz family 128x clock: 5.644796 MHz (-0.64 ppm nominal)"
 puts $manifest_handle "48-kHz family 128x clock: 6.144068 MHz (+11.03 ppm nominal)"
 puts $manifest_handle "Architecture: shared 2x/2x/2x FIR + shift-add CIC equalizer + CIC16"
-puts $manifest_handle "Synthesis directive: AreaOptimized_high"
-puts $manifest_handle "Synthesis resource sharing: on"
-puts $manifest_handle "Implementation opt directive: ExploreArea"
+puts $manifest_handle "CIC low-DSP profile: $cic_low_dsp_profile"
+puts $manifest_handle "Synthesis directive: $synthesis_directive"
+puts $manifest_handle "Flatten hierarchy: $flatten_hierarchy"
+puts $manifest_handle "Synthesis resource sharing: $resource_sharing"
+puts $manifest_handle "Implementation opt directive: $implementation_opt_directive"
 close $manifest_handle
 
 puts "NATIONAL_FINALS_SINGLE_PROCESS_BUILD_PASS"

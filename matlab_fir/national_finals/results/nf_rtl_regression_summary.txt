@@ -1,25 +1,36 @@
-National-finals RTL regression summary
-======================================
-Date: 2026-07-29
+National-finals low-DSP CIC RTL regression summary
+==================================================
+Date: 2026-07-30
 Simulator: Vivado Simulator 2018.3
-Command: powershell.exe -NoProfile -ExecutionPolicy Bypass -File matlab_fir/national_finals/sim/run_national_finals_rtl_regression.ps1 -PublishImpulseOutputs
+
+The full regression was run independently for CIC_LOW_DSP_PROFILE=1 (2 total
+DSP) and CIC_LOW_DSP_PROFILE=2 (3 total DSP). Both runs passed 9/9.
 
 1. dual-rate tone ROM
-   PASS: 44.1/48 kHz data, address wrap and synchronous family reset
+   PASS: 44.1/48 kHz data, address wrap, synchronous family reset
 2. CIC3 shift-add equalizer
-   PASS: 2009 samples
-3. dual-family MMCM/BUFGMUX clock
-   PASS: 5.644806/6.144091 MHz measured in XSim, return switch PASS,
-         no runt high pulse observed
-4. compact keypad
+   PASS: 2009 directed samples
+3. CIC serial/low-DSP cycle equivalence
+   PASS: continuous=160, randomized stalls=240, reset during burst,
+         3840 compared output samples across reference/serial/2-DSP/3-DSP
+4. dual-family MMCM/BUFGMUX clock
+   PASS: both audio master clocks and glitchless return switching
+5. compact keypad
    PASS: SW1-SW8 family/mode behavior
-5. board integration
+6. board integration
    PASS: reset=65535 scan=16384 mode_wait=442367 family_wait=458752
-6. final full-chain bit-true
+7. final full-chain bit-true
    PASS: impulse y4/y8/y128 = 1245/2499/40064 samples
    PASS: random  y4/y8/y128 = 4317/8643/138368 samples
    PASS: all three output nodes, all samples, 0 LSB mismatch
+8. full-chain reset recovery
+   PASS: 8 internal-state scenarios; 4096 y128 outputs per scenario
+9. reset-free dynamic mode switching
+   PASS: 10 switches; no runt pulse and no X
 
-OVERALL_PASS=1
-REGRESSION_COUNT=6
-REGRESSION_PASS=6
+PROFILE1_OVERALL_PASS=1
+PROFILE1_REGRESSION_COUNT=9
+PROFILE1_REGRESSION_PASS=9
+PROFILE2_OVERALL_PASS=1
+PROFILE2_REGRESSION_COUNT=9
+PROFILE2_REGRESSION_PASS=9

@@ -1,5 +1,90 @@
 # 高阶数字插值滤波器设计与 FPGA 验证
 
+## 全国总决赛低 DSP 最终优化与全 2x 公平对比（2026-07-30）
+
+本轮在分支 `codex/national-finals-cic-lowdsp-opt` 上，把 FIR-CIC 后级的
+comb 和积分加法器定向改用 LUT/Carry，仅保留前级 FIR 所需的 2 个 DSP，
+并提供“末级积分器使用一个 DSP”的 3-DSP 平衡档。两档均与原 CIC 做了
+逐拍等价验证，并使用与全 2x 完全相同的器件、顶层、XDC、RTL/MATLAB
+验收和 Vivado 2018.3 流程进行比较。
+
+结论：**在 DSP 数相同的条件下，低 DSP FIR-CIC 已全面低于全 2x 的
+LUT 和 FF**。因此，全 2x 不再是当前最低 DSP 的资源最优方案；它只保留
+约 6 dB 的 128x 阻带裕量优势。推荐的三个 Pareto 点为：
+
+- **最低 LUT：FIR-CIC 6-DSP**，573 LUT / 621 FF / 6 DSP。
+- **低 DSP/LUT 平衡主方案：FIR-CIC 3-DSP**，639 LUT / 621 FF / 3 DSP。
+- **最低 DSP：FIR-CIC 2-DSP**，674 LUT / 621 FF / 2 DSP。
+
+### 最终布局布线资源与工具签核
+
+| 架构 | LUT | FF | DSP48E1 | BRAM Tile | MMCM | WNS | WHS | 功耗估计 | 路由/DRC Error |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| FIR-CIC 6-DSP（最低 LUT） | **573** | 621 | 6 | 3 | 2 | +46.339 ns | +0.072 ns | 0.271 W | 全布通 / 0 |
+| **FIR-CIC 3-DSP（推荐平衡档）** | **639** | **621** | **3** | **3** | **2** | +45.745 ns | +0.082 ns | 0.271 W | 全布通 / 0 |
+| **FIR-CIC 2-DSP（最低 DSP）** | **674** | **621** | **2** | **3** | **2** | +46.390 ns | +0.078 ns | 0.271 W | 全布通 / 0 |
+| 全 2x 3-DSP | 714 | 662 | 3 | 3 | 2 | +46.438 ns | +0.105 ns | 0.271 W | 全布通 / 0 |
+| 全 2x 2-DSP | 728 | 662 | 2 | 3 | 2 | +46.441 ns | +0.105 ns | 0.271 W | 全布通 / 0 |
+
+同为 2 DSP 时，FIR-CIC 少 54 LUT、41 FF；同为 3 DSP 时少 75 LUT、
+41 FF，DSP/BRAM/MMCM 完全相同。CIC 3-DSP 相对 CIC 2-DSP 再少 35 LUT，
+代价是一颗 DSP48E1。功耗均为 vectorless 估计 0.271 W，不能据此宣称
+某个结构具有实测功耗优势。
+
+### FIR-CIC 最终 RTL 六工况频响
+
+| 输入采样率 | 输出节点 | 通带最大绝对偏差 | 通带峰峰纹波 | 阻带衰减 | 对称误差 |
+|---:|---:|---:|---:|---:|---:|
+| 44.1 kHz | 4x | 0.004610 dB | 0.005703 dB | 78.669 dB | 0 LSB |
+| 44.1 kHz | 8x | 0.005495 dB | 0.006274 dB | 78.161 dB | 0 LSB |
+| 44.1 kHz | 128x | 0.006918 dB | 0.008111 dB | 72.348 dB | 0 LSB |
+| 48 kHz | 4x | 0.004610 dB | 0.005703 dB | 78.669 dB | 0 LSB |
+| 48 kHz | 8x | 0.005495 dB | 0.005738 dB | 78.161 dB | 0 LSB |
+| 48 kHz | 128x | 0.006918 dB | 0.006917 dB | 72.348 dB | 0 LSB |
+
+### 全 2x 最终 RTL 六工况频响
+
+| 输入采样率 | 输出节点 | 通带最大绝对偏差 | 通带峰峰纹波 | 阻带衰减 | 对称误差 |
+|---:|---:|---:|---:|---:|---:|
+| 44.1 kHz | 4x | 0.004610 dB | 0.005703 dB | 78.669 dB | 0 LSB |
+| 44.1 kHz | 8x | 0.005395 dB | 0.006183 dB | 78.562 dB | 0 LSB |
+| 44.1 kHz | 128x | 0.005444 dB | 0.007823 dB | 78.447 dB | 0 LSB |
+| 48 kHz | 4x | 0.004610 dB | 0.005703 dB | 78.669 dB | 0 LSB |
+| 48 kHz | 8x | 0.005395 dB | 0.005719 dB | 78.562 dB | 0 LSB |
+| 48 kHz | 128x | 0.005444 dB | 0.005909 dB | 78.881 dB | 0 LSB |
+
+两种架构均满足 10 Hz～20 kHz、相对 0 dB 最大偏差不超过 ±0.05 dB、
+阻带不低于 70 dB和严格线性相位。低 DSP CIC 的算术改写不改变频响；
+2-DSP 和 3-DSP 档均与原 CIC 在全部正式节点实现 0 LSB 等价。
+
+### 本轮优化与全面验证
+
+1. CIC 的三个低速 comb 使用渐进位宽串行复用，三个高速积分器改为
+   LUT/Carry；2-DSP 档不让 CIC 占用 DSP，3-DSP 档仅把最终 32-bit
+   积分器定向映射到 DSP48E1。
+2. 保留全国赛专用 Stage 2/3 字长、BRAM 环形历史、共享 DSP 串行 MAC、
+   Stage 1 半带多相/对称计算以及移位加减 CIC 均衡器。
+3. 两档分别完成 RTL 回归 9/9：CIC 连续/随机停顿/突发中复位逐拍等价；
+   全链 impulse 和随机 PCM 的 4x/8x/128x 均为 0 LSB；8 个内部状态复位
+   场景和 10 次无复位动态倍率切换均通过。
+4. 每档扫描 5 组综合策略，确认
+   `AreaOptimized_high + rebuilt + resource_sharing=on` 最优；`full` 会破坏
+   XDC 使用的层次化时钟对象，因此否决。
+5. 每档再扫描 5 个 `opt_design` 策略。`Default/Explore/AddRemap` 并列最优，
+   正式版选最容易复现的 `Default`；不能沿用会把 3-DSP 布局 LUT 增至
+   716 的 `ExploreArea`。
+6. 两档均完成布局布线、setup/hold、完整路由、DRC Error=0、功耗报告和
+   bitstream 生成。当前没有实物板卡，不能把工具链签核写成物理板测通过。
+
+最终 bitstream：
+
+- [FIR-CIC 2-DSP bitstream](matlab_fir/national_finals/vivado_results/board_dual_rate_cic_2dsp_impl_default/national_finals_dual_rate_4x8x128x_cic_2dsp_areaopt.bit)，SHA-256 `59050F23AAB8C6F1A3942E415099F820E9F10DA0B73BBC85A7370CAA48604EB7`
+- [FIR-CIC 3-DSP bitstream](matlab_fir/national_finals/vivado_results/board_dual_rate_cic_3dsp_impl_default/national_finals_dual_rate_4x8x128x_cic_3dsp_areaopt.bit)，SHA-256 `5685C7338BDA0D55D849B555F91D9951398D073072EC3214D58E3C5EB4E69F1B`
+
+更完整的复现命令、SW1～SW8 映射和实板验收步骤见
+[全国总决赛交付说明](matlab_fir/national_finals/README.md)，原始对比摘要见
+[低 DSP 架构对比结果](matlab_fir/national_finals/results/cic_lowdsp_architecture_comparison_summary.txt)。
+
 ## 全国总决赛双采样率版本（2026-07-29）
 
 全国赛升级版已在分支 `codex/national-finals-configurable` 完成：支持 signed 24 bit、44.1/48 kHz 输入家族以及 4x/8x/128x 正式输出。最终 RTL 六工况的通带最大绝对偏差为 **0.004610～0.006918 dB**，阻带衰减为 **72.348～78.669 dB**，冲激对称误差均为 **0 LSB**；六组 XSim 回归全部通过，全链路 impulse + 随机 PCM 的 4x/8x/128x 三节点均为 **0 LSB mismatch**。

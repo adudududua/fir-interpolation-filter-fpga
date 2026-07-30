@@ -1,43 +1,57 @@
 National-finals FPGA implementation signoff
 ===========================================
-Date: 2026-07-29
+Date: 2026-07-30
 Tool: Vivado 2018.3
 Device: xc7a35tfgg484-2
 Top: board_demo_competition_dac8_top
-Design state: fully routed; bitstream generated
+Design state: both low-DSP candidates fully routed; bitstreams generated
 
+Recommended balanced candidate: CIC low-DSP profile 2
+-----------------------------------------------------
 Placed utilization
-  Slice LUTs:       602 / 20800 (2.89%)
-  Slice registers:  616 / 41600 (1.48%)
+  Slice LUTs:       639 / 20800 (3.07%)
+  Slice registers:  621 / 41600 (1.49%)
   BRAM tiles:         3 / 50    (6.00%)
-  DSP48E1:            8 / 90    (8.89%)
-  BUFGCTRL:            2 / 32    (6.25%)
-  MMCME2_ADV:          2 / 5    (40.00%)
+  DSP48E1:            3 / 90    (3.33%)
+  MMCM:               2 / 5    (40.00%)
 
-Routed timing
-  WNS: +46.309 ns
-  TNS:   0.000 ns
-  WHS:  +0.103 ns
-  THS:   0.000 ns
-  All user specified timing constraints are met.
-
-Routing and DRC
-  Fully routed nets: 1831 / 1831
+Routed timing and implementation
+  WNS/TNS: +45.745 / 0.000 ns
+  WHS/THS:  +0.082 / 0.000 ns
   Nets with routing errors: 0
   DRC errors: 0
-  DRC warnings/advisories: 211
-  The warnings are DSP input/output pipeline recommendations and asynchronous
-  DSP/BRAM control checks retained by the area-optimized architecture. They do
-  not block bitstream generation; physical-board validation is still required.
-
-Vectorless power estimate (Medium confidence)
-  Total: 0.271 W
-  Dynamic: 0.199 W
-  Device static: 0.072 W
+  Vectorless total power: 0.271 W
 
 Bitstream
-  national_finals_dual_rate_4x8x128x_areaopt.bit
-  SHA256: 28A18B572FC53E816CCB709BAF04DA3129E1F2B2BF51A1749682075A29EB043B
+  board_dual_rate_cic_3dsp_impl_default/
+  national_finals_dual_rate_4x8x128x_cic_3dsp_areaopt.bit
+  SHA256: 5685C7338BDA0D55D849B555F91D9951398D073072EC3214D58E3C5EB4E69F1B
+
+Minimum-DSP candidate: CIC low-DSP profile 1
+--------------------------------------------
+Placed utilization
+  Slice LUTs:       674 / 20800 (3.24%)
+  Slice registers:  621 / 41600 (1.49%)
+  BRAM tiles:         3 / 50    (6.00%)
+  DSP48E1:            2 / 90    (2.22%)
+  MMCM:               2 / 5    (40.00%)
+
+Routed timing and implementation
+  WNS/TNS: +46.390 / 0.000 ns
+  WHS/THS:  +0.078 / 0.000 ns
+  Nets with routing errors: 0
+  DRC errors: 0
+  Vectorless total power: 0.271 W
+
+Bitstream
+  board_dual_rate_cic_2dsp_impl_default/
+  national_finals_dual_rate_4x8x128x_cic_2dsp_areaopt.bit
+  SHA256: 59050F23AAB8C6F1A3942E415099F820E9F10DA0B73BBC85A7370CAA48604EB7
+
+The remaining DRC warnings/advisories are DSP pipeline recommendations and
+BRAM asynchronous-control checks. They do not block bitstream generation.
+Reset behavior is covered by eight directed internal-state recovery scenarios.
+Physical-board download and instrument measurements are still required.
 
 IMPLEMENTATION_PASS=1
 PHYSICAL_BOARD_TESTED=0

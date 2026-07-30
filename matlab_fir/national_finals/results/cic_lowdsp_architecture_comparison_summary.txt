@@ -1,0 +1,100 @@
+National-finals low-DSP architecture comparison
+================================================
+Date: 2026-07-30
+Tool/device: Vivado 2018.3 / XC7A35T-FGG484-2
+Top/XDC: board_demo_competition_dac8_top / common board constraints
+
+Final placed-and-routed resource comparison
+--------------------------------------------
+Architecture                         LUT   FF   DSP   BRAM tile   MMCM
+CIC low-DSP profile 1 (2 DSP total)  674  621    2       3         2
+CIC low-DSP profile 2 (3 DSP total)  639  621    3       3         2
+All-2x optimized (2 DSP total)        728  662    2       3         2
+All-2x optimized (3 DSP total)        714  662    3       3         2
+CIC serial-comb baseline (6 DSP)      573  621    6       3         2
+
+Same-DSP comparison
+-------------------
+At 2 DSP, CIC saves 54 LUT and 41 FF versus all-2x. BRAM/MMCM/DSP are equal.
+At 3 DSP, CIC saves 75 LUT and 41 FF versus all-2x. BRAM/MMCM/DSP are equal.
+CIC 3-DSP saves 35 LUT versus CIC 2-DSP at the cost of one DSP48E1.
+CIC 6-DSP remains the absolute minimum-LUT point, while CIC 2-DSP is the
+absolute minimum-DSP point. CIC 3-DSP is the balanced low-DSP/low-LUT point.
+
+Routed timing, routing, DRC, and power
+--------------------------------------
+Architecture                 WNS(ns)  WHS(ns)  route errors  DRC errors  power
+CIC 2-DSP                     46.390    0.078       0             0      0.271 W
+CIC 3-DSP                     45.745    0.082       0             0      0.271 W
+All-2x 2-DSP                  46.441    0.105       0             0      0.271 W
+All-2x 3-DSP                  46.438    0.105       0             0      0.271 W
+
+RTL/MATLAB acceptance
+---------------------
+Both CIC low-DSP profiles passed the national-finals RTL regression 9/9.
+The low-DSP CIC and the original CIC were cycle-by-cycle identical for
+continuous input, randomized stalls, and reset in the middle of a burst.
+The formal full-chain impulse and random-PCM comparisons were 0 LSB at the
+4x/8x/128x nodes. Eight internal-state reset scenarios and ten reset-free
+dynamic mode switches passed. The published RTL impulse response passed all
+six 44.1/48-kHz x 4x/8x/128x MATLAB acceptance cases.
+
+CIC RTL impulse metrics
+-----------------------
+Fs_in  node  pass_abs_max(dB)  ripple_pp(dB)  stop_attn(dB)  symmetry
+44100  4x       0.004610111       0.005702880      78.668823410    0 LSB
+44100  8x       0.005494934       0.006273642      78.161304264    0 LSB
+44100  128x     0.006917875       0.008110994      72.347814478    0 LSB
+48000  4x       0.004610111       0.005702880      78.668823410    0 LSB
+48000  8x       0.005494934       0.005738239      78.161304264    0 LSB
+48000  128x     0.006917875       0.006916932      72.347814478    0 LSB
+
+All-2x RTL impulse metrics
+--------------------------
+Fs_in  node  pass_abs_max(dB)  ripple_pp(dB)  stop_attn(dB)  symmetry
+44100  4x       0.004610          0.005703         78.669          0 LSB
+44100  8x       0.005395          0.006183         78.562          0 LSB
+44100  128x     0.005444          0.007823         78.447          0 LSB
+48000  4x       0.004610          0.005703         78.669          0 LSB
+48000  8x       0.005395          0.005719         78.562          0 LSB
+48000  128x     0.005444          0.005909         78.881          0 LSB
+
+All cases pass passband +/-0.05 dB, stopband >=70 dB, and strict linear phase.
+All-2x has about 6 dB more 128x stopband margin. The CIC profiles use fewer
+LUT/FF at equal DSP count and already meet the formal stopband requirement.
+
+Strategy scans
+--------------
+Synthesis: five combinations per profile. The valid best setting was
+AreaOptimized_high + flatten_hierarchy=rebuilt + resource_sharing=on.
+flatten_hierarchy=full was rejected because it removes hierarchy referenced by
+the board clock XDC.
+
+Implementation opt_design, final placed LUT:
+Directive             CIC 2-DSP   CIC 3-DSP
+Default                   674          639
+Explore                   674          639
+AddRemap                  674          639
+ExploreWithRemap          675          649
+ExploreArea               688          716
+
+Default is selected because it ties the best LUT result and is the least
+specialized reproducible implementation setting.
+
+Final bitstreams
+----------------
+CIC 2-DSP:
+  vivado_results/board_dual_rate_cic_2dsp_impl_default/
+  national_finals_dual_rate_4x8x128x_cic_2dsp_areaopt.bit
+  SHA256 59050F23AAB8C6F1A3942E415099F820E9F10DA0B73BBC85A7370CAA48604EB7
+
+CIC 3-DSP:
+  vivado_results/board_dual_rate_cic_3dsp_impl_default/
+  national_finals_dual_rate_4x8x128x_cic_3dsp_areaopt.bit
+  SHA256 5685C7338BDA0D55D849B555F91D9951398D073072EC3214D58E3C5EB4E69F1B
+
+IMPLEMENTATION_PASS=1
+RTL_REGRESSION_PROFILE1_PASS=1
+RTL_REGRESSION_PROFILE2_PASS=1
+MATLAB_ACCEPTANCE_PASS=1
+PHYSICAL_BOARD_TESTED=0

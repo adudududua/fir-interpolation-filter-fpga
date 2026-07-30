@@ -49,6 +49,7 @@ module demo_interp_dac8_audio_pcm_common #(
     parameter integer USE_PHASE7_CIC_BURST_COUNTER_DSP = 0,
     parameter integer USE_NATIONAL_FINALS_DATAPATH = 0,
     parameter integer USE_NATIONAL_FINALS_SERIAL_CIC_COMB = 0,
+    parameter integer USE_NATIONAL_FINALS_CIC_LOW_DSP_PROFILE = 0,
     parameter integer USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER = 0,
     parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 0
 )(
@@ -259,6 +260,8 @@ module demo_interp_dac8_audio_pcm_common #(
                     USE_PHASE7_CIC_BURST_COUNTER_DSP),
                 .USE_SERIAL_CIC_COMB(
                     USE_NATIONAL_FINALS_SERIAL_CIC_COMB),
+                .CIC_LOW_DSP_PROFILE(
+                    USE_NATIONAL_FINALS_CIC_LOW_DSP_PROFILE),
                 .USE_STAGE1_DSP48_PREADDER(
                     USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER),
                 .USE_NATIONAL_FINALS_NARROW_STAGE23(

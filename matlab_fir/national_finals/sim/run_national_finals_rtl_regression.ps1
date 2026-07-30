@@ -1,7 +1,9 @@
 [CmdletBinding()]
 param(
     [string]$VivadoBin = 'E:\app\Xilinx2018.3\Vivado\2018.3\bin',
-    [switch]$PublishImpulseOutputs
+    [switch]$PublishImpulseOutputs,
+    [ValidateSet(0, 1, 2)]
+    [int]$CicLowDspProfile = 0
 )
 
 $ErrorActionPreference = 'Stop'
@@ -27,6 +29,12 @@ foreach ($tool in @($xvlog, $xelab, $xsim, $glbl)) {
 }
 
 New-Item -ItemType Directory -Path $runRoot -Force | Out-Null
+
+$cicProfileDefines = switch ($CicLowDspProfile) {
+    1 { @('-d', 'NATIONAL_FINALS_CIC_PROFILE_1') }
+    2 { @('-d', 'NATIONAL_FINALS_CIC_PROFILE_2') }
+    default { @() }
+}
 
 function Invoke-CheckedTool {
     param(
@@ -127,11 +135,12 @@ $cicSerialDir = Invoke-RtlCase -Name 'cic_serial_equivalence' `
         (Join-Path $sourceRoot 'all2x_v6\round_sat_shift_compact.v'),
         (Join-Path $v7Source 'cic_interp16_core_dsp_ce.v'),
         (Join-Path $nfSource 'cic_interp16_serial_comb_dsp_ce.v'),
+        (Join-Path $nfSource 'cic_interp16_serial_comb_lowdsp_ce.v'),
         (Join-Path $nfSim 'tb_cic_interp16_serial_comb_equiv.v')
     ) `
     -Top 'tb_cic_interp16_serial_comb_equiv' `
     -Snapshot 'tb_nf_cic_serial_equiv_sim' `
-    -ExpectedPassText 'CIC SERIAL COMB EQUIVALENCE PASS'
+    -ExpectedPassText 'CIC SERIAL/LOWDSP EQUIVALENCE PASS'
 
 $clockDir = Invoke-RtlCase -Name 'clock' `
     -VerilogFiles @(
@@ -178,6 +187,7 @@ $fullDir = Invoke-RtlCase -Name 'full_chain_bittrue' `
         (Join-Path $nfSource 'cic3_compensator_shiftadd_ce.v'),
         (Join-Path $v7Source 'cic_interp16_core_dsp_ce.v'),
         (Join-Path $nfSource 'cic_interp16_serial_comb_dsp_ce.v'),
+        (Join-Path $nfSource 'cic_interp16_serial_comb_lowdsp_ce.v'),
         (Join-Path $v7Source 'interp128_all2x_v7_folded_fir_cic_top_ce.v'),
         (Join-Path $v7Sim 'tb_phase7_full_chain_bittrue.v'),
         $glbl
@@ -185,14 +195,14 @@ $fullDir = Invoke-RtlCase -Name 'full_chain_bittrue' `
     -Top 'tb_phase7_full_chain_bittrue' `
     -Snapshot 'tb_nf_full_final_sim' `
     -ExpectedPassText 'PHASE7 FULL CHAIN BITTRUE PASS: impulse + 1 seeds, all nodes 0 LSB.' `
-    -XvlogOptions @(
+    -XvlogOptions (@(
         '-d', 'NATIONAL_FINALS',
         '-d', 'NATIONAL_FINALS_USE_SERIAL_CIC_COMB',
         '-d', 'NATIONAL_FINALS_NARROW_STAGE23',
         '-d', 'PHASE7_USE_LUTRAM_STAGE23',
         '-d', 'PHASE7_USE_BRAM_STAGE23_HISTORY',
         '-d', 'PHASE7_USE_BRAM_STAGE23_COEFF'
-    ) `
+    ) + $cicProfileDefines) `
     -XelabOptions @('glbl', '-L', 'unisims_ver') `
     -Assets (@($coeffHeader) + $vectorFiles)
 
@@ -207,6 +217,7 @@ $resetDir = Invoke-RtlCase -Name 'full_chain_reset_recovery' `
         (Join-Path $nfSource 'cic3_compensator_shiftadd_ce.v'),
         (Join-Path $v7Source 'cic_interp16_core_dsp_ce.v'),
         (Join-Path $nfSource 'cic_interp16_serial_comb_dsp_ce.v'),
+        (Join-Path $nfSource 'cic_interp16_serial_comb_lowdsp_ce.v'),
         (Join-Path $v7Source 'interp128_all2x_v7_folded_fir_cic_top_ce.v'),
         (Join-Path $v7Sim 'tb_phase7_full_chain_reset_recovery.v'),
         $glbl
@@ -214,13 +225,13 @@ $resetDir = Invoke-RtlCase -Name 'full_chain_reset_recovery' `
     -Top 'tb_phase7_full_chain_reset_recovery' `
     -Snapshot 'tb_nf_full_reset_sim' `
     -ExpectedPassText 'PHASE7 FULL RESET RECOVERY PASS: 8 internal-state scenarios clean.' `
-    -XvlogOptions @(
+    -XvlogOptions (@(
         '-d', 'NATIONAL_FINALS',
         '-d', 'NATIONAL_FINALS_USE_SERIAL_CIC_COMB',
         '-d', 'PHASE7_USE_LUTRAM_STAGE23',
         '-d', 'PHASE7_USE_BRAM_STAGE23_HISTORY',
         '-d', 'PHASE7_USE_BRAM_STAGE23_COEFF'
-    ) `
+    ) + $cicProfileDefines) `
     -XelabOptions @('glbl', '-L', 'unisims_ver') `
     -Assets @($coeffHeader)
 
@@ -235,6 +246,7 @@ $dynamicDir = Invoke-RtlCase -Name 'dynamic_mode_switch' `
         (Join-Path $nfSource 'cic3_compensator_shiftadd_ce.v'),
         (Join-Path $v7Source 'cic_interp16_core_dsp_ce.v'),
         (Join-Path $nfSource 'cic_interp16_serial_comb_dsp_ce.v'),
+        (Join-Path $nfSource 'cic_interp16_serial_comb_lowdsp_ce.v'),
         (Join-Path $v7Source 'interp128_all2x_v7_folded_fir_cic_top_ce.v'),
         (Join-Path $nfSource 'dual_rate_test_tone_rom_source.v'),
         (Join-Path $sourceRoot 'demo_interp_dac8_audio_pcm_common.v'),
@@ -244,10 +256,10 @@ $dynamicDir = Invoke-RtlCase -Name 'dynamic_mode_switch' `
     -Top 'tb_phase7_mode_switch_dynamic' `
     -Snapshot 'tb_nf_dynamic_mode_sim' `
     -ExpectedPassText 'PHASE7 DYNAMIC MODE PASS: 10 switches, no reset, no runt pulse or X.' `
-    -XvlogOptions @(
+    -XvlogOptions (@(
         '-d', 'PHASE7_USE_BRAM_STAGE23_HISTORY',
         '-d', 'PHASE7_USE_BRAM_STAGE23_COEFF'
-    ) `
+    ) + $cicProfileDefines) `
     -XelabOptions @('glbl', '-L', 'unisims_ver') `
     -Assets @(
         $coeffHeader,

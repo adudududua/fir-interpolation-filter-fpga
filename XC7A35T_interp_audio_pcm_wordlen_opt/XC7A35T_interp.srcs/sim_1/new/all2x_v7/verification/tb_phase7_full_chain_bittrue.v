@@ -159,6 +159,13 @@ module tb_phase7_full_chain_bittrue;
 `else
         .USE_SERIAL_CIC_COMB(0),
 `endif
+`ifdef NATIONAL_FINALS_CIC_PROFILE_1
+        .CIC_LOW_DSP_PROFILE(1),
+`elsif NATIONAL_FINALS_CIC_PROFILE_2
+        .CIC_LOW_DSP_PROFILE(2),
+`else
+        .CIC_LOW_DSP_PROFILE(0),
+`endif
 `ifdef NATIONAL_FINALS_USE_STAGE1_DSP48_PREADDER
         .USE_STAGE1_DSP48_PREADDER(1),
 `else

@@ -1,5 +1,103 @@
 # 全国总决赛：双采样率可配置插值滤波器
 
+## 0. 低 DSP FIR-CIC 正式候选与全 2x 对比（2026-07-30）
+
+当前低 DSP 优化分支为 `codex/national-finals-cic-lowdsp-opt`。本轮把 CIC16
+后端的宽位 comb/积分运算从 DSP48E1 转到 LUT/Carry，并保留两档正式候选：
+
+- `CicLowDspProfile=1`：整链 **2 DSP**，最终 674 LUT / 621 FF。
+- `CicLowDspProfile=2`：整链 **3 DSP**，最终 639 LUT / 621 FF；推荐作为
+  低 DSP 与低 LUT 的平衡提交版本。
+
+两档都保持 3 BRAM Tile、2 MMCM，且所有 24-bit 定点输出与原 FIR-CIC
+逐点相同。相对同 DSP 数的全 2x，2-DSP CIC 少 54 LUT / 41 FF，3-DSP CIC
+少 75 LUT / 41 FF。全 2x 的 128x 阻带约多 6 dB，但两条路线都超过赛题
+70 dB 门槛。
+
+### 0.1 最终同口径资源、时序与功耗
+
+| 架构 | LUT | FF | DSP | BRAM Tile | MMCM | WNS/WHS | 功耗估计 | 结果 |
+|---|---:|---:|---:|---:|---:|---:|---:|---|
+| **FIR-CIC 3-DSP** | **639** | **621** | 3 | 3 | 2 | +45.745/+0.082 ns | 0.271 W | bitstream PASS |
+| **FIR-CIC 2-DSP** | **674** | **621** | 2 | 3 | 2 | +46.390/+0.078 ns | 0.271 W | bitstream PASS |
+| 全 2x 3-DSP | 714 | 662 | 3 | 3 | 2 | +46.438/+0.105 ns | 0.271 W | bitstream PASS |
+| 全 2x 2-DSP | 728 | 662 | 2 | 3 | 2 | +46.441/+0.105 ns | 0.271 W | bitstream PASS |
+| FIR-CIC 6-DSP | 573 | 621 | 6 | 3 | 2 | +46.339/+0.072 ns | 0.271 W | bitstream PASS |
+
+以上均为布局布线后的资源，不是 RTL 估算或仅综合结果。所有正式候选
+均为完整路由、DRC Error=0、setup/hold 通过。DRC 保留的 Warning/Advisory
+来自未加流水 DSP 性能建议和 BRAM 异步控制检查，不阻止 bitstream；复位
+功能已由 8 类内部状态回归覆盖。
+
+### 0.2 4x/8x/128x 六工况指标
+
+下表来自本轮 2-DSP CIC 正式 RTL 回归发布的 XSim 冲激响应；3-DSP CIC 与
+它逐拍 0 LSB 等价，因此两档指标相同。
+
+| 输入采样率 | 输出/输出采样率 | 通带最大绝对偏差 | 峰峰纹波 | 阻带衰减 | 对称性 |
+|---:|---:|---:|---:|---:|---:|
+| 44.1 kHz | 4x / 176.4 kHz | 0.004610 dB | 0.005703 dB | 78.669 dB | 0 LSB |
+| 44.1 kHz | 8x / 352.8 kHz | 0.005495 dB | 0.006274 dB | 78.161 dB | 0 LSB |
+| 44.1 kHz | 128x / 5.6448 MHz | 0.006918 dB | 0.008111 dB | 72.348 dB | 0 LSB |
+| 48 kHz | 4x / 192 kHz | 0.004610 dB | 0.005703 dB | 78.669 dB | 0 LSB |
+| 48 kHz | 8x / 384 kHz | 0.005495 dB | 0.005738 dB | 78.161 dB | 0 LSB |
+| 48 kHz | 128x / 6.144 MHz | 0.006918 dB | 0.006917 dB | 72.348 dB | 0 LSB |
+
+全部满足 10 Hz～20 kHz、±0.05 dB、阻带 ≥70 dB 和严格线性相位。
+
+### 0.3 本轮 RTL 与实现优化
+
+1. 低速 comb 使用 `20/21/22/23 bit` 渐进位宽并串行复用加减路径，避免
+   三个全宽并行 comb。
+2. 前两级高速积分器显式 `use_dsp="no"`，使用 Artix-7 Carry 链；2-DSP
+   档的末级也用 Carry，3-DSP 档只把末级积分器定向放入一个 DSP48E1。
+3. Stage 1 保留严格半带、对称多相和 BRAM 历史；Stage 2/3 保留全国赛
+   精简位宽、BRAM 历史/系数以及单 DSP 时分 MAC；均衡器仍为移位加减。
+4. 综合五策略扫描选择
+   `AreaOptimized_high/rebuilt/resource_sharing=on`。`full` 破坏 XDC 层次时钟
+   对象，不能进入布局布线。
+5. 实现五策略扫描表明 `Default/Explore/AddRemap` 并列最优；正式复现选
+   `Default`。原 `ExploreArea` 在本结构上会额外增加布局 LUT。
+
+### 0.4 验证覆盖
+
+- [x] 2-DSP CIC RTL 回归 9/9
+- [x] 3-DSP CIC RTL 回归 9/9
+- [x] 原 CIC、2-DSP CIC、3-DSP CIC 连续输入逐拍等价
+- [x] 随机时钟使能停顿与 burst 中复位逐拍等价
+- [x] 全链 impulse + 随机 PCM，4x/8x/128x 全部 0 LSB
+- [x] 8 类内部状态复位恢复，每类比较 4096 个 128x 输出
+- [x] 10 次无复位动态倍率切换，无 runt pulse、无 X
+- [x] 双采样率 ROM、MMCM/BUFGMUX、键盘和板级集成测试
+- [x] 两档综合、布局布线、时序、完整路由、DRC Error=0、bitstream
+- [ ] 实物板下载、六档 DA_CLK 与频谱仪测量
+
+### 0.5 一键复现与 bitstream
+
+2-DSP RTL 回归：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
+  .\matlab_fir\national_finals\sim\run_national_finals_rtl_regression.ps1 `
+  -CicLowDspProfile 1 -PublishImpulseOutputs
+```
+
+3-DSP RTL 回归把 profile 改为 `2`。生成推荐 3-DSP 板级 bitstream：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
+  .\matlab_fir\national_finals\vivado\run_national_finals_vivado_build.ps1 `
+  -Step all -CicLowDspProfile 2 `
+  -SynthesisDirective AreaOptimized_high `
+  -FlattenHierarchy rebuilt -ResourceSharing on `
+  -ImplementationOptDirective Default `
+  -ResultTag board_dual_rate_cic_3dsp_impl_default
+```
+
+- [2-DSP bitstream](vivado_results/board_dual_rate_cic_2dsp_impl_default/national_finals_dual_rate_4x8x128x_cic_2dsp_areaopt.bit)，SHA-256 `59050F23AAB8C6F1A3942E415099F820E9F10DA0B73BBC85A7370CAA48604EB7`
+- [3-DSP bitstream](vivado_results/board_dual_rate_cic_3dsp_impl_default/national_finals_dual_rate_4x8x128x_cic_3dsp_areaopt.bit)，SHA-256 `5685C7338BDA0D55D849B555F91D9951398D073072EC3214D58E3C5EB4E69F1B`
+- [完整量化、策略与验证摘要](results/cic_lowdsp_architecture_comparison_summary.txt)
+
 当前版本已完成 MATLAB 建模、24 bit 定点模型、RTL、六组 XSim 回归、Vivado 综合/布局布线/时序/DRC/功耗评估和 bitstream 生成。所有软件与 FPGA 工具验收均已通过；由于当前环境无法接触实物开发板，物理板下载和仪器测量仍需按本文最后一节执行，不能把 bitstream 成功等同于实板通过。
 
 开发分支：`codex/national-finals-configurable`

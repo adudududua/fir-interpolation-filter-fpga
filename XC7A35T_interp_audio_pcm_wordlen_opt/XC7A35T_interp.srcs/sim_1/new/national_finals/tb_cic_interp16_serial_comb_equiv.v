@@ -19,12 +19,20 @@ module tb_cic_interp16_serial_comb_equiv;
     wire reference_valid;
     wire signed [DATA_W-1:0] y_serial;
     wire serial_valid;
+    wire signed [DATA_W-1:0] y_lut;
+    wire lut_valid;
+    wire signed [DATA_W-1:0] y_hybrid;
+    wire hybrid_valid;
 
     reg signed [DATA_W-1:0] reference_queue [0:QUEUE_DEPTH-1];
     integer queue_write;
     integer queue_read;
+    integer lut_queue_read;
+    integer hybrid_queue_read;
     integer reference_count;
     integer serial_count;
+    integer lut_count;
+    integer hybrid_count;
     integer mismatch_count;
     integer random_seed;
     integer input_index;
@@ -65,6 +73,28 @@ module tb_cic_interp16_serial_comb_equiv;
         .comb_busy_dbg()
     );
 
+    cic_interp16_serial_comb_lowdsp_ce #(
+        .DATA_W(20),
+        .FINAL_PRUNE_LSB(0),
+        .USE_FINAL_INTEGRATOR_DSP(0)
+    ) u_lut (
+        .clk(clk), .rst_n(rst_n), .ce_out(ce_out),
+        .x_in(x_in), .x_in_valid(x_in_valid),
+        .y_out(y_lut), .y_out_valid(lut_valid),
+        .burst_remaining_dbg(), .pending_dbg(), .comb_busy_dbg()
+    );
+
+    cic_interp16_serial_comb_lowdsp_ce #(
+        .DATA_W(20),
+        .FINAL_PRUNE_LSB(0),
+        .USE_FINAL_INTEGRATOR_DSP(1)
+    ) u_hybrid (
+        .clk(clk), .rst_n(rst_n), .ce_out(ce_out),
+        .x_in(x_in), .x_in_valid(x_in_valid),
+        .y_out(y_hybrid), .y_out_valid(hybrid_valid),
+        .burst_remaining_dbg(), .pending_dbg(), .comb_busy_dbg()
+    );
+
     always #5 clk = ~clk;
 
     // The reference is three cycles earlier than the serial candidate.
@@ -73,8 +103,12 @@ module tb_cic_interp16_serial_comb_equiv;
         if (!rst_n) begin
             queue_write = 0;
             queue_read = 0;
+            lut_queue_read = 0;
+            hybrid_queue_read = 0;
             reference_count = 0;
             serial_count = 0;
+            lut_count = 0;
+            hybrid_count = 0;
             mismatch_count = 0;
         end
         else begin
@@ -99,6 +133,31 @@ module tb_cic_interp16_serial_comb_equiv;
                 end
                 queue_read = queue_read + 1;
                 serial_count = serial_count + 1;
+            end
+
+            if (lut_valid) begin
+                if (lut_queue_read >= queue_write)
+                    $fatal(1, "LUT CIC produced a sample before reference");
+                if (y_lut !== reference_queue[lut_queue_read]) begin
+                    mismatch_count = mismatch_count + 1;
+                    $display("LUT CIC mismatch sample=%0d reference=%0d dut=%0d",
+                        lut_count, reference_queue[lut_queue_read], y_lut);
+                end
+                lut_queue_read = lut_queue_read + 1;
+                lut_count = lut_count + 1;
+            end
+
+            if (hybrid_valid) begin
+                if (hybrid_queue_read >= queue_write)
+                    $fatal(1, "Hybrid CIC produced a sample before reference");
+                if (y_hybrid !== reference_queue[hybrid_queue_read]) begin
+                    mismatch_count = mismatch_count + 1;
+                    $display("Hybrid CIC mismatch sample=%0d reference=%0d dut=%0d",
+                        hybrid_count, reference_queue[hybrid_queue_read],
+                        y_hybrid);
+                end
+                hybrid_queue_read = hybrid_queue_read + 1;
+                hybrid_count = hybrid_count + 1;
             end
         end
     end
@@ -167,9 +226,18 @@ module tb_cic_interp16_serial_comb_equiv;
             if (serial_count != expected_inputs*16)
                 $fatal(1, "Serial count=%0d expected=%0d",
                        serial_count, expected_inputs*16);
+            if (lut_count != expected_inputs*16)
+                $fatal(1, "LUT count=%0d expected=%0d",
+                       lut_count, expected_inputs*16);
+            if (hybrid_count != expected_inputs*16)
+                $fatal(1, "Hybrid count=%0d expected=%0d",
+                       hybrid_count, expected_inputs*16);
             if (queue_read != queue_write)
                 $fatal(1, "Undrained reference samples=%0d",
                        queue_write-queue_read);
+            if (lut_queue_read != queue_write ||
+                hybrid_queue_read != queue_write)
+                $fatal(1, "Low-DSP reference queues did not drain");
         end
     endtask
 
@@ -203,7 +271,7 @@ module tb_cic_interp16_serial_comb_equiv;
         x_in_valid = 1'b0;
         ce_out = 1'b1;
         repeat (7) @(negedge clk);
-        if (!reference_valid || !serial_valid)
+        if (!reference_valid || !serial_valid || !lut_valid || !hybrid_valid)
             $fatal(1, "Directed reset did not land inside an active burst");
         #1 rst_n = 1'b0;
         repeat (3) @(negedge clk);
@@ -219,7 +287,7 @@ module tb_cic_interp16_serial_comb_equiv;
         stream_inputs(240, 1);
         drain_and_check(240);
 
-        $display("CIC SERIAL COMB EQUIVALENCE PASS: continuous=160 stalled=240 reset-mid-burst=PASS samples=%0d",
+        $display("CIC SERIAL/LOWDSP EQUIVALENCE PASS: continuous=160 stalled=240 reset-mid-burst=PASS samples=%0d",
                  serial_count);
         $finish;
     end

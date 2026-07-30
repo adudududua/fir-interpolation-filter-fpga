@@ -9,6 +9,10 @@ param(
     [string]$FlattenHierarchy = 'rebuilt',
     [ValidateSet('auto', 'on', 'off')]
     [string]$ResourceSharing = 'auto',
+    [ValidateSet(0, 1, 2)]
+    [int]$CicLowDspProfile = 0,
+    [ValidateSet('Default', 'Explore', 'ExploreWithRemap', 'ExploreArea', 'AddRemap')]
+    [string]$ImplementationOptDirective = 'Default',
     [ValidatePattern('^[A-Za-z0-9_-]+$')]
     [string]$ResultTag = 'board_dual_rate_areaopt'
 )
@@ -76,12 +80,21 @@ if ($Step -eq 'all' -or $Step -eq 'synth') {
             $SynthesisDirective,
             $FlattenHierarchy,
             $ResourceSharing,
-            $ResultTag
+            $ResultTag,
+            [string]$CicLowDspProfile
         )
 }
 
 if ($Step -eq 'all' -or $Step -eq 'implement') {
-    Invoke-VivadoStep -Name 'implementation' -TclPath $implementTcl
+    Invoke-VivadoStep -Name 'implementation' -TclPath $implementTcl `
+        -TclArguments @(
+            $ResultTag,
+            [string]$CicLowDspProfile,
+            $SynthesisDirective,
+            $FlattenHierarchy,
+            $ResourceSharing,
+            $ImplementationOptDirective
+        )
 }
 
 Write-Host ''

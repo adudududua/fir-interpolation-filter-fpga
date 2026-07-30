@@ -1,6 +1,8 @@
 [CmdletBinding()]
 param(
-    [string]$VivadoExe = 'E:\app\Xilinx2018.3\Vivado\2018.3\bin\vivado.bat'
+    [string]$VivadoExe = 'E:\app\Xilinx2018.3\Vivado\2018.3\bin\vivado.bat',
+    [ValidateSet(0, 1, 2)]
+    [int]$CicLowDspProfile = 0
 )
 
 $ErrorActionPreference = 'Stop'
@@ -8,35 +10,36 @@ Set-StrictMode -Version Latest
 
 $wrapper = Join-Path $PSScriptRoot 'run_national_finals_vivado_build.ps1'
 $resultRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\vivado_results')).Path
-$summaryPath = Join-Path $resultRoot 'synthesis_strategy_scan.csv'
+$tagPrefix = "scan_cic_profile${CicLowDspProfile}"
+$summaryPath = Join-Path $resultRoot "${tagPrefix}_strategy_scan.csv"
 
 $candidates = @(
     [pscustomobject]@{
-        Tag = 'scan_area_rebuilt_auto'
+        Tag = "${tagPrefix}_area_rebuilt_auto"
         Directive = 'AreaOptimized_high'
         Flatten = 'rebuilt'
         Sharing = 'auto'
     },
     [pscustomobject]@{
-        Tag = 'scan_area_full_auto'
+        Tag = "${tagPrefix}_area_full_auto"
         Directive = 'AreaOptimized_high'
         Flatten = 'full'
         Sharing = 'auto'
     },
     [pscustomobject]@{
-        Tag = 'scan_area_none_auto'
+        Tag = "${tagPrefix}_area_none_auto"
         Directive = 'AreaOptimized_high'
         Flatten = 'none'
         Sharing = 'auto'
     },
     [pscustomobject]@{
-        Tag = 'scan_area_rebuilt_on'
+        Tag = "${tagPrefix}_area_rebuilt_on"
         Directive = 'AreaOptimized_high'
         Flatten = 'rebuilt'
         Sharing = 'on'
     },
     [pscustomobject]@{
-        Tag = 'scan_default_rebuilt_auto'
+        Tag = "${tagPrefix}_default_rebuilt_auto"
         Directive = 'Default'
         Flatten = 'rebuilt'
         Sharing = 'auto'
@@ -60,6 +63,7 @@ $rows = foreach ($candidate in $candidates) {
     & $wrapper `
         -VivadoExe $VivadoExe `
         -Step synth `
+        -CicLowDspProfile $CicLowDspProfile `
         -SynthesisDirective $candidate.Directive `
         -FlattenHierarchy $candidate.Flatten `
         -ResourceSharing $candidate.Sharing `

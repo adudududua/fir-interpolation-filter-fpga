@@ -19,6 +19,7 @@ set synth_directive AreaOptimized_high
 set flatten_hierarchy rebuilt
 set resource_sharing auto
 set result_tag board_dual_rate_areaopt
+set cic_low_dsp_profile 0
 if {$argc > 0} {
     set reuse_current_synthesis [lindex $argv 0]
 }
@@ -37,6 +38,9 @@ if {$argc > 4} {
 if {$argc > 5} {
     set result_tag [lindex $argv 5]
 }
+if {$argc > 6} {
+    set cic_low_dsp_profile [lindex $argv 6]
+}
 if {$reuse_current_synthesis != 0 && $reuse_current_synthesis != 1} {
     error "reuse_current_synthesis must be 0 or 1"
 }
@@ -46,11 +50,15 @@ if {$synthesis_only != 0 && $synthesis_only != 1} {
 if {![regexp {^[A-Za-z0-9_-]+$} $result_tag]} {
     error "result_tag may contain only letters, digits, underscore, and dash"
 }
+if {$cic_low_dsp_profile < 0 || $cic_low_dsp_profile > 2} {
+    error "cic_low_dsp_profile must be 0, 1, or 2"
+}
 set result_dir [file normalize [file join $script_dir .. vivado_results $result_tag]]
 
 set nf_sources [list \
     [file join $nf_src_dir cic3_compensator_shiftadd_ce.v] \
     [file join $nf_src_dir cic_interp16_serial_comb_dsp_ce.v] \
+    [file join $nf_src_dir cic_interp16_serial_comb_lowdsp_ce.v] \
     [file join $nf_src_dir dual_family_audio_clock.v] \
     [file join $nf_src_dir dual_rate_test_tone_rom_source.v] \
     [file join $nf_src_dir nf_sine_15k_dual_rate_24bit_256.mem]]
@@ -115,6 +123,7 @@ set_property generic [list \
     USE_PHASE7_CIC_BURST_COUNTER_DSP=0 \
     USE_NATIONAL_FINALS_DATAPATH=1 \
     USE_NATIONAL_FINALS_SERIAL_CIC_COMB=1 \
+    USE_NATIONAL_FINALS_CIC_LOW_DSP_PROFILE=$cic_low_dsp_profile \
     USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER=0 \
     USE_NATIONAL_FINALS_NARROW_STAGE23=1] [get_filesets sources_1]
 
@@ -214,6 +223,7 @@ puts $manifest_handle "Bitstream: $bitstream_dst"
 puts $manifest_handle "44.1-kHz family 128x clock: 5.644796 MHz (-0.64 ppm nominal)"
 puts $manifest_handle "48-kHz family 128x clock: 6.144068 MHz (+11.03 ppm nominal)"
 puts $manifest_handle "Architecture: shared 2x/2x/2x FIR + shift-add CIC equalizer + CIC16"
+puts $manifest_handle "CIC low-DSP profile: $cic_low_dsp_profile"
 puts $manifest_handle "Synthesis directive: AreaOptimized_high"
 puts $manifest_handle "Implementation opt directive: ExploreArea"
 close $manifest_handle
