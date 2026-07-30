@@ -76,7 +76,8 @@ module tb_phase7_full_chain_reset_recovery;
     integer compare_enable;
 
     interp128_all2x_v7_folded_fir_cic_top_ce #(
-        .STAGE23_ACC_W(38), .CIC_ORDER(3), .FINAL_PRUNE_LSB(0),
+        .STAGE1_ACC_W(41), .STAGE23_ACC_W(38),
+        .CIC_ORDER(3), .FINAL_PRUNE_LSB(0),
 `ifdef PHASE7_USE_LUTRAM_STAGE23
         .USE_LUTRAM_STAGE23(1),
 `else
@@ -127,7 +128,8 @@ module tb_phase7_full_chain_reset_recovery;
     );
 
     interp128_all2x_v7_folded_fir_cic_top_ce #(
-        .STAGE23_ACC_W(38), .CIC_ORDER(3), .FINAL_PRUNE_LSB(0),
+        .STAGE1_ACC_W(41), .STAGE23_ACC_W(38),
+        .CIC_ORDER(3), .FINAL_PRUNE_LSB(0),
 `ifdef PHASE7_USE_LUTRAM_STAGE23
         .USE_LUTRAM_STAGE23(1),
 `else
@@ -249,10 +251,10 @@ module tb_phase7_full_chain_reset_recovery;
                     `DUT_STAGE23.stage2_pending;
                 3: ready_value =
                     `DUT_STAGE23.job_active &&
-                    `DUT_STAGE23.job_stage == 2'd2;
+                    !`DUT_STAGE23.job_stage3;
                 4: ready_value =
                     `DUT_STAGE23.job_active &&
-                    `DUT_STAGE23.job_stage == 2'd3;
+                    `DUT_STAGE23.job_stage3;
                 5: ready_value =
                     `DUT_CIC.burst_pending;
                 6: ready_value =

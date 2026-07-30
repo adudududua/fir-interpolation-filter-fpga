@@ -112,8 +112,9 @@ module interp2_stage1_strict_halfband_bram_ce #(
     assign fir_in_valid_dbg = ce_out && (phase_cnt == 1'b0);
 
     assign product_comb = pair_sum_comb * coeff_comb;
-    assign product_ext = {{(ACC_W-PROD_W){product_comb[PROD_W-1]}},
-                          product_comb};
+    // Signed assignment performs the required sign extension, or discards
+    // only redundant sign bits when a proven narrower accumulator is used.
+    assign product_ext = product_comb;
     assign dsp_preadd_a = read_mask_a ?
         {{(25-DATA_W){read_data_a[DATA_W-1]}}, read_data_a} : 25'sd0;
     assign dsp_preadd_d = read_mask_b ?

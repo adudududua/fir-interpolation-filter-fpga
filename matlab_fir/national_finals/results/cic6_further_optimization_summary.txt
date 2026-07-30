@@ -3,6 +3,7 @@ National-finals 6-DSP CIC further optimization
 Date: 2026-07-30
 Branch: codex/national-finals-cic-6dsp-further-opt
 Starting point: 573 LUT / 621 FF / 255 Slice / 6 DSP / 3 BRAM / 2 MMCM
+Previous selected point: 557 LUT / 536 FF / 228 Slice / 6 DSP / 3 BRAM / 2 MMCM
 
 Accepted changes
 ----------------
@@ -17,6 +18,22 @@ Accepted changes
    In serial-CIC mode only, the equalizer result is captured directly by the
    CIC input transaction, removing an otherwise redundant output register
    bank. The equalizer's default registered interface remains compatible.
+4. Rotating 22-bit serial-comb history
+   The three low-rate comb histories rotate across the three serial cycles.
+   The DSP input therefore always reads history bank 0 and no longer needs a
+   23-bit 3:1 mux. The CIC module changed from 44 LUT / 136 FF to
+   18 LUT / 138 FF.
+5. Exact four-bit burst counter
+   burst_pending identifies the first of 16 outputs; burst_remaining therefore
+   needs only four bits for values 15 down to 0.
+6. Proven 41-bit Stage1 accumulator
+   Sum(abs(non-zero coefficients)) = 44756. The conservative bound
+   2^24 * 44756 = 750881079296 is below signed-41 maximum 2^40-1 =
+   1099511627775. National-finals mode uses 41 bits; compatibility default
+   remains 42 bits.
+7. Compact Stage2/3 scheduler
+   The two-bit stage value 2/3 became one-bit job_stage3, and the fixed MAC
+   count is derived combinationally from stage and phase instead of stored.
 
 Rejected experiments
 --------------------
@@ -27,20 +44,38 @@ Rejected experiments
 3. Exact equalizer internal-width shrink
    Unit simulation passed but synthesis remained 584 LUT / 557 FF / 6 DSP,
    so there was no resource benefit.
+4. Equalizer sharing the Stage2/3 DSP
+   After correcting signed coefficient extension this was 0-LSB bit-true, but
+   synthesis increased to 592 LUT / 558 FF / 6 DSP.
+5. Explicit Stage1 DSP48 preadder
+   Synthesis increased to 586 LUT / 578 FF / 6 DSP.
+6. Merge burst_pending into the four-bit count
+   Independent CIC equivalence failed at output sample 16, so the robust
+   pending flag plus four-bit remaining count was restored.
 
 Selected result
 ---------------
-Placed: 557 LUT / 536 FF / 228 Slice / 6 DSP / 3 BRAM / 2 MMCM
-Timing: WNS +45.614 ns; WHS +0.105 ns; TNS/THS 0
-Routing: 1576/1576 routable nets complete; routing errors 0
+Synthesis: 554 LUT / 532 FF / 6 DSP / 3 BRAM / 2 MMCM
+Placed: 528 LUT / 532 FF / 229 Slice / 6 DSP / 3 BRAM / 2 MMCM
+Timing: WNS +45.075 ns; WHS +0.078 ns; TNS/THS 0
+Routing: 1547/1547 routable nets complete; routing errors 0
 DRC: Error 0
 Power: 0.271 W vectorless, Medium confidence
 Bitstream SHA256:
-4BCCFDC0559E542777F4BE758D85087D7B12E501F9A86EBD19393FB6CDCA0C3F
+C9C9421D07B02D39F90423D83BDC6AE2B1D60C49D43A4FFF4D19C4EF62EB6203
 
-The selected point uses one more LUT than the 556-LUT PREG candidate, but
-saves 21 FF and 3 physical Slices. It is therefore the better overall
-area Pareto point.
+Default, Explore and AddRemap all produced 528 LUT / 532 FF / 229 Slice and
+identical routed timing. Default is selected because it is the simplest and
+most reproducible implementation flow.
+
+Delta versus requested baseline:
+  LUT 573 -> 528 (-45, -7.85%)
+  FF  621 -> 532 (-89, -14.33%)
+  Slice 255 -> 229 (-26, -10.20%)
+Delta versus previous selected point:
+  LUT 557 -> 528 (-29, -5.21%)
+  FF  536 -> 532 (-4, -0.75%)
+  Slice 228 -> 229 (+1, +0.44%)
 
 Verification
 ------------

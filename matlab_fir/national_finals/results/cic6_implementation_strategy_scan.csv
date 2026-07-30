@@ -6,3 +6,6 @@ strategy_explore_with_remap,ExploreWithRemap,556,621,235,6,3,2,45.271,0.072,1,0,
 strategy_add_remap,AddRemap,556,621,229,6,3,2,45.294,0.092,1,0,1
 dsp_preg_default,Default,556,557,231,6,3,2,45.936,0.106,1,0,1
 selected_preg_eq_comb_default,Default,557,536,228,6,3,2,45.614,0.105,1,0,1
+rotate22_acc41_schedcompact_default,Default,528,532,229,6,3,2,45.075,0.078,1,0,1
+rotate22_acc41_schedcompact_explore,Explore,528,532,229,6,3,2,45.075,0.078,1,0,1
+rotate22_acc41_schedcompact_addremap,AddRemap,528,532,229,6,3,2,45.075,0.078,1,0,1

@@ -127,6 +127,7 @@ module tb_phase7_full_chain_bittrue;
     wire dbg_y8_valid;
 
     interp128_all2x_v7_folded_fir_cic_top_ce #(
+        .STAGE1_ACC_W    (41),
         .STAGE23_ACC_W   (38),
         .CIC_ORDER       (3),
         .FINAL_PRUNE_LSB (0),

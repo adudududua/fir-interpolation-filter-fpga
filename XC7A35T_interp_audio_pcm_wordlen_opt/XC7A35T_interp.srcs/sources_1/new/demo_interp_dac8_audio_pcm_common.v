@@ -245,6 +245,8 @@ module demo_interp_dac8_audio_pcm_common #(
     generate
         if (USE_PHASE7_FOLDED != 0) begin : gen_phase7_folded
             interp128_all2x_v7_folded_fir_cic_top_ce #(
+                .STAGE1_ACC_W(
+                    (USE_NATIONAL_FINALS_DATAPATH != 0) ? 41 : 42),
                 .STAGE23_ACC_W   (38),
                 .CIC_ORDER       (3),
                 .FINAL_PRUNE_LSB (0),

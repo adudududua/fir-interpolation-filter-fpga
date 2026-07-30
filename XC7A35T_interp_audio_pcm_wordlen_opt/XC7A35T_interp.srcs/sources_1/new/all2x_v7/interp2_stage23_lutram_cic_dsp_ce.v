@@ -113,10 +113,10 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     reg stage3_pending_phase;
 
     reg job_active;
-    reg [1:0] job_stage;
+    reg job_stage3;
     reg job_phase;
     reg [3:0] job_mac_index;
-    reg [3:0] job_mac_count;
+    wire [3:0] job_mac_count;
 
     wire [MEM_ADDR_W-1:0] hist_index;
     wire [MEM_ADDR_W-1:0] hist_pair_limit;
@@ -196,17 +196,20 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     assign stage2_write_addr = stage2_head - {{(MEM_ADDR_W-1){1'b0}}, 1'b1};
     assign stage3_write_addr = stage3_head - {{(MEM_ADDR_W-1){1'b0}}, 1'b1};
     assign hist_index = job_mac_index[MEM_ADDR_W-1:0];
-    assign hist_pair_limit = (job_stage == 2'd2) ?
+    assign hist_pair_limit = !job_stage3 ?
                              (job_phase ? 4'd7 : 4'd8) :
                              (job_phase ? 4'd4 : 4'd5);
     assign hist_mirror_index = hist_pair_limit - hist_index;
     assign coeff_index = (hist_index <= hist_mirror_index) ?
                          hist_index : hist_mirror_index;
-    assign coeff_addr = {(job_stage == 2'd3), job_phase,
+    assign coeff_addr = {job_stage3, job_phase,
                          coeff_index[2:0]};
     assign coeff_comb = coeff_rom[coeff_addr];
+    assign job_mac_count = !job_stage3 ?
+        (job_phase ? 4'd8 : 4'd9) :
+        (job_phase ? 4'd5 : 4'd6);
 
-    assign coeff_bram_stage3 = job_active ? (job_stage == 2'd3) :
+    assign coeff_bram_stage3 = job_active ? job_stage3 :
         (!stage2_pending && stage3_pending);
     assign coeff_bram_phase = job_active ? job_phase :
         (stage2_pending ? stage2_pending_phase : stage3_pending_phase);
@@ -226,9 +229,9 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     // BRAM 为同步读。任务空闲且 pending 时读取 index0；任务活动时，
     // 在当前抽头进入 DSP 的同时预取下一个抽头，避免额外空拍。
     assign stage2_bram_read_index =
-        (job_active && job_stage == 2'd2) ? hist_index + 4'd1 : 4'd0;
+        (job_active && !job_stage3) ? hist_index + 4'd1 : 4'd0;
     assign stage3_bram_read_index =
-        (job_active && job_stage == 2'd3) ? hist_index + 4'd1 : 4'd0;
+        (job_active && job_stage3) ? hist_index + 4'd1 : 4'd0;
     assign stage2_bram_read_addr = stage2_head + stage2_bram_read_index;
     assign stage3_bram_read_addr = stage3_head + stage3_bram_read_index;
     assign stage2_packed_read_addr = coeff_bram_stage3 ?
@@ -244,7 +247,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     assign stage3_mem = (hist_index < stage3_fill_count) ?
                         stage3_mem_raw : {STAGE3_DATA_W{1'b0}};
 
-    assign selected_sample = (job_stage == 2'd2) ? stage2_mem :
+    assign selected_sample = !job_stage3 ? stage2_mem :
         {{(STAGE2_DATA_W-STAGE3_DATA_W){stage3_mem[STAGE3_DATA_W-1]}},
          stage3_mem};
     assign dsp_input_a =
@@ -360,7 +363,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     assign stage2_phase_dbg = stage2_phase;
     assign stage3_phase_dbg = stage3_phase;
     assign scheduler_busy_dbg = job_active;
-    assign scheduler_stage_dbg = job_stage;
+    assign scheduler_stage_dbg = job_active ?
+        {1'b1, job_stage3} : 2'd0;
     assign scheduler_mac_index_dbg = job_mac_index;
 
     initial begin
@@ -562,10 +566,9 @@ module interp2_stage23_lutram_cic_dsp_ce #(
             stage2_pending_phase <= 1'b0;
             stage3_pending_phase <= 1'b0;
             job_active <= 1'b0;
-            job_stage <= 2'd0;
+            job_stage3 <= 1'b0;
             job_phase <= 1'b0;
             job_mac_index <= 4'd0;
-            job_mac_count <= 4'd0;
             acc_reg <= {ACC_W{1'b0}};
             stage2_y_out <= {STAGE2_DATA_W{1'b0}};
             stage3_y_out <= {STAGE3_DATA_W{1'b0}};
@@ -600,7 +603,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
 
             if (job_active) begin
                 if (job_mac_index == job_mac_count - 4'd1) begin
-                    if (job_stage == 2'd2) begin
+                    if (!job_stage3) begin
                         stage2_y_out <= stage2_q15_rounded;
                         stage2_y_out_valid <= 1'b1;
                     end
@@ -619,19 +622,17 @@ module interp2_stage23_lutram_cic_dsp_ce #(
             end
             else if (stage2_pending) begin
                 job_active <= 1'b1;
-                job_stage <= 2'd2;
+                job_stage3 <= 1'b0;
                 job_phase <= stage2_pending_phase;
                 job_mac_index <= 4'd0;
-                job_mac_count <= stage2_pending_phase ? 4'd8 : 4'd9;
                 acc_reg <= {ACC_W{1'b0}};
                 stage2_pending <= 1'b0;
             end
             else if (stage3_pending) begin
                 job_active <= 1'b1;
-                job_stage <= 2'd3;
+                job_stage3 <= 1'b1;
                 job_phase <= stage3_pending_phase;
                 job_mac_index <= 4'd0;
-                job_mac_count <= stage3_pending_phase ? 4'd5 : 4'd6;
                 acc_reg <= {ACC_W{1'b0}};
                 stage3_pending <= 1'b0;
             end

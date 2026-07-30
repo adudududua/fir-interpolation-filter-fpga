@@ -36,6 +36,7 @@
 //=============================================================
 
 module interp128_all2x_v7_folded_fir_cic_top_ce #(
+    parameter integer STAGE1_ACC_W = 42,
     parameter integer STAGE23_ACC_W = 38,
     parameter integer CIC_ORDER = 3,
     parameter integer FINAL_PRUNE_LSB = 3,
@@ -97,6 +98,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
 
     interp2_stage1_strict_halfband_bram_ce #(
         .DATA_W (24),
+        .ACC_W(STAGE1_ACC_W),
         .USE_DSP48_PREADDER(USE_STAGE1_DSP48_PREADDER)
     ) u_interp2_stage1_strict_halfband_bram_ce (
         .clk(clk), .rst_n(rst_n), .ce_out(ce2_out),

@@ -9,23 +9,23 @@ Branch: codex/national-finals-cic-6dsp-further-opt
 Result tag: board_dual_rate_cic6_opt
 
 Placed utilization
-  Slices:            228 / 8150  (2.80%)
-  Slice LUTs:        557 / 20800 (2.68%)
-  Slice registers:   536 / 41600 (1.29%)
+  Slices:            229 / 8150  (2.81%)
+  Slice LUTs:        528 / 20800 (2.54%)
+  Slice registers:   532 / 41600 (1.28%)
   BRAM tiles:         3 / 50    (6.00%)
   DSP48E1:            6 / 90    (6.67%)
   BUFGCTRL:            2 / 32    (6.25%)
   MMCME2_ADV:          2 / 5    (40.00%)
 
 Routed timing
-  WNS: +45.614 ns
+  WNS: +45.075 ns
   TNS:   0.000 ns
-  WHS:  +0.105 ns
+  WHS:  +0.078 ns
   THS:   0.000 ns
   All user specified timing constraints are met.
 
 Routing and DRC
-  Fully routed routable nets: 1576 / 1576
+  Fully routed routable nets: 1547 / 1547
   Nets with routing errors: 0
   DRC errors: 0
   DRC violations: 73 warnings + 1 advisory
@@ -41,16 +41,24 @@ Vectorless power estimate (Medium confidence)
 Bitstream
   vivado_results/board_dual_rate_cic6_opt/
   national_finals_dual_rate_4x8x128x_areaopt.bit
-  SHA256: 4BCCFDC0559E542777F4BE758D85087D7B12E501F9A86EBD19393FB6CDCA0C3F
+  SHA256: C9C9421D07B02D39F90423D83BDC6AE2B1D60C49D43A4FFF4D19C4EF62EB6203
 
 Optimization delta versus the requested 573-LUT/6-DSP CIC baseline
-  Slice LUTs:      573 -> 557 (-16, -2.79%)
-  Slice registers: 621 -> 536 (-85, -13.69%)
-  Slices:          255 -> 228 (-27, -10.59%)
+  Slice LUTs:      573 -> 528 (-45, -7.85%)
+  Slice registers: 621 -> 532 (-89, -14.33%)
+  Slices:          255 -> 229 (-26, -10.20%)
   DSP/BRAM/MMCM:   unchanged at 6 / 3 / 2
   Power:           unchanged at 0.271 W
-  Selected over the 556-LUT candidate because it uses 21 fewer FF and
-  3 fewer physical Slices for only one additional LUT.
+
+Delta versus the previous 557-LUT selected implementation
+  Slice LUTs:      557 -> 528 (-29, -5.21%)
+  Slice registers: 536 -> 532 (-4, -0.75%)
+  Slices:          228 -> 229 (+1, +0.44%)
+  DSP/BRAM/MMCM and vectorless power: unchanged
+
+Final strategy scan
+  Default / Explore / AddRemap all placed at 528 LUT / 532 FF / 229 Slice,
+  WNS +45.075 ns and WHS +0.078 ns. Default is selected for reproducibility.
 
 IMPLEMENTATION_PASS=1
 PHYSICAL_BOARD_TESTED=0

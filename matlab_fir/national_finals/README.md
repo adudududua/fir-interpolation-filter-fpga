@@ -36,7 +36,7 @@ y[n] = x[n-1] + (2*x[n-1] - x[n] - x[n-2]) / 8
 
 它仅用加减和算术右移，不增加乘法器；4x/8x 输出保持平坦 FIR 响应。双采样率板级测试正弦也打包在同一个 256×24 bit ROM 中。
 
-当前正式版布局布线后为 **557 LUT / 536 FF / 228 Slice / 6 DSP / 3 BRAM / 2 MMCM**。相对本轮指定的 573 LUT / 621 FF / 255 Slice / 6 DSP CIC 基线，减少 16 LUT、85 FF 和 27 Slice；DSP、BRAM、MMCM 以及 0.271 W Vectorless 功耗不增加。
+当前正式版布局布线后为 **528 LUT / 532 FF / 229 Slice / 6 DSP / 3 BRAM / 2 MMCM**。相对最初指定的 573 LUT / 621 FF / 255 Slice / 6 DSP CIC 基线，减少 45 LUT、89 FF 和 26 Slice；相对上一轮 557 LUT / 536 FF 正式版又减少 29 LUT 和 4 FF。DSP、BRAM、MMCM 以及 0.271 W Vectorless 功耗均不增加。
 
 ## 3. 正式 RTL 冲激指标
 
@@ -71,7 +71,7 @@ y[n] = x[n-1] + (2*x[n-1] - x[n] - x[n-2]) / 8
 | 全链路复位恢复 | 8 个内部状态场景，每场景比较 4096 个 128x 输出 | PASS，8/8 |
 | 动态倍率切换 | 不复位连续切换 10 次；检查 runt、X、锁死和冻结 | PASS，10/10 |
 
-最终一次发布回归目录为 `_work/rtl_regression/20260730_183321`。九项测试全部通过；所有逐点比较节点无 X、无丢样、无数值失配。证据摘要见 [nf_rtl_regression_summary.txt](results/nf_rtl_regression_summary.txt)。
+最终一次发布回归目录为 `_work/rtl_regression/20260730_205231`。九项测试全部通过；所有逐点比较节点无 X、无丢样、无数值失配。证据摘要见 [nf_rtl_regression_summary.txt](results/nf_rtl_regression_summary.txt)。
 
 一键重跑：
 
@@ -89,15 +89,15 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
 
 | 项目 | 结果 |
 |---|---:|
-| Slice | 228 / 8150（2.80%） |
-| Slice LUT | 557 / 20800（2.68%） |
-| Slice register | 536 / 41600（1.29%） |
+| Slice | 229 / 8150（2.81%） |
+| Slice LUT | 528 / 20800（2.54%） |
+| Slice register | 532 / 41600（1.28%） |
 | BRAM tile | 3 / 50（6.00%） |
 | DSP48E1 | 6 / 90（6.67%） |
 | BUFGCTRL / MMCM | 2 / 2 |
-| WNS / TNS | +45.614 ns / 0 ns |
-| WHS / THS | +0.105 ns / 0 ns |
-| 路由错误 | 0，1576/1576 可布线网络全部完成 |
+| WNS / TNS | +45.075 ns / 0 ns |
+| WHS / THS | +0.078 ns / 0 ns |
+| 路由错误 | 0，1547/1547 可布线网络全部完成 |
 | DRC Error | 0 |
 | Vectorless 功耗 | 0.271 W（动态 0.199 W，静态 0.072 W，Medium confidence） |
 
@@ -112,25 +112,32 @@ matlab_fir/national_finals/vivado_results/board_dual_rate_cic6_opt/
 national_finals_dual_rate_4x8x128x_areaopt.bit
 ```
 
-SHA-256：`4BCCFDC0559E542777F4BE758D85087D7B12E501F9A86EBD19393FB6CDCA0C3F`
+SHA-256：`C9C9421D07B02D39F90423D83BDC6AE2B1D60C49D43A4FFF4D19C4EF62EB6203`
 
-### 5.1 本轮 6-DSP CIC 优化结果
+### 5.1 两轮 6-DSP CIC 优化结果
 
-固定同一个综合 DCP 对五个 `opt_design` 指令进行了完整实现扫描，每个点均生成 bitstream 并检查时序和 DRC：
+第一轮固定同一个综合 DCP 对五个 `opt_design` 指令进行了完整实现扫描；第二轮在继续压缩 RTL 后对 `Default / Explore / AddRemap` 再做完整实现扫描。每个最终候选均完成布局布线、时序、DRC 和 bitstream：
 
 | 候选 | LUT | FF | Slice | DSP | WNS / WHS | 结论 |
 |---|---:|---:|---:|---:|---:|---|
 | 原 6-DSP 基线，ExploreArea | 573 | 621 | 255 | 6 | +46.339 / +0.072 ns | 对照 |
 | 基线 RTL，Default | **556** | 621 | 229 | 6 | +45.294 / +0.092 ns | 策略最低 LUT |
 | DSP PREG，Default | **556** | 557 | 231 | 6 | +45.936 / +0.106 ns | 最低 LUT 候选 |
-| **DSP PREG + 组合交接，Default** | **557** | **536** | **228** | **6** | **+45.614 / +0.105 ns** | **正式版本** |
+| DSP PREG + 组合交接，Default | 557 | 536 | 228 | 6 | +45.614 / +0.105 ns | 上一轮正式版 |
+| 第二轮 RTL，Explore | **528** | **532** | **229** | **6** | **+45.075 / +0.078 ns** | 与 Default 同资源 |
+| 第二轮 RTL，AddRemap | **528** | **532** | **229** | **6** | **+45.075 / +0.078 ns** | 与 Default 同资源 |
+| **第二轮 RTL，Default** | **528** | **532** | **229** | **6** | **+45.075 / +0.078 ns** | **当前正式版本** |
 
-正式版本比最低 LUT 候选只多 1 LUT，但减少 21 FF 和 3 个物理 Slice，因此是更好的整体面积 Pareto 点。本轮保留的两个结构优化是：
+当前正式版综合后为 554 LUT / 532 FF，`opt_design` 后布局布线结果进一步收敛到 528 LUT / 532 FF。三种最终实现策略资源和时序完全一致，因此选择流程最简单、复现性最好的 `Default`。两轮累计保留的结构优化是：
 
 1. 两个隐藏 CIC 积分状态采用 DSP48E1 PREG 原生同步复位；所有外部可见控制、最终状态、valid 和输出仍保持异步复位，并已通过 8 个复位恢复场景。
 2. 仅在串行 CIC 模式下取消均衡器冗余输出寄存器，由 CIC 输入事务直接捕获组合结果；均衡器默认的寄存输出兼容接口没有改变。
+3. 串行 CIC 的三级 comb 历史统一为 22 bit，并在三个 comb 周期中轮转，使 DSP 输入固定读取第 0 级历史，消除了原 23 bit 三选一宽位复用器。该模块由 44 LUT / 136 FF 降到 18 LUT / 138 FF；增加 2 个 FF，换得 26 个 LUT。
+4. CIC 的 16 拍 burst 剩余计数由 5 bit 收窄为 4 bit，`burst_pending` 继续单独表示首拍，因此 16 个输出的协议没有改变。
+5. Stage1 累加器由 42 bit 收窄到 41 bit。26 个非零系数绝对值之和为 44756，最坏界 `2^24 × 44756 = 750881079296`，小于 signed 41 bit 正上限 `2^40-1 = 1099511627775`，因此不会溢出；默认兼容配置仍保留 42 bit。
+6. Stage2/3 调度状态由 2 bit 的级号压成 1 bit `job_stage3`，固定 MAC 次数改为由级号和相位组合生成，不再保存 4 bit `job_mac_count`。
 
-均衡运算融合进串行 comb DSP 的实验虽然 0 LSB 通过，但实现为 581 LUT / 622 FF，已回退；整个 CIC 改同步复位会破坏异步复位断言，也已回退；均衡器精确缩位综合资源不变，同样不保留。完整策略数据见 [cic6_implementation_strategy_scan.csv](results/cic6_implementation_strategy_scan.csv)，优化记录见 [cic6_further_optimization_summary.txt](results/cic6_further_optimization_summary.txt)。
+淘汰项也进行了真实综合或仿真：均衡运算融合进串行 comb DSP 为 581 LUT / 622 FF；改为共享 Stage2/3 DSP 的版本在修正 signed 系数扩展后虽 0 LSB 通过，但综合为 592 LUT / 558 FF；Stage1 显式 DSP48 预加器为 586 LUT / 578 FF；均衡器再缩 1 bit 没有 LUT 收益；把 pending 合并进 burst 计数则在第 16 个样点破坏等价性。上述候选均已回退，不进入正式 RTL。整个 CIC 改同步复位也因破坏异步复位断言而淘汰。完整策略数据见 [cic6_implementation_strategy_scan.csv](results/cic6_implementation_strategy_scan.csv)，优化记录见 [cic6_further_optimization_summary.txt](results/cic6_further_optimization_summary.txt)。
 
 ## 6. MATLAB 与 Vivado 复现
 

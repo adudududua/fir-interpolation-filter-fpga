@@ -49,6 +49,7 @@ module cic_interp16_serial_comb_dsp_ce #(
     localparam integer RATE_LOG2 = 4;
     localparam integer FULL_W = DATA_W + CIC_ORDER*RATE_LOG2;
     localparam integer COMB_W = DATA_W + CIC_ORDER;
+    localparam integer COMB_DELAY_W = DATA_W + CIC_ORDER - 1;
     localparam integer FINAL_W = FULL_W - FINAL_PRUNE_LSB;
     localparam integer OUTPUT_SHIFT =
         (CIC_ORDER-1)*RATE_LOG2 - FINAL_PRUNE_LSB;
@@ -56,9 +57,14 @@ module cic_interp16_serial_comb_dsp_ce #(
     // The kth finite difference grows by at most one bit. Keeping the
     // low-rate comb state at 20/21/22/23 bits is mathematically lossless;
     // only the high-rate integrators require the full 32-bit CIC width.
-    reg signed [DATA_W-1:0] comb_delay0;
-    reg signed [DATA_W:0] comb_delay1;
-    reg signed [DATA_W+1:0] comb_delay2;
+    // Rotate the three low-rate histories during the three serial comb
+    // cycles.  The selected delay is then always comb_delay0, eliminating a
+    // COMB_W-bit 3:1 mux at the DSP input.  A uniform DATA_W+2 history width
+    // exactly covers the widest stored second difference and costs only
+    // three additional state bits versus the former 20/21/22-bit banks.
+    reg signed [COMB_DELAY_W-1:0] comb_delay0;
+    reg signed [COMB_DELAY_W-1:0] comb_delay1;
+    reg signed [COMB_DELAY_W-1:0] comb_delay2;
     reg signed [COMB_W-1:0] comb_operand;
     reg [1:0] comb_stage_index;
     reg comb_active;
@@ -69,7 +75,7 @@ module cic_interp16_serial_comb_dsp_ce #(
     reg signed [FINAL_W-1:0] final_integrator_state;
 
     reg burst_pending;
-    reg [4:0] burst_remaining;
+    reg [3:0] burst_remaining;
 
     wire signed [COMB_W-1:0] x_comb_extended;
     wire signed [COMB_W-1:0] comb_delay_selected;
@@ -80,7 +86,7 @@ module cic_interp16_serial_comb_dsp_ce #(
     wire signed [FINAL_W-1:0] final_input_rounded;
     wire signed [FINAL_W-1:0] final_integrator_next;
     wire signed [DATA_W-1:0] normalized_output;
-    (* use_dsp = "no" *) wire [4:0] burst_remaining_decrement;
+    (* use_dsp = "no" *) wire [3:0] burst_remaining_decrement;
     (* use_dsp = "no" *) wire [1:0] comb_stage_index_increment;
 
     integer integrator_idx;
@@ -89,20 +95,17 @@ module cic_interp16_serial_comb_dsp_ce #(
     assign x_comb_extended =
         {{(COMB_W-DATA_W){x_in[DATA_W-1]}}, x_in};
     assign comb_delay_selected =
-        (comb_stage_index == 2'd0) ?
-            {{(COMB_W-DATA_W){comb_delay0[DATA_W-1]}}, comb_delay0} :
-        (comb_stage_index == 2'd1) ?
-            {{(COMB_W-DATA_W-1){comb_delay1[DATA_W]}}, comb_delay1} :
-            {{(COMB_W-DATA_W-2){comb_delay2[DATA_W+1]}}, comb_delay2};
+        {{(COMB_W-COMB_DELAY_W){comb_delay0[COMB_DELAY_W-1]}},
+         comb_delay0};
 
     // Progressive widths are exact for the three finite differences.
     assign comb_stage_result =
         comb_operand - comb_delay_selected;
 
     assign output_event = ce_out &&
-                          (burst_pending || burst_remaining != 5'd0);
+                          (burst_pending || burst_remaining != 4'd0);
     assign first_output_event = ce_out && burst_pending &&
-                                burst_remaining == 5'd0;
+                                burst_remaining == 4'd0;
     // Once the third comb subtraction completes, comb_operand itself holds
     // the burst sample. Reusing it avoids a duplicate FULL_W-bit register.
     assign high_rate_input = first_output_event ?
@@ -111,11 +114,11 @@ module cic_interp16_serial_comb_dsp_ce #(
     assign final_integrator_next = final_integrator_state +
                                    final_input_rounded;
 
-    assign burst_remaining_dbg = burst_remaining;
+    assign burst_remaining_dbg = {1'b0, burst_remaining};
     assign pending_dbg = burst_pending;
     assign comb_busy_dbg = comb_active;
 
-    assign burst_remaining_decrement = burst_remaining - 5'd1;
+    assign burst_remaining_decrement = burst_remaining - 4'd1;
     assign comb_stage_index_increment = comb_stage_index + 2'd1;
 
     generate
@@ -156,9 +159,9 @@ module cic_interp16_serial_comb_dsp_ce #(
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            comb_delay0 <= {DATA_W{1'b0}};
-            comb_delay1 <= {(DATA_W+1){1'b0}};
-            comb_delay2 <= {(DATA_W+2){1'b0}};
+            comb_delay0 <= {COMB_DELAY_W{1'b0}};
+            comb_delay1 <= {COMB_DELAY_W{1'b0}};
+            comb_delay2 <= {COMB_DELAY_W{1'b0}};
             comb_operand <= {COMB_W{1'b0}};
             comb_stage_index <= 2'd0;
             comb_active <= 1'b0;
@@ -166,7 +169,7 @@ module cic_interp16_serial_comb_dsp_ce #(
             final_integrator_state <= {FINAL_W{1'b0}};
 
             burst_pending <= 1'b0;
-            burst_remaining <= 5'd0;
+            burst_remaining <= 4'd0;
             y_out <= {DATA_W{1'b0}};
             y_out_valid <= 1'b0;
         end
@@ -180,12 +183,9 @@ module cic_interp16_serial_comb_dsp_ce #(
             end
 
             if (comb_active) begin
-                case (comb_stage_index)
-                    2'd0: comb_delay0 <= comb_operand[DATA_W-1:0];
-                    2'd1: comb_delay1 <= comb_operand[DATA_W:0];
-                    default:
-                        comb_delay2 <= comb_operand[DATA_W+1:0];
-                endcase
+                comb_delay0 <= comb_delay1;
+                comb_delay1 <= comb_delay2;
+                comb_delay2 <= comb_operand[COMB_DELAY_W-1:0];
                 comb_operand <= comb_stage_result;
 
                 if (comb_stage_index == CIC_ORDER-1) begin
@@ -204,10 +204,10 @@ module cic_interp16_serial_comb_dsp_ce #(
 
                 if (first_output_event) begin
                     burst_pending <= 1'b0;
-                    burst_remaining <= 5'd15;
+                    burst_remaining <= 4'd15;
                 end
-                else if (burst_remaining == 5'd1) begin
-                    burst_remaining <= 5'd0;
+                else if (burst_remaining == 4'd1) begin
+                    burst_remaining <= 4'd0;
                 end
                 else begin
                     burst_remaining <= burst_remaining_decrement;
