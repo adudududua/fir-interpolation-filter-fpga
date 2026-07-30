@@ -1,35 +1,35 @@
 National-finals FPGA implementation signoff
 ===========================================
-Date: 2026-07-30
+Date: 2026-07-31
 Tool: Vivado 2018.3
 Device: xc7a35tfgg484-2
 Top: board_demo_competition_dac8_top
 Design state: fully routed; bitstream generated
-Branch: codex/national-finals-cic6-microcode-opt
-Result tag: board_dual_rate_cic6_accmux_opt
+Branch: codex/national-finals-cic6-preg-round-opt
+Result tag: board_dual_rate_cic6_preg_round_snapshot_opt
 
 Placed utilization
-  Slices:            205 / 8150  (2.52%)
-  Slice LUTs:        487 / 20800 (2.34%)
-  Slice registers:   532 / 41600 (1.28%)
-  BRAM tiles:         3 / 50    (6.00%)
-  DSP48E1:            6 / 90    (6.67%)
-  BUFGCTRL:            2 / 32    (6.25%)
-  MMCME2_ADV:          2 / 5    (40.00%)
+  Slices:            199 / 8150  (2.44%)
+  Slice LUTs:        461 / 20800 (2.22%)
+  Slice registers:   464 / 41600 (1.12%)
+  BRAM tiles:          3 / 50    (6.00%)
+  DSP48E1:             6 / 90    (6.67%)
+  BUFGCTRL:             2 / 32    (6.25%)
+  MMCME2_ADV:           2 / 5    (40.00%)
 
 Routed timing
-  WNS: +46.420 ns
+  WNS: +45.405 ns
   TNS:   0.000 ns
-  WHS:  +0.105 ns
+  WHS:  +0.114 ns
   THS:   0.000 ns
   All user specified timing constraints are met.
 
 Routing and DRC
-  Fully routed routable nets: 1504 / 1504
+  Fully routed routable nets: 1355 / 1355
   Nets with routing errors: 0
   DRC errors: 0
-  DRC violations: 73 warnings + 1 advisory
-  The warnings are DSP input/output pipeline recommendations and asynchronous
+  DRC findings: 70 warnings + 1 advisory
+  The findings are DSP input/output pipeline recommendations and asynchronous
   DSP/BRAM control checks retained by the area-optimized architecture. They do
   not block bitstream generation; physical-board validation is still required.
 
@@ -39,26 +39,28 @@ Vectorless power estimate (Medium confidence)
   Device static: 0.072 W
 
 Bitstream
-  vivado_results/board_dual_rate_cic6_accmux_opt/
+  vivado_results/board_dual_rate_cic6_preg_round_snapshot_opt/
   national_finals_dual_rate_4x8x128x_areaopt.bit
-  SHA256: F0C28ED35732E386A92CBF47A597E0751E32BE4F1172BC0E902FD59EB3A93AF9
+  SHA256: 7FDAE2FCEA41643658A4DD05BF77C062EAA92C5610A3E6BC12CC1254EBCF36CE
 
 Optimization delta versus the requested 573-LUT/6-DSP CIC baseline
-  Slice LUTs:      573 -> 487 (-86, -15.01%)
-  Slice registers: 621 -> 532 (-89, -14.33%)
-  Slices:          255 -> 205 (-50, -19.61%)
+  Slice LUTs:      573 -> 461 (-112, -19.55%)
+  Slice registers: 621 -> 464 (-157, -25.28%)
+  Slices:          255 -> 199 ( -56, -21.96%)
   DSP/BRAM/MMCM:   unchanged at 6 / 3 / 2
   Power:           unchanged at 0.271 W
 
-Delta versus the previous 528-LUT selected implementation
-  Slice LUTs:      528 -> 487 (-41, -7.77%)
-  Slice registers: 532 -> 532 (0)
-  Slices:          229 -> 205 (-24, -10.48%)
+Delta versus the previous 487-LUT selected implementation
+  Slice LUTs:      487 -> 461 (-26, -5.34%)
+  Slice registers: 532 -> 464 (-68, -12.78%)
+  Slices:          205 -> 199 ( -6, -2.93%)
   DSP/BRAM/MMCM and vectorless power: unchanged
 
-Final strategy scan
-  Default / Explore / AddRemap all placed at 487 LUT / 532 FF / 205 Slice,
-  WNS +46.420 ns and WHS +0.105 ns. Default is selected for reproducibility.
+Final strategy scan from the same synthesis checkpoint
+  Default:     461 LUT / 464 FF / 199 Slice, WNS +45.405 ns, WHS +0.114 ns
+  AddRemap:    461 LUT / 464 FF / 199 Slice, WNS +45.405 ns, WHS +0.114 ns
+  ExploreArea: 472 LUT / 464 FF / 194 Slice, WNS +46.367 ns, WHS +0.152 ns
+  Default is selected because LUT count is the primary resource objective.
 
 IMPLEMENTATION_PASS=1
 PHYSICAL_BOARD_TESTED=0

@@ -2,7 +2,7 @@
 
 当前版本已完成 MATLAB 建模、24 bit 定点模型、RTL、9 项 XSim 回归、Vivado 综合/布局布线/时序/DRC/功耗评估和 bitstream 生成。所有软件与 FPGA 工具验收均已通过；由于当前环境无法接触实物开发板，物理板下载和仪器测量仍需按本文最后一节执行，不能把 bitstream 成功等同于实板通过。
 
-开发分支：`codex/national-finals-cic6-microcode-opt`
+开发分支：`codex/national-finals-cic6-preg-round-opt`
 
 ## 1. 完成状态
 
@@ -36,7 +36,7 @@ y[n] = x[n-1] + (2*x[n-1] - x[n] - x[n-2]) / 8
 
 它仅用加减和算术右移，不增加乘法器；4x/8x 输出保持平坦 FIR 响应。双采样率板级测试正弦也打包在同一个 256×24 bit ROM 中。
 
-当前正式版布局布线后为 **487 LUT / 532 FF / 205 Slice / 6 DSP / 3 BRAM / 2 MMCM**。相对最初指定的 573 LUT / 621 FF / 255 Slice / 6 DSP CIC 基线，减少 86 LUT、89 FF 和 50 Slice；相对第二轮 528 LUT / 532 FF 正式版再减少 41 LUT 和 24 Slice。DSP、BRAM、MMCM 以及 0.271 W Vectorless 功耗均不增加。
+当前正式版布局布线后为 **461 LUT / 464 FF / 199 Slice / 6 DSP / 3 BRAM / 2 MMCM**。相对最初指定的 573 LUT / 621 FF / 255 Slice / 6 DSP CIC 基线，减少 112 LUT、157 FF 和 56 Slice；相对第三轮 487 LUT / 532 FF 正式版再减少 26 LUT、68 FF 和 6 Slice。DSP、BRAM、MMCM 以及 0.271 W Vectorless 功耗均不增加。
 
 ## 3. 正式 RTL 冲激指标
 
@@ -71,7 +71,7 @@ y[n] = x[n-1] + (2*x[n-1] - x[n] - x[n-2]) / 8
 | 全链路复位恢复 | 8 个内部状态场景，每场景比较 4096 个 128x 输出 | PASS，8/8 |
 | 动态倍率切换 | 不复位连续切换 10 次；检查 runt、X、锁死和冻结 | PASS，10/10 |
 
-最终一次发布回归目录为 `_work/rtl_regression/20260730_223215`。九项测试全部通过；所有逐点比较节点无 X、无丢样、无数值失配。证据摘要见 [nf_rtl_regression_summary.txt](results/nf_rtl_regression_summary.txt)。
+最终一次发布回归目录为 `_work/rtl_regression/20260731_020230`。九项测试全部通过；所有逐点比较节点无 X、无丢样、无数值失配。证据摘要见 [nf_rtl_regression_summary.txt](results/nf_rtl_regression_summary.txt)。
 
 一键重跑：
 
@@ -89,34 +89,34 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
 
 | 项目 | 结果 |
 |---|---:|
-| Slice | 205 / 8150（2.52%） |
-| Slice LUT | 487 / 20800（2.34%） |
-| Slice register | 532 / 41600（1.28%） |
+| Slice | 199 / 8150（2.44%） |
+| Slice LUT | 461 / 20800（2.22%） |
+| Slice register | 464 / 41600（1.12%） |
 | BRAM tile | 3 / 50（6.00%） |
 | DSP48E1 | 6 / 90（6.67%） |
 | BUFGCTRL / MMCM | 2 / 2 |
-| WNS / TNS | +46.420 ns / 0 ns |
-| WHS / THS | +0.105 ns / 0 ns |
-| 路由错误 | 0，1504/1504 可布线网络全部完成 |
+| WNS / TNS | +45.405 ns / 0 ns |
+| WHS / THS | +0.114 ns / 0 ns |
+| 路由错误 | 0，1355/1355 可布线网络全部完成 |
 | DRC Error | 0 |
 | Vectorless 功耗 | 0.271 W（动态 0.199 W，静态 0.072 W，Medium confidence） |
 
-Vivado DRC 报告仍有 73 条 Warning 和 1 条 Advisory，主要是面积优先结构中未加流水的 DSP 性能建议，以及 DSP/BRAM 异步控制检查。当前时序余量很大、路由完整、DRC Error 为 0 且 bitstream 已成功生成；这些警告不是“已物理验证”的替代品，首次上板仍要重点检查复位和采样率切换。
+Vivado DRC 报告共有 70 条 Warning 和 1 条 Advisory，主要是面积优先结构中未加流水的 DSP 性能建议，以及 DSP/BRAM 异步控制检查。当前时序余量很大、路由完整、DRC Error 为 0 且 bitstream 已成功生成；这些警告不是“已物理验证”的替代品，首次上板仍要重点检查复位和采样率切换。
 
 签核摘要见 [nf_hardware_signoff_summary.txt](results/nf_hardware_signoff_summary.txt)。
 
 bitstream：
 
 ```text
-matlab_fir/national_finals/vivado_results/board_dual_rate_cic6_accmux_opt/
+matlab_fir/national_finals/vivado_results/board_dual_rate_cic6_preg_round_snapshot_opt/
 national_finals_dual_rate_4x8x128x_areaopt.bit
 ```
 
-SHA-256：`F0C28ED35732E386A92CBF47A597E0751E32BE4F1172BC0E902FD59EB3A93AF9`
+SHA-256：`7FDAE2FCEA41643658A4DD05BF77C062EAA92C5610A3E6BC12CC1254EBCF36CE`
 
-### 5.1 三轮 6-DSP CIC 优化结果
+### 5.1 四轮 6-DSP CIC 优化结果
 
-第一轮固定同一个综合 DCP 对五个 `opt_design` 指令进行了完整实现扫描；第二轮继续压缩宽位复用器、字长和调度状态；第三轮消除 Stage2/3 DSP C 输入前的零/累加器宽复用器。第二、三轮都对 `Default / Explore / AddRemap` 做了完整实现扫描，每个最终候选均完成布局布线、时序、DRC 和 bitstream：
+第一轮固定同一个综合 DCP 对五个 `opt_design` 指令进行了完整实现扫描；第二轮继续压缩宽位复用器、字长和调度状态；第三轮消除 Stage2/3 DSP C 输入前的零/累加器宽复用器；第四轮让 Stage1 和 Stage2/3 的 DSP48E1 PREG 直接保存累加结果，并利用空闲提交周期完成精确 Q15 舍入。每个最终候选均完成布局布线、时序和 DRC，选中的 Default 版本另外生成并校验 bitstream：
 
 | 候选 | LUT | FF | Slice | DSP | WNS / WHS | 结论 |
 |---|---:|---:|---:|---:|---:|---|
@@ -129,9 +129,12 @@ SHA-256：`F0C28ED35732E386A92CBF47A597E0751E32BE4F1172BC0E902FD59EB3A93AF9`
 | 第二轮 RTL，Default | 528 | 532 | 229 | 6 | +45.075 / +0.078 ns | 上一正式版本 |
 | 第三轮 RTL，Explore | **487** | **532** | **205** | **6** | **+46.420 / +0.105 ns** | 与 Default 同资源 |
 | 第三轮 RTL，AddRemap | **487** | **532** | **205** | **6** | **+46.420 / +0.105 ns** | 与 Default 同资源 |
-| **第三轮 RTL，Default** | **487** | **532** | **205** | **6** | **+46.420 / +0.105 ns** | **当前正式版本** |
+| 第三轮 RTL，Default | **487** | **532** | **205** | **6** | **+46.420 / +0.105 ns** | 上一正式版本 |
+| 第四轮 RTL，ExploreArea | 472 | **464** | **194** | **6** | **+46.367 / +0.152 ns** | Slice 最低 |
+| 第四轮 RTL，AddRemap | **461** | **464** | 199 | **6** | **+45.405 / +0.114 ns** | 与 Default 同资源 |
+| **第四轮 RTL，Default** | **461** | **464** | **199** | **6** | **+45.405 / +0.114 ns** | **当前正式版本，LUT 最低** |
 
-当前正式版综合后为 519 LUT / 532 FF，`opt_design` 后布局布线结果进一步收敛到 487 LUT / 532 FF。三种最终实现策略资源和时序完全一致，因此选择流程最简单、复现性最好的 `Default`。三轮累计保留的结构优化是：
+当前正式版综合后为 469 LUT / 464 FF，`opt_design` 后布局布线结果进一步收敛到 461 LUT / 464 FF。Default 与 AddRemap 同为最低 461 LUT；ExploreArea 少 5 Slice，但多 11 LUT，因此按赛题的 LUT 优先目标选择流程最简单、复现性最好的 `Default`。四轮累计保留的结构优化是：
 
 1. 两个隐藏 CIC 积分状态采用 DSP48E1 PREG 原生同步复位；所有外部可见控制、最终状态、valid 和输出仍保持异步复位，并已通过 8 个复位恢复场景。
 2. 仅在串行 CIC 模式下取消均衡器冗余输出寄存器，由 CIC 输入事务直接捕获组合结果；均衡器默认的寄存输出兼容接口没有改变。
@@ -140,8 +143,11 @@ SHA-256：`F0C28ED35732E386A92CBF47A597E0751E32BE4F1172BC0E902FD59EB3A93AF9`
 5. Stage1 累加器由 42 bit 收窄到 41 bit。26 个非零系数绝对值之和为 44756，最坏界 `2^24 × 44756 = 750881079296`，小于 signed 41 bit 正上限 `2^40-1 = 1099511627775`，因此不会溢出；默认兼容配置仍保留 42 bit。
 6. Stage2/3 调度状态由 2 bit 的级号压成 1 bit `job_stage3`，固定 MAC 次数改为由级号和相位组合生成，不再保存 4 bit `job_mac_count`。
 7. 每个 Stage2/3 MAC 任务开始时调度器已经清零 `acc_reg`，所以首抽头无需再以 `job_mac_index==0` 选择常数 0。DSP48E1 C 输入恒接累加器、OPMODE 恒为 M+C，消除了 ACC_W 级零/累加器复用器；独立 Stage2/3 等价测试分别比较 336/671 个输出，误差均为 0 LSB。
+8. Stage1 和共享 Stage2/3 取消外部宽位累加器与结果寄存器，直接用 DSP48E1 PREG 通过 `M+P` 保存串行 MAC 状态；Stage1 的对称抽头仍由 DSP 预加器完成。
+9. MAC 结束后的空闲提交周期在 DSP 内加入精确 Q15 舍入偏置：非负数加 16384，负数加 16383。移位、饱和和输出协议不变，删除外部宽位舍入加法器。
+10. 新时延会与下一次 Stage3 写入重叠，因此任务启动时锁存环形历史 `head/fill`；完整链回归曾真实捕获这一问题。修正后进一步把 Stage2/3 两组读头选择器合并为共享 `history_read_head`，9/9 回归恢复 0 LSB。
 
-淘汰项也进行了真实综合或仿真：均衡运算融合进串行 comb DSP 为 581 LUT / 622 FF；改为共享 Stage2/3 DSP 的版本在修正 signed 系数扩展后虽 0 LSB 通过，但综合为 592 LUT / 558 FF；Stage1 显式 DSP48 预加器为 586 LUT / 578 FF；把 pending 合并进 burst 计数则在第 16 个样点破坏等价性。第三轮又验证了 Stage2/3 BRAM 微码（554 LUT）、Stage1 直接舍入（555 LUT / 491 FF）、Stage1 24 bit 结果寄存器（563 LUT / 515 FF）和均衡器位宽收窄（519 LUT、无收益），均未进入正式 RTL。动态 OPMODE 首抽头方案先降至 520 LUT，最终利用清零不变量把 OPMODE 固定为 M+C 后降至 519 LUT。完整策略数据见 [cic6_implementation_strategy_scan.csv](results/cic6_implementation_strategy_scan.csv)，优化记录见 [cic6_further_optimization_summary.txt](results/cic6_further_optimization_summary.txt)。
+淘汰项也进行了真实综合或仿真：均衡运算融合进串行 comb DSP 为 581 LUT / 622 FF；改为共享 Stage2/3 DSP 的版本在修正 signed 系数扩展后虽 0 LSB 通过，但综合为 592 LUT / 558 FF；早期只替换 Stage1 预加器、未让 PREG 保存累加状态的方案为 586 LUT / 578 FF；把 pending 合并进 burst 计数则在第 16 个样点破坏等价性。第三轮又验证了 Stage2/3 BRAM 微码（554 LUT）、Stage1 直接舍入（555 LUT / 491 FF）、Stage1 24 bit 结果寄存器（563 LUT / 515 FF）和均衡器位宽收窄（519 LUT、无收益），均未进入正式 RTL。第四轮选择 461 LUT 的 Default，而不是用 11 LUT 换 5 Slice 的 ExploreArea。完整策略数据见 [cic6_implementation_strategy_scan.csv](results/cic6_implementation_strategy_scan.csv)，优化记录见 [cic6_further_optimization_summary.txt](results/cic6_further_optimization_summary.txt)。
 
 ## 6. MATLAB 与 Vivado 复现
 
@@ -164,7 +170,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
   -Step all
 ```
 
-包装脚本先执行面积优化综合，再以低内存单进程完成布局布线、报告和 bitstream。默认实现指令是本轮扫描选出的 `Default`；本轮正式结果目录为 `vivado_results/board_dual_rate_cic6_accmux_opt`。日志与 `.Xil` 均写入 `matlab_fir/national_finals/_work/vivado/<时间戳>`，不会污染项目根目录。
+包装脚本先执行面积优化综合，再以低内存单进程完成布局布线、报告和 bitstream。默认实现指令是本轮扫描选出的 `Default`；本轮正式结果目录为 `vivado_results/board_dual_rate_cic6_preg_round_snapshot_opt`。日志与 `.Xil` 均写入 `matlab_fir/national_finals/_work/vivado/<时间戳>`，不会污染项目根目录。
 
 ## 7. SW1～SW8 与预期 DA_CLK
 

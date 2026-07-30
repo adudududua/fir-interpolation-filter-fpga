@@ -12,7 +12,7 @@ set synth_dcp [file join $project_dir XC7A35T_interp.runs synth_1 \
     board_demo_competition_dac8_top.dcp]
 set board_xdc [file join $project_dir XC7A35T_interp.srcs constrs_1 new \
     board_demo_competition_dac8_top.xdc]
-set result_tag board_dual_rate_cic6_accmux_opt
+set result_tag board_dual_rate_cic6_preg_round_snapshot_opt
 set implementation_opt_directive Default
 if {$argc > 0} {
     set result_tag [lindex $argv 0]
@@ -121,8 +121,9 @@ puts $manifest_handle "Architecture: 1-DSP Stage1 + 1-DSP shared Stage2/3 + shif
 puts $manifest_handle "CIC state optimization: hidden integrators use DSP48E1 PREG synchronous reset"
 puts $manifest_handle "Equalizer optimization: combinational hand-off into serial CIC input capture"
 puts $manifest_handle "Serial-comb optimization: rotating uniform 22-bit history removes the wide 3:1 DSP-input mux"
-puts $manifest_handle "Stage1 optimization: proven-safe 41-bit accumulator in national-finals mode"
-puts $manifest_handle "Stage2/3 optimization: one-bit stage state, derived MAC count, and cleared-accumulator invariant removes the DSP C-input mux"
+puts $manifest_handle "Stage1 optimization: DSP48E1 preadder plus PREG MAC state, 41-bit proven bound, and exact DSP-resident Q15 rounding"
+puts $manifest_handle "Stage2/3 optimization: shared DSP48E1 PREG MAC state, exact DSP-resident Q15 rounding, and transaction-local BRAM history metadata"
+puts $manifest_handle "Stage2/3 correctness: job head/fill snapshots protect an active MAC from the next ring-buffer write"
 puts $manifest_handle "Synthesis directive: AreaOptimized_high"
 puts $manifest_handle "Synthesis resource sharing: on"
 puts $manifest_handle "Implementation opt directive: $implementation_opt_directive"

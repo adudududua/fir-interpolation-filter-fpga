@@ -1,101 +1,92 @@
-National-finals 6-DSP CIC further optimization
-================================================
-Date: 2026-07-30
-Branch: codex/national-finals-cic6-microcode-opt
-Starting point: 573 LUT / 621 FF / 255 Slice / 6 DSP / 3 BRAM / 2 MMCM
-Previous selected point: 557 LUT / 536 FF / 228 Slice / 6 DSP / 3 BRAM / 2 MMCM
+National-finals 6-DSP CIC fourth-round optimization
+====================================================
+Date: 2026-07-31
+Branch: codex/national-finals-cic6-preg-round-opt
+Requested baseline: 573 LUT / 621 FF / 255 Slice / 6 DSP / 3 BRAM / 2 MMCM
+Immediate parent synthesis: 519 LUT / 532 FF / 6 DSP / 3 BRAM / 2 MMCM
+Immediate parent placed: 487 LUT / 532 FF / 205 Slice / 6 DSP / 3 BRAM / 2 MMCM
 
-Accepted changes
-----------------
-1. Default opt_design strategy
-   The five-directive scan showed that Default/Explore/AddRemap all reached
-   556 LUT on the baseline netlist, versus 573 LUT for ExploreArea.
-2. DSP48E1 PREG state retention
-   The two hidden CIC integrator states use synchronous reset so Vivado can
-   retain them in the existing DSP48E1 PREGs. Externally visible control,
-   final state, valid and output registers retain asynchronous reset.
-3. Combinational equalizer-to-CIC hand-off
-   In serial-CIC mode only, the equalizer result is captured directly by the
-   CIC input transaction, removing an otherwise redundant output register
-   bank. The equalizer's default registered interface remains compatible.
-4. Rotating 22-bit serial-comb history
-   The three low-rate comb histories rotate across the three serial cycles.
-   The DSP input therefore always reads history bank 0 and no longer needs a
-   23-bit 3:1 mux. The CIC module changed from 44 LUT / 136 FF to
-   18 LUT / 138 FF.
-5. Exact four-bit burst counter
-   burst_pending identifies the first of 16 outputs; burst_remaining therefore
-   needs only four bits for values 15 down to 0.
-6. Proven 41-bit Stage1 accumulator
-   Sum(abs(non-zero coefficients)) = 44756. The conservative bound
-   2^24 * 44756 = 750881079296 is below signed-41 maximum 2^40-1 =
-   1099511627775. National-finals mode uses 41 bits; compatibility default
-   remains 42 bits.
-7. Compact Stage2/3 scheduler
-   The two-bit stage value 2/3 became one-bit job_stage3, and the fixed MAC
-   count is derived combinationally from stage and phase instead of stored.
-8. Stage2/3 DSP accumulator-input mux removal
-   acc_reg is synchronously cleared at every new MAC job, so it already equals
-   zero for the first tap. Driving DSP48E1 C directly from acc_reg and keeping
-   OPMODE at M+C removes the ACC_W-wide zero/accumulator mux without changing
-   any arithmetic result. Independent Stage2/3 equivalence and full-chain RTL
-   regression both report 0-LSB mismatch.
+Accepted fourth-round changes
+-----------------------------
+1. Stage1 DSP48E1 PREG accumulation
+   The external ACC_W accumulator/result registers were removed. The existing
+   DSP48E1 PREG now stores every M+P MAC step and the final sum. The symmetric
+   sample pair still uses the DSP48 preadder. The national-finals configuration
+   remains at the proven-safe 41-bit accumulator bound.
+2. Shared Stage2/3 DSP48E1 PREG accumulation
+   The same PREG feedback structure replaces the external shared accumulator
+   and result bank while preserving one DSP for both filters.
+3. Exact DSP-resident Q15 rounding
+   The otherwise idle result-commit cycle performs P+C inside the DSP. C is
+   +16384 for a nonnegative result and +16383 for a negative result, exactly
+   matching the original symmetric rounding rule. Only shift and saturation
+   remain outside the DSP.
+4. Transaction-local history snapshot
+   The longer Stage2/3 PREG schedule can overlap the next Stage3 input write.
+   Full-chain regression exposed that reading the live head/fill state could
+   select an unwritten BRAM slot. job_history_head and job_fill_count are now
+   latched when the MAC transaction starts.
+5. Shared Stage2/3 history read head
+   After the correctness fix, duplicated stage-specific snapshot muxes were
+   reduced to one history_read_head shared by both selected history banks.
 
-Rejected experiments
+Resource progression
 --------------------
-1. Equalizer arithmetic fused into the serial comb DSP
-   RTL was bit-true but implemented at 581 LUT / 622 FF / 6 DSP: worse.
-2. Whole-CIC synchronous reset
-   It saved registers but failed the required asynchronous reset assertion.
-3. Exact equalizer internal-width shrink
-   Unit simulation passed but synthesis remained 584 LUT / 557 FF / 6 DSP,
-   so there was no resource benefit.
-4. Equalizer sharing the Stage2/3 DSP
-   After correcting signed coefficient extension this was 0-LSB bit-true, but
-   synthesis increased to 592 LUT / 558 FF / 6 DSP.
-5. Explicit Stage1 DSP48 preadder
-   Synthesis increased to 586 LUT / 578 FF / 6 DSP.
-6. Merge burst_pending into the four-bit count
-   Independent CIC equivalence failed at output sample 16, so the robust
-   pending flag plus four-bit remaining count was restored.
-7. Stage2/3 BRAM microcode
-   Independent equivalence passed at 0 LSB, but synthesis remained
-   554 LUT / 532 FF and Stage2/3 changed by only one LUT.
-8. Stage1 direct rounding and reduced result registers
-   Both unit simulations passed, but implementations were 555 LUT / 491 FF
-   and 563 LUT / 515 FF respectively, so both were reverted.
-9. Equalizer width tightening
-   All 2009 directed samples passed, but synthesis stayed at 519 LUT / 532 FF.
+  Parent synthesis:                519 LUT / 532 FF
+  Fourth-round synthesis:          469 LUT / 464 FF
+  Parent placed Default:           487 LUT / 532 FF / 205 Slice
+  Fourth-round placed Default:     461 LUT / 464 FF / 199 Slice
+  Fourth-round placed AddRemap:    461 LUT / 464 FF / 199 Slice
+  Fourth-round placed ExploreArea: 472 LUT / 464 FF / 194 Slice
+
+Default is selected: it ties AddRemap for the lowest LUT count and uses 11
+fewer LUTs than ExploreArea. ExploreArea saves five Slices but is not the
+preferred point for the stated LUT-first objective.
+
+Rejected or superseded experiments
+----------------------------------
+1. Earlier Stage1 preadder-only rewrite
+   It did not keep the whole accumulation in PREG and grew to
+   586 LUT / 578 FF, so it remains rejected.
+2. Stage1-only and Stage2/3-only PREG candidates
+   They were useful isolation experiments, but the accepted implementation
+   combines both blocks and performs rounding in the DSP idle cycle.
+3. Live Stage2/3 ring-buffer metadata
+   Unit equivalence passed, but the full-chain test found corruption when the
+   next input changed the live head during an existing MAC. It was rejected
+   and replaced by the transaction snapshot.
+4. ExploreArea as the formal implementation
+   It reached 194 Slices but required 472 LUT. The 461-LUT Default result is
+   selected for the competition deliverable.
 
 Selected result
 ---------------
-Synthesis: 519 LUT / 532 FF / 6 DSP / 3 BRAM / 2 MMCM
-Placed: 487 LUT / 532 FF / 205 Slice / 6 DSP / 3 BRAM / 2 MMCM
-Timing: WNS +46.420 ns; WHS +0.105 ns; TNS/THS 0
-Routing: 1504/1504 routable nets complete; routing errors 0
-DRC: Error 0
+Synthesis: 469 LUT / 464 FF / 6 DSP / 3 BRAM / 2 MMCM
+Placed: 461 LUT / 464 FF / 199 Slice / 6 DSP / 3 BRAM / 2 MMCM
+Timing: WNS +45.405 ns; WHS +0.114 ns; TNS/THS 0
+Routing: 1355/1355 routable nets complete; routing errors 0
+DRC: Error 0; 70 warnings and 1 advisory
 Power: 0.271 W vectorless, Medium confidence
 Bitstream SHA256:
-F0C28ED35732E386A92CBF47A597E0751E32BE4F1172BC0E902FD59EB3A93AF9
-
-Default, Explore and AddRemap all produced 487 LUT / 532 FF / 205 Slice and
-identical routed timing. Default is selected because it is the simplest and
-most reproducible implementation flow.
+7FDAE2FCEA41643658A4DD05BF77C062EAA92C5610A3E6BC12CC1254EBCF36CE
 
 Delta versus requested baseline:
-  LUT 573 -> 487 (-86, -15.01%)
-  FF  621 -> 532 (-89, -14.33%)
-  Slice 255 -> 205 (-50, -19.61%)
-Delta versus previous selected point:
-  LUT 528 -> 487 (-41, -7.77%)
-  FF  532 -> 532 (0)
-  Slice 229 -> 205 (-24, -10.48%)
+  LUT   573 -> 461 (-112, -19.55%)
+  FF    621 -> 464 (-157, -25.28%)
+  Slice 255 -> 199 ( -56, -21.96%)
+Delta versus immediate parent:
+  LUT   487 -> 461 (-26, -5.34%)
+  FF    532 -> 464 (-68, -12.78%)
+  Slice 205 -> 199 ( -6, -2.93%)
+DSP / BRAM / MMCM remain 6 / 3 / 2.
 
 Verification
 ------------
+Stage1 ACC_W=41 unit test: PASS, impulse 615 + random 359 outputs
+Independent Stage2/3 equivalence: PASS, 336/671 outputs, 0 LSB
 Vivado Simulator 2018.3 regression: PASS 9/9
-Full-chain MATLAB/RTL bit-true mismatch: 0 LSB
-Reset recovery: PASS 8/8 scenarios
+Full-chain impulse/random y4/y8/y128: 0 LSB mismatch
+Reset recovery: PASS 8/8 scenarios, 4096 y128 outputs per scenario
 Dynamic mode switching: PASS 10 switches
 MATLAB analysis of six published RTL impulses: PASS 6/6
 Implementation, timing, routing, DRC, power and bitstream: PASS

@@ -58,7 +58,12 @@ module interp2_stage1_strict_halfband_bram_ce #(
 
     localparam integer ADDR_W = 6;
     localparam integer PAIR_W = DATA_W + 1;
-    localparam integer PROD_W = PAIR_W + COEFF_W;
+    localparam integer QUOT_W = ACC_W - FRAC_W;
+    localparam integer UPPER_W = QUOT_W - DATA_W;
+    localparam signed [DATA_W-1:0] OUT_MAX =
+        {1'b0, {(DATA_W-1){1'b1}}};
+    localparam signed [DATA_W-1:0] OUT_MIN =
+        {1'b1, {(DATA_W-1){1'b0}}};
 
     (* ram_style = "block" *)
     reg signed [DATA_W-1:0] sample_mem [0:RAM_DEPTH-1];
@@ -89,124 +94,127 @@ module interp2_stage1_strict_halfband_bram_ce #(
     reg read_mask_b;
     reg [4:0] read_coeff_index;
 
-    reg signed [ACC_W-1:0] acc_reg;
-    reg signed [ACC_W-1:0] filter_result;
     reg signed [DATA_W-1:0] delay_result;
+    reg filter_commit_pending;
 
     wire signed [DATA_W-1:0] x_current;
     reg signed [PAIR_W-1:0] pair_sum_comb;
     reg signed [COEFF_W-1:0] coeff_comb;
-    (* use_dsp = "yes" *)
-    wire signed [PROD_W-1:0] product_comb;
-    wire signed [ACC_W-1:0] product_ext;
     wire signed [24:0] dsp_preadd_a;
     wire signed [24:0] dsp_preadd_d;
+    wire signed [29:0] dsp_input_a;
     wire signed [17:0] dsp_coeff_b;
-    wire signed [47:0] dsp_acc_c;
     wire signed [47:0] dsp_mac_full;
     wire signed [ACC_W-1:0] mac_sum_comb;
     wire signed [DATA_W-1:0] filter_rounded;
+    wire [4:0] dsp_inmode;
+    wire dsp_p_reset;
+    wire dsp_p_ce;
+    wire [6:0] dsp_opmode;
+    wire signed [47:0] dsp_round_bias;
+    wire signed [QUOT_W-1:0] rounded_quotient;
+    wire rounded_upper_is_sign_extension;
 
     assign x_current = x_in_valid ? x_in : {DATA_W{1'b0}};
     assign fir_in_dbg = x_current;
     assign fir_in_valid_dbg = ce_out && (phase_cnt == 1'b0);
 
-    assign product_comb = pair_sum_comb * coeff_comb;
-    // Signed assignment performs the required sign extension, or discards
-    // only redundant sign bits when a proven narrower accumulator is used.
-    assign product_ext = product_comb;
     assign dsp_preadd_a = read_mask_a ?
         {{(25-DATA_W){read_data_a[DATA_W-1]}}, read_data_a} : 25'sd0;
     assign dsp_preadd_d = read_mask_b ?
         {{(25-DATA_W){read_data_b[DATA_W-1]}}, read_data_b} : 25'sd0;
+    assign dsp_input_a = (USE_DSP48_PREADDER != 0) ?
+        {{5{dsp_preadd_a[24]}}, dsp_preadd_a} :
+        {{(30-PAIR_W){pair_sum_comb[PAIR_W-1]}}, pair_sum_comb};
     assign dsp_coeff_b =
         {{(18-COEFF_W){coeff_comb[COEFF_W-1]}}, coeff_comb};
-    assign dsp_acc_c = {{(48-ACC_W){acc_reg[ACC_W-1]}}, acc_reg};
+    assign dsp_inmode = (USE_DSP48_PREADDER != 0) ?
+        5'b00100 : 5'b00000;
+    assign dsp_p_reset = !rst_n ||
+        (ce_out && phase_cnt == 1'b0);
+    assign dsp_p_ce =
+        (read_data_valid && !read_is_delay) || filter_commit_pending;
+    assign dsp_round_bias = mac_sum_comb[ACC_W-1] ?
+        48'sd16383 : 48'sd16384;
+    assign dsp_opmode = filter_commit_pending ?
+        7'b0001110 : 7'b0100101;
 
-    generate
-        if (USE_DSP48_PREADDER != 0) begin : gen_explicit_dsp48_preadder
-            // One combinational DSP48E1 implements
-            // (sample_a + sample_b) * coefficient + accumulator.
-            // INMODE=00100 selects D+A at the 25-bit pre-adder.
-            DSP48E1 #(
-                .A_INPUT("DIRECT"),
-                .B_INPUT("DIRECT"),
-                .USE_DPORT("TRUE"),
-                .USE_MULT("MULTIPLY"),
-                .USE_SIMD("ONE48"),
-                .AREG(0),
-                .ACASCREG(0),
-                .BREG(0),
-                .BCASCREG(0),
-                .CREG(0),
-                .DREG(0),
-                .ADREG(0),
-                .MREG(0),
-                .PREG(0),
-                .INMODEREG(0),
-                .OPMODEREG(0),
-                .ALUMODEREG(0),
-                .CARRYINREG(0),
-                .CARRYINSELREG(0)
-            ) u_stage1_dsp48e1 (
-                .P(dsp_mac_full),
-                .A({5'b00000, dsp_preadd_a}),
-                .B(dsp_coeff_b),
-                .C(dsp_acc_c),
-                .D(dsp_preadd_d),
-                .INMODE(5'b00100),
-                .OPMODE(7'b0110101),
-                .ALUMODE(4'b0000),
-                .CARRYINSEL(3'b000),
-                .CARRYIN(1'b0),
-                .ACIN(30'd0),
-                .BCIN(18'd0),
-                .PCIN(48'd0),
-                .CARRYCASCIN(1'b0),
-                .MULTSIGNIN(1'b0),
-                .CLK(clk),
-                .CEA1(1'b0),
-                .CEA2(1'b0),
-                .CEAD(1'b0),
-                .CEALUMODE(1'b0),
-                .CEB1(1'b0),
-                .CEB2(1'b0),
-                .CEC(1'b0),
-                .CECARRYIN(1'b0),
-                .CECTRL(1'b0),
-                .CED(1'b0),
-                .CEINMODE(1'b0),
-                .CEM(1'b0),
-                .CEP(1'b0),
-                .RSTA(1'b0),
-                .RSTALLCARRYIN(1'b0),
-                .RSTALUMODE(1'b0),
-                .RSTB(1'b0),
-                .RSTC(1'b0),
-                .RSTCTRL(1'b0),
-                .RSTD(1'b0),
-                .RSTINMODE(1'b0),
-                .RSTM(1'b0),
-                .RSTP(1'b0),
-                .ACOUT(),
-                .BCOUT(),
-                .CARRYCASCOUT(),
-                .CARRYOUT(),
-                .MULTSIGNOUT(),
-                .OVERFLOW(),
-                .PATTERNBDETECT(),
-                .PATTERNDETECT(),
-                .PCOUT(),
-                .UNDERFLOW()
-            );
-        end
-        else begin : gen_inferred_stage1_mac
-            assign dsp_mac_full = 48'sd0;
-        end
-    endgenerate
+    // PREG holds both the running sum and the completed filter result.  The
+    // phase interval is hundreds of clocks, so one result-commit cycle is
+    // available after the final MAC without changing the output cadence.
+    DSP48E1 #(
+        .A_INPUT("DIRECT"),
+        .B_INPUT("DIRECT"),
+        .USE_DPORT("TRUE"),
+        .USE_MULT("MULTIPLY"),
+        .USE_SIMD("ONE48"),
+        .AREG(0),
+        .ACASCREG(0),
+        .BREG(0),
+        .BCASCREG(0),
+        .CREG(0),
+        .DREG(0),
+        .ADREG(0),
+        .MREG(0),
+        .PREG(1),
+        .INMODEREG(0),
+        .OPMODEREG(0),
+        .ALUMODEREG(0),
+        .CARRYINREG(0),
+        .CARRYINSELREG(0)
+    ) u_stage1_dsp48e1 (
+        .P(dsp_mac_full),
+        .A(dsp_input_a),
+        .B(dsp_coeff_b),
+        .C(dsp_round_bias),
+        .D((USE_DSP48_PREADDER != 0) ? dsp_preadd_d : 25'sd0),
+        .INMODE(dsp_inmode),
+        .OPMODE(dsp_opmode),
+        .ALUMODE(4'b0000),
+        .CARRYINSEL(3'b000),
+        .CARRYIN(1'b0),
+        .ACIN(30'd0),
+        .BCIN(18'd0),
+        .PCIN(48'd0),
+        .CARRYCASCIN(1'b0),
+        .MULTSIGNIN(1'b0),
+        .CLK(clk),
+        .CEA1(1'b0),
+        .CEA2(1'b0),
+        .CEAD(1'b0),
+        .CEALUMODE(1'b0),
+        .CEB1(1'b0),
+        .CEB2(1'b0),
+        .CEC(1'b0),
+        .CECARRYIN(1'b0),
+        .CECTRL(1'b0),
+        .CED(1'b0),
+        .CEINMODE(1'b0),
+        .CEM(1'b0),
+        .CEP(dsp_p_ce),
+        .RSTA(1'b0),
+        .RSTALLCARRYIN(1'b0),
+        .RSTALUMODE(1'b0),
+        .RSTB(1'b0),
+        .RSTC(1'b0),
+        .RSTCTRL(1'b0),
+        .RSTD(1'b0),
+        .RSTINMODE(1'b0),
+        .RSTM(1'b0),
+        .RSTP(dsp_p_reset),
+        .ACOUT(),
+        .BCOUT(),
+        .CARRYCASCOUT(),
+        .CARRYOUT(),
+        .MULTSIGNOUT(),
+        .OVERFLOW(),
+        .PATTERNBDETECT(),
+        .PATTERNDETECT(),
+        .PCOUT(),
+        .UNDERFLOW()
+    );
 
-    assign mac_sum_comb = (USE_DSP48_PREADDER != 0) ?
-        dsp_mac_full[ACC_W-1:0] : acc_reg + product_ext;
+    assign mac_sum_comb = dsp_mac_full[ACC_W-1:0];
 
     always @(*) begin
         pair_sum_comb =
@@ -246,14 +254,15 @@ module interp2_stage1_strict_halfband_bram_ce #(
         endcase
     end
 
-    round_sat_shift_compact #(
-        .IN_W   (ACC_W),
-        .OUT_W  (DATA_W),
-        .SHIFT_N(FRAC_W)
-    ) u_round_sat_q15_to_data (
-        .din  (filter_result),
-        .dout (filter_rounded)
-    );
+    // The result-commit DSP cycle has already added the exact signed Q15
+    // rounding bias.  Saturation therefore needs no external carry chain.
+    assign rounded_quotient = mac_sum_comb >>> FRAC_W;
+    assign rounded_upper_is_sign_extension =
+        rounded_quotient[QUOT_W-1:DATA_W] ==
+        {UPPER_W{rounded_quotient[DATA_W-1]}};
+    assign filter_rounded = rounded_upper_is_sign_extension ?
+        rounded_quotient[DATA_W-1:0] :
+        (rounded_quotient[QUOT_W-1] ? OUT_MIN : OUT_MAX);
 
     // Port A：phase0 写入，其余周期作为第一个同步读端口。
     always @(posedge clk) begin
@@ -307,15 +316,19 @@ module interp2_stage1_strict_halfband_bram_ce #(
             issue_index <= 5'd0;
             read_addr_a <= {ADDR_W{1'b0}};
             read_addr_b <= {ADDR_W{1'b0}};
-            acc_reg <= {ACC_W{1'b0}};
-            filter_result <= {ACC_W{1'b0}};
             delay_result <= {DATA_W{1'b0}};
+            filter_commit_pending <= 1'b0;
             y_out <= {DATA_W{1'b0}};
             y_out_valid <= 1'b0;
         end
         else begin
             y_out_valid <= 1'b0;
             read_issue_valid <= 1'b0;
+
+            if (filter_commit_pending) begin
+                filter_ready <= 1'b1;
+                filter_commit_pending <= 1'b0;
+            end
 
             if (read_data_valid) begin
                 if (read_is_delay) begin
@@ -324,12 +337,8 @@ module interp2_stage1_strict_halfband_bram_ce #(
                     delay_ready <= 1'b1;
                 end
                 else if (read_coeff_index == PAIR_COUNT-1) begin
-                    filter_result <= mac_sum_comb;
-                    filter_ready <= 1'b1;
+                    filter_commit_pending <= 1'b1;
                     mac_active <= 1'b0;
-                end
-                else begin
-                    acc_reg <= mac_sum_comb;
                 end
             end
 
@@ -371,7 +380,6 @@ module interp2_stage1_strict_halfband_bram_ce #(
                         (fill_count < HISTORY_LEN) ?
                         (fill_count + 6'd1) : fill_count;
 
-                    acc_reg <= {ACC_W{1'b0}};
                     mac_active <= 1'b1;
                     filter_ready <= 1'b0;
                     issue_active <= 1'b1;

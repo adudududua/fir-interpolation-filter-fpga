@@ -8,11 +8,11 @@ param(
     [ValidateSet('rebuilt', 'full', 'none')]
     [string]$FlattenHierarchy = 'rebuilt',
     [ValidateSet('auto', 'on', 'off')]
-    [string]$ResourceSharing = 'auto',
+    [string]$ResourceSharing = 'on',
     [ValidateSet('Default', 'Explore', 'ExploreWithRemap', 'ExploreArea', 'AddRemap')]
     [string]$ImplementationOptDirective = 'Default',
     [ValidatePattern('^[A-Za-z0-9_-]+$')]
-    [string]$ResultTag = 'board_dual_rate_cic6_accmux_opt'
+    [string]$ResultTag = 'board_dual_rate_cic6_preg_round_snapshot_opt'
 )
 
 $ErrorActionPreference = 'Stop'

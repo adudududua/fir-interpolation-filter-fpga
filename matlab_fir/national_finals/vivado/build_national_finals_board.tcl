@@ -17,8 +17,8 @@ set reuse_current_synthesis 0
 set synthesis_only 0
 set synth_directive AreaOptimized_high
 set flatten_hierarchy rebuilt
-set resource_sharing auto
-set result_tag board_dual_rate_areaopt
+set resource_sharing on
+set result_tag board_dual_rate_cic6_preg_round_snapshot_opt
 if {$argc > 0} {
     set reuse_current_synthesis [lindex $argv 0]
 }

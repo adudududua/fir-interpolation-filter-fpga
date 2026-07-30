@@ -78,9 +78,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     localparam integer MEM_DEPTH = 16;
     localparam integer FRAC_W = 15;
     localparam integer SHIFT_W = ACC_W - FRAC_W;
-    localparam integer ROUND_W = SHIFT_W + 1;
-    localparam integer STAGE2_UPPER_W = ROUND_W - STAGE2_DATA_W;
-    localparam integer STAGE3_UPPER_W = ROUND_W - STAGE3_DATA_W;
+    localparam integer STAGE2_UPPER_W = SHIFT_W - STAGE2_DATA_W;
+    localparam integer STAGE3_UPPER_W = SHIFT_W - STAGE3_DATA_W;
 
     localparam signed [STAGE2_DATA_W-1:0] STAGE2_OUT_MAX =
         {1'b0, {(STAGE2_DATA_W-1){1'b1}}};
@@ -116,6 +115,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     reg job_stage3;
     reg job_phase;
     reg [3:0] job_mac_index;
+    reg [MEM_ADDR_W-1:0] job_history_head;
+    reg [MEM_ADDR_W-1:0] job_fill_count;
     wire [3:0] job_mac_count;
 
     wire [MEM_ADDR_W-1:0] hist_index;
@@ -137,11 +138,13 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     (* ram_style = "block" *)
     reg signed [STAGE3_DATA_W-1:0] stage3_packed_bram [0:63];
 
-    reg signed [ACC_W-1:0] acc_reg;
     reg signed [COEFF_W-1:0] coeff_bram_raw;
+    reg job_result_pending;
+    reg job_output_pending;
 
     wire [MEM_ADDR_W-1:0] stage2_write_addr;
     wire [MEM_ADDR_W-1:0] stage3_write_addr;
+    wire [MEM_ADDR_W-1:0] history_read_head;
     wire [MEM_ADDR_W-1:0] stage2_read_addr;
     wire [MEM_ADDR_W-1:0] stage3_read_addr;
     wire [MEM_ADDR_W-1:0] stage2_bram_read_index;
@@ -165,14 +168,14 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     wire signed [29:0] dsp_input_a;
     wire signed [24:0] dsp_input_d;
     wire signed [17:0] dsp_coeff_b;
-    wire signed [47:0] dsp_acc_c;
     wire signed [47:0] dsp_mac_full;
     wire signed [ACC_W-1:0] mac_sum_comb;
+    wire dsp_p_reset;
+    wire [6:0] dsp_opmode;
+    wire signed [47:0] dsp_round_bias;
     wire signed [STAGE2_DATA_W-1:0] stage2_q15_rounded;
     wire signed [STAGE3_DATA_W-1:0] stage3_q15_rounded;
     wire signed [SHIFT_W-1:0] truncated_value;
-    wire round_increment;
-    wire signed [ROUND_W-1:0] rounded_value;
     wire stage2_upper_is_sign_extension;
     wire stage3_upper_is_sign_extension;
     wire coeff_bram_stage3;
@@ -195,6 +198,12 @@ module interp2_stage23_lutram_cic_dsp_ce #(
 
     assign stage2_write_addr = stage2_head - {{(MEM_ADDR_W-1){1'b0}}, 1'b1};
     assign stage3_write_addr = stage3_head - {{(MEM_ADDR_W-1){1'b0}}, 1'b1};
+    // The shared MAC can observe only one history bank at a time.  A single
+    // latched head therefore serves both banks during a job; while idle, the
+    // same address path prefetches index zero for the next priority-selected
+    // pending job.
+    assign history_read_head = job_active ? job_history_head :
+        (stage2_pending ? stage2_head : stage3_head);
     assign hist_index = job_mac_index[MEM_ADDR_W-1:0];
     assign hist_pair_limit = !job_stage3 ?
                              (job_phase ? 4'd7 : 4'd8) :
@@ -223,8 +232,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
                                      ~coeff_bram_phase,
                                      coeff_bram_next_index};
 
-    assign stage2_read_addr = stage2_head + hist_index;
-    assign stage3_read_addr = stage3_head + hist_index;
+    assign stage2_read_addr = history_read_head + hist_index;
+    assign stage3_read_addr = history_read_head + hist_index;
 
     // BRAM 为同步读。任务空闲且 pending 时读取 index0；任务活动时，
     // 在当前抽头进入 DSP 的同时预取下一个抽头，避免额外空拍。
@@ -232,8 +241,10 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         (job_active && !job_stage3) ? hist_index + 4'd1 : 4'd0;
     assign stage3_bram_read_index =
         (job_active && job_stage3) ? hist_index + 4'd1 : 4'd0;
-    assign stage2_bram_read_addr = stage2_head + stage2_bram_read_index;
-    assign stage3_bram_read_addr = stage3_head + stage3_bram_read_index;
+    assign stage2_bram_read_addr =
+        history_read_head + stage2_bram_read_index;
+    assign stage3_bram_read_addr =
+        history_read_head + stage3_bram_read_index;
     assign stage2_packed_read_addr = coeff_bram_stage3 ?
         packed_coeff_read_addr : {2'b00, stage2_bram_read_addr};
     assign stage3_packed_read_addr = coeff_bram_stage3 ?
@@ -242,9 +253,9 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     assign stage2_lutram_raw = stage2_hist_mem[stage2_read_addr];
     assign stage3_lutram_raw = stage3_hist_mem[stage3_read_addr];
 
-    assign stage2_mem = (hist_index < stage2_fill_count) ?
+    assign stage2_mem = (hist_index < job_fill_count) ?
                         stage2_mem_raw : {STAGE2_DATA_W{1'b0}};
-    assign stage3_mem = (hist_index < stage3_fill_count) ?
+    assign stage3_mem = (hist_index < job_fill_count) ?
                         stage3_mem_raw : {STAGE3_DATA_W{1'b0}};
 
     assign selected_sample = !job_stage3 ? stage2_mem :
@@ -259,14 +270,20 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         stage3_packed_raw[COEFF_W-1:0];
     assign dsp_coeff_b = (USE_PACKED_BRAM != 0) ? packed_coeff_raw :
         ((USE_BRAM_COEFF != 0) ? coeff_bram_raw : coeff_comb);
-    assign dsp_acc_c =
-        {{(48-ACC_W){acc_reg[ACC_W-1]}}, acc_reg};
-    // acc_reg is cleared whenever a job starts, so the first tap already
-    // observes C=0.  Keeping M+C selected for every tap avoids the former
-    // ACC_W-wide zero/accumulator mux without requiring mode decode logic.
+    // PREG is synchronously cleared as a new job is accepted, then feeds the
+    // DSP48 ALU Z input on every MAC cycle.  After the final MAC, one otherwise
+    // idle cycle adds the exact signed Q15 rounding bias inside the same DSP:
+    // +16384 for non-negative sums and +16383 for negative sums.
+    assign dsp_p_reset = !rst_n ||
+        (!job_active && !job_result_pending && !job_output_pending &&
+         (stage2_pending || stage3_pending));
+    assign dsp_round_bias = mac_sum_comb[ACC_W-1] ?
+        48'sd16383 : 48'sd16384;
+    assign dsp_opmode = job_result_pending ?
+        7'b0001110 : 7'b0100101;
 
-    // 显式使用一颗 DSP48E1，避免综合器把预加、乘法和累加拆成多颗 DSP。
-    // 不使用预加器，OPMODE=0110101 实现 A*B+C。
+    // 显式使用一颗 DSP48E1，避免综合器把乘法和累加拆成多颗 DSP。
+    // MAC 周期用 M+P，提交周期用 P+C 加入符号相关舍入偏置。
     DSP48E1 #(
         .A_INPUT("DIRECT"),
         .B_INPUT("DIRECT"),
@@ -281,7 +298,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         .DREG(0),
         .ADREG(0),
         .MREG(0),
-        .PREG(0),
+        .PREG(1),
         .INMODEREG(0),
         .OPMODEREG(0),
         .ALUMODEREG(0),
@@ -291,10 +308,10 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         .P(dsp_mac_full),
         .A(dsp_input_a),
         .B(dsp_coeff_b),
-        .C(dsp_acc_c),
+        .C(dsp_round_bias),
         .D(dsp_input_d),
         .INMODE(5'b00000),
-        .OPMODE(7'b0110101),
+        .OPMODE(dsp_opmode),
         .ALUMODE(4'b0000),
         .CARRYINSEL(3'b000),
         .CARRYIN(1'b0),
@@ -316,7 +333,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         .CED(1'b0),
         .CEINMODE(1'b0),
         .CEM(1'b0),
-        .CEP(1'b0),
+        .CEP(job_active || job_result_pending),
         .RSTA(1'b0),
         .RSTALLCARRYIN(1'b0),
         .RSTALUMODE(1'b0),
@@ -326,7 +343,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         .RSTD(1'b0),
         .RSTINMODE(1'b0),
         .RSTM(1'b0),
-        .RSTP(1'b0),
+        .RSTP(dsp_p_reset),
         .ACOUT(),
         .BCOUT(),
         .CARRYCASCOUT(),
@@ -340,32 +357,29 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     );
     assign mac_sum_comb = dsp_mac_full[ACC_W-1:0];
 
-    // 两级只会有一个 job 活动，因此共享一次 Q15 截断和舍入加一，
-    // 再分别执行 22bit 与 20bit 的符号扩展检查和饱和。
+    // The PREG value has already received the exact signed rounding bias.
+    // Only arithmetic truncation and the two output-width saturation checks
+    // remain in Slice logic.
     assign truncated_value = mac_sum_comb >>> FRAC_W;
-    assign round_increment = mac_sum_comb[FRAC_W-1] &&
-        (!mac_sum_comb[ACC_W-1] || (|mac_sum_comb[FRAC_W-2:0]));
-    assign rounded_value =
-        $signed({truncated_value[SHIFT_W-1], truncated_value}) +
-        $signed({{SHIFT_W{1'b0}}, round_increment});
 
     assign stage2_upper_is_sign_extension =
-        rounded_value[ROUND_W-1:STAGE2_DATA_W] ==
-        {STAGE2_UPPER_W{rounded_value[STAGE2_DATA_W-1]}};
+        truncated_value[SHIFT_W-1:STAGE2_DATA_W] ==
+        {STAGE2_UPPER_W{truncated_value[STAGE2_DATA_W-1]}};
     assign stage3_upper_is_sign_extension =
-        rounded_value[ROUND_W-1:STAGE3_DATA_W] ==
-        {STAGE3_UPPER_W{rounded_value[STAGE3_DATA_W-1]}};
+        truncated_value[SHIFT_W-1:STAGE3_DATA_W] ==
+        {STAGE3_UPPER_W{truncated_value[STAGE3_DATA_W-1]}};
 
     assign stage2_q15_rounded = stage2_upper_is_sign_extension ?
-        rounded_value[STAGE2_DATA_W-1:0] :
-        (rounded_value[ROUND_W-1] ? STAGE2_OUT_MIN : STAGE2_OUT_MAX);
+        truncated_value[STAGE2_DATA_W-1:0] :
+        (truncated_value[SHIFT_W-1] ? STAGE2_OUT_MIN : STAGE2_OUT_MAX);
     assign stage3_q15_rounded = stage3_upper_is_sign_extension ?
-        rounded_value[STAGE3_DATA_W-1:0] :
-        (rounded_value[ROUND_W-1] ? STAGE3_OUT_MIN : STAGE3_OUT_MAX);
+        truncated_value[STAGE3_DATA_W-1:0] :
+        (truncated_value[SHIFT_W-1] ? STAGE3_OUT_MIN : STAGE3_OUT_MAX);
 
     assign stage2_phase_dbg = stage2_phase;
     assign stage3_phase_dbg = stage3_phase;
-    assign scheduler_busy_dbg = job_active;
+    assign scheduler_busy_dbg =
+        job_active || job_result_pending || job_output_pending;
     assign scheduler_stage_dbg = job_active ?
         {1'b1, job_stage3} : 2'd0;
     assign scheduler_mac_index_dbg = job_mac_index;
@@ -572,7 +586,10 @@ module interp2_stage23_lutram_cic_dsp_ce #(
             job_stage3 <= 1'b0;
             job_phase <= 1'b0;
             job_mac_index <= 4'd0;
-            acc_reg <= {ACC_W{1'b0}};
+            job_history_head <= {MEM_ADDR_W{1'b0}};
+            job_fill_count <= {MEM_ADDR_W{1'b0}};
+            job_result_pending <= 1'b0;
+            job_output_pending <= 1'b0;
             stage2_y_out <= {STAGE2_DATA_W{1'b0}};
             stage3_y_out <= {STAGE3_DATA_W{1'b0}};
             stage2_y_out_valid <= 1'b0;
@@ -604,22 +621,28 @@ module interp2_stage23_lutram_cic_dsp_ce #(
                 stage3_phase <= ~stage3_phase;
             end
 
-            if (job_active) begin
-                if (job_mac_index == job_mac_count - 4'd1) begin
-                    if (!job_stage3) begin
-                        stage2_y_out <= stage2_q15_rounded;
-                        stage2_y_out_valid <= 1'b1;
-                    end
-                    else begin
-                        stage3_y_out <= stage3_q15_rounded;
-                        stage3_y_out_valid <= 1'b1;
-                    end
-                    job_active <= 1'b0;
-                    job_mac_index <= 4'd0;
-                    acc_reg <= {ACC_W{1'b0}};
+            if (job_output_pending) begin
+                if (!job_stage3) begin
+                    stage2_y_out <= stage2_q15_rounded;
+                    stage2_y_out_valid <= 1'b1;
                 end
                 else begin
-                    acc_reg <= mac_sum_comb;
+                    stage3_y_out <= stage3_q15_rounded;
+                    stage3_y_out_valid <= 1'b1;
+                end
+                job_output_pending <= 1'b0;
+            end
+            else if (job_result_pending) begin
+                job_result_pending <= 1'b0;
+                job_output_pending <= 1'b1;
+            end
+            else if (job_active) begin
+                if (job_mac_index == job_mac_count - 4'd1) begin
+                    job_active <= 1'b0;
+                    job_result_pending <= 1'b1;
+                    job_mac_index <= 4'd0;
+                end
+                else begin
                     job_mac_index <= job_mac_index + 4'd1;
                 end
             end
@@ -628,7 +651,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
                 job_stage3 <= 1'b0;
                 job_phase <= stage2_pending_phase;
                 job_mac_index <= 4'd0;
-                acc_reg <= {ACC_W{1'b0}};
+                job_history_head <= stage2_head;
+                job_fill_count <= stage2_fill_count;
                 stage2_pending <= 1'b0;
             end
             else if (stage3_pending) begin
@@ -636,7 +660,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
                 job_stage3 <= 1'b1;
                 job_phase <= stage3_pending_phase;
                 job_mac_index <= 4'd0;
-                acc_reg <= {ACC_W{1'b0}};
+                job_history_head <= stage3_head;
+                job_fill_count <= stage3_fill_count;
                 stage3_pending <= 1'b0;
             end
         end

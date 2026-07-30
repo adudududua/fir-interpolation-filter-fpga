@@ -12,3 +12,6 @@ rotate22_acc41_schedcompact_addremap,AddRemap,528,532,229,6,3,2,45.075,0.078,1,0
 accmux_invariant_default,Default,487,532,205,6,3,2,46.420,0.105,1,0,1
 accmux_invariant_explore,Explore,487,532,205,6,3,2,46.420,0.105,1,0,1
 accmux_invariant_addremap,AddRemap,487,532,205,6,3,2,46.420,0.105,1,0,1
+preg_round_snapshot_default,Default,461,464,199,6,3,2,45.405,0.114,1,0,1
+preg_round_snapshot_explorearea,ExploreArea,472,464,194,6,3,2,46.367,0.152,1,0,1
+preg_round_snapshot_addremap,AddRemap,461,464,199,6,3,2,45.405,0.114,1,0,1

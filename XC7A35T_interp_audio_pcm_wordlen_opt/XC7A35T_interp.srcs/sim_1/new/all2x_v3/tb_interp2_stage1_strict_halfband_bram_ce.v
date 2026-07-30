@@ -30,6 +30,7 @@
 
 module tb_interp2_stage1_strict_halfband_bram_ce;
 
+    localparam integer DUT_ACC_W = 41;
     localparam integer IMPULSE_INPUT_COUNT = 256;
     localparam integer IMPULSE_GOLDEN_COUNT = 615;
     localparam integer RANDOM_INPUT_COUNT = 128;
@@ -63,7 +64,9 @@ module tb_interp2_stage1_strict_halfband_bram_ce;
 
     assign ce2_out = (ce_cnt[5:0] == 6'b000000);
 
-    interp2_stage1_strict_halfband_bram_ce dut_impulse (
+    interp2_stage1_strict_halfband_bram_ce #(
+        .ACC_W(DUT_ACC_W)
+    ) dut_impulse (
         .clk              (clk),
         .rst_n            (rst_n),
         .ce_out           (ce2_out),
@@ -76,7 +79,9 @@ module tb_interp2_stage1_strict_halfband_bram_ce;
         .fir_in_valid_dbg ()
     );
 
-    interp2_stage1_strict_halfband_bram_ce dut_random (
+    interp2_stage1_strict_halfband_bram_ce #(
+        .ACC_W(DUT_ACC_W)
+    ) dut_random (
         .clk              (clk),
         .rst_n            (rst_n),
         .ce_out           (ce2_out),
