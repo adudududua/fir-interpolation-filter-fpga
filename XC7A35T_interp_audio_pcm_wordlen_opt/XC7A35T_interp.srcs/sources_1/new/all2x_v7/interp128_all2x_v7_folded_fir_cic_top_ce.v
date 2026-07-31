@@ -47,6 +47,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     parameter integer USE_BRAM_STAGE23_COEFF = 0,
     parameter integer USE_PACKED_BRAM_STAGE23 = 0,
     parameter integer CIC_BURST_COUNTER_USE_DSP = 0,
+    parameter integer CIC_COMB_USE_DSP = 0,
     parameter integer USE_SERIAL_CIC_COMB = 0,
     parameter integer USE_STAGE1_DSP48_PREADDER = 0,
     parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 0,
@@ -241,7 +242,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
                 .DATA_W          (21),
                 .OUTPUT_W        (20),
                 .FINAL_PRUNE_LSB (FINAL_PRUNE_LSB),
-                .BURST_COUNTER_USE_DSP(CIC_BURST_COUNTER_USE_DSP)
+                .BURST_COUNTER_USE_DSP(CIC_BURST_COUNTER_USE_DSP),
+                .COMB_USE_DSP(CIC_COMB_USE_DSP)
             ) u_cic_interp16_serial_comb_dsp_ce (
                 .clk                  (clk),
                 .rst_n                (rst_n),

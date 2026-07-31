@@ -437,6 +437,7 @@
         <Generic Name="USE_PHASE7_CIC_BURST_COUNTER_DSP" Val="0"/>
         <Generic Name="USE_NATIONAL_FINALS_DATAPATH" Val="1"/>
         <Generic Name="USE_NATIONAL_FINALS_SERIAL_CIC_COMB" Val="1"/>
+        <Generic Name="USE_NATIONAL_FINALS_CIC_COMB_DSP" Val="0"/>
         <Generic Name="USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER" Val="0"/>
         <Generic Name="USE_NATIONAL_FINALS_NARROW_STAGE23" Val="1"/>
       </Config>
