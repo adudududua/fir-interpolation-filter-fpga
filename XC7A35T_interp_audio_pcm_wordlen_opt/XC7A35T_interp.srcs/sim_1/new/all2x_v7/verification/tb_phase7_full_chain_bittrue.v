@@ -126,7 +126,11 @@ module tb_phase7_full_chain_bittrue;
     wire signed [23:0] dbg_y8;
     wire dbg_y8_valid;
 
+`ifdef NATIONAL_FINALS_SHARED_FIR_MAC
+    interp128_all2x_v7_shared_fir_mac_top_ce #(
+`else
     interp128_all2x_v7_folded_fir_cic_top_ce #(
+`endif
         .STAGE1_ACC_W    (41),
         .STAGE23_ACC_W   (38),
         .CIC_ORDER       (3),
