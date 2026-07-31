@@ -1,13 +1,13 @@
 National finals formal RTL impulse acceptance
 =============================================
 Source: XSim outputs, not coefficient-only model
-Limits: pass <= +/-0.050 dB, stop >= 70.0 dB
+Limits: pass <= +/-0.050 dB, stop >= 70.0 dB, absolute gain <= +/-0.010 dB, mode delta <= 0.010 dB
 
-Fs_in=44100 node=4x Fs_out=176400 len=225 pass_abs=0.004610111 dB ripple=0.005702880 dB stop=78.668823410 dB sym=0 LSB gd=112.000000 phase_res=7.11e-14 PASS=1
-Fs_in=44100 node=8x Fs_out=352800 len=459 pass_abs=0.005494934 dB ripple=0.006273642 dB stop=78.161304264 dB sym=0 LSB gd=229.000000 phase_res=1.42e-13 PASS=1
-Fs_in=44100 node=128x Fs_out=5.6448e+06 len=7406 pass_abs=0.006917875 dB ripple=0.008110994 dB stop=72.347814478 dB sym=0 LSB gd=3702.500000 phase_res=2.84e-14 PASS=1
-Fs_in=48000 node=4x Fs_out=192000 len=225 pass_abs=0.004610111 dB ripple=0.005702880 dB stop=78.668823410 dB sym=0 LSB gd=112.000000 phase_res=5.68e-14 PASS=1
-Fs_in=48000 node=8x Fs_out=384000 len=459 pass_abs=0.005494934 dB ripple=0.005738239 dB stop=78.161304264 dB sym=0 LSB gd=229.000000 phase_res=2.84e-14 PASS=1
-Fs_in=48000 node=128x Fs_out=6.144e+06 len=7406 pass_abs=0.006917875 dB ripple=0.006916932 dB stop=72.347814478 dB sym=0 LSB gd=3702.500000 phase_res=2.84e-14 PASS=1
+Fs_in=44100 node=4x Fs_out=176400 len=225 pass_abs=0.004610111 dB ripple=0.005702880 dB stop=78.668823410 dB sym=0 LSB gd=112.000000 phase_res=7.11e-14 gain=0.999815940857 (-0.001598865 dB) delta4x=0.000000000 dB PASS=1
+Fs_in=44100 node=8x Fs_out=352800 len=459 pass_abs=0.005394745 dB ripple=0.006173687 dB stop=78.561809849 dB sym=0 LSB gd=229.000000 phase_res=1.42e-13 gain=0.999688148499 (-0.002709130 dB) delta4x=-0.001110266 dB PASS=1
+Fs_in=44100 node=128x Fs_out=5.6448e+06 len=7406 pass_abs=0.006116383 dB ripple=0.008055724 dB stop=72.331082151 dB sym=0 LSB gd=3702.500000 phase_res=2.84e-14 gain=0.999599456787 (-0.003479771 dB) delta4x=-0.001880907 dB PASS=1
+Fs_in=48000 node=4x Fs_out=192000 len=225 pass_abs=0.004610111 dB ripple=0.005702880 dB stop=78.668823410 dB sym=0 LSB gd=112.000000 phase_res=5.68e-14 gain=0.999815940857 (-0.001598865 dB) delta4x=0.000000000 dB PASS=1
+Fs_in=48000 node=8x Fs_out=384000 len=459 pass_abs=0.005394745 dB ripple=0.005718829 dB stop=78.561809849 dB sym=0 LSB gd=229.000000 phase_res=2.84e-14 gain=0.999688148499 (-0.002709130 dB) delta4x=-0.001110266 dB PASS=1
+Fs_in=48000 node=128x Fs_out=6.144e+06 len=7406 pass_abs=0.006116383 dB ripple=0.006115655 dB stop=72.331082151 dB sym=0 LSB gd=3702.500000 phase_res=2.84e-14 gain=0.999599456787 (-0.003479771 dB) delta4x=-0.001880907 dB PASS=1
 
 OVERALL_PASS=1

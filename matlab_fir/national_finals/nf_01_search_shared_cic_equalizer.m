@@ -26,7 +26,6 @@ clc;
 script_dir = fileparts(mfilename('fullpath'));
 matlab_root = fileparts(script_dir);
 v2_dir = fullfile(matlab_root, 'alt_all2x_v2');
-all2x_dir = fullfile(matlab_root, 'alt_all2x');
 result_dir = fullfile(script_dir, 'results');
 figure_dir = fullfile(script_dir, 'figures');
 if ~exist(result_dir, 'dir'); mkdir(result_dir); end
@@ -48,11 +47,7 @@ reference = load(reference_path, 'best_config');
 h1 = double(reference.best_config(1).coeff_int(:).') / 2^FRAC_W;
 h2 = double(reference.best_config(2).coeff_int(:).') / 2^FRAC_W;
 
-stage3_path = fullfile(all2x_dir, 'stage03_2x_coeff_decimal.txt');
-if ~exist(stage3_path, 'file')
-    error('缺少平坦 Stage3 系数：%s', stage3_path);
-end
-h3 = double(readmatrix(stage3_path).') / 2^FRAC_W;
+h3 = double(nf_stage3_q15_coefficients()) / 2^FRAC_W;
 
 h4 = conv(upsample_ir(h1, 2), h2);
 h8 = conv(upsample_ir(h4, 2), h3);

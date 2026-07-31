@@ -34,8 +34,8 @@ module nf_unified_fir_coeff_bram (
         .WRITE_MODE_B("READ_FIRST"),
         .INIT_00(256'h0000000000000000000000000000FF8D0216FAEA0844765A0844FAEA0216FF8D),
         .INIT_01(256'h00000000000000000000000000000000FF3504D1EE0D4DE94DE9EE0D04D1FF35),
-        .INIT_02(256'h000000000000000000000000000000000000000000CAF99C25992599F99C00CA),
-        .INIT_03(256'h00000000000000000000000000000000000000000000FFB601053E880105FFB6),
+        .INIT_02(256'h00000000000000000000000000000000000000000194F3384B324B32F3380194),
+        .INIT_03(256'h00000000000000000000000000000000000000000000FF6C020A7D10020AFF6C),
         .INIT_04(256'h0232FE39016FFEDB00E9FF4A008DFF950050FFC5002AFFE30013FFF40007FFFB),
         .INIT_05(256'h0000000000000000000000005164E5240FCCF50D082EF9A30510FBEB0351FD4D),
         .INIT_06(256'h0),
@@ -96,18 +96,21 @@ module nf_unified_fir_coeff_bram (
         coeff_mem[22] = 16'sd1233;
         coeff_mem[23] = -16'sd203;
 
-        coeff_mem[32] = 16'sd202;
-        coeff_mem[33] = -16'sd1636;
-        coeff_mem[34] = 16'sd9625;
-        coeff_mem[35] = 16'sd9625;
-        coeff_mem[36] = -16'sd1636;
-        coeff_mem[37] = 16'sd202;
+        // Stage3 is represented consistently as signed Q15.  Each
+        // polyphase branch sums to approximately one, so the complete
+        // interpolation filter has DC gain two before zero insertion.
+        coeff_mem[32] = 16'sd404;
+        coeff_mem[33] = -16'sd3272;
+        coeff_mem[34] = 16'sd19250;
+        coeff_mem[35] = 16'sd19250;
+        coeff_mem[36] = -16'sd3272;
+        coeff_mem[37] = 16'sd404;
 
-        coeff_mem[48] = -16'sd74;
-        coeff_mem[49] = 16'sd261;
-        coeff_mem[50] = 16'sd16008;
-        coeff_mem[51] = 16'sd261;
-        coeff_mem[52] = -16'sd74;
+        coeff_mem[48] = -16'sd148;
+        coeff_mem[49] = 16'sd522;
+        coeff_mem[50] = 16'sd32016;
+        coeff_mem[51] = 16'sd522;
+        coeff_mem[52] = -16'sd148;
 
         coeff_mem[64] = -16'sd5;
         coeff_mem[65] = 16'sd7;

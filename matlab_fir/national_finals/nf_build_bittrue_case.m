@@ -15,8 +15,7 @@ function result = nf_build_bittrue_case(x)
     reference = load(fullfile(v2_dir, ...
         'stage1_strict_halfband_config.mat'), 'best_config');
     stage_config = reference.best_config(1:3);
-    stage3_coeff = int64(readmatrix(fullfile(matlab_root, ...
-        'alt_all2x', 'stage03_2x_coeff_decimal.txt')).');
+    stage3_coeff = nf_stage3_q15_coefficients();
     stage_config(3).coeff_int = stage3_coeff;
     stage_config(3).frac_w = 15;
     stage_config(3).acc_w_recommended = 38;

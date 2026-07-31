@@ -84,12 +84,6 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     localparam integer SHIFT_W = ACC_W - FRAC_W;
     localparam integer STAGE2_UPPER_W = SHIFT_W - STAGE2_DATA_W;
     localparam integer STAGE3_UPPER_W = SHIFT_W - STAGE3_DATA_W;
-    // National-finals flat Stage3 has max |coefficient sum| 22926.
-    // With a signed 20-bit input its MAC magnitude is below 2^34, so the
-    // rounded Q15 result always fits signed 20 bits.  A 35-bit signed view is
-    // therefore sufficient and the generic saturation mux is provably dead.
-    localparam integer NF_STAGE3_ACC_W = 35;
-
     localparam signed [STAGE2_DATA_W-1:0] STAGE2_OUT_MAX =
         {1'b0, {(STAGE2_DATA_W-1){1'b1}}};
     localparam signed [STAGE2_DATA_W-1:0] STAGE2_OUT_MIN =
@@ -383,26 +377,18 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         truncated_value[STAGE2_DATA_W-1:0] :
         (truncated_value[SHIFT_W-1] ? STAGE2_OUT_MIN : STAGE2_OUT_MAX);
 
-    generate
-        if (STAGE3_FLAT != 0 && COEFF_W == 16 &&
-            STAGE3_DATA_W == NF_STAGE3_ACC_W-FRAC_W) begin :
-                gen_national_finals_stage3_proven_width
-            assign stage3_upper_is_sign_extension = 1'b1;
-            assign stage3_q15_rounded =
-                dsp_mac_full[NF_STAGE3_ACC_W-1:FRAC_W];
-        end
-        else begin : gen_stage3_generic_saturation
-            assign stage3_upper_is_sign_extension =
-                truncated_value[SHIFT_W-1:STAGE3_DATA_W] ==
-                {STAGE3_UPPER_W{
-                    truncated_value[STAGE3_DATA_W-1]}};
-            assign stage3_q15_rounded =
-                stage3_upper_is_sign_extension ?
-                truncated_value[STAGE3_DATA_W-1:0] :
-                (truncated_value[SHIFT_W-1] ?
-                 STAGE3_OUT_MIN : STAGE3_OUT_MAX);
-        end
-    endgenerate
+    // The national-finals Stage3 coefficients are true Q15 values.  Their
+    // worst-case absolute branch sum no longer makes the former 35-bit
+    // direct slice safe, so retain the complete 38-bit view and explicit
+    // signed saturation for every Stage3 configuration.
+    assign stage3_upper_is_sign_extension =
+        truncated_value[SHIFT_W-1:STAGE3_DATA_W] ==
+        {STAGE3_UPPER_W{truncated_value[STAGE3_DATA_W-1]}};
+    assign stage3_q15_rounded =
+        stage3_upper_is_sign_extension ?
+        truncated_value[STAGE3_DATA_W-1:0] :
+        (truncated_value[SHIFT_W-1] ?
+         STAGE3_OUT_MIN : STAGE3_OUT_MAX);
 
     assign stage2_phase_dbg = stage2_phase;
     assign stage3_phase_dbg = stage3_phase;
@@ -460,24 +446,24 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         if (STAGE3_FLAT != 0) begin
             // 全国赛独立 8x 输出使用原 Phase 6 平坦 Stage3。
             // CIC 的通带下垂由后接三抽头移位加法器单独补偿。
-            coeff_rom[16] = 18'sd202;
-            coeff_rom[17] = -18'sd1636;
-            coeff_rom[18] = 18'sd9625;
-            coeff_rom[24] = -18'sd74;
-            coeff_rom[25] = 18'sd261;
-            coeff_rom[26] = 18'sd16008;
+            coeff_rom[16] = 18'sd404;
+            coeff_rom[17] = -18'sd3272;
+            coeff_rom[18] = 18'sd19250;
+            coeff_rom[24] = -18'sd148;
+            coeff_rom[25] = 18'sd522;
+            coeff_rom[26] = 18'sd32016;
 
-            coeff_sequence_bram[32] = 18'sd202;
-            coeff_sequence_bram[33] = -18'sd1636;
-            coeff_sequence_bram[34] = 18'sd9625;
-            coeff_sequence_bram[35] = 18'sd9625;
-            coeff_sequence_bram[36] = -18'sd1636;
-            coeff_sequence_bram[37] = 18'sd202;
-            coeff_sequence_bram[48] = -18'sd74;
-            coeff_sequence_bram[49] = 18'sd261;
-            coeff_sequence_bram[50] = 18'sd16008;
-            coeff_sequence_bram[51] = 18'sd261;
-            coeff_sequence_bram[52] = -18'sd74;
+            coeff_sequence_bram[32] = 18'sd404;
+            coeff_sequence_bram[33] = -18'sd3272;
+            coeff_sequence_bram[34] = 18'sd19250;
+            coeff_sequence_bram[35] = 18'sd19250;
+            coeff_sequence_bram[36] = -18'sd3272;
+            coeff_sequence_bram[37] = 18'sd404;
+            coeff_sequence_bram[48] = -18'sd148;
+            coeff_sequence_bram[49] = 18'sd522;
+            coeff_sequence_bram[50] = 18'sd32016;
+            coeff_sequence_bram[51] = 18'sd522;
+            coeff_sequence_bram[52] = -18'sd148;
         end
         else if (CIC_ORDER == 3) begin
             coeff_rom[16] = 18'sd561;

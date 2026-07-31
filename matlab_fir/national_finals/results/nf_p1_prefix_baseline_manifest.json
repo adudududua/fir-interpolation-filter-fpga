@@ -1,0 +1,20 @@
+{
+  "config_id": "nf_route1_prefx_436lut_5dsp",
+  "git_commit": "34593d3939fab5d91bde5b90234c751a77e9ec7c",
+  "device": "xc7a35tffg484-2",
+  "resources": {
+    "lut": 436,
+    "ff": 471,
+    "bram_tile": 3,
+    "dsp": 5,
+    "mmcm": 2
+  },
+  "rtl_regression": "10/10 PASS against the pre-fix bit-true model",
+  "known_issue": "Stage3 coefficients were Q14 magnitudes but the MAC shifted by Q15; normalized response checks hid the absolute gain error.",
+  "measured_absolute_gain_db": {
+    "4x": -0.0015988646,
+    "8x": -6.0233919048,
+    "128x": -6.0249332697
+  },
+  "status": "frozen diagnostic baseline; not board-release eligible"
+}

@@ -123,7 +123,7 @@ puts $manifest_handle "Equalizer optimization: combinational hand-off plus lossl
 puts $manifest_handle "Serial-comb optimization: rotating uniform 22-bit history removes the wide 3:1 DSP-input mux"
 puts $manifest_handle "Stage1 optimization: fabric symmetric pair sum plus DSP48E1 multiplier/PREG MAC state, 41-bit proven bound, and exact DSP-resident Q15 rounding"
 puts $manifest_handle "Stage2/3 optimization: shared DSP48E1 PREG MAC state, constant 16383 plus CARRYIN exact rounding, and transaction-local BRAM history metadata"
-puts $manifest_handle "Stage3 optimization: coefficient/input bound proves a 35-bit MAC view and removes unreachable 20-bit saturation logic"
+puts $manifest_handle "Stage3 correctness: true Q15 coefficients, complete 38-bit MAC view, and explicit signed 20-bit saturation"
 puts $manifest_handle "Stage2/3 correctness: job head/fill snapshots protect an active MAC from the next ring-buffer write"
 puts $manifest_handle "Synthesis directive: AreaOptimized_high"
 puts $manifest_handle "Synthesis resource sharing: on"

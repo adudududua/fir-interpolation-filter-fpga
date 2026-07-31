@@ -2,7 +2,7 @@
 
 ## 优化演进总览（建议先读）
 
-本节按时间顺序统一整理“最初 4x+2x 结构、区域赛全 2x 优化、FIR-CIC 优化、全国赛全 2x 回退对照、全国赛 6-DSP CIC、440-LUT 锚点、442-LUT/432-FF 低 FF Pareto 版、434-LUT 第七轮、Route 1 的 424-LUT 最低 LUT 版，以及当前 436-LUT/5-DSP comb-LUT Pareto 版”。后文保留各阶段的设计、仿真、实现和板测原始记录，作为本节结论的详细证据。
+本节按时间顺序统一整理“最初 4x+2x 结构、区域赛全 2x 优化、FIR-CIC 优化、全国赛全 2x 回退对照、全国赛 6-DSP CIC、440/442/434-LUT 演进、Route 1、comb-LUT 低 DSP 版，以及当前 P1 真 Q15 正确性修复版”。重要纠错：旧 424-LUT/6-DSP 与 436-LUT/5-DSP 版本的归一化频响虽通过，但 8x/128x 绝对增益约低 6.02 dB，现仅作为资源演进历史；当前算法正确基线为 446 LUT / 5 DSP。
 
 ### 统计与比较口径
 
@@ -16,6 +16,14 @@
 | **MATLAB 候选** | 只完成数学或定点搜索，未进入完整 RTL/实现 | 只能比较频响，不能填写 FPGA 资源 |
 
 下文的 LUT、FF、DSP、BRAM 和 MMCM 均取 Vivado 布局布线后结果；明确标为“独立链”的早期数据除外。BRAM 按 BRAM Tile 计数，两个 RAMB18E1 等于一个 BRAM Tile。功耗均为 Vivado vectorless 估计，不是实测值；`0.168/0.169 W` 来自早期单采样率顶层且为 Low confidence，`0.271 W` 来自全国赛双采样率顶层且为 Medium confidence，因此两组数值不能用于推导滤波器本身的功耗增量。
+
+### P1 正确性修复：Stage 3 真 Q15 与绝对增益门禁
+
+独立复核冲激直流和发现：旧 Stage 3 整数系数只有 Q14 幅度，共享 MAC 却固定右移 15 bit。4x 不经过 Stage 3，绝对增益为 -0.001599 dB；8x/128x 则分别为 -6.023392/-6.024933 dB。旧频响脚本对每个节点分别除以自身冲激和，因此只证明了频响形状，没有证明模式间幅度一致。
+
+P1 将 Stage 3 统一为真 Q15，修正 MATLAB、RTL 系数 ROM、统一 RAMB18E1 INIT 与原语测试，恢复完整 38-bit signed 饱和路径，并新增 `±0.01 dB` 绝对增益和 `0.01 dB` 模式间增益差门禁。修复后 4x/8x/128x 为 -0.001599/-0.002709/-0.003480 dB，最大差 0.001881 dB；RTL 10/10 和全链路 0 LSB 回归通过。
+
+修复版 post-route 为 **446 LUT / 471 FF / 5 DSP / 3 BRAM Tile / 2 MMCM**，WNS/WHS **+45.104/+0.121 ns**，功耗 0.271 W。多出的 10 LUT 是恢复 38-bit 饱和检查的正确性成本。完整证据见 [P1 Stage 3 Q 格式修复签核](matlab_fir/national_finals/results/p1_stage3_qformat_fix_summary.md)。
 
 通带指标也统一区分两种定义：
 

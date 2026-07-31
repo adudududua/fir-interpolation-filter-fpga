@@ -79,17 +79,17 @@ module tb_nf_unified_fir_coeff_bram_primitive;
                 6'd21: expected_stage23 = -16'sd4595;
                 6'd22: expected_stage23 =  16'sd1233;
                 6'd23: expected_stage23 = -16'sd203;
-                6'd32: expected_stage23 =  16'sd202;
-                6'd33: expected_stage23 = -16'sd1636;
-                6'd34: expected_stage23 =  16'sd9625;
-                6'd35: expected_stage23 =  16'sd9625;
-                6'd36: expected_stage23 = -16'sd1636;
-                6'd37: expected_stage23 =  16'sd202;
-                6'd48: expected_stage23 = -16'sd74;
-                6'd49: expected_stage23 =  16'sd261;
-                6'd50: expected_stage23 =  16'sd16008;
-                6'd51: expected_stage23 =  16'sd261;
-                6'd52: expected_stage23 = -16'sd74;
+                6'd32: expected_stage23 =  16'sd404;
+                6'd33: expected_stage23 = -16'sd3272;
+                6'd34: expected_stage23 =  16'sd19250;
+                6'd35: expected_stage23 =  16'sd19250;
+                6'd36: expected_stage23 = -16'sd3272;
+                6'd37: expected_stage23 =  16'sd404;
+                6'd48: expected_stage23 = -16'sd148;
+                6'd49: expected_stage23 =  16'sd522;
+                6'd50: expected_stage23 =  16'sd32016;
+                6'd51: expected_stage23 =  16'sd522;
+                6'd52: expected_stage23 = -16'sd148;
                 default: expected_stage23 = 16'sd0;
             endcase
         end
