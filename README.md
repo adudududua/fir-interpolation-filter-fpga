@@ -8,6 +8,44 @@ Vivado 2018.3 对 `XC7A35T-FGG484-2` 的最终布局布线结果为 **440 LUT / 
 
 ### 全国赛版主要改进与优化方法
 
+#### 当前正式结构与资源映射
+
+当前正式版不是全七级 2x FIR，而是将计算密集的低倍率部分保留为 FIR、高倍率部分替换为 CIC：
+
+```text
+signed 24-bit PCM，44.1/48 kHz
+  -> Stage1：105-tap 严格半带 FIR，2x
+  -> Stage2：17-tap FIR，2x
+  -> Stage3：11-tap 平坦 FIR，2x
+  -> [-1, 10, -1]/8 无乘法 CIC 通带均衡器
+  -> CIC16，N=3
+  -> 4x / 8x / 128x 正式输出
+```
+
+DSP48E1 的最终分配如下：
+
+| 运算模块 | DSP 数量 | 复用方法 |
+|---|---:|---|
+| Stage1 | 1 | 严格半带、对称抽头、串行 MAC |
+| Stage2/3 | 1 | 两级按任务时分复用同一颗 DSP |
+| CIC 三级 comb | 1 | 三个周期串行完成三级差分 |
+| CIC 三级 integrator | 3 | 每个 128x 输出使能并行更新 |
+| **总计** | **6** | 控制计数器显式禁止占用 DSP |
+
+正式 Vivado 配置固定为：
+
+```text
+Synthesis directive  = AreaOptimized_high
+Flatten hierarchy    = rebuilt
+Resource sharing     = on
+opt_design directive = Default
+Stage1 DSP preadder  = off
+Serial CIC comb      = on
+Narrow Stage2/3      = on
+```
+
+需要特别说明，Stage1 显式 DSP48 预加器不是当前启用项：在相同 PREG 累加结构上，开启预加器综合为 491 LUT，关闭并采用“织构对称预加 + DSP 乘加”时为 469 LUT，因此正式版按真实综合结果保持关闭。第五轮则把 Q15 舍入改为 DSP 内部的 `16383 + CARRYIN`，并用 Stage3 的系数/输入最坏界证明删除不可能触发的饱和逻辑，最终由上一正式版 461 LUT 降至 **440 LUT**。
+
 1. **双采样率共用滤波数据通路**：44.1 kHz 和 48 kHz 共用同一套 FIR、CIC、DSP、BRAM、定点舍入及饱和逻辑，仅用两路 MMCM 产生两组音频主时钟，再由 `BUFGMUX_CTRL` 完成无毛刺家族切换，避免复制整条插值链。
 2. **三级 2x FIR 加 16x CIC 的 128x 分级结构**：前三级采用 `105 tap 严格半带 FIR -> 17 tap FIR -> 11 tap FIR`，分别形成 4x、8x 正式输出；后端以三级 CIC16 代替四级 2x FIR，把高倍率部分的乘法运算改为加减和累加。
 3. **严格半带、多相和对称抽头优化**：利用半带零系数、线性相位对称性和多相分解，只计算有效抽头；利用 48 MHz 系统时钟相对音频采样使能的周期余量进行串行 MAC，减少并行乘法器和加法树。

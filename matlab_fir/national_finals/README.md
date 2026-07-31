@@ -38,6 +38,33 @@ y[n] = x[n-1] + (2*x[n-1] - x[n] - x[n-2]) / 8
 
 当前正式版布局布线后为 **440 LUT / 464 FF / 191 Slice / 6 DSP / 3 BRAM / 2 MMCM**。相对最初指定的 573 LUT / 621 FF / 255 Slice / 6 DSP CIC 基线，减少 133 LUT、157 FF 和 64 Slice；相对上一轮 461 LUT / 464 FF 正式版再减少 21 LUT 和 8 Slice。DSP、BRAM、MMCM 以及 0.271 W Vectorless 功耗均不增加。
 
+### 2.1 当前正式版优化方法
+
+```text
+24-bit PCM，44.1/48 kHz
+  -> 105-tap 严格半带 FIR 2x
+  -> 17-tap FIR 2x
+  -> 11-tap 平坦 FIR 2x
+  -> [-1,10,-1]/8 移位加减均衡
+  -> CIC16，N=3
+  -> 4x / 8x / 128x
+```
+
+资源压缩方法归纳如下：
+
+1. Stage1 利用严格半带零系数和线性相位对称性，以一颗 DSP 串行完成有效抽头；Stage2/3 再时分复用一颗 DSP。
+2. CIC 三级 comb 在三个空闲周期内复用一颗 DSP，三级 integrator 使用三颗 DSP，总 DSP 固定为 `1 + 1 + 1 + 3 = 6`。
+3. Stage1 与 Stage2/3 直接使用 DSP48E1 PREG 保存 `M+P` 累加状态，取消外部宽位累加器和结果寄存器。
+4. Stage1 的 41-bit 累加宽度由系数绝对值和的最坏界证明；Stage2/3 保持 38-bit 通用累加宽度。
+5. 第五轮 Q15 舍入将 DSP C 输入固定为 16383，仅在非负结果时通过 `CARRYIN` 再加 1，精确等价于原来的非负 `+16384`、负数 `+16383`，同时删除宽常数选择器。
+6. 平坦 Stage3 的系数绝对值和为 22926，20-bit 输入下 MAC 绝对值满足 `22926 × 2^19 < 2^34`；因此 signed 35-bit 视图足够，Q15 输出必然落在 signed 20-bit 内，可删除不可能触发的饱和比较/选择器。
+7. 三级 comb 历史统一为 22 bit 并轮转，让 DSP 输入始终读取固定历史寄存器，删除 23-bit 三选一宽复用器。
+8. Stage1 历史、Stage2/3 历史/系数以及双采样率测试 ROM 使用 6 个 RAMB18E1，即 3 个 BRAM Tile。
+9. CIC 前的 `[-1,10,-1]/8` 均衡器只使用加减和算术右移，不增加 DSP，同时保证 128x 通带和阻带指标。
+10. 正式综合/实现配置为 `AreaOptimized_high + rebuilt + ResourceSharing=on + opt_design Default`，并由 GUI 原生工程和独立脚本两条流程交叉复现。
+
+Stage1 DSP48 预加器经过 A/B 综合后明确淘汰：开启时为 491 个综合 LUT，关闭并使用织构对称预加时为 469 个综合 LUT。因此当前结构是“织构预加 + DSP 乘法/PREG MAC”，不能再描述为已启用 DSP48 预加器。
+
 ## 3. 正式 RTL 冲激指标
 
 以下数据直接来自 XSim 导出的最终 RTL 冲激响应，不是只分析浮点系数。
