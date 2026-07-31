@@ -49,6 +49,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     parameter integer CIC_ORDER = 3,
     parameter integer STAGE3_FLAT = 0,
     parameter integer USE_BRAM_HISTORY = 0,
+    parameter integer USE_UNIFIED_BRAM_HISTORY = 0,
     parameter integer USE_BRAM_COEFF = 0,
     parameter integer USE_PACKED_BRAM = 0,
     parameter integer USE_EXTERNAL_COEFF_BRAM = 0
@@ -161,6 +162,10 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     wire signed [STAGE3_DATA_W-1:0] stage3_lutram_raw;
     reg signed [STAGE2_DATA_W-1:0] stage2_bram_raw;
     reg signed [STAGE3_DATA_W-1:0] stage3_bram_raw;
+    wire signed [STAGE2_DATA_W-1:0] stage23_unified_bram_raw;
+    reg stage3_write_queued;
+    reg [MEM_ADDR_W-1:0] stage3_queued_write_addr;
+    reg signed [STAGE3_DATA_W-1:0] stage3_queued_write_data;
     reg signed [STAGE2_DATA_W-1:0] stage2_packed_raw;
     reg signed [STAGE3_DATA_W-1:0] stage3_packed_raw;
     wire signed [STAGE2_DATA_W-1:0] stage2_mem_raw;
@@ -190,6 +195,14 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     wire [5:0] stage2_packed_read_addr;
     wire [5:0] stage3_packed_read_addr;
     wire signed [COEFF_W-1:0] packed_coeff_raw;
+    wire unified_read_stage3;
+    wire [MEM_ADDR_W-1:0] unified_read_index;
+    wire [MEM_ADDR_W:0] unified_read_addr;
+    wire stage2_history_write_event;
+    wire stage3_history_write_event;
+    wire unified_write_enable;
+    wire [MEM_ADDR_W:0] unified_write_addr;
+    wire signed [STAGE2_DATA_W-1:0] unified_write_data;
 
     integer coeff_init_idx;
     integer coeff_sequence_init_idx;
@@ -254,6 +267,30 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         packed_coeff_read_addr : {2'b00, stage2_bram_read_addr};
     assign stage3_packed_read_addr = coeff_bram_stage3 ?
         {2'b00, stage3_bram_read_addr} : packed_coeff_read_addr;
+    assign unified_read_stage3 = coeff_bram_stage3;
+    assign unified_read_index = job_active ? hist_index + 4'd1 : 4'd0;
+    assign unified_read_addr = {
+        unified_read_stage3,
+        history_read_head + unified_read_index
+    };
+    assign stage2_history_write_event =
+        stage2_ce_out && stage2_phase == 1'b0;
+    assign stage3_history_write_event =
+        stage3_ce_out && stage3_phase == 1'b0;
+    assign unified_write_enable = stage3_write_queued ||
+                                  stage2_history_write_event ||
+                                  stage3_history_write_event;
+    assign unified_write_addr = stage3_write_queued ?
+        {1'b1, stage3_queued_write_addr} :
+        (stage2_history_write_event ? {1'b0, stage2_write_addr} :
+                                      {1'b1, stage3_write_addr});
+    assign unified_write_data = stage3_write_queued ?
+        {{(STAGE2_DATA_W-STAGE3_DATA_W){
+            stage3_queued_write_data[STAGE3_DATA_W-1]}},
+         stage3_queued_write_data} :
+        (stage2_history_write_event ? stage2_x_current :
+         {{(STAGE2_DATA_W-STAGE3_DATA_W){
+            stage3_x_current[STAGE3_DATA_W-1]}}, stage3_x_current});
 
     assign stage2_lutram_raw = stage2_hist_mem[stage2_read_addr];
     assign stage3_lutram_raw = stage3_hist_mem[stage3_read_addr];
@@ -544,6 +581,46 @@ module interp2_stage23_lutram_cic_dsp_ce #(
                 end
             end
         end
+        else if (USE_UNIFIED_BRAM_HISTORY != 0) begin :
+                gen_unified_bram_history
+            assign stage2_mem_raw = stage23_unified_bram_raw;
+            assign stage3_mem_raw =
+                stage23_unified_bram_raw[STAGE3_DATA_W-1:0];
+
+            nf_stage23_history_ramb18_sdp #(
+                .DATA_W(STAGE2_DATA_W),
+                .ADDR_W(MEM_ADDR_W+1)
+            ) u_nf_stage23_history_ramb18_sdp (
+                .clk(clk),
+                .read_addr(unified_read_addr),
+                .read_data(stage23_unified_bram_raw),
+                .write_enable(unified_write_enable),
+                .write_addr(unified_write_addr),
+                .write_data(unified_write_data)
+            );
+
+            // Dedicated write port.  A one-entry queue is sufficient because
+            // phase-zero history writes are separated by at least 16 clocks;
+            // the only collision is a coincident Stage2/Stage3 request.
+            always @(posedge clk) begin
+                if (!rst_n) begin
+                    stage3_write_queued <= 1'b0;
+                    stage3_queued_write_addr <= {MEM_ADDR_W{1'b0}};
+                    stage3_queued_write_data <=
+                        {STAGE3_DATA_W{1'b0}};
+                end
+                else if (stage3_write_queued) begin
+                    stage3_write_queued <= 1'b0;
+                end
+                else if (stage2_history_write_event) begin
+                    if (stage3_history_write_event) begin
+                        stage3_write_queued <= 1'b1;
+                        stage3_queued_write_addr <= stage3_write_addr;
+                        stage3_queued_write_data <= stage3_x_current;
+                    end
+                end
+            end
+        end
         else if (USE_BRAM_HISTORY != 0) begin : gen_bram_history
             assign stage2_mem_raw = stage2_bram_raw;
             assign stage3_mem_raw = stage3_bram_raw;
@@ -697,6 +774,9 @@ module interp2_stage23_lutram_cic_dsp_ce #(
             $fatal(1, "STAGE3_FLAT must be 0 or 1");
         if (USE_BRAM_HISTORY != 0 && USE_BRAM_HISTORY != 1)
             $fatal(1, "USE_BRAM_HISTORY must be 0 or 1");
+        if (USE_UNIFIED_BRAM_HISTORY != 0 &&
+            USE_UNIFIED_BRAM_HISTORY != 1)
+            $fatal(1, "USE_UNIFIED_BRAM_HISTORY must be 0 or 1");
         if (USE_BRAM_COEFF != 0 && USE_BRAM_COEFF != 1)
             $fatal(1, "USE_BRAM_COEFF must be 0 or 1");
     end
@@ -707,6 +787,11 @@ module interp2_stage23_lutram_cic_dsp_ce #(
                 $fatal(1, "Stage 2 LUTRAM pending overwrite");
             if (stage3_ce_out && stage3_pending)
                 $fatal(1, "Stage 3 LUTRAM pending overwrite");
+            if (USE_UNIFIED_BRAM_HISTORY != 0 &&
+                stage3_write_queued &&
+                (stage2_history_write_event ||
+                 stage3_history_write_event))
+                $fatal(1, "Unified Stage2/3 history write queue overflow");
         end
     end
 `endif

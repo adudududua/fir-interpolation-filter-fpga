@@ -102,6 +102,7 @@ $nfSource = Join-Path $sourceRoot 'national_finals'
 $nfSim = Join-Path $simRoot 'national_finals'
 $v7Source = Join-Path $sourceRoot 'all2x_v7'
 $v7Sim = Join-Path $simRoot 'all2x_v7\verification'
+$coeffHeader = Join-Path $sourceRoot 'all2x_v2\all2x_v2_coeff_pkg.vh'
 
 $romDir = Invoke-RtlCase -Name 'rom' `
     -VerilogFiles @(
@@ -125,6 +126,20 @@ $coeffPrimitiveDir = Invoke-RtlCase -Name 'unified_coeff_ramb18_primitive' `
     -XvlogOptions @('-d', 'SYNTHESIS') `
     -XelabOptions @('glbl', '-L', 'unisims_ver')
 
+$stage1SingleBramDir = Invoke-RtlCase -Name 'stage1_single_bram_equivalence' `
+    -VerilogFiles @(
+        (Join-Path $sourceRoot 'all2x_v3\interp2_stage1_strict_halfband_bram_ce.v'),
+        (Join-Path $nfSource 'nf_stage1_history_ramb18_sdp.v'),
+        (Join-Path $nfSource 'interp2_stage1_single_bram_serial_ce.v'),
+        (Join-Path $nfSim 'tb_stage1_single_bram_equiv.v'),
+        $glbl
+    ) `
+    -Top 'tb_stage1_single_bram_equiv' `
+    -Snapshot 'tb_nf_stage1_single_bram_sim' `
+    -ExpectedPassText 'STAGE1 SINGLE BRAM EQUIVALENCE PASS' `
+    -XelabOptions @('glbl', '-L', 'unisims_ver') `
+    -Assets @((Join-Path $sourceRoot 'all2x_v3\all2x_v3_stage1_coeff_pkg.vh'))
+
 $equalizerDir = Invoke-RtlCase -Name 'equalizer' `
     -VerilogFiles @(
         (Join-Path $nfSource 'cic3_compensator_shiftadd_ce.v'),
@@ -133,6 +148,26 @@ $equalizerDir = Invoke-RtlCase -Name 'equalizer' `
     -Top 'tb_cic3_compensator_shiftadd_ce' `
     -Snapshot 'tb_nf_equalizer_sim' `
     -ExpectedPassText 'NF CIC3 SHIFTADD COMPENSATOR PASS samples=2009'
+
+$stage23UnifiedDir = Invoke-RtlCase -Name 'stage23_unified_history' `
+    -VerilogFiles @(
+        (Join-Path $sourceRoot 'all2x_v6\round_sat_shift_compact.v'),
+        (Join-Path $sourceRoot 'all2x_v5\round_sat_q15_compact_to24.v'),
+        (Join-Path $nfSource 'nf_stage23_history_ramb18_sdp.v'),
+        (Join-Path $v7Source 'interp2_stage23_folded_cic_dsp_ce.v'),
+        (Join-Path $v7Source 'interp2_stage23_lutram_cic_dsp_ce.v'),
+        (Join-Path $v7Sim 'tb_stage23_lutram_dsp_equiv.v'),
+        $glbl
+    ) `
+    -Top 'tb_stage23_lutram_dsp_equiv' `
+    -Snapshot 'tb_nf_stage23_unified_history_sim' `
+    -ExpectedPassText 'PASS: Stage 2/3 LUTRAM candidate is 0 LSB equivalent.' `
+    -XvlogOptions @(
+        '-d', 'PHASE7_ENABLE_BRAM_HISTORY',
+        '-d', 'NATIONAL_FINALS_UNIFIED_STAGE23_HISTORY'
+    ) `
+    -XelabOptions @('glbl', '-L', 'unisims_ver') `
+    -Assets @($coeffHeader)
 
 $cicSerialDir = Invoke-RtlCase -Name 'cic_serial_equivalence' `
     -VerilogFiles @(
@@ -199,16 +234,18 @@ $boardDir = Invoke-RtlCase -Name 'board' `
 
 $vectorFiles = Get-ChildItem -LiteralPath (Join-Path $nfRoot 'vectors\daily') -Filter '*.mem' |
     ForEach-Object { $_.FullName }
-$coeffHeader = Join-Path $sourceRoot 'all2x_v2\all2x_v2_coeff_pkg.vh'
 $fullDir = Invoke-RtlCase -Name 'full_chain_bittrue' `
     -VerilogFiles @(
         (Join-Path $sourceRoot 'all2x_v6\round_sat_shift_compact.v'),
         (Join-Path $sourceRoot 'all2x_v3\interp2_stage1_strict_halfband_bram_ce.v'),
+        (Join-Path $nfSource 'nf_stage1_history_ramb18_sdp.v'),
+        (Join-Path $nfSource 'interp2_stage1_single_bram_serial_ce.v'),
         (Join-Path $sourceRoot 'all2x_v6\bridge_valid_quantized_to_interp2_ce.v'),
         (Join-Path $sourceRoot 'all2x_v5\round_sat_q15_compact_to24.v'),
         (Join-Path $v7Source 'interp2_stage23_folded_cic_dsp_ce.v'),
         (Join-Path $v7Source 'interp2_stage23_lutram_cic_dsp_ce.v'),
         (Join-Path $nfSource 'nf_unified_fir_coeff_bram.v'),
+        (Join-Path $nfSource 'nf_stage23_history_ramb18_sdp.v'),
         (Join-Path $nfSource 'cic3_compensator_shiftadd_ce.v'),
         (Join-Path $v7Source 'cic_interp16_core_dsp_ce.v'),
         (Join-Path $nfSource 'cic_interp16_serial_comb_dsp_ce.v'),
@@ -227,6 +264,8 @@ $fullDir = Invoke-RtlCase -Name 'full_chain_bittrue' `
         '-d', 'NATIONAL_FINALS_NARROW_STAGE23',
         '-d', 'PHASE7_USE_LUTRAM_STAGE23',
         '-d', 'PHASE7_USE_BRAM_STAGE23_HISTORY',
+        '-d', 'NATIONAL_FINALS_UNIFIED_STAGE23_HISTORY',
+        '-d', 'NATIONAL_FINALS_SINGLE_BRAM_STAGE1',
         '-d', 'PHASE7_USE_BRAM_STAGE23_COEFF'
     ) `
     -XelabOptions @('glbl', '-L', 'unisims_ver') `
@@ -236,11 +275,14 @@ $resetDir = Invoke-RtlCase -Name 'full_chain_reset_recovery' `
     -VerilogFiles @(
         (Join-Path $sourceRoot 'all2x_v6\round_sat_shift_compact.v'),
         (Join-Path $sourceRoot 'all2x_v3\interp2_stage1_strict_halfband_bram_ce.v'),
+        (Join-Path $nfSource 'nf_stage1_history_ramb18_sdp.v'),
+        (Join-Path $nfSource 'interp2_stage1_single_bram_serial_ce.v'),
         (Join-Path $sourceRoot 'all2x_v6\bridge_valid_quantized_to_interp2_ce.v'),
         (Join-Path $sourceRoot 'all2x_v5\round_sat_q15_compact_to24.v'),
         (Join-Path $v7Source 'interp2_stage23_folded_cic_dsp_ce.v'),
         (Join-Path $v7Source 'interp2_stage23_lutram_cic_dsp_ce.v'),
         (Join-Path $nfSource 'nf_unified_fir_coeff_bram.v'),
+        (Join-Path $nfSource 'nf_stage23_history_ramb18_sdp.v'),
         (Join-Path $nfSource 'cic3_compensator_shiftadd_ce.v'),
         (Join-Path $v7Source 'cic_interp16_core_dsp_ce.v'),
         (Join-Path $nfSource 'cic_interp16_serial_comb_dsp_ce.v'),
@@ -258,6 +300,8 @@ $resetDir = Invoke-RtlCase -Name 'full_chain_reset_recovery' `
         '-d', 'NATIONAL_FINALS_USE_N3_HOLD',
         '-d', 'PHASE7_USE_LUTRAM_STAGE23',
         '-d', 'PHASE7_USE_BRAM_STAGE23_HISTORY',
+        '-d', 'NATIONAL_FINALS_UNIFIED_STAGE23_HISTORY',
+        '-d', 'NATIONAL_FINALS_SINGLE_BRAM_STAGE1',
         '-d', 'PHASE7_USE_BRAM_STAGE23_COEFF'
     ) `
     -XelabOptions @('glbl', '-L', 'unisims_ver') `
@@ -267,11 +311,14 @@ $dynamicDir = Invoke-RtlCase -Name 'dynamic_mode_switch' `
     -VerilogFiles @(
         (Join-Path $sourceRoot 'all2x_v6\round_sat_shift_compact.v'),
         (Join-Path $sourceRoot 'all2x_v3\interp2_stage1_strict_halfband_bram_ce.v'),
+        (Join-Path $nfSource 'nf_stage1_history_ramb18_sdp.v'),
+        (Join-Path $nfSource 'interp2_stage1_single_bram_serial_ce.v'),
         (Join-Path $sourceRoot 'all2x_v6\bridge_valid_quantized_to_interp2_ce.v'),
         (Join-Path $sourceRoot 'all2x_v5\round_sat_q15_compact_to24.v'),
         (Join-Path $v7Source 'interp2_stage23_folded_cic_dsp_ce.v'),
         (Join-Path $v7Source 'interp2_stage23_lutram_cic_dsp_ce.v'),
         (Join-Path $nfSource 'nf_unified_fir_coeff_bram.v'),
+        (Join-Path $nfSource 'nf_stage23_history_ramb18_sdp.v'),
         (Join-Path $nfSource 'cic3_compensator_shiftadd_ce.v'),
         (Join-Path $v7Source 'cic_interp16_core_dsp_ce.v'),
         (Join-Path $nfSource 'cic_interp16_serial_comb_dsp_ce.v'),
@@ -305,5 +352,5 @@ if ($PublishImpulseOutputs) {
 }
 
 Write-Host ''
-Write-Host 'NATIONAL FINALS RTL REGRESSION PASS (12/12)'
+Write-Host 'NATIONAL FINALS RTL REGRESSION PASS (14/14)'
 Write-Host "Run directory: $runRoot"

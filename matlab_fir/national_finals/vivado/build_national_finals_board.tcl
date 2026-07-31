@@ -57,6 +57,9 @@ set result_dir [file normalize [file join $script_dir .. vivado_results $result_
 
 set nf_sources [list \
     [file join $nf_src_dir nf_unified_fir_coeff_bram.v] \
+    [file join $nf_src_dir nf_stage1_history_ramb18_sdp.v] \
+    [file join $nf_src_dir interp2_stage1_single_bram_serial_ce.v] \
+    [file join $nf_src_dir nf_stage23_history_ramb18_sdp.v] \
     [file join $nf_src_dir cic3_compensator_shiftadd_ce.v] \
     [file join $nf_src_dir cic_interp16_serial_comb_dsp_ce.v] \
     [file join $nf_src_dir cic_interp16_n3_hold2_dsp_ce.v] \
@@ -120,6 +123,8 @@ set_property generic [list \
     COMPACT_KEYPAD_SCAN_DIV=20000 \
     USE_SHARED_KEYPAD_SCAN_TICK=1 \
     USE_PHASE7_BRAM_STAGE23_HISTORY=1 \
+    USE_PHASE7_UNIFIED_BRAM_STAGE23_HISTORY=1 \
+    USE_NATIONAL_FINALS_SINGLE_BRAM_STAGE1=1 \
     USE_PHASE7_BRAM_STAGE23_COEFF=1 \
     USE_PHASE8_PACKED_BRAM_STAGE23=0 \
     USE_PHASE7_CIC_BURST_COUNTER_DSP=0 \
@@ -226,10 +231,11 @@ puts $manifest_handle "Bitstream: $bitstream_dst"
 puts $manifest_handle "44.1-kHz family 128x clock: 5.644796 MHz (-0.64 ppm nominal)"
 puts $manifest_handle "48-kHz family 128x clock: 6.144068 MHz (+11.03 ppm nominal)"
 puts $manifest_handle "Architecture: shared 2x/2x/2x FIR + shift-add CIC equalizer + exact N3 Hold CIC16 with two DSP integrators"
-puts $manifest_handle "CIC DSP mapping: serial low-rate comb uses LUT CARRY4; three high-rate integrators use DSP48E1"
+puts $manifest_handle "CIC DSP mapping: two low-rate combs use LUT CARRY4; exact Hold16 feeds two high-rate DSP48E1 integrators"
 puts $manifest_handle "Equalizer headroom optimization: lossless 21-bit equalizer output feeds a 21-bit CIC input; clipping is deferred to the final 20-bit CIC quantizer"
 puts $manifest_handle "Synthesis directive: AreaOptimized_high"
 puts $manifest_handle "Stage1 DSP48 preadder: $stage1_dsp48_preadder"
+puts $manifest_handle "Stage1 history: one RAMB18, current-sample bypass plus serialized symmetric reads"
 puts $manifest_handle "Rounding: constant 16383 plus DSP48 CARRYIN for non-negative MAC sums"
 puts $manifest_handle "Stage3: proven 35-bit MAC bound removes unreachable 20-bit saturation logic"
 puts $manifest_handle "Implementation opt directive: Default"

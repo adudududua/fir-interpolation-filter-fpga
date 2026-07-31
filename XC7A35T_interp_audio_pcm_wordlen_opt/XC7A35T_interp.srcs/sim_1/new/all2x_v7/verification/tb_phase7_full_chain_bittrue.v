@@ -145,6 +145,16 @@ module tb_phase7_full_chain_bittrue;
 `else
         .USE_BRAM_STAGE23_HISTORY(0),
 `endif
+`ifdef NATIONAL_FINALS_UNIFIED_STAGE23_HISTORY
+        .USE_UNIFIED_BRAM_STAGE23_HISTORY(1),
+`else
+        .USE_UNIFIED_BRAM_STAGE23_HISTORY(0),
+`endif
+`ifdef NATIONAL_FINALS_SINGLE_BRAM_STAGE1
+        .USE_SINGLE_BRAM_STAGE1(1),
+`else
+        .USE_SINGLE_BRAM_STAGE1(0),
+`endif
 `ifdef PHASE7_USE_BRAM_STAGE23_COEFF
         .USE_BRAM_STAGE23_COEFF(1),
 `else

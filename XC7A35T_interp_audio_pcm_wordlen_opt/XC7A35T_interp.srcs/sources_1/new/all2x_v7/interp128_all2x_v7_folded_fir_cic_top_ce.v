@@ -44,6 +44,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     parameter integer STAGE3_FLAT = 0,
     parameter integer USE_CIC3_SHIFTADD_COMPENSATOR = 0,
     parameter integer USE_BRAM_STAGE23_HISTORY = 0,
+    parameter integer USE_UNIFIED_BRAM_STAGE23_HISTORY = 0,
+    parameter integer USE_SINGLE_BRAM_STAGE1 = 0,
     parameter integer USE_BRAM_STAGE23_COEFF = 0,
     parameter integer USE_PACKED_BRAM_STAGE23 = 0,
     parameter integer CIC_BURST_COUNTER_USE_DSP = 0,
@@ -121,19 +123,38 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
         end
     endgenerate
 
-    interp2_stage1_strict_halfband_bram_ce #(
-        .DATA_W (24),
-        .ACC_W(STAGE1_ACC_W),
-        .USE_DSP48_PREADDER(USE_STAGE1_DSP48_PREADDER),
-        .USE_EXTERNAL_COEFF_BRAM(USE_UNIFIED_FIR_COEFF_BRAM)
-    ) u_interp2_stage1_strict_halfband_bram_ce (
-        .clk(clk), .rst_n(rst_n), .ce_out(ce2_out),
-        .x_in(x_in), .x_in_valid(x_in_valid),
-        .y_out(y2_w), .y_out_valid(y2_valid_w),
-        .phase_dbg(), .fir_in_dbg(), .fir_in_valid_dbg(),
-        .external_coeff_addr(stage1_coeff_addr_w),
-        .external_coeff_data(stage1_coeff_data_w)
-    );
+    generate
+        if (USE_SINGLE_BRAM_STAGE1 != 0) begin : gen_single_bram_stage1
+            interp2_stage1_single_bram_serial_ce #(
+                .DATA_W(24),
+                .ACC_W(STAGE1_ACC_W),
+                .USE_DSP48_PREADDER(USE_STAGE1_DSP48_PREADDER),
+                .USE_EXTERNAL_COEFF_BRAM(USE_UNIFIED_FIR_COEFF_BRAM)
+            ) u_interp2_stage1_strict_halfband_bram_ce (
+                .clk(clk), .rst_n(rst_n), .ce_out(ce2_out),
+                .x_in(x_in), .x_in_valid(x_in_valid),
+                .y_out(y2_w), .y_out_valid(y2_valid_w),
+                .phase_dbg(), .fir_in_dbg(), .fir_in_valid_dbg(),
+                .external_coeff_addr(stage1_coeff_addr_w),
+                .external_coeff_data(stage1_coeff_data_w)
+            );
+        end
+        else begin : gen_dual_bram_stage1
+            interp2_stage1_strict_halfband_bram_ce #(
+                .DATA_W(24),
+                .ACC_W(STAGE1_ACC_W),
+                .USE_DSP48_PREADDER(USE_STAGE1_DSP48_PREADDER),
+                .USE_EXTERNAL_COEFF_BRAM(USE_UNIFIED_FIR_COEFF_BRAM)
+            ) u_interp2_stage1_strict_halfband_bram_ce (
+                .clk(clk), .rst_n(rst_n), .ce_out(ce2_out),
+                .x_in(x_in), .x_in_valid(x_in_valid),
+                .y_out(y2_w), .y_out_valid(y2_valid_w),
+                .phase_dbg(), .fir_in_dbg(), .fir_in_valid_dbg(),
+                .external_coeff_addr(stage1_coeff_addr_w),
+                .external_coeff_data(stage1_coeff_data_w)
+            );
+        end
+    endgenerate
 
     bridge_valid_quantized_to_interp2_ce #(
         .IN_W(24), .OUT_W(22), .SHIFT_N(2)
@@ -165,6 +186,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
                 .CIC_ORDER(CIC_ORDER),
                 .STAGE3_FLAT(STAGE3_FLAT),
                 .USE_BRAM_HISTORY(USE_BRAM_STAGE23_HISTORY),
+                .USE_UNIFIED_BRAM_HISTORY(
+                    USE_UNIFIED_BRAM_STAGE23_HISTORY),
                 .USE_BRAM_COEFF(USE_BRAM_STAGE23_COEFF),
                 .USE_PACKED_BRAM(USE_PACKED_BRAM_STAGE23),
                 .USE_EXTERNAL_COEFF_BRAM(USE_UNIFIED_FIR_COEFF_BRAM)
@@ -324,6 +347,9 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
             $fatal(1, "Serial CIC comb candidate requires CIC_ORDER=3");
         if (USE_N3_HOLD_EQUIV != 0 && CIC_ORDER != 3)
             $fatal(1, "N=3 Hold CIC rewrite requires CIC_ORDER=3");
+        if (USE_SINGLE_BRAM_STAGE1 != 0 &&
+            USE_SINGLE_BRAM_STAGE1 != 1)
+            $fatal(1, "USE_SINGLE_BRAM_STAGE1 must be 0 or 1");
     end
 
     always @(posedge clk) begin

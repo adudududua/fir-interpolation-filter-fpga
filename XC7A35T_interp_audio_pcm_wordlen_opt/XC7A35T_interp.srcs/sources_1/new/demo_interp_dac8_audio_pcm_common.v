@@ -44,6 +44,8 @@ module demo_interp_dac8_audio_pcm_common #(
     parameter integer USE_PHASE7_FOLDED = 1,
     parameter integer USE_PHASE7_LUTRAM_STAGE23 = 0,
     parameter integer USE_PHASE7_BRAM_STAGE23_HISTORY = 0,
+    parameter integer USE_PHASE7_UNIFIED_BRAM_STAGE23_HISTORY = 0,
+    parameter integer USE_NATIONAL_FINALS_SINGLE_BRAM_STAGE1 = 0,
     parameter integer USE_PHASE7_BRAM_STAGE23_COEFF = 0,
     parameter integer USE_PHASE8_PACKED_BRAM_STAGE23 = 0,
     parameter integer USE_PHASE7_CIC_BURST_COUNTER_DSP = 0,
@@ -258,6 +260,10 @@ module demo_interp_dac8_audio_pcm_common #(
                 .USE_CIC3_SHIFTADD_COMPENSATOR(
                     USE_NATIONAL_FINALS_DATAPATH),
                 .USE_BRAM_STAGE23_HISTORY(USE_PHASE7_BRAM_STAGE23_HISTORY),
+                .USE_UNIFIED_BRAM_STAGE23_HISTORY(
+                    USE_PHASE7_UNIFIED_BRAM_STAGE23_HISTORY),
+                .USE_SINGLE_BRAM_STAGE1(
+                    USE_NATIONAL_FINALS_SINGLE_BRAM_STAGE1),
                 .USE_BRAM_STAGE23_COEFF(USE_PHASE7_BRAM_STAGE23_COEFF),
                 .USE_PACKED_BRAM_STAGE23(USE_PHASE8_PACKED_BRAM_STAGE23),
                 .CIC_BURST_COUNTER_USE_DSP(

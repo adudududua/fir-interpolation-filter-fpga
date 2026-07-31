@@ -21,10 +21,10 @@
 | P2 验证闭环 | 完成 | 六工况频响、冲激/随机 0 LSB、负向增益测试和 XSim 回归恢复 |
 | P3 工程闭环 | 软件侧完成 | 原子模式 CDC、同步复位、MMCM 锁定同步、ODDR 时钟转发、IOB 数据寄存器、AD9708 STA；物理板切换仍待现场 |
 | P4-A N3 Hold | 软件/工具侧完成 | 旧 `C³→↑16→I³` 严格改写为 `C²→Hold16→I²`；12/12 XSim、7680 个 CIC 输出和全链路均 0 LSB；post-route `491 LUT / 444 FF / 197 Slice / 4 DSP / 3 BRAM Tile` |
-| P4-B BRAM 调度 | 待执行 | Stage 1 单 RAM 串行双读和 Stage 2/3 合并历史分别验证，联合目标 3 -> 2 Tile |
+| P4-B BRAM 调度 | 软件/工具侧完成 | Stage 1 单 RAM 串行双读、Stage 2/3 统一历史；14/14 XSim，post-route `504 LUT / 493 FF / 202 Slice / 4 DSP / 2 BRAM Tile`，WNS/WHS `+45.637/+0.119 ns` |
 | P5 研究支线 | 暂不进入主线 | 仅从已经验证的标签另开分支 |
 
-P3 的详细实测证据见 [P3 工程闭环签核](p3_engineering_closure_summary.md)，P4-A 见 [N3 Hold 4-DSP 签核](p4a_n3_hold_4dsp_summary.md)。
+P3 的详细实测证据见 [P3 工程闭环签核](p3_engineering_closure_summary.md)，P4-A 见 [N3 Hold 4-DSP 签核](p4a_n3_hold_4dsp_summary.md)，P4-B 见 [单 BRAM 4-DSP 签核](p4b_single_bram_4dsp_summary.md)。
 
 ## 继续执行规则
 

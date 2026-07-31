@@ -31,6 +31,11 @@ module tb_phase7_full_chain_reset_recovery;
 `else
 `define DUT_STAGE23 u_dut.gen_register_stage23.u_interp2_stage23_folded_cic_dsp_ce
 `endif
+`ifdef NATIONAL_FINALS_SINGLE_BRAM_STAGE1
+`define DUT_STAGE1 u_dut.gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce
+`else
+`define DUT_STAGE1 u_dut.gen_dual_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce
+`endif
 `ifdef NATIONAL_FINALS_USE_N3_HOLD
 `define DUT_CIC u_dut.gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce
 `elsif NATIONAL_FINALS_USE_SERIAL_CIC_COMB
@@ -90,6 +95,16 @@ module tb_phase7_full_chain_reset_recovery;
 `else
         .USE_BRAM_STAGE23_HISTORY(0),
 `endif
+`ifdef NATIONAL_FINALS_UNIFIED_STAGE23_HISTORY
+        .USE_UNIFIED_BRAM_STAGE23_HISTORY(1),
+`else
+        .USE_UNIFIED_BRAM_STAGE23_HISTORY(0),
+`endif
+`ifdef NATIONAL_FINALS_SINGLE_BRAM_STAGE1
+        .USE_SINGLE_BRAM_STAGE1(1),
+`else
+        .USE_SINGLE_BRAM_STAGE1(0),
+`endif
 `ifdef PHASE7_USE_BRAM_STAGE23_COEFF
         .USE_BRAM_STAGE23_COEFF(1),
 `else
@@ -146,6 +161,16 @@ module tb_phase7_full_chain_reset_recovery;
         .USE_BRAM_STAGE23_HISTORY(1),
 `else
         .USE_BRAM_STAGE23_HISTORY(0),
+`endif
+`ifdef NATIONAL_FINALS_UNIFIED_STAGE23_HISTORY
+        .USE_UNIFIED_BRAM_STAGE23_HISTORY(1),
+`else
+        .USE_UNIFIED_BRAM_STAGE23_HISTORY(0),
+`endif
+`ifdef NATIONAL_FINALS_SINGLE_BRAM_STAGE1
+        .USE_SINGLE_BRAM_STAGE1(1),
+`else
+        .USE_SINGLE_BRAM_STAGE1(0),
 `endif
 `ifdef PHASE7_USE_BRAM_STAGE23_COEFF
         .USE_BRAM_STAGE23_COEFF(1),
@@ -258,7 +283,7 @@ module tb_phase7_full_chain_reset_recovery;
             ready_value = 1'b0;
             case (test_scenario)
                 1: ready_value =
-                    u_dut.u_interp2_stage1_strict_halfband_bram_ce.mac_active;
+                    `DUT_STAGE1.mac_active;
                 2: ready_value =
                     `DUT_STAGE23.stage2_pending;
                 3: ready_value =
@@ -299,7 +324,7 @@ module tb_phase7_full_chain_reset_recovery;
             @(negedge clk);
             if (dut_y4_valid !== 1'b0 || dut_y8_valid !== 1'b0 ||
                     dut_y128_valid !== 1'b0 ||
-                    u_dut.u_interp2_stage1_strict_halfband_bram_ce.mac_active !== 1'b0 ||
+                    `DUT_STAGE1.mac_active !== 1'b0 ||
                     `DUT_STAGE23.stage2_pending !== 1'b0 ||
                     `DUT_STAGE23.stage3_pending !== 1'b0 ||
                     `DUT_STAGE23.job_active !== 1'b0)

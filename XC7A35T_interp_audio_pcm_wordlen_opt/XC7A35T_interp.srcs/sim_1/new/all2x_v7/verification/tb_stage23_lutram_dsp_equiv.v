@@ -41,6 +41,11 @@ module tb_stage23_lutram_dsp_equiv;
 `else
     localparam integer CANDIDATE_USE_BRAM_HISTORY = 0;
 `endif
+`ifdef NATIONAL_FINALS_UNIFIED_STAGE23_HISTORY
+    localparam integer CANDIDATE_USE_UNIFIED_BRAM_HISTORY = 1;
+`else
+    localparam integer CANDIDATE_USE_UNIFIED_BRAM_HISTORY = 0;
+`endif
 `ifdef PHASE7_ENABLE_BRAM_COEFF
     localparam integer CANDIDATE_USE_BRAM_COEFF = 1;
 `else
@@ -123,6 +128,8 @@ module tb_stage23_lutram_dsp_equiv;
         .ACC_W(38),
         .CIC_ORDER(3),
         .USE_BRAM_HISTORY(CANDIDATE_USE_BRAM_HISTORY),
+        .USE_UNIFIED_BRAM_HISTORY(
+            CANDIDATE_USE_UNIFIED_BRAM_HISTORY),
         .USE_BRAM_COEFF(CANDIDATE_USE_BRAM_COEFF),
         .USE_PACKED_BRAM(CANDIDATE_USE_PACKED_BRAM)
     ) u_candidate (

@@ -1,0 +1,21 @@
+National-finals dual-rate board build
+Project: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.xpr
+Part: xc7a35tfgg484-2
+Top: board_demo_competition_dac8_top
+Bitstream: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/vivado_results/board_dual_rate_p4b2_bram2_v1/national_finals_dual_rate_4x8x128x_areaopt.bit
+44.1-kHz family 128x clock: 5.644796 MHz (-0.64 ppm nominal)
+48-kHz family 128x clock: 6.144068 MHz (+11.03 ppm nominal)
+Architecture: shared 2x/2x/2x FIR + shift-add CIC equalizer + exact N3 Hold CIC16 with two DSP integrators
+CIC DSP mapping: two low-rate combs use LUT CARRY4; exact Hold16 feeds two high-rate DSP48E1 integrators
+Equalizer headroom optimization: lossless 21-bit equalizer output feeds a 21-bit CIC input; clipping is deferred to the final 20-bit CIC quantizer
+Synthesis directive: AreaOptimized_high
+Stage1 DSP48 preadder: 0
+Stage1 history: one RAMB18, current-sample bypass plus serialized symmetric reads
+Rounding: constant 16383 plus DSP48 CARRYIN for non-negative MAC sums
+Stage3: proven 35-bit MAC bound removes unreachable 20-bit saturation logic
+Implementation opt directive: Default
+Post-route resources: 504 LUT / 493 FF / 202 Slice / 4 DSP48E1 / 4 RAMB18E1 (2 BRAM Tile) / 2 MMCM
+Timing: WNS/TNS +45.637/0 ns; WHS/THS +0.119/0 ns; zero failing endpoints
+Power: 0.271 W total; 0.199 W dynamic; 0.072 W static; Medium confidence
+RTL regression: 14/14 PASS; run 20260801_022831
+Bitstream SHA-256: DA0665E43A8DA5230AB93FC786AB0EED47BD83FE393C9B1416BA3360B8DE5E85

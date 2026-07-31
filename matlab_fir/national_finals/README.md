@@ -1,8 +1,8 @@
 # 全国总决赛：双采样率可配置插值滤波器
 
-当前 P3 工程基线已完成 MATLAB 建模、24 bit 定点模型、11 项 XSim 回归、Vivado 综合/布局布线/时序/DRC/CDC/功耗评估和 bitstream 生成。所有可在当前环境执行的软件与 FPGA 工具验收均已通过；由于当前环境无法接触实物开发板，物理板下载和仪器测量仍需按本文最后一节执行，不能把 bitstream 成功等同于实板通过。
+当前 P4-B 候选已完成 MATLAB 建模、24 bit 定点模型、14 项 XSim 回归、Vivado 综合/布局布线/时序/DRC/CDC/功耗评估和 bitstream 生成。所有可在当前环境执行的软件与 FPGA 工具验收均已通过；由于当前环境无法接触实物开发板，物理板下载和仪器测量仍需按本文最后一节执行，不能把 bitstream 成功等同于实板通过。
 
-当前结构优化起点为 P3：`462 LUT / 447 FF / 180 Slice / 5 DSP / 3 BRAM / 2 MMCM`。它继承 P1 真 Q15 修复，并增加原子 CDC、同步复位和 AD9708 输出时序闭环。复核发现旧 Route 1 `424 LUT / 6 DSP` 与低 DSP `436 LUT / 5 DSP` 的 Stage 3 系数实际为 Q14 幅度、MAC 却按 Q15 右移，导致 8x/128x 绝对增益约为 -6.02 dB；这些旧版本只保留为资源演进历史，不再作为发布候选。指导评估、阶段进度和回退规则见 [下一阶段优化指导执行记录](results/next_stage_optimization_guide_execution.md)。
+当前可发布 Pareto 点为 P3 `462 LUT / 447 FF / 5 DSP / 3 BRAM Tile`、P4-A `491 LUT / 444 FF / 4 DSP / 3 BRAM Tile` 和 P4-B `504 LUT / 493 FF / 4 DSP / 2 BRAM Tile`。三版均继承 P1 真 Q15 修复和 P3 的原子 CDC、同步复位、AD9708 输出时序闭环。复核发现旧 Route 1 `424 LUT / 6 DSP` 与低 DSP `436 LUT / 5 DSP` 的 Stage 3 系数实际为 Q14 幅度、MAC 却按 Q15 右移，导致 8x/128x 绝对增益约为 -6.02 dB；这些旧版本只保留为资源演进历史，不再作为发布候选。指导评估、阶段进度和回退规则见 [下一阶段优化指导执行记录](results/next_stage_optimization_guide_execution.md)。
 
 ## 0. P1：Stage 3 真 Q15 与绝对增益闭环
 
@@ -27,6 +27,14 @@ CDC 报告中专用 `BUFGMUX_CTRL` 选择入口和 bundled-data shadow bus 分�
 独立等价测试覆盖连续 320 组、随机停顿 480 组、复位中断与 7680 个输出样本；完整 RTL 回归扩展为 **12/12 PASS**，Stage1/2/3/128x 全链路仍为 0 LSB。post-route 为 **491 LUT / 444 FF / 197 Slice / 4 DSP / 3 BRAM Tile / 2 MMCM / 17 IO**，WNS/WHS 为 **+45.738/+0.052 ns**，AD9708 最差输出 setup/hold 仍为 **+76.116/+78.117 ns**，功耗 **0.271 W**。bitstream SHA-256 为 `D262BA94186D992016FE9FACD157E34FDB29EDF0F9A3433A38833A65B101C334`。
 
 这是 DSP 优先 Pareto 点：相对 P3 少 1 DSP、少 3 FF，但增加 29 LUT 和 17 Slice，不能表述为所有资源同时下降。详细验证和 waiver 见 [P4-A N3 Hold 签核](results/p4a_n3_hold_4dsp_summary.md)。
+
+## P4-B：Stage 1/2/3 历史 RAM 时分复用，3 降至 2 BRAM Tile
+
+P4-B 保持 P4-A 的 4-DSP N3 Hold 数值路径，只优化历史存储。Stage 1 把当前输入旁路为第 0 对左样本，单 RAMB18E1 按 `R0,L1,R1,...,L25,R25` 连续读取其余对称样本，约 53 拍完成 26 次 MAC，满足 64 拍截止期。Stage 2/3 用 bank 地址共享一个 32×22-bit RAMB18E1，同拍双写冲突由一项 Stage 3 写队列吸收。两处均使用显式 SDP RAMB18E1，防止 Vivado 回退为 LUTRAM。
+
+完整回归为 **14/14 PASS**：Stage 1 新旧核 1400 输出 0 LSB、Stage 2/3 分别 336/671 输出 0 LSB、N3 Hold 7680 输出 0 LSB，并通过全链随机/冲激、8 种内部状态复位、1200 次原子 CDC、100 次家族切换和 10 次不停机倍率切换。post-route 为 **504 LUT / 493 FF / 202 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM / 17 IO**，WNS/WHS **+45.637/+0.119 ns**，功耗 **0.271 W**，bitstream SHA-256 为 `DA0665E43A8DA5230AB93FC786AB0EED47BD83FE393C9B1416BA3360B8DE5E85`。
+
+相对 P4-A，P4-B 多 13 LUT、49 FF 和 5 Slice，少 1 BRAM Tile；因此 P4-A 与 P4-B 分别作为低 LUT/FF 与低 BRAM 的 4-DSP 回退点保留。详细证据见 [P4-B 单 BRAM 签核](results/p4b_single_bram_4dsp_summary.md)。
 
 ## 0.1 Route 1：统一双端口系数 RAM（历史资源点）
 
@@ -82,7 +90,7 @@ USE_NATIONAL_FINALS_CIC_COMB_DSP   = 0
                                 +-- 4x 输出    +-- 8x 输出
                                                |
                                                +-> [-1,10,-1]/8 移位加减均衡
-                                                   -> CIC16, N=3 -> 128x 输出
+                                                   -> C² -> Hold16 -> I² -> 128x 输出
 ```
 
 44.1 kHz 与 48 kHz 共用同一 FIR/CIC 数据通路、DSP 和数据 BRAM，只增加两路 MMCM 与一个 `BUFGMUX_CTRL`。128x 支路的三抽头对称均衡器为
@@ -93,7 +101,7 @@ y[n] = x[n-1] + (2*x[n-1] - x[n] - x[n-2]) / 8
 
 它仅用加减和算术右移，不增加乘法器；4x/8x 输出保持平坦 FIR 响应。双采样率板级测试正弦也打包在同一个 256×24 bit ROM 中。
 
-第七轮434-LUT基线布局布线后为 **434 LUT / 469 FF / 190 Slice / 6 DSP / 3 BRAM / 2 MMCM**。相对最初指定的573 LUT / 621 FF / 255 Slice / 6 DSP CIC基线，减少139 LUT、152 FF和65 Slice；Route 1在此基础上继续降到424 LUT。当前第八轮则以12个LUT为代价把DSP由6降到5，并把Slice由188降到181，具体见第0节和第5.1节。
+第七轮434-LUT基线布局布线后为 **434 LUT / 469 FF / 190 Slice / 6 DSP / 3 BRAM / 2 MMCM**。相对最初指定的573 LUT / 621 FF / 255 Slice / 6 DSP CIC基线，减少139 LUT、152 FF和65 Slice；Route 1和第八轮是后续历史资源点。完成 P1 标度修复和 P3 工程闭环后，P4-A 以 N3 Hold 降至4 DSP，P4-B 再把历史存储从3降至2 BRAM Tile；当前 post-route 为 **504 LUT / 493 FF / 202 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM**。
 
 ### 2.1 第七轮434-LUT基线优化方法
 
@@ -116,7 +124,7 @@ y[n] = x[n-1] + (2*x[n-1] - x[n] - x[n-2]) / 8
 5. 第五轮 Q15 舍入将 DSP C 输入固定为 16383，仅在非负结果时通过 `CARRYIN` 再加 1，精确等价于原来的非负 `+16384`、负数 `+16383`，同时删除宽常数选择器。
 6. 平坦 Stage3 的系数绝对值和为 22926，20-bit 输入下 MAC 绝对值满足 `22926 × 2^19 < 2^34`；因此 signed 35-bit 视图足够，Q15 输出必然落在 signed 20-bit 内，可删除不可能触发的饱和比较/选择器。
 7. 三级 comb 历史统一为 22 bit 并轮转，让 DSP 输入始终读取固定历史寄存器，删除 23-bit 三选一宽复用器。
-8. Stage1 历史、Stage2/3 历史/系数以及双采样率测试 ROM 使用 6 个 RAMB18E1，即 3 个 BRAM Tile。
+8. P4-B 中 Stage1 历史使用单 RAMB18E1 串行双读，Stage2/3 历史按 bank 合并为另一个 RAMB18E1；加上统一系数和测试 ROM，全机使用 4 个 RAMB18E1，即 2 个 BRAM Tile。
 9. CIC 前的 `[-1,10,-1]/8` 均衡器只使用加减和算术右移，不增加 DSP；当前版无损保留 21-bit 自然峰值余量，并把 20-bit 饱和统一后移到 CIC 最终输出量化器，避免中间重复削顶逻辑。
 10. 正式综合/实现配置为 `AreaOptimized_high + rebuilt + ResourceSharing=on + opt_design Default`，并由 GUI 原生工程和独立脚本两条流程交叉复现。
 11. 均衡器单元测试同时实例化 20-bit 兼容输出与 21-bit 余量输出，对 2009 组含正负满量程样本分别检查饱和结果和未削顶精确结果。
@@ -158,11 +166,11 @@ Vivado routed checkpoint 的 DSP48 属性核查表明，新增状态实际进入
 | 输入采样率 | 输出 | 通带最大绝对偏差 | 通带峰峰值 | 阻带衰减 | 冲激对称误差 | 判定 |
 |---:|---:|---:|---:|---:|---:|---|
 | 44.1 kHz | 4x / 176.4 kHz | 0.004610 dB | 0.005703 dB | 78.669 dB | 0 LSB | PASS |
-| 44.1 kHz | 8x / 352.8 kHz | 0.005495 dB | 0.006274 dB | 78.161 dB | 0 LSB | PASS |
-| 44.1 kHz | 128x / 5.6448 MHz | 0.006918 dB | 0.008111 dB | 72.348 dB | 0 LSB | PASS |
+| 44.1 kHz | 8x / 352.8 kHz | 0.005395 dB | 0.006174 dB | 78.562 dB | 0 LSB | PASS |
+| 44.1 kHz | 128x / 5.6448 MHz | 0.006116 dB | 0.008056 dB | 72.331 dB | 0 LSB | PASS |
 | 48 kHz | 4x / 192 kHz | 0.004610 dB | 0.005703 dB | 78.669 dB | 0 LSB | PASS |
-| 48 kHz | 8x / 384 kHz | 0.005495 dB | 0.005738 dB | 78.161 dB | 0 LSB | PASS |
-| 48 kHz | 128x / 6.144 MHz | 0.006918 dB | 0.006917 dB | 72.348 dB | 0 LSB | PASS |
+| 48 kHz | 8x / 384 kHz | 0.005395 dB | 0.005719 dB | 78.562 dB | 0 LSB | PASS |
+| 48 kHz | 128x / 6.144 MHz | 0.006116 dB | 0.006116 dB | 72.331 dB | 0 LSB | PASS |
 
 所有六工况均满足 ±0.05 dB 和 70 dB 门槛，冲激响应逐点严格对称，拟合相位残差最大约 `1.42e-13 rad`。
 
@@ -176,16 +184,20 @@ Vivado routed checkpoint 的 DSP48 属性核查表明，新增状态实际进入
 |---|---|---|
 | ROM | 双采样率数据、回卷、同步复位 | PASS |
 | 统一系数 RAMB18E1 原语 | A/B 双端口共 96 个地址逐点核对 | PASS |
+| Stage 1 单 BRAM 等价 | 新旧核 1400 个输出、valid 和数据逐拍比较 | PASS，0 LSB |
+| Stage 2/3 统一历史 | Stage 2/3 分别比较 336/671 个输出 | PASS，0 LSB |
 | 移位加减均衡器 | 2009 个定向样本 | PASS |
 | 串行 comb CIC 等价性 | 连续、停顿、burst 中复位和 3840 个输出 | PASS |
+| N3 Hold CIC 等价性 | 连续320、停顿480、复位中断，共7680输出 | PASS，0 LSB |
 | MMCM/BUFGMUX | 双频率、往返切换、无 runt 高脉冲 | PASS |
+| 模式 CDC 握手 | 1200 次全方向事务，原子提交和逐次 ACK | PASS |
 | 矩阵键盘 | SW1～SW8 家族/倍率映射 | PASS |
 | 板级顶层 | 上电复位、共享扫描、SW2、SW6、保护切换 | PASS |
 | 全链路 bit-true | impulse + 固定种子随机 PCM；4x/8x/128x | PASS，0 LSB |
 | 全链路复位恢复 | 8 个内部状态场景，每场景比较 4096 个 128x 输出 | PASS，8/8 |
 | 动态倍率切换 | 不复位连续切换 10 次；检查 runt、X、锁死和冻结 | PASS，10/10 |
 
-本轮最终发布回归目录为 `_work/rtl_regression/20260731_224732`。十项测试全部通过；所有逐点比较节点无 X、无丢样、无数值失配。证据摘要见 [nf_rtl_regression_summary.txt](results/nf_rtl_regression_summary.txt)。
+P4-B 最终发布回归目录为 `_work/rtl_regression/20260801_022831`。十四项测试全部通过；所有逐点比较节点无 X、无丢样、无数值失配。P4-B 详细证据见 [单 BRAM 签核](results/p4b_single_bram_4dsp_summary.md)，历史证据摘要见 [nf_rtl_regression_summary.txt](results/nf_rtl_regression_summary.txt)。
 
 一键重跑：
 
@@ -203,39 +215,45 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
 
 | 项目 | 结果 |
 |---|---:|
-| Slice | 181 / 8150（2.22%） |
-| Slice LUT | 436 / 20800（2.10%） |
-| Slice register | 471 / 41600（1.13%） |
-| BRAM tile | 3 / 50（6.00%） |
-| DSP48E1 | 5 / 90（5.56%） |
+| Slice | 202 / 8150（2.48%） |
+| Slice LUT | 504 / 20800（2.42%） |
+| Slice register | 493 / 41600（1.19%） |
+| BRAM tile | 2 / 50（4.00%，4 RAMB18E1） |
+| DSP48E1 | 4 / 90（4.44%） |
 | BUFGCTRL / MMCM | 2 / 2 |
-| WNS / TNS | +45.662 ns / 0 ns |
-| WHS / THS | +0.116 ns / 0 ns |
-| setup / hold 失败端点 | 0 / 0（总端点各 1711） |
-| 路由错误 | 0，1329/1329 可布线网络全部完成 |
+| WNS / TNS | +45.637 ns / 0 ns |
+| WHS / THS | +0.119 ns / 0 ns |
+| setup / hold 失败端点 | 0 / 0（总端点各 1715） |
+| 路由错误 | 0，1285 个可布线网络，Fully Routed |
 | DRC Error | 0 |
 | Vectorless 功耗 | 0.271 W（动态 0.199 W，静态 0.072 W，Medium confidence） |
 
-Vivado DRC 报告共有 65 条 Warning 和 1 条 Advisory，主要是面积优先结构中未加流水的 DSP 性能建议，以及 DSP/BRAM 异步控制检查；Error 和 Critical Warning 均为 0。当前时序余量很大、路由完整且 bitstream 已成功生成；这些警告不是“已物理验证”的替代品，首次上板仍要重点检查复位和采样率切换。
+Vivado DRC 报告共有 7 条 Warning 和 1 条 Advisory，均为面积优先 DSP 未加输入/输出流水的性能建议；Error 为 0。当前时序余量很大、路由完整且 bitstream 已成功生成；这些警告不是“已物理验证”的替代品，首次上板仍要重点检查复位和采样率切换。
 
-本轮签核摘要见 [cic5_comb_lut_optimization_summary.md](results/cic5_comb_lut_optimization_summary.md)，完整原始报告见 [board_dual_rate_cic5_comb_lut_v1_final](vivado_results/board_dual_rate_cic5_comb_lut_v1_final)。
+本轮签核摘要见 [p4b_single_bram_4dsp_summary.md](results/p4b_single_bram_4dsp_summary.md)，完整原始报告见 [board_dual_rate_p4b2_bram2_v1](vivado_results/board_dual_rate_p4b2_bram2_v1)。
 
 bitstream：
 
 ```text
-matlab_fir/national_finals/vivado_results/board_dual_rate_cic5_comb_lut_v1_final/
+matlab_fir/national_finals/vivado_results/board_dual_rate_p4b2_bram2_v1/
 national_finals_dual_rate_4x8x128x_areaopt.bit
 ```
 
-SHA-256：`B344EB816AF39F0F0C14DCFCEAF9F0735E94EEDF509116BC68569BB0938C8F17`
+SHA-256：`DA0665E43A8DA5230AB93FC786AB0EED47BD83FE393C9B1416BA3360B8DE5E85`
 
-### 5.1 第八轮 5-DSP comb-LUT Pareto 版签核
+### 5.1 P4-B 单 BRAM / 4-DSP Pareto 版签核
+
+综合阶段为 `525 LUT / 499 FF / 4 DSP / 4 RAMB18E1`；布局布线后收敛为 `504 LUT / 493 FF / 202 Slice`。4 个 RAMB18E1 的原语层级严格对应测试 ROM、Stage 1 历史、Stage 2/3 统一历史和统一 FIR 系数，证明 BRAM Tile 的下降不是统计或 GUI 参数差异。相对 P4-A，LUT/FF/Slice 分别增加 13/49/5，BRAM Tile 减少 1，WNS/WHS 仍为正，功耗报告精度下不变。
+
+该结构已经通过 Stage 1、Stage 2/3 和 CIC 三层独立等价测试，再通过完整链、复位和动态模式回归；不是仅凭频响近似接受。P4-A 与 P4-B 的详细对照和现场待办见 [P4-B 签核](results/p4b_single_bram_4dsp_summary.md)。
+
+### 5.2 第八轮 5-DSP comb-LUT Pareto 版签核（历史标度缺陷版本）
 
 Route 1 的 6 个 DSP 为 `Stage1 1 + Stage2/3 共享 1 + CIC comb 1 + CIC integrator 3`。本轮把每个 8x 输入仅执行三次、并且相邻事务之间有 16 个主时钟余量的 23-bit comb 减法放回 LUT/CARRY4；三个在 128x 输出阶段每拍更新的宽积分器仍放在 DSP48E1，形成 `1 + 1 + 0 + 3 = 5 DSP`。
 
 与 Route 1 的最终实现相比，新版为 **436 LUT / 471 FF / 181 Slice / 5 DSP**：增加 12 LUT、FF 不变、减少 7 Slice和1 DSP；BRAM/MMCM/IO与0.271 W功耗不变。该版本保持全部滤波系数和数值路径，故六工况频响与 Route 1 完全相同。完整 Stop/Go、RTL、Timing、DRC 和 bitstream 证据见 [5-DSP 优化签核](results/cic5_comb_lut_optimization_summary.md)。
 
-### 5.2 五轮 6-DSP CIC 优化结果
+### 5.3 五轮 6-DSP CIC 优化结果
 
 第一轮固定同一个综合 DCP 对五个 `opt_design` 指令进行了完整实现扫描；第二轮继续压缩宽位复用器、字长和调度状态；第三轮消除 Stage2/3 DSP C 输入前的零/累加器宽复用器；第四轮让 Stage1 和 Stage2/3 的 DSP48E1 PREG 直接保存累加结果，并利用空闲提交周期完成精确 Q15 舍入。每个最终候选均完成布局布线、时序和 DRC，选中的 Default 版本另外生成并校验 bitstream：
 
@@ -278,7 +296,7 @@ Route 1 的 6 个 DSP 为 `Stage1 1 + Stage2/3 共享 1 + CIC comb 1 + CIC integ
 
 淘汰项也进行了真实综合或仿真：均衡运算融合进串行 comb DSP 为 581 LUT / 622 FF；改为共享 Stage2/3 DSP 的版本在修正 signed 系数扩展后虽 0 LSB 通过，但综合为 592 LUT / 558 FF；早期只替换 Stage1 预加器、未让 PREG 保存累加状态的方案为 586 LUT / 578 FF；本轮在现有 PREG 结构上再次开启 DSP48 预加器，综合仍由 469 增至 491 LUT；把 pending 合并进 burst 计数则在第 16 个样点破坏等价性。其余 Stage2/3 BRAM 微码、Stage1 直接舍入、24 bit 结果寄存器和均衡器位宽收窄也均按 Stop/Go 淘汰。完整策略数据见 [cic6_implementation_strategy_scan.csv](results/cic6_implementation_strategy_scan.csv)，优化记录见 [cic6_further_optimization_summary.txt](results/cic6_further_optimization_summary.txt)。
 
-### 5.3 第六轮低 FF Pareto 版签核
+### 5.4 第六轮低 FF Pareto 版签核
 
 以下数据来自 `board_dual_rate_cic6_round6_preg_opt` 的最终 routed 报告，不是综合估算：
 
@@ -309,18 +327,21 @@ SHA-256：`49DF03B71C6D73A73EE282A5D1EEE0D9F5EB91ADDB96879ACBA381F0D999D47C`
 
 详细记录见 [cic6_round6_ff_optimization_summary.txt](results/cic6_round6_ff_optimization_summary.txt) 和 [cic6_round6_strategy_scan.csv](results/cic6_round6_strategy_scan.csv)。
 
-### 5.4 GUI 资源不一致问题与修复
+### 5.5 GUI 资源不一致问题与修复
 
 此前 GUI 显示 **482 LUT / 542 FF / 8 DSP**，不是 461-LUT 报告测错，而是 `.xpr` 只启用了 `USE_NATIONAL_FINALS_DATAPATH=1`，没有启用串行 comb CIC、全国赛 Stage2/3 窄系数和综合资源共享；GUI 因而综合了旧的 8-DSP 并行 CIC。工程文件现已显式登记串行 CIC 源文件并固定以下配置：
 
 - `USE_NATIONAL_FINALS_SERIAL_CIC_COMB=1`
+- `USE_NATIONAL_FINALS_N3_HOLD_EQUIV=1`
 - `USE_NATIONAL_FINALS_CIC_COMB_DSP=0`
 - `USE_NATIONAL_FINALS_NARROW_STAGE23=1`
+- `USE_NATIONAL_FINALS_SINGLE_BRAM_STAGE1=1`
+- `USE_PHASE7_UNIFIED_BRAM_STAGE23_HISTORY=1`
 - `USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER=0`
 - `ResourceSharing=on`
 - `opt_design Directive=Default`
 
-第五轮用普通工程 `synth_1/impl_1` 从头重建得到 440 LUT / 464 FF；第七轮在同一工程配置和更新后的 RTL 上从头重建为 **434 LUT / 469 FF / 6 DSP / 3 BRAM Tile / 2 MMCM**。当前工程进一步显式固定 comb 的 LUT 映射，从头实现为 **436 LUT / 471 FF / 5 DSP / 3 BRAM Tile / 2 MMCM**，与独立签核流程一致。可用以下命令检查配置并重建：
+第五轮用普通工程 `synth_1/impl_1` 从头重建得到 440 LUT / 464 FF；第七轮在同一工程配置和更新后的 RTL 上从头重建为 **434 LUT / 469 FF / 6 DSP / 3 BRAM Tile / 2 MMCM**。随后 comb-LUT 历史版为 **436 LUT / 471 FF / 5 DSP / 3 BRAM Tile / 2 MMCM**。当前 XPR 已进一步固定 N3 Hold、Stage 1 单 RAM 和 Stage 2/3 统一历史，普通工程从头实现为 **504 LUT / 493 FF / 4 DSP / 2 BRAM Tile / 2 MMCM**，与独立签核流程一致。可用以下命令检查配置并重建：
 
 ```powershell
 vivado.bat -mode batch -source `
@@ -349,7 +370,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
   -Step all
 ```
 
-包装脚本先执行面积优化综合，再以低内存单进程完成布局布线、报告和 bitstream。默认实现指令是本轮复核后的 `Default`；本轮正式结果目录为 `vivado_results/board_dual_rate_cic5_comb_lut_v1_final`，Route 1、第五轮 440-LUT 与第六轮低 FF 回退结果仍分别保留在原结果目录。日志与 `.Xil` 均写入 `matlab_fir/national_finals/_work/vivado/<时间戳>`，不会污染项目根目录。
+包装脚本先执行面积优化综合，再以低内存单进程完成布局布线、报告和 bitstream。默认实现指令是本轮复核后的 `Default`；P4-B 正式结果目录为 `vivado_results/board_dual_rate_p4b2_bram2_v1`，P4-A、P3、Route 1、第五轮 440-LUT 与第六轮低 FF 回退结果仍分别保留在原结果目录。日志与 `.Xil` 均写入 `matlab_fir/national_finals/_work/vivado/<时间戳>`，不会污染项目根目录。
 
 ## 7. SW1～SW8 与预期 DA_CLK
 
