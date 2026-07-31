@@ -216,9 +216,28 @@ FIR-CIC 正式 128x RTL 冲激的通带最大绝对偏差为 **0.00303062 dB**�
 
 #### Route 1：统一 FIR 系数存储
 
-原结构的 Stage1 与共享 Stage2/3 各自携带系数存储和地址译码。Route 1 将两组逻辑合并为一块显式 true-dual-port RAMB18E1：端口 A 服务 Stage1，端口 B 服务 Stage2/3；数据历史 BRAM、MAC 调度、系数和所有定点边界保持不变。因此输出与 434-LUT CIC 基线逐位一致，六工况频响也完全沿用原正式指标。
+Route 1 的名称容易让人误以为“三段 FIR 已经合并成一颗 DSP”，实际并非如此。首先对 48 kHz 最紧工况做了 128 拍输入超周期预算：Stage1 最坏需要 27 拍，Stage2 两相任务合计 42 拍，Stage3 四个任务合计 60 拍，单 DSP 总计需要 **129 拍**。这已经超过 128 拍，还没有可靠处理仲裁和 RAM 延迟的余量，因此正式方案保留 Stage1 与 Stage2/3 两条 DSP MAC 通道，把优化目标改为消除两条通道之间重复的**系数存储与地址译码**。
 
-该方案布局布线为 **424 LUT / 471 FF / 188 Slice / 6 DSP / 3 BRAM / 2 MMCM**，相对 434-LUT 基线减少 10 LUT 和 2 Slice，增加 2 FF；WNS/WHS 为 **+45.356/+0.117 ns**，TNS/THS 为 0，功耗仍为 0.271 W。它通过 10/10 RTL 回归、完整实现、DRC 和 bitstream，是当前**最低 LUT**全国赛方案。独立分支为 `codex/national-finals-unified-fir-engine-v1`，回退标签为 `national-finals-route1-424LUT-471FF-6DSP-3BRAM-2MMCM`。
+434-LUT 基线中，Stage1 的 26 个对称非零系数由独立 `case` 常量网络选择，Stage2/3 则使用另一套同步系数 BRAM。Route 1 新增统一系数模块 `nf_unified_fir_coeff_bram`，并显式实例化一块 true-dual-port `RAMB18E1`：
+
+- A 端口地址 64～89 保存并读取 Stage1 的 26 个 signed 16-bit 对称系数；
+- B 端口地址 0～63 保存并读取 Stage2/3 的两相系数；
+- 两个端口可以在同一拍分别向两颗 FIR DSP 供数，不引入计算互斥；
+- 复用原本已经存在的系数 RAMB18 容量，因此 BRAM Tile 仍为 3，DSP 仍为 6；
+- Stage1/Stage2/3 数据历史、MAC 调度、Q15 舍入、饱和、均衡器和 CIC16 全部保持不变。
+
+真正的 LUT 收益来自删除 Stage1 的 26 路常量译码和宽系数选择网络，而不是改变滤波器算法。综合结果由 **452 LUT / 469 FF** 降到 **436 LUT / 469 FF**，Stage1 层级由 136 LUT 降到 120 LUT；布局布线进一步由 **434 LUT / 469 FF / 190 Slice** 收敛到 **424 LUT / 471 FF / 188 Slice**。最终相对基线减少 10 LUT 和 2 Slice，增加 2 FF，DSP/BRAM/MMCM/IO 与 0.271 W Vectorless 功耗均不变。
+
+由于显式 `RAMB18E1` 的 `INIT_xx` 拼接错误可能只在综合/bitstream 分支出现，本轮额外建立了原语级测试，逐地址核对 32 个 Stage1 地址和 64 个 Stage2/3 地址。测试曾发现并修复 `INIT_05` 末尾漏写一个十六进制数字导致的半字节错位；修复后原语 96 个地址全部通过。正式验证结果为：
+
+- 全国赛 XSim 回归 **10/10 PASS**；
+- impulse 与固定随机输入的 4x/8x/128x 均为 **0 LSB mismatch**；
+- 8 个内部状态复位恢复场景和 10 次无复位动态倍率切换全部通过；
+- 六个采样率/倍率工况的频响和严格线性相位与 434-LUT 基线完全一致；
+- WNS/TNS 为 **+45.356/0 ns**，WHS/THS 为 **+0.117/0 ns**，未布线网络和 routing error 均为 0；
+- DRC Error=0，正式 bitstream SHA-256 为 `77D67B9E53FF43A0774A2F0093B5A89F22F27371C8CD9FD59DB018834C757BF4`。
+
+还试过把 Stage2 的两次量化融合成一次 Q17→20-bit 量化：逐位和频响均通过，综合为 437 LUT / 467 FF，但相对正式 Route 1 多 1 LUT、只少 2 FF，因此按 LUT 优先规则否决。Route 1 的正式分支为 `codex/national-finals-unified-fir-engine-v1`，提交为 `aaac3be`，回退标签为 `national-finals-route1-424LUT-471FF-6DSP-3BRAM-2MMCM`。
 
 #### Route 2：把 16 倍尾级重新拆成 HB/CIC
 

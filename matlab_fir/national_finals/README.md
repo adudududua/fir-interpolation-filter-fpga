@@ -17,6 +17,25 @@ Route 1 只统一 Stage1/Stage2/3 系数 BRAM，定点输出和原六工况频�
 
 Route 2B 六工况的通带最大绝对偏差为 **0.005872～0.010569 dB**，阻带衰减为 **71.585～73.438 dB**；impulse、固定随机和满量程随机的 4x/8x/128x 全部 0 LSB。公共全国赛回归 9/9 PASS，完整实现满足 setup/hold、DRC Error=0，bitstream SHA-256 为 `96F1BEE26BD6EDE53B3F8FB431A38C11F31AFF65549579518AA3CE2D2CA42D3E`，回退标签为 `national-finals-route2-570LUT-551FF-5DSP-3BRAM-2MMCM`。详细系数、逐节点指标和 Stop/Go 证据见 [Route 2 最终签核摘要](route2_cic_frontend/results/route2_final_summary.md)。
 
+### 0.1 Route 1 为什么能从 434 LUT 降到 424 LUT
+
+Route 1 没有修改 FIR-CIC 算法，也没有把三段 FIR 强行压进一颗 DSP。48 kHz 最紧工况下，Stage1、Stage2、Stage3 在一个 128 拍输入超周期内分别需要 27、42、60 拍，合计 129 拍，因此单 DSP 没有可靠余量。正式方案保留 Stage1 与 Stage2/3 两条 DSP MAC 通道，只合并重复的系数存储：
+
+```text
+434-LUT 基线
+  Stage1：26 路 case 常量系数网络 -> FIR DSP 1
+  Stage2/3：独立同步系数 BRAM    -> FIR DSP 2
+
+Route 1
+  统一 true-dual-port RAMB18E1
+    A口 64..89 -> Stage1 FIR DSP
+    B口  0..63 -> Stage2/3 FIR DSP
+```
+
+这样既允许两颗 DSP 同拍读取不同系数，又复用了原系数 RAMB18 的空闲地址空间，不增加 BRAM。删除 Stage1 常量译码/选择网络后，综合由 452 LUT 降到 436 LUT，Stage1 层级由 136 LUT 降到 120 LUT；布局布线最终为 **424 LUT / 471 FF / 188 Slice / 6 DSP / 3 BRAM / 2 MMCM**。相比 434-LUT 基线少 10 LUT和2 Slice，多2 FF，其余硬资源和0.271 W功耗不变。
+
+验证不是只看综合表：显式 RAMB18E1 的 96 个有效地址全部逐地址核对，完整回归10/10 PASS，4x/8x/128x逐点0 LSB，8个复位恢复场景、10次动态切档、六工况频响、完整实现、时序、DRC和bitstream全部通过。正式提交为 `aaac3be`，标签为 `national-finals-route1-424LUT-471FF-6DSP-3BRAM-2MMCM`，bitstream SHA-256 为 `77D67B9E53FF43A0774A2F0093B5A89F22F27371C8CD9FD59DB018834C757BF4`。
+
 ## 1. 完成状态
 
 - [x] 44.1 kHz / 48 kHz、signed 24 bit 输入数据通路
