@@ -210,6 +210,7 @@ module demo_interp_dac8_audio_pcm_common #(
     input  wire       rst_n,
     input  wire       family_48k,
     input  wire [1:0] mode_sel,
+    input  wire       force_mute,
     output wire       dac_clk,
     output wire [7:0] dac_data,
     output wire [1:0] mode_led

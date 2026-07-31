@@ -79,6 +79,7 @@ module tb_phase7_mode_switch_dynamic;
         .rst_n(rst_n),
         .family_48k(1'b0),
         .mode_sel(mode_sel),
+        .force_mute(1'b0),
         .dac_clk(dac_clk),
         .dac_data(dac_data),
         .mode_led(mode_led)

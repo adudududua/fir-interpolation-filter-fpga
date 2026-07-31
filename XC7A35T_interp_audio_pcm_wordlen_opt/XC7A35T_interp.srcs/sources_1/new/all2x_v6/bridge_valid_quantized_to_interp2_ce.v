@@ -52,7 +52,7 @@ module bridge_valid_quantized_to_interp2_ce #(
     assign consume_now = ce_out_next &&
                          (phase_mirror == 1'b0) && pending;
 
-    always @(posedge clk or negedge rst_n) begin
+    always @(posedge clk) begin
         if (!rst_n) begin
             pending <= 1'b0;
             phase_mirror <= 1'b1;

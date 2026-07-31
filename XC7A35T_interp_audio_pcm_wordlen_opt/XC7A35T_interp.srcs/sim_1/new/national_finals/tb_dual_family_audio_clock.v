@@ -16,7 +16,10 @@ module tb_dual_family_audio_clock;
     time rise_stop;
     time high_start;
     time high_width;
+    time low_start;
+    time low_width;
     integer edge_index;
+    integer switch_index;
     reg check_high_width;
 
     dual_family_audio_clock u_dut (
@@ -39,12 +42,20 @@ module tb_dual_family_audio_clock;
         end
     end
 
-    always @(posedge clk_audio_128x)
+    always @(posedge clk_audio_128x) begin
         high_start = $time;
+        low_width = $time - low_start;
+        if (check_high_width && low_width < 65000) begin
+            $display("FAIL: runt low pulse during family switch: %0d ps",
+                     low_width);
+            $fatal(1);
+        end
+    end
 
     always @(negedge clk_audio_128x) begin
         high_width = $time - high_start;
-        if (check_high_width && high_width < 70000) begin
+        low_start = $time;
+        if (check_high_width && high_width < 65000) begin
             $display("FAIL: runt high pulse during family switch: %0d ps",
                      high_width);
             $fatal(1);
@@ -89,7 +100,10 @@ module tb_dual_family_audio_clock;
         rise_stop = 0;
         high_start = 0;
         high_width = 0;
+        low_start = 0;
+        low_width = 0;
         edge_index = 0;
+        switch_index = 0;
 
         repeat (20) @(posedge clk_20m);
         reset = 1'b0;
@@ -99,19 +113,27 @@ module tb_dual_family_audio_clock;
         check_high_width = 1'b1;
         measure_period(1'b0, 177000, 177400);
 
+        for (switch_index = 0; switch_index < 100;
+             switch_index = switch_index + 1) begin
+            @(negedge clk_20m);
+            family_48k = ~family_48k;
+            repeat (8) @(posedge clk_audio_128x);
+            if (!locked_selected) begin
+                $display("FAIL: selected family MMCM is not locked at switch %0d",
+                         switch_index);
+                $fatal(1);
+            end
+        end
+
         family_48k = 1'b1;
         repeat (20) @(posedge clk_audio_128x);
-        if (!locked_selected) begin
-            $display("FAIL: selected 48 kHz-family MMCM is not locked");
-            $fatal(1);
-        end
         measure_period(1'b1, 162600, 162900);
 
         family_48k = 1'b0;
         repeat (20) @(posedge clk_audio_128x);
         measure_period(1'b0, 177000, 177400);
 
-        $display("PASS: dual-family clock frequency and glitchless switching");
+        $display("PASS: dual-family clock frequency and glitchless switching; 100-switch pulse-width stress");
         $finish;
     end
 

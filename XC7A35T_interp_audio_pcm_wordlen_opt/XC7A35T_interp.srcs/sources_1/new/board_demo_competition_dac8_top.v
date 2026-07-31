@@ -195,9 +195,9 @@ module board_demo_competition_dac8_top #(
     reg        family_active = 1'b0;
     wire       family_switch_busy;
     wire       clk_audio_128x;
-    wire       mmcm_locked_selected;
-    wire       mmcm_locked_44k1_unused;
-    wire       mmcm_locked_48k_unused;
+    wire       mmcm_locked_selected_unused;
+    wire       mmcm_locked_44k1;
+    wire       mmcm_locked_48k;
 
     assign family_switch_busy = |family_switch_cnt;
 
@@ -221,9 +221,9 @@ module board_demo_competition_dac8_top #(
         .reset(~rst_n_int),
         .family_48k(family_active),
         .clk_audio_128x(clk_audio_128x),
-        .locked_selected(mmcm_locked_selected),
-        .locked_44k1(mmcm_locked_44k1_unused),
-        .locked_48k(mmcm_locked_48k_unused)
+        .locked_selected(mmcm_locked_selected_unused),
+        .locked_44k1(mmcm_locked_44k1),
+        .locked_48k(mmcm_locked_48k)
     );
 
     //=========================================================
@@ -235,25 +235,45 @@ module board_demo_competition_dac8_top #(
     // rst_audio_n：
     //   送给正式插值公共模块。
     //=========================================================
-    (* ASYNC_REG = "TRUE" *) reg [2:0] rst_audio_sync = 3'b000;
+    (* ASYNC_REG = "TRUE" *) reg [1:0] locked_44k1_sync = 2'b00;
+    (* ASYNC_REG = "TRUE" *) reg [1:0] locked_48k_sync = 2'b00;
+    reg rst_audio_request_n_sys = 1'b0;
+    (* ASYNC_REG = "TRUE" *) reg [1:0] rst_request_sync = 2'b00;
+    reg [2:0] rst_audio_sync = 3'b000;
 
     wire rst_audio_async_n;
-    assign rst_audio_async_n = rst_n_int &&
-                               !family_switch_busy &&
-                               mmcm_locked_selected;
+    assign rst_audio_async_n = rst_audio_request_n_sys;
 
-    always @(posedge clk_audio_128x or negedge rst_audio_async_n) begin
-        if (!rst_audio_async_n) begin
-            rst_audio_sync <= 3'b000;
-        end
-        else begin
-            rst_audio_sync <= {rst_audio_sync[1:0], 1'b1};
-        end
+    always @(posedge clk_sys_bufg) begin
+        locked_44k1_sync <= {locked_44k1_sync[0], mmcm_locked_44k1};
+        locked_48k_sync <= {locked_48k_sync[0], mmcm_locked_48k};
+
+        if (!rst_n_int)
+            rst_audio_request_n_sys <= 1'b0;
+        else
+            rst_audio_request_n_sys <= !family_switch_busy &&
+                (family_active ? locked_48k_sync[1] : locked_44k1_sync[1]);
+    end
+
+    always @(posedge clk_audio_128x) begin
+        rst_request_sync <= {rst_request_sync[0], rst_audio_async_n};
+        rst_audio_sync <= {rst_audio_sync[1:0], rst_request_sync[1]};
+    end
+
+    // Keep the asynchronous assertion confined to the synchronizer above.
+    // This extra register changes only on an audio clock edge, so every
+    // FIR/CIC/DSP/BRAM control observes a purely synchronous reset source.
+    reg rst_audio_datapath_n = 1'b0;
+
+    always @(posedge clk_audio_128x) begin
+        if (!rst_audio_sync[2])
+            rst_audio_datapath_n <= 1'b0;
+        else
+            rst_audio_datapath_n <= 1'b1;
     end
 
     wire rst_audio_n;
-
-    assign rst_audio_n = rst_audio_sync[2];
+    assign rst_audio_n = rst_audio_datapath_n;
 
     //=========================================================
     // 6）模式控制跨时钟域同步
@@ -262,17 +282,32 @@ module board_demo_competition_dac8_top #(
     // 音频域前使用两级同步器。按键模式在消抖后长时间保持稳定，
     // 因此逐位同步不会影响实际模式切换。
     //=========================================================
-    (* ASYNC_REG = "TRUE" *) reg [1:0] mode_audio_meta = 2'b11;
-    (* ASYNC_REG = "TRUE" *) reg [1:0] mode_audio_sync = 2'b11;
+    wire [1:0] mode_audio_atomic;
+    wire       mode_audio_mute;
+    wire       mode_ctrl_busy_unused;
 
-    always @(posedge clk_audio_128x or negedge rst_audio_n) begin
+    nf_mode_cdc_handshake u_nf_mode_cdc_handshake (
+        .ctrl_clk    (clk_sys_bufg),
+        .ctrl_rst_n  (rst_n_int),
+        .ctrl_mode   (key_mode_sel),
+        .ctrl_busy   (mode_ctrl_busy_unused),
+        .audio_clk   (clk_audio_128x),
+        .audio_rst_n (rst_audio_n),
+        .audio_mode  (mode_audio_atomic),
+        .audio_mute  (mode_audio_mute)
+    );
+
+    (* ASYNC_REG = "TRUE" *) reg family_audio_meta = 1'b0;
+    (* ASYNC_REG = "TRUE" *) reg family_audio_sync = 1'b0;
+
+    always @(posedge clk_audio_128x) begin
         if (!rst_audio_n) begin
-            mode_audio_meta <= 2'b11;
-            mode_audio_sync <= 2'b11;
+            family_audio_meta <= 1'b0;
+            family_audio_sync <= 1'b0;
         end
         else begin
-            mode_audio_meta <= key_mode_sel;
-            mode_audio_sync <= mode_audio_meta;
+            family_audio_meta <= family_active;
+            family_audio_sync <= family_audio_meta;
         end
     end
 
@@ -301,8 +336,9 @@ module board_demo_competition_dac8_top #(
     ) u_demo_interp_dac8_audio_pcm_common (
         .clk_audio_128x (clk_audio_128x),
         .rst_n          (rst_audio_n),
-        .family_48k     (family_active),
-        .mode_sel       (mode_audio_sync),
+        .family_48k     (family_audio_sync),
+        .mode_sel       (mode_audio_atomic),
+        .force_mute     (mode_audio_mute),
 
         .dac_clk        (dac_clk),
         .dac_data       (dac_data),

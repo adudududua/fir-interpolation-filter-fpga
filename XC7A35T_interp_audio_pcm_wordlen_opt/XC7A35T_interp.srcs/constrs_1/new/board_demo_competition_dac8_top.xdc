@@ -152,6 +152,37 @@ set_property IOSTANDARD LVCMOS33 [get_ports {dac_data[*]}]
 set_property DRIVE 8 [get_ports {dac_data[*]}]
 set_property SLEW SLOW [get_ports {dac_data[*]}]
 
+# Model the ODDR clock-forwarding path for both mutually exclusive families.
+# Low-rate modes only remove edges, so the 128x clocks are conservative master
+# clocks for all four DAC modes.
+set nf_clk_44k1 [get_clocks -of_objects \
+    [get_pins u_dual_family_audio_clock/u_mmcm_44k1/CLKOUT0]]
+set nf_clk_48k [get_clocks -of_objects \
+    [get_pins u_dual_family_audio_clock/u_mmcm_48k/CLKOUT0]]
+set nf_dac_oddr_c [get_pins \
+    u_demo_interp_dac8_audio_pcm_common/gen_dac_clock_oddr.u_dac_clock_oddr/C]
+
+create_generated_clock -name dac_clk_44k1_128x \
+    -source $nf_dac_oddr_c -master_clock $nf_clk_44k1 -divide_by 1 -add \
+    [get_ports dac_clk]
+create_generated_clock -name dac_clk_48k_128x \
+    -source $nf_dac_oddr_c -master_clock $nf_clk_48k -divide_by 1 -add \
+    [get_ports dac_clk]
+
+# AD9708 captures on DAC_CLK rising edges. Worst-case device requirements are
+# tS=2.0 ns and tH=1.5 ns; add a conservative 0.5 ns PCB/package skew budget.
+# The 128x clocks are the fastest and therefore bound the lower-rate modes.
+set nf_dac_clk_44k1 [get_clocks dac_clk_44k1_128x]
+set nf_dac_clk_48k [get_clocks dac_clk_48k_128x]
+set_output_delay -clock $nf_dac_clk_44k1 -max 2.500 \
+    [get_ports {dac_data[*]}]
+set_output_delay -clock $nf_dac_clk_44k1 -min -2.000 \
+    [get_ports {dac_data[*]}]
+set_output_delay -clock $nf_dac_clk_48k -max 2.500 -add_delay \
+    [get_ports {dac_data[*]}]
+set_output_delay -clock $nf_dac_clk_48k -min -2.000 -add_delay \
+    [get_ports {dac_data[*]}]
+
 
 #=============================================================
 # 5）蜂鸣器静音输出约束
@@ -177,6 +208,7 @@ set_property PULLUP true [get_ports beep_io]
 # 进行同步和消抖，因此这里设置 false path。
 #=============================================================
 set_false_path -from [get_ports {key_kc[*]}]
+set_false_path -to [get_ports {key_kr[*]}]
 
 
 #=============================================================
@@ -194,8 +226,9 @@ set_false_path -from [get_ports {key_kc[*]}]
 # 44.1 kHz 与 48 kHz 家族逻辑互斥，不应分析两路时钟之间的伪路径。
 set_clock_groups -asynchronous \
     -group [get_clocks clk_20M] \
-    -group [get_clocks {clk_44k1_raw clk_48k_raw}]
+    -group [get_clocks [list $nf_clk_44k1 $nf_clk_48k \
+        dac_clk_44k1_128x dac_clk_48k_128x]]
 
 set_clock_groups -logically_exclusive \
-    -group [get_clocks clk_44k1_raw] \
-    -group [get_clocks clk_48k_raw]
+    -group [get_clocks [list $nf_clk_44k1 dac_clk_44k1_128x]] \
+    -group [get_clocks [list $nf_clk_48k dac_clk_48k_128x]]

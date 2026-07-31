@@ -178,7 +178,7 @@ module cic_interp16_serial_comb_dsp_ce #(
         end
     end
 
-    always @(posedge clk or negedge rst_n) begin
+    always @(posedge clk) begin
         if (!rst_n) begin
             comb_delay0 <= {COMB_DELAY_W{1'b0}};
             comb_delay1 <= {COMB_DELAY_W{1'b0}};

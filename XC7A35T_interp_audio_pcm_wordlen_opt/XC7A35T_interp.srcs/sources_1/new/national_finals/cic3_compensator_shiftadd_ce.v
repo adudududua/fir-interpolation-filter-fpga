@@ -75,7 +75,7 @@ module cic3_compensator_shiftadd_ce #(
     assign y_out_valid = (REGISTER_OUTPUT != 0) ?
                          y_out_valid_reg : x_in_valid;
 
-    always @(posedge clk or negedge rst_n) begin
+    always @(posedge clk) begin
         if (!rst_n) begin
             x_z1 <= {DATA_W{1'b0}};
             x_z2 <= {DATA_W{1'b0}};

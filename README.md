@@ -2,7 +2,7 @@
 
 ## 优化演进总览（建议先读）
 
-本节按时间顺序统一整理“最初 4x+2x 结构、区域赛全 2x 优化、FIR-CIC 优化、全国赛全 2x 回退对照、全国赛 6-DSP CIC、440/442/434-LUT 演进、Route 1、comb-LUT 低 DSP 版，以及当前 P1 真 Q15 正确性修复版”。重要纠错：旧 424-LUT/6-DSP 与 436-LUT/5-DSP 版本的归一化频响虽通过，但 8x/128x 绝对增益约低 6.02 dB，现仅作为资源演进历史；当前算法正确基线为 446 LUT / 5 DSP。
+本节按时间顺序统一整理“最初 4x+2x 结构、区域赛全 2x 优化、FIR-CIC 优化、全国赛全 2x 回退对照、全国赛 6-DSP CIC、440/442/434-LUT 演进、Route 1、comb-LUT 低 DSP 版、P1 真 Q15 正确性修复，以及 P3 工程闭环版”。重要纠错：旧 424-LUT/6-DSP 与 436-LUT/5-DSP 版本的归一化频响虽通过，但 8x/128x 绝对增益约低 6.02 dB，现仅作为资源演进历史；当前结构优化基线为 P3 的 462 LUT / 447 FF / 5 DSP。
 
 ### 统计与比较口径
 
@@ -24,6 +24,12 @@
 P1 将 Stage 3 统一为真 Q15，修正 MATLAB、RTL 系数 ROM、统一 RAMB18E1 INIT 与原语测试，恢复完整 38-bit signed 饱和路径，并新增 `±0.01 dB` 绝对增益和 `0.01 dB` 模式间增益差门禁。修复后 4x/8x/128x 为 -0.001599/-0.002709/-0.003480 dB，最大差 0.001881 dB；RTL 10/10 和全链路 0 LSB 回归通过。
 
 修复版 post-route 为 **446 LUT / 471 FF / 5 DSP / 3 BRAM Tile / 2 MMCM**，WNS/WHS **+45.104/+0.121 ns**，功耗 0.271 W。多出的 10 LUT 是恢复 38-bit 饱和检查的正确性成本。完整证据见 [P1 Stage 3 Q 格式修复签核](matlab_fir/national_finals/results/p1_stage3_qformat_fix_summary.md)。
+
+### P3 工程闭环：原子 CDC、同步复位与 AD9708 STA
+
+P3 保持 P1 的系数和位真样点不变，把两位模式选择改成 request/ack 原子握手，数据通路改为同步复位，并加入 MMCM 锁定同步、安全静音、IOB 数据寄存器和 ODDR DAC 时钟转发。XSim 从零重跑为 **11/11 PASS**，其中模式 CDC 覆盖 1200 次全方向事务，双 MMCM 家族切换压力测试 100 次，动态倍率切换的边沿数为 32/128/256/4096 且无 runt/X。
+
+post-route 为 **462 LUT / 447 FF / 180 Slice / 5 DSP / 3 BRAM Tile / 2 MMCM**，WNS/WHS **+46.140/+0.050 ns**，功耗 **0.271 W**。AD9708 约束包含 2.0 ns setup、1.5 ns hold 和 0.5 ns 附加裕量，最差输出 setup/hold 为 **+76.116/+78.117 ns**。bitstream SHA-256 为 `A38C6D4F4B3C023DBD22897505B85864990CFC7C5D974A84FA38C5F0ADE21033`。详细证据和 CDC/DRC waiver 见 [P3 工程闭环签核](matlab_fir/national_finals/results/p3_engineering_closure_summary.md)，指导合理性与后续 P4/P5 分工见 [下一阶段优化指导执行记录](matlab_fir/national_finals/results/next_stage_optimization_guide_execution.md)。
 
 通带指标也统一区分两种定义：
 

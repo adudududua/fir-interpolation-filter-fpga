@@ -129,3 +129,13 @@ matlab_fir/alt_all2x_v7/verification/rtl_outputs/
 /tmp/
 matlab_fir/national_finals/_work/
 /README_save.md
+
+# National-finals P3 intermediate implementation experiments.  The selected
+# v5 signoff directory remains visible and is committed separately.
+matlab_fir/national_finals/vivado_results/board_dual_rate_p3_cdc_atomic/
+matlab_fir/national_finals/vivado_results/board_dual_rate_p3_cdc_atomic_compact/
+matlab_fir/national_finals/vivado_results/board_dual_rate_p3_engineering_closed/
+matlab_fir/national_finals/vivado_results/board_dual_rate_p3_engineering_closed_v3/
+matlab_fir/national_finals/vivado_results/board_dual_rate_p3_engineering_closed_v4/
+matlab_fir/national_finals/vivado_results/board_dual_rate_p3_sync_reset/
+matlab_fir/national_finals/vivado_results/board_dual_rate_p3_sync_reset_bridge/

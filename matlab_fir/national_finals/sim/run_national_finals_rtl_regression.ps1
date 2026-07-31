@@ -156,6 +156,15 @@ $clockDir = Invoke-RtlCase -Name 'clock' `
     -ExpectedPassText 'PASS: dual-family clock frequency and glitchless switching' `
     -XelabOptions @('glbl', '-L', 'unisims_ver')
 
+$modeCdcDir = Invoke-RtlCase -Name 'mode_cdc_handshake' `
+    -VerilogFiles @(
+        (Join-Path $nfSource 'nf_mode_cdc_handshake.v'),
+        (Join-Path $nfSim 'tb_nf_mode_cdc_handshake.v')
+    ) `
+    -Top 'tb_nf_mode_cdc_handshake' `
+    -Snapshot 'tb_nf_mode_cdc_handshake_sim' `
+    -ExpectedPassText 'NF MODE CDC HANDSHAKE PASS: 1200 directed transitions, atomic commit, stable bundled data, one ACK each.'
+
 $keypadDir = Invoke-RtlCase -Name 'keypad' `
     -VerilogFiles @(
         (Join-Path $sourceRoot 'board_demo_competition_dac8_top.v'),
@@ -170,6 +179,7 @@ $boardDir = Invoke-RtlCase -Name 'board' `
     -VerilogFiles @(
         (Join-Path $sourceRoot 'board_demo_competition_dac8_top.v'),
         (Join-Path $sourceRoot 'matrix_keypad_mode_ctrl_compact.v'),
+        (Join-Path $nfSource 'nf_mode_cdc_handshake.v'),
         (Join-Path $v7Sim 'tb_board_phase7_shared_keypad_scan.v')
     ) `
     -Top 'tb_board_phase7_shared_keypad_scan' `
@@ -279,5 +289,5 @@ if ($PublishImpulseOutputs) {
 }
 
 Write-Host ''
-Write-Host 'NATIONAL FINALS RTL REGRESSION PASS (10/10)'
+Write-Host 'NATIONAL FINALS RTL REGRESSION PASS (11/11)'
 Write-Host "Run directory: $runRoot"

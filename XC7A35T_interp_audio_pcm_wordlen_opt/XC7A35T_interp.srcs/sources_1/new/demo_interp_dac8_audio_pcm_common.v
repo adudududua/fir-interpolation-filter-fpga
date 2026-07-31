@@ -53,6 +53,7 @@ module demo_interp_dac8_audio_pcm_common #(
     parameter integer USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER = 0,
     parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 0
 )(
+    input  wire        force_mute,
     input  wire        clk_audio_128x,  // 5.6448MHz 连续音频 128x 时钟
     input  wire        rst_n,           // 低有效复位
     input  wire        family_48k,      // 0=44.1kHz，1=48kHz
@@ -132,7 +133,7 @@ module demo_interp_dac8_audio_pcm_common #(
     assign ce2_out        = (ce_cnt[5:0] == 6'b000000);
     assign x_in_update_ce = (ce_cnt == 7'd127);
 
-    always @(posedge clk_audio_128x or negedge rst_n) begin
+    always @(posedge clk_audio_128x) begin
         if (!rst_n)
             ce_cnt <= 7'd0;
         else
@@ -142,7 +143,7 @@ module demo_interp_dac8_audio_pcm_common #(
     // 只在所有候选 DAC 时钟均为低电平时切换时钟源。
     // 这样 mode_sel 即使在任意基准时钟上升沿更新，也不会让
     // 组合时钟选择器产生零宽或不足半个基准周期的脉冲。
-    always @(negedge clk_audio_128x or negedge rst_n) begin
+    always @(negedge clk_audio_128x) begin
         if (!rst_n)
             mode_state <= MODE_128X;
         else if (!ce_cnt[6] && !ce_cnt[4] && !ce_cnt[3])
@@ -207,7 +208,7 @@ module demo_interp_dac8_audio_pcm_common #(
 
     assign x_in = audio_sample_w;
 
-    always @(posedge clk_audio_128x or negedge rst_n) begin
+    always @(posedge clk_audio_128x) begin
         if (!rst_n)
             x_in_valid <= 1'b0;
         else
@@ -397,10 +398,12 @@ module demo_interp_dac8_audio_pcm_common #(
     //   dac_clk 上升沿给 AD9708 采样；
     //   数据在下降沿提前更新，可以给 DAC 留出建立时间。
     //=========================================================
-    reg [7:0] dac_data_r;
+    (* IOB = "TRUE" *) reg [7:0] dac_data_r;
 
-    always @(negedge clk_audio_128x or negedge rst_n) begin
+    always @(negedge clk_audio_128x) begin
         if (!rst_n)
+            dac_data_r <= 8'd128;
+        else if (force_mute || (mode_state != mode_request))
             dac_data_r <= 8'd128;
         else if (selected_valid)
             dac_data_r <= sample_u8_w;
@@ -408,9 +411,42 @@ module demo_interp_dac8_audio_pcm_common #(
 
     assign dac_data = dac_data_r;
 
-    assign dac_clk = (mode_state == MODE_1X) ? ce_cnt[6] :
-                     (mode_state == MODE_4X) ? ce_cnt[4] :
-                     (mode_state == MODE_8X) ? ce_cnt[3] :
-                                                clk_audio_128x;
+    wire [6:0] ce_cnt_next_w;
+    wire       dac_clk_div_next_w;
+
+    assign ce_cnt_next_w = ce_cnt + 7'd1;
+    assign dac_clk_div_next_w =
+        (mode_state == MODE_1X) ? ce_cnt_next_w[6] :
+        (mode_state == MODE_4X) ? ce_cnt_next_w[4] :
+        (mode_state == MODE_8X) ? ce_cnt_next_w[3] : 1'b0;
+
+    generate
+        if (USE_NATIONAL_FINALS_DATAPATH != 0) begin : gen_dac_clock_oddr
+            // SAME_EDGE captures both values on the 128x rising edge. Low-rate
+            // modes repeat the next divider value across both half cycles;
+            // 128x mode emits the canonical 1/0 forwarded-clock pattern.
+            ODDR #(
+                .DDR_CLK_EDGE("SAME_EDGE"),
+                .INIT(1'b0),
+                .SRTYPE("SYNC")
+            ) u_dac_clock_oddr (
+                .Q(dac_clk),
+                .C(clk_audio_128x),
+                .CE(1'b1),
+                .D1((mode_state == MODE_128X) ? 1'b1 :
+                    dac_clk_div_next_w),
+                .D2((mode_state == MODE_128X) ? 1'b0 :
+                    dac_clk_div_next_w),
+                .R(~rst_n),
+                .S(1'b0)
+            );
+        end
+        else begin : gen_legacy_dac_clock_mux
+            assign dac_clk = (mode_state == MODE_1X) ? ce_cnt[6] :
+                             (mode_state == MODE_4X) ? ce_cnt[4] :
+                             (mode_state == MODE_8X) ? ce_cnt[3] :
+                                                        clk_audio_128x;
+        end
+    endgenerate
 
 endmodule

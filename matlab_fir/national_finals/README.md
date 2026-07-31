@@ -1,8 +1,8 @@
 # 全国总决赛：双采样率可配置插值滤波器
 
-当前版本已完成 MATLAB 建模、24 bit 定点模型、RTL、10 项 XSim 回归、Vivado 综合/布局布线/时序/DRC/功耗评估和 bitstream 生成。所有软件与 FPGA 工具验收均已通过；由于当前环境无法接触实物开发板，物理板下载和仪器测量仍需按本文最后一节执行，不能把 bitstream 成功等同于实板通过。
+当前 P3 工程基线已完成 MATLAB 建模、24 bit 定点模型、11 项 XSim 回归、Vivado 综合/布局布线/时序/DRC/CDC/功耗评估和 bitstream 生成。所有可在当前环境执行的软件与 FPGA 工具验收均已通过；由于当前环境无法接触实物开发板，物理板下载和仪器测量仍需按本文最后一节执行，不能把 bitstream 成功等同于实板通过。
 
-当前算法正确基线为 P1 真 Q15 修复版：`446 LUT / 471 FF / 5 DSP / 3 BRAM / 2 MMCM`。复核发现旧 Route 1 `424 LUT / 6 DSP` 与低 DSP `436 LUT / 5 DSP` 的 Stage 3 系数实际为 Q14 幅度、MAC 却按 Q15 右移，导致 8x/128x 绝对增益约为 -6.02 dB；旧脚本的逐节点归一化掩盖了该问题。这两个版本及 434/442-LUT 版本只保留为资源演进历史，不再作为发布候选。完整修复与正反向验证见 [P1 Stage 3 Q 格式修复签核](results/p1_stage3_qformat_fix_summary.md)。
+当前结构优化起点为 P3：`462 LUT / 447 FF / 180 Slice / 5 DSP / 3 BRAM / 2 MMCM`。它继承 P1 真 Q15 修复，并增加原子 CDC、同步复位和 AD9708 输出时序闭环。复核发现旧 Route 1 `424 LUT / 6 DSP` 与低 DSP `436 LUT / 5 DSP` 的 Stage 3 系数实际为 Q14 幅度、MAC 却按 Q15 右移，导致 8x/128x 绝对增益约为 -6.02 dB；这些旧版本只保留为资源演进历史，不再作为发布候选。指导评估、阶段进度和回退规则见 [下一阶段优化指导执行记录](results/next_stage_optimization_guide_execution.md)。
 
 ## 0. P1：Stage 3 真 Q15 与绝对增益闭环
 
@@ -11,6 +11,14 @@ P1 将 11-tap Stage 3 统一为真 Q15 系数 `[404,-148,-3272,522,19250,32016,1
 新增绝对增益门禁先对旧 RTL 输出执行负向验证并正确失败：4x/8x/128x 分别为 `-0.001599/-6.023392/-6.024933 dB`。修复后为 `-0.001599/-0.002709/-0.003480 dB`，最大模式间差 `0.001881 dB`，均满足 `0.01 dB` 门槛。XSim 10/10、完整链冲激/随机三节点 0 LSB、六工况频响与严格线性相位全部通过。
 
 post-route 结果为 **446 LUT / 471 FF / 5 DSP / 3 BRAM Tile / 2 MMCM / 17 IO**，WNS/WHS 为 **+45.104/+0.121 ns**，功耗仍为 0.271 W，bitstream SHA-256 为 `F57419974501552FE670DD711354B244908EA05EC8DE95511719C467D1D74749`。相对旧 436-LUT 故障基线多 10 LUT，原因是恢复可达的 38-bit 饱和逻辑；其余主要资源不增加。
+
+## P3：CDC、同步复位与 AD9708 接口闭环
+
+P3 不改变 P1 的滤波系数、定点舍入和样点值。两位模式总线改为 request/ack 原子握手，FIR/CIC/bridge/键盘状态采用同步复位，MMCM `locked` 和音频复位释放经过同步器；切换期间 DAC 强制中点静音。8 位 `dac_data` 进入 IOB 寄存器，`dac_clk` 由 ODDR 转发，并按 AD9708 setup/hold 加板级裕量建立两个互斥 forwarded clock 约束。
+
+从零 XSim 回归为 **11/11 PASS**：包含 1200 次模式 CDC 全方向压力测试、100 次双 MMCM 家族切换、8 个内部复位恢复场景、10 次动态倍率切换、串行 CIC 对拍、完整链冲激/随机 0 LSB 和统一 RAMB18E1 全地址检查。post-route 为 **462 LUT / 447 FF / 180 Slice / 5 DSP / 3 BRAM Tile / 2 MMCM / 17 IO**，WNS/WHS 为 **+46.140/+0.050 ns**，AD9708 最差输出 setup/hold 为 **+76.116/+78.117 ns**，功耗仍为 **0.271 W**。bitstream SHA-256 为 `A38C6D4F4B3C023DBD22897505B85864990CFC7C5D974A84FA38C5F0ADE21033`。
+
+CDC 报告中专用 `BUFGMUX_CTRL` 选择入口和 bundled-data shadow bus 分别保留书面 waiver；它们没有用 false path 隐藏，详细逐规则说明和板级待办见 [P3 工程闭环签核](results/p3_engineering_closure_summary.md)。
 
 ## 0.1 Route 1：统一双端口系数 RAM（历史资源点）
 

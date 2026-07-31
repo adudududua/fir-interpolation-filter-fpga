@@ -272,11 +272,16 @@ module tb_phase7_full_chain_reset_recovery;
 
     task assert_pipeline_reset;
         begin
+            // The national-finals datapath uses synchronous reset so DSP
+            // and BRAM address/control registers can be absorbed safely.
+            // Reset must be visible at the first active clock edge, then
+            // remain clean for the complete reset interval.
+            @(posedge clk);
             #1;
             if (`DUT_CIC.burst_pending !== 1'b0 ||
                     `DUT_CIC.burst_remaining !== 5'd0 ||
                     `DUT_CIC.final_integrator_state !== 32'sd0)
-                $fatal(1, "CIC asynchronous reset failed scenario=%0d",
+                $fatal(1, "CIC synchronous reset failed scenario=%0d",
                     scenario_index);
             repeat (2) @(posedge clk);
             @(negedge clk);

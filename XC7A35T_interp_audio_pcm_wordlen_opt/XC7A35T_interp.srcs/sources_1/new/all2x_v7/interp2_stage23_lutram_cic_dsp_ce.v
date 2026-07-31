@@ -585,7 +585,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         end
     endgenerate
 
-    always @(posedge clk or negedge rst_n) begin
+    always @(posedge clk) begin
         if (!rst_n) begin
             stage2_head <= {MEM_ADDR_W{1'b0}};
             stage3_head <= {MEM_ADDR_W{1'b0}};

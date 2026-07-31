@@ -60,6 +60,7 @@ set nf_sources [list \
     [file join $nf_src_dir cic3_compensator_shiftadd_ce.v] \
     [file join $nf_src_dir cic_interp16_serial_comb_dsp_ce.v] \
     [file join $nf_src_dir dual_family_audio_clock.v] \
+    [file join $nf_src_dir nf_mode_cdc_handshake.v] \
     [file join $nf_src_dir dual_rate_test_tone_rom_source.v] \
     [file join $nf_src_dir nf_sine_15k_dual_rate_24bit_256.mem]]
 

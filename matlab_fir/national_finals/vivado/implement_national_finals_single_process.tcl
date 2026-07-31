@@ -91,11 +91,26 @@ report_utilization -hierarchical \
     -file [file join $result_dir utilization_hierarchical.rpt]
 report_timing_summary -delay_type min_max -max_paths 30 \
     -file [file join $result_dir timing_summary_routed.rpt]
+report_timing -to [get_ports {dac_data[*]}] -delay_type max -max_paths 8 \
+    -file [file join $result_dir dac_output_setup_routed.rpt]
+report_timing -to [get_ports {dac_data[*]}] -delay_type min -max_paths 8 \
+    -file [file join $result_dir dac_output_hold_routed.rpt]
 report_clock_interaction -delay_type min_max \
     -file [file join $result_dir clock_interaction_routed.rpt]
 report_route_status -file [file join $result_dir route_status_routed.rpt]
 report_power -file [file join $result_dir power_vectorless_routed.rpt]
 report_drc -file [file join $result_dir drc_routed.rpt]
+catch {
+    report_methodology \
+        -file [file join $result_dir methodology_routed.rpt]
+}
+catch {
+    report_cdc -details -file [file join $result_dir cdc_routed.rpt]
+}
+catch {
+    check_timing -verbose \
+        -file [file join $result_dir check_timing_routed.rpt]
+}
 
 write_primitive_report \
     [file join $result_dir dsp_utilization_routed.rpt] \
@@ -115,6 +130,14 @@ puts $manifest_handle "Top: board_demo_competition_dac8_top"
 puts $manifest_handle "Bitstream: $bitstream_dst"
 puts $manifest_handle [format "Routed setup slack: %.3f ns" $setup_slack]
 puts $manifest_handle [format "Routed hold slack: %.3f ns" $hold_slack]
+set dac_setup_path [get_timing_paths -to [get_ports {dac_data[*]}] \
+    -delay_type max -max_paths 1]
+set dac_hold_path [get_timing_paths -to [get_ports {dac_data[*]}] \
+    -delay_type min -max_paths 1]
+puts $manifest_handle [format "AD9708 output setup slack: %.3f ns" \
+    [get_property SLACK $dac_setup_path]]
+puts $manifest_handle [format "AD9708 output hold slack: %.3f ns" \
+    [get_property SLACK $dac_hold_path]]
 puts $manifest_handle "44.1-kHz family 128x clock: 5.644796 MHz (-0.64 ppm nominal)"
 puts $manifest_handle "48-kHz family 128x clock: 6.144068 MHz (+11.03 ppm nominal)"
 puts $manifest_handle "Architecture: 1-DSP Stage1 + 1-DSP shared Stage2/3 + shift-add equalizer + 4-DSP serial-comb CIC16"

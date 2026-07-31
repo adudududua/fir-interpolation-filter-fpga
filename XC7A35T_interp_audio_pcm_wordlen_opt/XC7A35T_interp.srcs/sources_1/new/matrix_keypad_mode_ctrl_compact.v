@@ -55,8 +55,8 @@ module matrix_keypad_mode_ctrl_compact #(
     reg [SCAN_CNT_W-1:0] scan_cnt;
     reg [1:0] scan_idx;
 
-    reg [1:0] kc_meta;
-    reg [1:0] kc_sync;
+    (* ASYNC_REG = "TRUE" *) reg [1:0] kc_meta;
+    (* ASYNC_REG = "TRUE" *) reg [1:0] kc_sync;
 
     reg       row0_found;
     reg [1:0] row0_mode;
@@ -99,7 +99,7 @@ module matrix_keypad_mode_ctrl_compact #(
     assign scan_advance = (USE_EXTERNAL_SCAN_TICK != 0) ? scan_tick :
                           (scan_cnt == SCAN_DIV - 1);
 
-    always @(posedge clk or negedge rst_n) begin
+    always @(posedge clk) begin
         if (!rst_n)
             scan_cnt <= {SCAN_CNT_W{1'b0}};
         else if (USE_EXTERNAL_SCAN_TICK != 0)
@@ -110,7 +110,7 @@ module matrix_keypad_mode_ctrl_compact #(
             scan_cnt <= scan_cnt + {{(SCAN_CNT_W-1){1'b0}}, 1'b1};
     end
 
-    always @(posedge clk or negedge rst_n) begin
+    always @(posedge clk) begin
         if (!rst_n) begin
             kc_meta <= 2'b11;
             kc_sync <= 2'b11;
@@ -121,7 +121,7 @@ module matrix_keypad_mode_ctrl_compact #(
         end
     end
 
-    always @(posedge clk or negedge rst_n) begin
+    always @(posedge clk) begin
         if (!rst_n) begin
             scan_idx      <= 2'd0;
             kr_drive_low  <= 4'b0001;
