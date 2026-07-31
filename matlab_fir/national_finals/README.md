@@ -2,7 +2,23 @@
 
 当前版本已完成 MATLAB 建模、24 bit 定点模型、RTL、9 项 XSim 回归、Vivado 综合/布局布线/时序/DRC/功耗评估和 bitstream 生成。所有软件与 FPGA 工具验收均已通过；由于当前环境无法接触实物开发板，物理板下载和仪器测量仍需按本文最后一节执行，不能把 bitstream 成功等同于实板通过。
 
-当前最低 LUT 正式版：`434 LUT / 469 FF / 190 Slice`，位于分支 `codex/national-finals-cic6-round7-lut-opt`；`442 LUT / 432 FF / 194 Slice` 的第六轮版本继续作为低 FF Pareto 回退点。两者均保持 6 DSP / 3 BRAM / 2 MMCM，频响和正式 RTL 逐点输出完全一致。
+当前最低 LUT 正式版为 Route 1：`424 LUT / 471 FF / 188 Slice / 6 DSP / 3 BRAM / 2 MMCM`，位于分支 `codex/national-finals-unified-fir-engine-v1`。原 `434 LUT / 469 FF` 第七轮版和 `442 LUT / 432 FF` 低 FF 版继续作为回退点；Route 1没有改变滤波系数与定点输出。
+
+## 0. Route 1：统一双端口系数 RAM
+
+Route 1保留Stage1和Stage2/3两颗FIR DSP。原因是48 kHz最紧工况下，一个128拍输入超周期内三段FIR最坏需要`27+42+60=129`拍，单DSP没有可靠调度余量。实际优化是把Stage1的26路`case`常量系数网络，与Stage2/3同步系数BRAM合并到一个显式true-dual-port `RAMB18E1`：
+
+- A口地址64～89供Stage1读取26个signed 16-bit对称系数；
+- B口地址0～63供Stage2/3读取两相系数；
+- 两颗DSP可以同拍读取，不降低吞吐；
+- 利用原RAMB18的空闲地址，BRAM Tile仍为3；
+- 所有历史存储、MAC、舍入、饱和、均衡器、CIC16和六工况频响不变。
+
+该改动删除了Stage1的常量译码/宽选择网络，综合从452 LUT降到436 LUT，Stage1层级从136 LUT降到120 LUT；布局布线从434 LUT / 469 FF / 190 Slice降到 **424 LUT / 471 FF / 188 Slice**。DSP/BRAM/MMCM/IO和0.271 W功耗不变。
+
+验证包括：统一RAMB18E1的96个地址逐点检查、全国赛回归10/10 PASS、4x/8x/128x冲激和固定随机0 LSB、8个复位恢复场景、10次动态倍率切换、六工况频响、完整布局布线、时序和DRC。WNS/WHS为 **+45.356/+0.117 ns**，TNS/THS为0，bitstream SHA-256为`77D67B9E53FF43A0774A2F0093B5A89F22F27371C8CD9FD59DB018834C757BF4`。
+
+正式提交为`aaac3be`，标签为`national-finals-route1-424LUT-471FF-6DSP-3BRAM-2MMCM`。更完整的Stop/Go过程见 [Route 1 优化记录](results/route1_unified_engine_progress.md)。
 
 ## 1. 完成状态
 
@@ -36,9 +52,9 @@ y[n] = x[n-1] + (2*x[n-1] - x[n] - x[n-2]) / 8
 
 它仅用加减和算术右移，不增加乘法器；4x/8x 输出保持平坦 FIR 响应。双采样率板级测试正弦也打包在同一个 256×24 bit ROM 中。
 
-当前正式版布局布线后为 **434 LUT / 469 FF / 190 Slice / 6 DSP / 3 BRAM / 2 MMCM**。相对最初指定的 573 LUT / 621 FF / 255 Slice / 6 DSP CIC 基线，减少 139 LUT、152 FF 和 65 Slice；相对第五轮 440 LUT / 464 FF 版再减少 6 LUT 和 1 Slice，增加 5 FF。DSP、BRAM、MMCM 以及 0.271 W Vectorless 功耗均不增加。
+第七轮434-LUT基线布局布线后为 **434 LUT / 469 FF / 190 Slice / 6 DSP / 3 BRAM / 2 MMCM**。相对最初指定的573 LUT / 621 FF / 255 Slice / 6 DSP CIC基线，减少139 LUT、152 FF和65 Slice；Route 1在此基础上继续降到424 LUT，具体见第0节。
 
-### 2.1 当前正式版优化方法
+### 2.1 第七轮434-LUT基线优化方法
 
 ```text
 24-bit PCM，44.1/48 kHz
@@ -193,10 +209,10 @@ SHA-256：`8AA618986749BFDFF8A5FDBD8CF125E34F529DA1449356717B739B1E4545A0D4`
 | 第五轮 `CARRYIN`，AddRemap | 451 | 464 | - | 6 | +45.647 / +0.140 ns | 与 Default 同 LUT |
 | 第五轮 `CARRYIN`，ExploreArea | 475 | 464 | - | 6 | +46.154 / +0.099 ns | No-Go |
 | 第五轮 Stage3 证明字长，Default | 440 | 464 | 191 | 6 | +46.046 / +0.127 ns | 440-LUT 锚点 |
-| **第七轮 21-bit 余量，Default** | **434** | **469** | **190** | **6** | **+45.539 / +0.108 ns** | **当前最低 LUT 正式版本** |
+| **第七轮 21-bit 余量，Default** | **434** | **469** | **190** | **6** | **+45.539 / +0.108 ns** | **Route 1之前的最低LUT回退版本** |
 | 第七轮 21-bit 余量，ExploreArea | 468 | 469 | **177** | 6 | +46.357 / +0.095 ns | Slice 更低但 LUT 增加，不采用 |
 
-当前正式版综合后为 452 LUT / 469 FF，`opt_design` 后布局布线结果进一步收敛到 434 LUT / 469 FF。第五轮的 `CARRYIN` 中间候选上，Default 与 AddRemap 均为 451 LUT，ExploreArea 为 475 LUT；第七轮同一 DCP 的 ExploreArea 为 468 LUT，因此继续选择 LUT 最低且流程最简单的 `Default`。累计保留的结构优化是：
+第七轮版本综合后为452 LUT / 469 FF，`opt_design`后布局布线结果进一步收敛到434 LUT / 469 FF。第五轮的`CARRYIN`中间候选上，Default与AddRemap均为451 LUT，ExploreArea为475 LUT；第七轮同一DCP的ExploreArea为468 LUT，因此当时选择LUT最低且流程最简单的`Default`。累计保留的结构优化是：
 
 1. 两个隐藏 CIC 积分状态采用 DSP48E1 PREG 原生同步复位；所有外部可见控制、最终状态、valid 和输出仍保持异步复位，并已通过 8 个复位恢复场景。
 2. 仅在串行 CIC 模式下取消均衡器冗余输出寄存器，由 CIC 输入事务直接捕获组合结果；均衡器默认的寄存输出兼容接口没有改变。
