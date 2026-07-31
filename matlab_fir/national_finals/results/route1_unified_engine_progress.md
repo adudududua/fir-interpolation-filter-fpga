@@ -35,7 +35,9 @@ RAMB18，正式候选使用显式 `RAMB18E1`：
 
 验证结果：
 
-- XSim 全国赛回归：9/9 PASS；
+- XSim 全国赛回归：10/10 PASS；
+- 额外强制走 `RAMB18E1` 原语分支，逐地址核对 32 个 Stage1
+  地址和 64 个 Stage2/3 地址：PASS；
 - 4x/8x/128x 冲激与随机向量：逐点 0 LSB；
 - 8 种内部状态复位恢复：PASS；
 - 10 次无复位动态倍率切换：PASS；
@@ -46,9 +48,50 @@ RAMB18，正式候选使用显式 `RAMB18E1`：
 原始综合报告：
 `vivado_results/board_dual_rate_route1_unified_coeff_ramb18_synth/`
 
-## 后续
+原语级验证首次运行时发现 `INIT_05` 末尾漏写一个十六进制 `D`，
+导致 Stage1 地址 80～89 在 bitstream 分支中发生半字节错位。行为
+模型不会暴露这一错误。修复后原语 96 个地址全部通过，随后重新生成
+了正式 bitstream；中间标签
+`national-finals-route1-r1.1-436synth-6DSP-3BRAM` 仅作为结构回退点，
+不应直接用于上板。
 
-R1.2 将尝试把 Stage2 的 Q15→22 bit 和级间 22→20 bit 两次量化
-合并为 Stage2 DSP 提交周期内的一次 Q17→20 bit 量化。该候选会
-改变少量最低有效位，必须重新生成 RTL 位真参考并重新执行六工况
-MATLAB 频响验收，不能用 R1.1 的 0-LSB 结论代替。
+最终布局布线结果：
+
+- 424 LUT / 471 FF / 188 Slice；
+- 6 DSP / 3 BRAM Tile（6 个 RAMB18E1）/ 2 MMCM / 17 IO；
+- WNS +45.356 ns，TNS 0，WHS +0.117 ns，THS 0；
+- 0 个未布线网络、0 个 routing error；
+- DRC：0 Error / 0 Critical Warning；其余 69 条 Warning 和 1 条
+  Advisory 均为未加 DSP 流水及异步复位驱动 BRAM 地址的结构提示；
+- vectorless 功耗 0.271 W（动态 0.199 W、静态 0.072 W，
+  Confidence=Medium）；
+- bitstream 生成成功。
+
+相对 434 LUT / 469 FF / 190 Slice 的已实现基线，Route 1 最终减少
+10 LUT 和 2 Slice，增加 2 FF；DSP、BRAM、MMCM、IO、功耗均不变。
+
+正式实现目录：
+`vivado_results/board_dual_rate_route1_unified_coeff_ramb18_final/`
+
+## R1.2：Stage2 单次量化候选（验证通过，资源否决）
+
+尝试把 Stage2 的 Q15→22 bit 和级间 22→20 bit 两次量化合并为
+Stage2 DSP 提交周期内的一次 Q17→20 bit 量化，同时保留下一级偶相
+CE 所需的两状态 valid-only 桥。
+
+验证过程与结果：
+
+- 重新生成融合舍入规则的 MATLAB 位真参考；
+- XSim 全国赛回归 9/9 PASS；
+- 4x/8x/128x 冲激与随机向量逐点 0 LSB；
+- 8 种复位恢复和 10 次动态切换全部 PASS；
+- 六工况 MATLAB 频响与严格线性相位全部 PASS；
+- 综合：437 LUT / 467 FF / 6 DSP / 3 BRAM Tile。
+
+与 R1.1 相比，该候选仅减少 2 FF，却增加 1 LUT。原因是被删除的
+22→20 bit Slice 舍入器转移成了 Stage2 DSP 输出端的可变 Q15/Q17
+选择与 20 bit 饱和逻辑，净面积没有下降。因此 R1.2 不进入最终
+实现，路线 1 回到已标记的 R1.1。
+
+原始实验综合报告保留在：
+`vivado_results/board_dual_rate_route1_unified_coeff_fused_q17_synth/`

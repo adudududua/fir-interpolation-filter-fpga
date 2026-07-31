@@ -1,0 +1,49 @@
+National-finals Route 1 final summary
+=====================================
+Architecture: dual FIR DSP lanes with one explicit true-dual-port coefficient RAMB18E1
+Part/top: xc7a35tfgg484-2 / board_demo_competition_dac8_top
+
+Verification
+------------
+RTL regression: PASS 10/10
+Behavioral full-chain: impulse + fixed random, 4x/8x/128x all 0 LSB
+Primitive coefficient memory: PASS, 32 Stage1 + 64 Stage2/3 addresses
+Reset recovery: PASS, 8 internal-state scenarios
+Dynamic mode switching: PASS, 10 switches without reset
+MATLAB frequency/linear-phase acceptance: PASS, six rate/mode conditions
+
+Routed utilization
+------------------
+LUT: 424
+FF: 471
+Slice: 188
+DSP48E1: 6
+BRAM Tile: 3 (6 RAMB18E1)
+MMCM: 2
+IO: 17
+
+Timing and routing
+------------------
+WNS: +45.356 ns
+TNS: 0.000 ns
+WHS: +0.117 ns
+THS: 0.000 ns
+Unrouted nets: 0
+Routing errors: 0
+
+Power and DRC
+-------------
+Total vectorless power: 0.271 W (Medium confidence)
+Dynamic: 0.199 W
+Static: 0.072 W
+DRC: 0 errors, 0 critical warnings, 69 warnings, 1 advisory
+
+Artifacts
+---------
+Implementation directory:
+matlab_fir/national_finals/vivado_results/board_dual_rate_route1_unified_coeff_ramb18_final
+Bitstream:
+national_finals_dual_rate_4x8x128x_areaopt.bit
+Bitstream size: 2192139 bytes
+Bitstream SHA-256:
+77D67B9E53FF43A0774A2F0093B5A89F22F27371C8CD9FD59DB018834C757BF4

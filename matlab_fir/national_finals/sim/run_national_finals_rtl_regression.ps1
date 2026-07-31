@@ -113,6 +113,18 @@ $romDir = Invoke-RtlCase -Name 'rom' `
     -ExpectedPassText 'PASS: dual-rate ROM data, wrap, and synchronous family reset' `
     -Assets @((Join-Path $nfSource 'nf_sine_15k_dual_rate_24bit_256.mem'))
 
+$coeffPrimitiveDir = Invoke-RtlCase -Name 'unified_coeff_ramb18_primitive' `
+    -VerilogFiles @(
+        (Join-Path $nfSource 'nf_unified_fir_coeff_bram.v'),
+        (Join-Path $nfSim 'tb_nf_unified_fir_coeff_bram_primitive.v'),
+        $glbl
+    ) `
+    -Top 'tb_nf_unified_fir_coeff_bram_primitive' `
+    -Snapshot 'tb_nf_unified_coeff_primitive_sim' `
+    -ExpectedPassText 'UNIFIED COEFFICIENT RAMB18 PRIMITIVE PASS: 32 Stage1 + 64 Stage23 addresses' `
+    -XvlogOptions @('-d', 'SYNTHESIS') `
+    -XelabOptions @('glbl', '-L', 'unisims_ver')
+
 $equalizerDir = Invoke-RtlCase -Name 'equalizer' `
     -VerilogFiles @(
         (Join-Path $nfSource 'cic3_compensator_shiftadd_ce.v'),
@@ -267,5 +279,5 @@ if ($PublishImpulseOutputs) {
 }
 
 Write-Host ''
-Write-Host 'NATIONAL FINALS RTL REGRESSION PASS (9/9)'
+Write-Host 'NATIONAL FINALS RTL REGRESSION PASS (10/10)'
 Write-Host "Run directory: $runRoot"
