@@ -39,7 +39,8 @@ module interp2_stage1_strict_halfband_bram_ce #(
     parameter integer PAIR_COUNT  = `V3_S1_PAIR_COUNT,
     parameter integer DELAY_INDEX = `V3_S1_DELAY_INDEX,
     parameter integer RAM_DEPTH   = 64,
-    parameter integer USE_DSP48_PREADDER = 0
+    parameter integer USE_DSP48_PREADDER = 0,
+    parameter integer USE_ROUTE2_COEFF = 0
 )(
     input  wire                         clk,
     input  wire                         rst_n,
@@ -60,6 +61,8 @@ module interp2_stage1_strict_halfband_bram_ce #(
     localparam integer PAIR_W = DATA_W + 1;
     localparam integer QUOT_W = ACC_W - FRAC_W;
     localparam integer UPPER_W = QUOT_W - DATA_W;
+    localparam signed [47:0] ROUND_BIAS =
+        (48'sd1 <<< (FRAC_W-1))-48'sd1;
     localparam signed [DATA_W-1:0] OUT_MAX =
         {1'b0, {(DATA_W-1){1'b1}}};
     localparam signed [DATA_W-1:0] OUT_MIN =
@@ -135,10 +138,12 @@ module interp2_stage1_strict_halfband_bram_ce #(
         (ce_out && phase_cnt == 1'b0);
     assign dsp_p_ce =
         (read_data_valid && !read_is_delay) || filter_commit_pending;
-    // Exact symmetric rounding is 16383 + 1 for a non-negative sum.
+    // Exact symmetric rounding is 2^(FRAC_W-1)-1 plus one carry for a
+    // non-negative sum.  Keeping the expression parameterized is required
+    // by the Route2 Q16 Stage1 as well as the original Q15 Stage1.
     // Keeping C constant and using the DSP carry input avoids a sign-driven
     // 48-bit constant selector.
-    assign dsp_round_bias = 48'sd16383;
+    assign dsp_round_bias = ROUND_BIAS;
     assign dsp_round_carryin =
         filter_commit_pending && !mac_sum_comb[ACC_W-1];
     assign dsp_opmode = filter_commit_pending ?
@@ -227,37 +232,74 @@ module interp2_stage1_strict_halfband_bram_ce #(
                      (read_mask_a ? read_data_a : {DATA_W{1'b0}})}) +
             $signed({(read_mask_b ? read_data_b[DATA_W-1] : 1'b0),
                      (read_mask_b ? read_data_b : {DATA_W{1'b0}})});
-
-        case (read_coeff_index)
-            5'd0:  coeff_comb = `V3_S1_C00;
-            5'd1:  coeff_comb = `V3_S1_C01;
-            5'd2:  coeff_comb = `V3_S1_C02;
-            5'd3:  coeff_comb = `V3_S1_C03;
-            5'd4:  coeff_comb = `V3_S1_C04;
-            5'd5:  coeff_comb = `V3_S1_C05;
-            5'd6:  coeff_comb = `V3_S1_C06;
-            5'd7:  coeff_comb = `V3_S1_C07;
-            5'd8:  coeff_comb = `V3_S1_C08;
-            5'd9:  coeff_comb = `V3_S1_C09;
-            5'd10: coeff_comb = `V3_S1_C10;
-            5'd11: coeff_comb = `V3_S1_C11;
-            5'd12: coeff_comb = `V3_S1_C12;
-            5'd13: coeff_comb = `V3_S1_C13;
-            5'd14: coeff_comb = `V3_S1_C14;
-            5'd15: coeff_comb = `V3_S1_C15;
-            5'd16: coeff_comb = `V3_S1_C16;
-            5'd17: coeff_comb = `V3_S1_C17;
-            5'd18: coeff_comb = `V3_S1_C18;
-            5'd19: coeff_comb = `V3_S1_C19;
-            5'd20: coeff_comb = `V3_S1_C20;
-            5'd21: coeff_comb = `V3_S1_C21;
-            5'd22: coeff_comb = `V3_S1_C22;
-            5'd23: coeff_comb = `V3_S1_C23;
-            5'd24: coeff_comb = `V3_S1_C24;
-            5'd25: coeff_comb = `V3_S1_C25;
-            default: coeff_comb = {COEFF_W{1'b0}};
-        endcase
     end
+
+    generate
+        if (USE_ROUTE2_COEFF != 0) begin : gen_route2_stage1_coeff
+            always @(*) begin
+                case (read_coeff_index)
+                    5'd0:  coeff_comb = `R2_S1_C00;
+                    5'd1:  coeff_comb = `R2_S1_C01;
+                    5'd2:  coeff_comb = `R2_S1_C02;
+                    5'd3:  coeff_comb = `R2_S1_C03;
+                    5'd4:  coeff_comb = `R2_S1_C04;
+                    5'd5:  coeff_comb = `R2_S1_C05;
+                    5'd6:  coeff_comb = `R2_S1_C06;
+                    5'd7:  coeff_comb = `R2_S1_C07;
+                    5'd8:  coeff_comb = `R2_S1_C08;
+                    5'd9:  coeff_comb = `R2_S1_C09;
+                    5'd10: coeff_comb = `R2_S1_C10;
+                    5'd11: coeff_comb = `R2_S1_C11;
+                    5'd12: coeff_comb = `R2_S1_C12;
+                    5'd13: coeff_comb = `R2_S1_C13;
+                    5'd14: coeff_comb = `R2_S1_C14;
+                    5'd15: coeff_comb = `R2_S1_C15;
+                    5'd16: coeff_comb = `R2_S1_C16;
+                    5'd17: coeff_comb = `R2_S1_C17;
+                    5'd18: coeff_comb = `R2_S1_C18;
+                    5'd19: coeff_comb = `R2_S1_C19;
+                    5'd20: coeff_comb = `R2_S1_C20;
+                    5'd21: coeff_comb = `R2_S1_C21;
+                    5'd22: coeff_comb = `R2_S1_C22;
+                    5'd23: coeff_comb = `R2_S1_C23;
+                    default: coeff_comb = {COEFF_W{1'b0}};
+                endcase
+            end
+        end
+        else begin : gen_baseline_stage1_coeff
+            always @(*) begin
+                case (read_coeff_index)
+                    5'd0:  coeff_comb = `V3_S1_C00;
+                    5'd1:  coeff_comb = `V3_S1_C01;
+                    5'd2:  coeff_comb = `V3_S1_C02;
+                    5'd3:  coeff_comb = `V3_S1_C03;
+                    5'd4:  coeff_comb = `V3_S1_C04;
+                    5'd5:  coeff_comb = `V3_S1_C05;
+                    5'd6:  coeff_comb = `V3_S1_C06;
+                    5'd7:  coeff_comb = `V3_S1_C07;
+                    5'd8:  coeff_comb = `V3_S1_C08;
+                    5'd9:  coeff_comb = `V3_S1_C09;
+                    5'd10: coeff_comb = `V3_S1_C10;
+                    5'd11: coeff_comb = `V3_S1_C11;
+                    5'd12: coeff_comb = `V3_S1_C12;
+                    5'd13: coeff_comb = `V3_S1_C13;
+                    5'd14: coeff_comb = `V3_S1_C14;
+                    5'd15: coeff_comb = `V3_S1_C15;
+                    5'd16: coeff_comb = `V3_S1_C16;
+                    5'd17: coeff_comb = `V3_S1_C17;
+                    5'd18: coeff_comb = `V3_S1_C18;
+                    5'd19: coeff_comb = `V3_S1_C19;
+                    5'd20: coeff_comb = `V3_S1_C20;
+                    5'd21: coeff_comb = `V3_S1_C21;
+                    5'd22: coeff_comb = `V3_S1_C22;
+                    5'd23: coeff_comb = `V3_S1_C23;
+                    5'd24: coeff_comb = `V3_S1_C24;
+                    5'd25: coeff_comb = `V3_S1_C25;
+                    default: coeff_comb = {COEFF_W{1'b0}};
+                endcase
+            end
+        end
+    endgenerate
 
     // The result-commit DSP cycle has already added the exact signed Q15
     // rounding bias.  Saturation therefore needs no external carry chain.
@@ -419,6 +461,16 @@ module interp2_stage1_strict_halfband_bram_ce #(
 
 `ifndef SYNTHESIS
     reg input_seen;
+
+    initial begin
+        if (USE_ROUTE2_COEFF != 0 &&
+            (COEFF_W != `R2_S1_COEFF_W ||
+             FRAC_W != `R2_S1_FRAC_W ||
+             HISTORY_LEN != `R2_S1_HISTORY_LEN ||
+             PAIR_COUNT != `R2_S1_PAIR_COUNT ||
+             DELAY_INDEX != `R2_S1_DELAY_INDEX))
+            $fatal(1, "Route2 Stage1 parameters do not match coefficients");
+    end
 
     always @(posedge clk) begin
         if (!rst_n) begin

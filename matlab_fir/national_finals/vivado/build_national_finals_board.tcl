@@ -18,8 +18,10 @@ set synthesis_only 0
 set synth_directive AreaOptimized_high
 set flatten_hierarchy rebuilt
 set resource_sharing on
-set result_tag board_dual_rate_cic6_round7_headroom_opt
+set result_tag board_dual_rate_route2b_5dsp_final
 set stage1_dsp48_preadder 0
+set use_route2_cic_repartition 1
+set use_route2_single_hb_cic8 0
 if {$argc > 0} {
     set reuse_current_synthesis [lindex $argv 0]
 }
@@ -41,6 +43,12 @@ if {$argc > 5} {
 if {$argc > 6} {
     set stage1_dsp48_preadder [lindex $argv 6]
 }
+if {$argc > 7} {
+    set use_route2_cic_repartition [lindex $argv 7]
+}
+if {$argc > 8} {
+    set use_route2_single_hb_cic8 [lindex $argv 8]
+}
 if {$reuse_current_synthesis != 0 && $reuse_current_synthesis != 1} {
     error "reuse_current_synthesis must be 0 or 1"
 }
@@ -50,6 +58,14 @@ if {$synthesis_only != 0 && $synthesis_only != 1} {
 if {$stage1_dsp48_preadder != 0 && $stage1_dsp48_preadder != 1} {
     error "stage1_dsp48_preadder must be 0 or 1"
 }
+if {$use_route2_cic_repartition != 0 &&
+    $use_route2_cic_repartition != 1} {
+    error "use_route2_cic_repartition must be 0 or 1"
+}
+if {$use_route2_single_hb_cic8 != 0 &&
+    $use_route2_single_hb_cic8 != 1} {
+    error "use_route2_single_hb_cic8 must be 0 or 1"
+}
 if {![regexp {^[A-Za-z0-9_-]+$} $result_tag]} {
     error "result_tag may contain only letters, digits, underscore, and dash"
 }
@@ -57,9 +73,14 @@ set result_dir [file normalize [file join $script_dir .. vivado_results $result_
 
 set nf_sources [list \
     [file join $nf_src_dir cic3_compensator_shiftadd_ce.v] \
+    [file join $nf_src_dir cic_interp4_n2_serial_comb_dsp_ce.v] \
+    [file join $nf_src_dir cic_interp8_n3_serial_comb_dsp_ce.v] \
     [file join $nf_src_dir cic_interp16_serial_comb_dsp_ce.v] \
     [file join $nf_src_dir dual_family_audio_clock.v] \
     [file join $nf_src_dir dual_rate_test_tone_rom_source.v] \
+    [file join $nf_src_dir interp2_dual_halfband7_shared_shiftadd_ce.v] \
+    [file join $nf_src_dir interp128_route2_single_hb_cic8_top_ce.v] \
+    [file join $nf_src_dir interp128_route2_tail_cic_top_ce.v] \
     [file join $nf_src_dir nf_sine_15k_dual_rate_24bit_256.mem]]
 
 set nf_sim_sources [list \
@@ -123,7 +144,10 @@ set_property generic [list \
     USE_NATIONAL_FINALS_DATAPATH=1 \
     USE_NATIONAL_FINALS_SERIAL_CIC_COMB=1 \
     USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER=$stage1_dsp48_preadder \
-    USE_NATIONAL_FINALS_NARROW_STAGE23=1] [get_filesets sources_1]
+    USE_NATIONAL_FINALS_NARROW_STAGE23=1 \
+    USE_ROUTE2_CIC_REPARTITION=$use_route2_cic_repartition \
+    USE_ROUTE2_SINGLE_HB_CIC8=$use_route2_single_hb_cic8] \
+    [get_filesets sources_1]
 
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
@@ -220,12 +244,22 @@ puts $manifest_handle "Top: board_demo_competition_dac8_top"
 puts $manifest_handle "Bitstream: $bitstream_dst"
 puts $manifest_handle "44.1-kHz family 128x clock: 5.644796 MHz (-0.64 ppm nominal)"
 puts $manifest_handle "48-kHz family 128x clock: 6.144068 MHz (+11.03 ppm nominal)"
-puts $manifest_handle "Architecture: shared 2x/2x/2x FIR + shift-add CIC equalizer + CIC16"
-puts $manifest_handle "Equalizer headroom optimization: lossless 21-bit equalizer output feeds a 21-bit CIC input; clipping is deferred to the final 20-bit CIC quantizer"
+if {$use_route2_single_hb_cic8 != 0} {
+    puts $manifest_handle "Architecture: FIR2 x3 + one sparse shift-add HB2 + CIC8 N3"
+    puts $manifest_handle "Route-2 quantization: Stage1 Q16, Stage2 Q15, compensated Stage3 Q14 with exact signed rounding"
+    puts $manifest_handle "Route-2C status: optional 6-DSP synthesis candidate; Route-2B remains the board-build default"
+} elseif {$use_route2_cic_repartition != 0} {
+    puts $manifest_handle "Architecture: FIR2 x3 + sparse shift-add HB2 x2 + CIC4 N2"
+    puts $manifest_handle "Route-2 quantization: Stage1 Q16, Stage2 Q15, compensated Stage3 Q14 with exact signed rounding"
+    puts $manifest_handle "Route-2B optimization: two canonical halfbands share one compact shift-add datapath; CIC4 uses one serial comb DSP and two integrator DSPs"
+} else {
+    puts $manifest_handle "Architecture: shared 2x/2x/2x FIR + shift-add CIC equalizer + CIC16"
+    puts $manifest_handle "Equalizer headroom optimization: lossless 21-bit equalizer output feeds a 21-bit CIC input; clipping is deferred to the final 20-bit CIC quantizer"
+    puts $manifest_handle "Rounding: constant 16383 plus DSP48 CARRYIN for non-negative Q15 MAC sums"
+    puts $manifest_handle "Stage3: proven 35-bit MAC bound removes unreachable 20-bit saturation logic"
+}
 puts $manifest_handle "Synthesis directive: AreaOptimized_high"
 puts $manifest_handle "Stage1 DSP48 preadder: $stage1_dsp48_preadder"
-puts $manifest_handle "Rounding: constant 16383 plus DSP48 CARRYIN for non-negative MAC sums"
-puts $manifest_handle "Stage3: proven 35-bit MAC bound removes unreachable 20-bit saturation logic"
 puts $manifest_handle "Implementation opt directive: Default"
 close $manifest_handle
 

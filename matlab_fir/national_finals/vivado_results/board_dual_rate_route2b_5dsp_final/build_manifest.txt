@@ -1,0 +1,13 @@
+National-finals dual-rate board build
+Project: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.xpr
+Part: xc7a35tfgg484-2
+Top: board_demo_competition_dac8_top
+Bitstream: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/vivado_results/board_dual_rate_route2b_5dsp_final/national_finals_dual_rate_4x8x128x_areaopt.bit
+44.1-kHz family 128x clock: 5.644796 MHz (-0.64 ppm nominal)
+48-kHz family 128x clock: 6.144068 MHz (+11.03 ppm nominal)
+Architecture: FIR2 x3 + sparse shift-add HB2 x2 + CIC4 N2
+Route-2 quantization: Stage1 Q16, Stage2 Q15, compensated Stage3 Q14 with exact signed rounding
+Route-2B optimization: two canonical halfbands share one compact shift-add datapath; CIC4 uses one serial comb DSP and two integrator DSPs
+Synthesis directive: AreaOptimized_high
+Stage1 DSP48 preadder: 0
+Implementation opt directive: Default

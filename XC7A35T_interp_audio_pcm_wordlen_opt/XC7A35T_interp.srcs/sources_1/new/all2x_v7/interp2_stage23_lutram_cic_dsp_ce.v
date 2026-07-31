@@ -48,6 +48,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     parameter integer ACC_W = 38,
     parameter integer CIC_ORDER = 3,
     parameter integer STAGE3_FLAT = 0,
+    // 0=legacy/flat, 1=Route2B dual-HB+CIC4, 2=Route2C HB+CIC8.
+    parameter integer USE_ROUTE2_STAGE3 = 0,
     parameter integer USE_BRAM_HISTORY = 0,
     parameter integer USE_BRAM_COEFF = 0,
     parameter integer USE_PACKED_BRAM = 0
@@ -283,7 +285,9 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     assign dsp_p_reset = !rst_n ||
         (!job_active && !job_result_pending && !job_output_pending &&
          (stage2_pending || stage3_pending));
-    assign dsp_round_bias = 48'sd16383;
+    assign dsp_round_bias =
+        (USE_ROUTE2_STAGE3 != 0 && job_stage3) ?
+        48'sd8191 : 48'sd16383;
     assign dsp_round_carryin =
         job_result_pending && !mac_sum_comb[ACC_W-1];
     assign dsp_opmode = job_result_pending ?
@@ -377,7 +381,26 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         (truncated_value[SHIFT_W-1] ? STAGE2_OUT_MIN : STAGE2_OUT_MAX);
 
     generate
-        if (STAGE3_FLAT != 0 && COEFF_W == 16 &&
+        if (USE_ROUTE2_STAGE3 != 0) begin :
+                gen_route2_stage3_q14_saturation
+            localparam integer ROUTE2_FRAC_W = 14;
+            localparam integer ROUTE2_SHIFT_W =
+                ACC_W-ROUTE2_FRAC_W;
+            localparam integer ROUTE2_UPPER_W =
+                ROUTE2_SHIFT_W-STAGE3_DATA_W;
+            wire signed [ROUTE2_SHIFT_W-1:0] route2_truncated;
+            assign route2_truncated = mac_sum_comb >>> ROUTE2_FRAC_W;
+            assign stage3_upper_is_sign_extension =
+                route2_truncated[ROUTE2_SHIFT_W-1:STAGE3_DATA_W] ==
+                {ROUTE2_UPPER_W{
+                    route2_truncated[STAGE3_DATA_W-1]}};
+            assign stage3_q15_rounded =
+                stage3_upper_is_sign_extension ?
+                route2_truncated[STAGE3_DATA_W-1:0] :
+                (route2_truncated[ROUTE2_SHIFT_W-1] ?
+                 STAGE3_OUT_MIN : STAGE3_OUT_MAX);
+        end
+        else if (STAGE3_FLAT != 0 && COEFF_W == 16 &&
             STAGE3_DATA_W == NF_STAGE3_ACC_W-FRAC_W) begin :
                 gen_national_finals_stage3_proven_width
             assign stage3_upper_is_sign_extension = 1'b1;
@@ -450,7 +473,51 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         coeff_sequence_bram[22] = `V2_S2_P1_C1;
         coeff_sequence_bram[23] = `V2_S2_P1_C0;
 
-        if (STAGE3_FLAT != 0) begin
+        if (USE_ROUTE2_STAGE3 == 2) begin
+            // Route 2C 11-tap Q14 compensator for one sparse halfband
+            // followed by R=8, N=3 CIC.
+            coeff_rom[16] = 18'sd242;
+            coeff_rom[17] = -18'sd1810;
+            coeff_rom[18] = 18'sd9759;
+            coeff_rom[24] = 18'sd21;
+            coeff_rom[25] = -18'sd212;
+            coeff_rom[26] = 18'sd16768;
+
+            coeff_sequence_bram[32] = 18'sd242;
+            coeff_sequence_bram[33] = -18'sd1810;
+            coeff_sequence_bram[34] = 18'sd9759;
+            coeff_sequence_bram[35] = 18'sd9759;
+            coeff_sequence_bram[36] = -18'sd1810;
+            coeff_sequence_bram[37] = 18'sd242;
+            coeff_sequence_bram[48] = 18'sd21;
+            coeff_sequence_bram[49] = -18'sd212;
+            coeff_sequence_bram[50] = 18'sd16768;
+            coeff_sequence_bram[51] = -18'sd212;
+            coeff_sequence_bram[52] = 18'sd21;
+        end
+        else if (USE_ROUTE2_STAGE3 != 0) begin
+            // Route 2B 11-tap Q14 compensator for the two sparse halfbands
+            // and the following R=4, N=2 CIC.
+            coeff_rom[16] = 18'sd231;
+            coeff_rom[17] = -18'sd1722;
+            coeff_rom[18] = 18'sd9683;
+            coeff_rom[24] = 18'sd14;
+            coeff_rom[25] = -18'sd75;
+            coeff_rom[26] = 18'sd16506;
+
+            coeff_sequence_bram[32] = 18'sd231;
+            coeff_sequence_bram[33] = -18'sd1722;
+            coeff_sequence_bram[34] = 18'sd9683;
+            coeff_sequence_bram[35] = 18'sd9683;
+            coeff_sequence_bram[36] = -18'sd1722;
+            coeff_sequence_bram[37] = 18'sd231;
+            coeff_sequence_bram[48] = 18'sd14;
+            coeff_sequence_bram[49] = -18'sd75;
+            coeff_sequence_bram[50] = 18'sd16506;
+            coeff_sequence_bram[51] = -18'sd75;
+            coeff_sequence_bram[52] = 18'sd14;
+        end
+        else if (STAGE3_FLAT != 0) begin
             // 全国赛独立 8x 输出使用原 Phase 6 平坦 Stage3。
             // CIC 的通带下垂由后接三抽头移位加法器单独补偿。
             coeff_rom[16] = 18'sd202;
@@ -692,7 +759,9 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     initial begin
         if (STAGE2_DATA_W > 24 || STAGE2_DATA_W < STAGE3_DATA_W)
             $fatal(1, "Invalid Stage 2/3 data widths");
-        if (COEFF_W != 18 && !(STAGE3_FLAT != 0 && COEFF_W == 16))
+        if (COEFF_W != 18 &&
+            !(STAGE3_FLAT != 0 && COEFF_W == 16) &&
+            !(USE_ROUTE2_STAGE3 != 0 && COEFF_W == 17))
             $fatal(1, "Stage 2/3 coefficients require 18bit, or 16bit in flat Stage3 mode");
         if (USE_PACKED_BRAM != 0 &&
             (STAGE2_DATA_W < COEFF_W || STAGE3_DATA_W < COEFF_W))
@@ -701,6 +770,10 @@ module interp2_stage23_lutram_cic_dsp_ce #(
             $fatal(1, "CIC_ORDER must be 3 or 4");
         if (STAGE3_FLAT != 0 && STAGE3_FLAT != 1)
             $fatal(1, "STAGE3_FLAT must be 0 or 1");
+        if (USE_ROUTE2_STAGE3 != 0 && STAGE3_FLAT == 0)
+            $fatal(1, "Route2 Stage3 requires the proven-width Stage3 path");
+        if (USE_ROUTE2_STAGE3 < 0 || USE_ROUTE2_STAGE3 > 2)
+            $fatal(1, "USE_ROUTE2_STAGE3 must be 0, 1, or 2");
         if (USE_BRAM_HISTORY != 0 && USE_BRAM_HISTORY != 1)
             $fatal(1, "USE_BRAM_HISTORY must be 0 or 1");
         if (USE_BRAM_COEFF != 0 && USE_BRAM_COEFF != 1)

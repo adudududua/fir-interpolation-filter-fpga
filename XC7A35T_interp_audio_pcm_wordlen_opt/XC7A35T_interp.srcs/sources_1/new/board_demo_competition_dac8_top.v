@@ -50,7 +50,9 @@ module board_demo_competition_dac8_top #(
     // Legacy/regional wrappers continue to select their own parameter values.
     parameter integer USE_NATIONAL_FINALS_SERIAL_CIC_COMB = 1,
     parameter integer USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER = 0,
-    parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 1
+    parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 1,
+    parameter integer USE_ROUTE2_CIC_REPARTITION = 1,
+    parameter integer USE_ROUTE2_SINGLE_HB_CIC8 = 0
 )(
     input  wire       clk,       // 板载 20MHz 系统时钟
 
@@ -294,7 +296,11 @@ module board_demo_competition_dac8_top #(
         .USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER(
             USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER),
         .USE_NATIONAL_FINALS_NARROW_STAGE23(
-            USE_NATIONAL_FINALS_NARROW_STAGE23)
+            USE_NATIONAL_FINALS_NARROW_STAGE23),
+        .USE_ROUTE2_CIC_REPARTITION(
+            USE_ROUTE2_CIC_REPARTITION),
+        .USE_ROUTE2_SINGLE_HB_CIC8(
+            USE_ROUTE2_SINGLE_HB_CIC8)
     ) u_demo_interp_dac8_audio_pcm_common (
         .clk_audio_128x (clk_audio_128x),
         .rst_n          (rst_audio_n),

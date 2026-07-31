@@ -2,7 +2,20 @@
 
 当前版本已完成 MATLAB 建模、24 bit 定点模型、RTL、9 项 XSim 回归、Vivado 综合/布局布线/时序/DRC/功耗评估和 bitstream 生成。所有软件与 FPGA 工具验收均已通过；由于当前环境无法接触实物开发板，物理板下载和仪器测量仍需按本文最后一节执行，不能把 bitstream 成功等同于实板通过。
 
-当前最低 LUT 正式版：`434 LUT / 469 FF / 190 Slice`，位于分支 `codex/national-finals-cic6-round7-lut-opt`；`442 LUT / 432 FF / 194 Slice` 的第六轮版本继续作为低 FF Pareto 回退点。两者均保持 6 DSP / 3 BRAM / 2 MMCM，频响和正式 RTL 逐点输出完全一致。
+当前最低 LUT 正式版已经更新为 Route 1 的 `424 LUT / 471 FF / 188 Slice / 6 DSP`，位于分支 `codex/national-finals-unified-fir-engine-v1`。本轮 Route 2B 则把 FIR-CIC 降到 `570 LUT / 551 FF / 229 Slice / 5 DSP`，位于分支 `codex/national-finals-cic-front-end-v1`；它用更多通用逻辑换少 1 颗 DSP。原 `434 LUT / 469 FF` 第七轮版本和 `442 LUT / 432 FF` 低 FF 版都保留为明确回退点。
+
+## 0. 本轮双路线结论
+
+| 方案 | 状态 | LUT | FF | Slice | DSP | BRAM | MMCM | WNS/WHS | 功耗 |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| 434-LUT 第七轮基线 | 已实现 | 434 | 469 | 190 | 6 | 3 | 2 | +45.539/+0.108 ns | 0.271 W |
+| **Route 1 统一系数 RAM** | **已实现/bitstream** | **424** | **471** | **188** | **6** | **3** | **2** | **+45.356/+0.117 ns** | **0.271 W** |
+| **Route 2B 双 HB + CIC4** | **已实现/bitstream** | **570** | **551** | **229** | **5** | **3** | **2** | **+46.258/+0.118 ns** | **0.271 W** |
+| Route 2C 单 HB + CIC8 | 仅综合，Stop/Go 淘汰 | 512 | 473 | — | 6 | 3 | 2 | — | — |
+
+Route 1 只统一 Stage1/Stage2/3 系数 BRAM，定点输出和原六工况频响完全不变；它是 LUT 优先时的推荐版本。Route 2B 将尾级改为 `FIR2 ×3 -> canonical HB2 ×2 -> CIC4/N2`，两个半带级共享紧凑移位加法器，CIC comb 串行共享一颗 DSP，因此总 DSP 为 5；它是 DSP 权重更高时的 FIR-CIC Pareto 版本。Route 2C 虽然频响、逐位 RTL 和综合通过，但同为 6 DSP 时 LUT 高于 Route 1，故没有继续消耗时间做布局布线。
+
+Route 2B 六工况的通带最大绝对偏差为 **0.005872～0.010569 dB**，阻带衰减为 **71.585～73.438 dB**；impulse、固定随机和满量程随机的 4x/8x/128x 全部 0 LSB。公共全国赛回归 9/9 PASS，完整实现满足 setup/hold、DRC Error=0，bitstream SHA-256 为 `96F1BEE26BD6EDE53B3F8FB431A38C11F31AFF65549579518AA3CE2D2CA42D3E`，回退标签为 `national-finals-route2-570LUT-551FF-5DSP-3BRAM-2MMCM`。详细系数、逐节点指标和 Stop/Go 证据见 [Route 2 最终签核摘要](route2_cic_frontend/results/route2_final_summary.md)。
 
 ## 1. 完成状态
 
@@ -36,9 +49,9 @@ y[n] = x[n-1] + (2*x[n-1] - x[n] - x[n-2]) / 8
 
 它仅用加减和算术右移，不增加乘法器；4x/8x 输出保持平坦 FIR 响应。双采样率板级测试正弦也打包在同一个 256×24 bit ROM 中。
 
-当前正式版布局布线后为 **434 LUT / 469 FF / 190 Slice / 6 DSP / 3 BRAM / 2 MMCM**。相对最初指定的 573 LUT / 621 FF / 255 Slice / 6 DSP CIC 基线，减少 139 LUT、152 FF 和 65 Slice；相对第五轮 440 LUT / 464 FF 版再减少 6 LUT 和 1 Slice，增加 5 FF。DSP、BRAM、MMCM 以及 0.271 W Vectorless 功耗均不增加。
+第七轮 434-LUT 基线布局布线后为 **434 LUT / 469 FF / 190 Slice / 6 DSP / 3 BRAM / 2 MMCM**。相对最初指定的 573 LUT / 621 FF / 255 Slice / 6 DSP CIC 基线，减少 139 LUT、152 FF 和 65 Slice；相对第五轮 440 LUT / 464 FF 版再减少 6 LUT 和 1 Slice，增加 5 FF。DSP、BRAM、MMCM 以及 0.271 W Vectorless 功耗均不增加。Route 1/Route 2 的继续优化见第 0 节。
 
-### 2.1 当前正式版优化方法
+### 2.1 第七轮 434-LUT 基线优化方法
 
 ```text
 24-bit PCM，44.1/48 kHz
@@ -193,10 +206,10 @@ SHA-256：`8AA618986749BFDFF8A5FDBD8CF125E34F529DA1449356717B739B1E4545A0D4`
 | 第五轮 `CARRYIN`，AddRemap | 451 | 464 | - | 6 | +45.647 / +0.140 ns | 与 Default 同 LUT |
 | 第五轮 `CARRYIN`，ExploreArea | 475 | 464 | - | 6 | +46.154 / +0.099 ns | No-Go |
 | 第五轮 Stage3 证明字长，Default | 440 | 464 | 191 | 6 | +46.046 / +0.127 ns | 440-LUT 锚点 |
-| **第七轮 21-bit 余量，Default** | **434** | **469** | **190** | **6** | **+45.539 / +0.108 ns** | **当前最低 LUT 正式版本** |
+| **第七轮 21-bit 余量，Default** | **434** | **469** | **190** | **6** | **+45.539 / +0.108 ns** | **第七轮最低 LUT 回退版本** |
 | 第七轮 21-bit 余量，ExploreArea | 468 | 469 | **177** | 6 | +46.357 / +0.095 ns | Slice 更低但 LUT 增加，不采用 |
 
-当前正式版综合后为 452 LUT / 469 FF，`opt_design` 后布局布线结果进一步收敛到 434 LUT / 469 FF。第五轮的 `CARRYIN` 中间候选上，Default 与 AddRemap 均为 451 LUT，ExploreArea 为 475 LUT；第七轮同一 DCP 的 ExploreArea 为 468 LUT，因此继续选择 LUT 最低且流程最简单的 `Default`。累计保留的结构优化是：
+第七轮版本综合后为 452 LUT / 469 FF，`opt_design` 后布局布线结果进一步收敛到 434 LUT / 469 FF。第五轮的 `CARRYIN` 中间候选上，Default 与 AddRemap 均为 451 LUT，ExploreArea 为 475 LUT；第七轮同一 DCP 的 ExploreArea 为 468 LUT，因此当时选择 LUT 最低且流程最简单的 `Default`。累计保留的结构优化是：
 
 1. 两个隐藏 CIC 积分状态采用 DSP48E1 PREG 原生同步复位；所有外部可见控制、最终状态、valid 和输出仍保持异步复位，并已通过 8 个复位恢复场景。
 2. 仅在串行 CIC 模式下取消均衡器冗余输出寄存器，由 CIC 输入事务直接捕获组合结果；均衡器默认的寄存输出兼容接口没有改变。

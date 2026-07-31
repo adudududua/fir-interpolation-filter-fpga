@@ -115,6 +115,20 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PSRCDIR/sources_1/new/national_finals/cic_interp4_n2_serial_comb_dsp_ce.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/new/national_finals/cic_interp8_n3_serial_comb_dsp_ce.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PSRCDIR/sources_1/new/demo_interp_dac8_audio_pcm_common.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -164,6 +178,20 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PSRCDIR/sources_1/new/national_finals/interp128_route2_single_hb_cic8_top_ce.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/new/national_finals/interp128_route2_tail_cic_top_ce.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PSRCDIR/sources_1/new/all2x_v2/interp2_all2x_v2_stage_select.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -172,6 +200,13 @@
         </FileInfo>
       </File>
       <File Path="$PSRCDIR/sources_1/new/interp2_ctrl_ce.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/new/national_finals/interp2_dual_halfband7_shared_shiftadd_ce.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -432,6 +467,8 @@
         <Generic Name="USE_NATIONAL_FINALS_SERIAL_CIC_COMB" Val="1"/>
         <Generic Name="USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER" Val="0"/>
         <Generic Name="USE_NATIONAL_FINALS_NARROW_STAGE23" Val="1"/>
+        <Generic Name="USE_ROUTE2_CIC_REPARTITION" Val="1"/>
+        <Generic Name="USE_ROUTE2_SINGLE_HB_CIC8" Val="0"/>
       </Config>
     </FileSet>
     <FileSet Name="constrs_1" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1">

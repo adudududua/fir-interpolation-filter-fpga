@@ -49,4 +49,40 @@
 `define V3_S1_C24 (-17'sd6876)
 `define V3_S1_C25 (17'sd20836)
 
+// Route 2B: 97-tap strict-halfband Stage1, Q16.  The direct phase remains
+// an unscaled one-sample delay; these 24 values are the unique coefficients
+// of the filtered phase.
+`define R2_S1_TAPS          97
+`define R2_S1_FRAC_W        16
+`define R2_S1_COEFF_W       18
+`define R2_S1_ACC_W         42
+`define R2_S1_HISTORY_LEN   48
+`define R2_S1_PAIR_COUNT    24
+`define R2_S1_DELAY_INDEX   23
+
+`define R2_S1_C00 (-18'sd19)
+`define R2_S1_C01 (18'sd25)
+`define R2_S1_C02 (-18'sd41)
+`define R2_S1_C03 (18'sd63)
+`define R2_S1_C04 (-18'sd93)
+`define R2_S1_C05 (18'sd132)
+`define R2_S1_C06 (-18'sd182)
+`define R2_S1_C07 (18'sd245)
+`define R2_S1_C08 (-18'sd324)
+`define R2_S1_C09 (18'sd422)
+`define R2_S1_C10 (-18'sd541)
+`define R2_S1_C11 (18'sd686)
+`define R2_S1_C12 (-18'sd861)
+`define R2_S1_C13 (18'sd1074)
+`define R2_S1_C14 (-18'sd1332)
+`define R2_S1_C15 (18'sd1650)
+`define R2_S1_C16 (-18'sd2046)
+`define R2_S1_C17 (18'sd2551)
+`define R2_S1_C18 (-18'sd3220)
+`define R2_S1_C19 (18'sd4157)
+`define R2_S1_C20 (-18'sd5581)
+`define R2_S1_C21 (18'sd8069)
+`define R2_S1_C22 (-18'sd13741)
+`define R2_S1_C23 (18'sd41675)
+
 `endif

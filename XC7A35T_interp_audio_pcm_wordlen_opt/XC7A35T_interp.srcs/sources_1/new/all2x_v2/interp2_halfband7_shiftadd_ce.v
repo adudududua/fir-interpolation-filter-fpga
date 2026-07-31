@@ -26,7 +26,9 @@
 
 (* use_dsp = "no" *)
 module interp2_halfband7_shiftadd_ce #(
-    parameter integer DATA_W = 24
+    parameter integer DATA_W = 24,
+    parameter integer ASSUME_VALID_PHASE0 = 0,
+    parameter integer PROVEN_NO_SATURATION = 0
 )(
     input  wire                         clk,
     input  wire                         rst_n,
@@ -53,8 +55,11 @@ module interp2_halfband7_shiftadd_ce #(
     wire signed [ACC_W-1:0]  pair_inner_ext;
     wire signed [ACC_W-1:0]  even_acc;
     wire signed [DATA_W-1:0] even_rounded;
+    wire signed [ACC_W-1:0] even_biased;
+    wire signed [ACC_W-1:0] even_shifted;
 
-    assign x_current = x_in_valid ? x_in : {DATA_W{1'b0}};
+    assign x_current = (ASSUME_VALID_PHASE0 != 0) ? x_in :
+        (x_in_valid ? x_in : {DATA_W{1'b0}});
     assign pair_edge = $signed({x_current[DATA_W-1], x_current})
                      + $signed({x_d3[DATA_W-1], x_d3});
     assign pair_inner = $signed({x_d1[DATA_W-1], x_d1})
@@ -68,14 +73,26 @@ module interp2_halfband7_shiftadd_ce #(
                     + pair_inner_ext
                     + (pair_inner_ext <<< 3);
 
-    round_sat_q16_to24 #(
-        .IN_W   (ACC_W),
-        .OUT_W  (DATA_W),
-        .FRAC_W (4)
-    ) u_round_sat_q4_to_data (
-        .din_full (even_acc),
-        .dout_24  (even_rounded)
-    );
+    generate
+        if (PROVEN_NO_SATURATION != 0) begin : gen_compact_round
+            assign even_biased = even_acc+{{(ACC_W-3){1'b0}}, 3'd7}+
+                {{(ACC_W-1){1'b0}}, ~even_acc[ACC_W-1]};
+            assign even_shifted = even_biased >>> 4;
+            assign even_rounded = even_shifted[DATA_W-1:0];
+        end
+        else begin : gen_saturating_round
+            assign even_biased = {ACC_W{1'b0}};
+            assign even_shifted = {ACC_W{1'b0}};
+            round_sat_shift_compact #(
+                .IN_W   (ACC_W),
+                .OUT_W  (DATA_W),
+                .SHIFT_N(4)
+            ) u_round_sat_q4_to_data (
+                .din  (even_acc),
+                .dout (even_rounded)
+            );
+        end
+    endgenerate
 
     assign phase_dbg = phase_cnt;
 

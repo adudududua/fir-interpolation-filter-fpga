@@ -2,7 +2,7 @@
 
 ## 优化演进总览（建议先读）
 
-本节按时间顺序统一整理“最初 4x+2x 结构、区域赛全 2x 优化、FIR-CIC 优化、全国赛全 2x 回退对照、全国赛 6-DSP CIC、440-LUT 锚点、442-LUT/432-FF 低 FF Pareto 版以及当前 434-LUT 最低 LUT 版”。后文保留各阶段的设计、仿真、实现和板测原始记录，作为本节结论的详细证据。
+本节按时间顺序统一整理“最初 4x+2x 结构、区域赛全 2x 优化、FIR-CIC 优化、全国赛全 2x 回退对照、全国赛 6-DSP CIC、440-LUT 锚点、442-LUT/432-FF 低 FF Pareto 版、434-LUT 基线，以及本轮 Route 1/Route 2 创新结构”。后文保留各阶段的设计、仿真、实现和板测原始记录，作为本节结论的详细证据。
 
 ### 统计与比较口径
 
@@ -35,6 +35,8 @@
   -> 全国赛 6-DSP CIC：573 LUT 基线连续优化到 440 LUT
   -> 第六轮复位映射：442 LUT / 432 FF，形成低 FF Pareto 点
   -> 第七轮余量后移：均衡器保留 21-bit 无损余量，CIC 末端统一量化，降至 434 LUT
+  -> Route 1：统一 Stage1/Stage2/3 系数 RAM，降至 424 LUT / 6 DSP
+  -> Route 2：重分配尾级倍率，形成 570 LUT / 5 DSP 的最低 DSP FIR-CIC Pareto 点
 ```
 
 ### 第一阶段：最初 4x+2x 基线与全 2x 重构
@@ -208,6 +210,44 @@ FIR-CIC 正式 128x RTL 冲激的通带最大绝对偏差为 **0.00303062 dB**�
 
 第六轮完整取舍与签核见 [低 FF 优化摘要](matlab_fir/national_finals/results/cic6_round6_ff_optimization_summary.txt)，策略原始汇总见 [第六轮实现策略表](matlab_fir/national_finals/results/cic6_round6_strategy_scan.csv)。
 
+### 第六阶段：创新结构双路线（先统一存储，再重分配尾级倍率）
+
+在 434-LUT 基线上继续做局部布尔化简，单轮只能减少少量 LUT。为寻找更明显的结构收益，本轮按“先 1 后 2”保留两条独立 Git 回退路线，并分别做 Stop/Go：
+
+#### Route 1：统一 FIR 系数存储
+
+原结构的 Stage1 与共享 Stage2/3 各自携带系数存储和地址译码。Route 1 将两组逻辑合并为一块显式 true-dual-port RAMB18E1：端口 A 服务 Stage1，端口 B 服务 Stage2/3；数据历史 BRAM、MAC 调度、系数和所有定点边界保持不变。因此输出与 434-LUT CIC 基线逐位一致，六工况频响也完全沿用原正式指标。
+
+该方案布局布线为 **424 LUT / 471 FF / 188 Slice / 6 DSP / 3 BRAM / 2 MMCM**，相对 434-LUT 基线减少 10 LUT 和 2 Slice，增加 2 FF；WNS/WHS 为 **+45.356/+0.117 ns**，TNS/THS 为 0，功耗仍为 0.271 W。它通过 10/10 RTL 回归、完整实现、DRC 和 bitstream，是当前**最低 LUT**全国赛方案。独立分支为 `codex/national-finals-unified-fir-engine-v1`，回退标签为 `national-finals-route1-424LUT-471FF-6DSP-3BRAM-2MMCM`。
+
+#### Route 2：把 16 倍尾级重新拆成 HB/CIC
+
+Route 2 不再微调原 `CIC16/N3`，而是重做 Stage1/Stage3 系数并搜索尾级倍率分配：
+
+| 候选 | 数据通路 | 频响/调度 | 资源阶段 | Stop/Go |
+|---|---|---|---|---|
+| Route 2A | 前置 `CIC2/N1 + 177-tap` 补偿插值 FIR | 六工况中目标节点频响可过，但需要 362 个周期，超过现有 128 周期预算 | MATLAB | **NO-GO-TIMING** |
+| Route 2B | `FIR2 ×3 -> canonical HB2 ×2 -> CIC4/N2` | 六工况通过；三类逐位向量全节点 0 LSB | 完整布局布线 | **保留为 5-DSP Pareto 点** |
+| Route 2C | `FIR2 ×3 -> canonical HB2 -> CIC8/N3` | 六工况和三类逐位向量通过 | 综合 512 LUT / 473 FF / 6 DSP / 3 BRAM | **同为 6 DSP 时被 424-LUT Route 1 支配，停止实现** |
+
+Route 2B 的两个半带级都使用 `[-1,0,9,16,9,0,-1]/16`，并共享一套紧凑移位加法数据通路；Stage1、Stage2/3 各用一颗串行 MAC DSP，CIC4 的两级 comb 共享一颗 DSP，两级 integrator 使用两颗 DSP，因此总计 `1+1+1+2=5 DSP`。Stage3 重新设计为 11-tap Q14 补偿 FIR，系数为：
+
+```text
+[231 14 -1722 -75 9683 16506 9683 -75 -1722 14 231]
+```
+
+Route 2B 布局布线为 **570 LUT / 551 FF / 229 Slice / 5 DSP / 3 BRAM / 2 MMCM**。相对 Route 1，它用 146 LUT、80 FF 和 41 Slice 换取 1 颗 DSP；相对最初 573-LUT/6-DSP CIC 基线则同时减少 3 LUT、70 FF、26 Slice 和 1 DSP。WNS/WHS 为 **+46.258/+0.118 ns**，TNS/THS 为 0，Vectorless 功耗仍为 **0.271 W**，DRC Error=0，并已生成 bitstream。它不是最低 LUT 方案，但是真正完成全流程验证的**最低 DSP FIR-CIC 方案**。
+
+Route 2B 的全链路 RTL 对 impulse、固定随机和满量程随机三类输入分别比较 4x/8x/128x，全部 **0 LSB mismatch**；公共全国赛回归为 **9/9 PASS**，覆盖 ROM、双 MMCM 无毛刺切换、按键、板级集成、8 个复位恢复场景和 10 次不停机倍率切换。bitstream SHA-256 为 `96F1BEE26BD6EDE53B3F8FB431A38C11F31AFF65549579518AA3CE2D2CA42D3E`，资源命名回退标签为 `national-finals-route2-570LUT-551FF-5DSP-3BRAM-2MMCM`。物理开发板下载仍需现场执行，不能把板级 RTL/实现通过表述为已经完成物理板测。
+
+最终选择不是单一“全面最优”：
+
+- **LUT 优先**：Route 1，424 LUT / 6 DSP；
+- **DSP 优先且仍希望 LUT 不超过旧 573-LUT 基线**：Route 2B，570 LUT / 5 DSP；
+- Route 2C 仅作为算法/RTL/综合备选保留，不替代前两者。
+
+完整 Route 2 搜索、系数、六工况、逐位输出计数与硬件签核见 [Route 2 最终摘要](matlab_fir/national_finals/route2_cic_frontend/results/route2_final_summary.md)。
+
 ### 各结构频响汇总
 
 早期版本只归档最终 128x 指标；全国赛版本才对 44.1/48 kHz 下的 4x、8x、128x 六工况全部签核。所有“—”都表示原报告未保存该口径，不表示测试失败。
@@ -225,18 +265,30 @@ FIR-CIC 正式 128x RTL 冲激的通带最大绝对偏差为 **0.00303062 dB**�
 | 全国赛全 2x | 48 kHz | 4x | 0.004610 dB | 0.005703 dB | 78.669 dB | RTL 冲激，0 LSB |
 | 全国赛全 2x | 48 kHz | 8x | 0.005395 dB | 0.005719 dB | 78.562 dB | RTL 冲激，0 LSB |
 | 全国赛全 2x | 48 kHz | 128x | 0.005444 dB | 0.005909 dB | 78.881 dB | RTL 冲激，0 LSB |
-| **当前 6-DSP CIC** | **44.1 kHz** | **4x** | **0.004610 dB** | **0.005703 dB** | **78.669 dB** | **RTL 冲激，0 LSB** |
-| **当前 6-DSP CIC** | **44.1 kHz** | **8x** | **0.005495 dB** | **0.006274 dB** | **78.161 dB** | **RTL 冲激，0 LSB** |
-| **当前 6-DSP CIC** | **44.1 kHz** | **128x** | **0.006918 dB** | **0.008111 dB** | **72.348 dB** | **RTL 冲激，0 LSB** |
-| **当前 6-DSP CIC** | **48 kHz** | **4x** | **0.004610 dB** | **0.005703 dB** | **78.669 dB** | **RTL 冲激，0 LSB** |
-| **当前 6-DSP CIC** | **48 kHz** | **8x** | **0.005495 dB** | **0.005738 dB** | **78.161 dB** | **RTL 冲激，0 LSB** |
-| **当前 6-DSP CIC** | **48 kHz** | **128x** | **0.006918 dB** | **0.006917 dB** | **72.348 dB** | **RTL 冲激，0 LSB** |
+| **434 基线 / Route 1** | **44.1 kHz** | **4x** | **0.004610 dB** | **0.005703 dB** | **78.669 dB** | **Route 1 仅合并系数 RAM，RTL 输出不变** |
+| **434 基线 / Route 1** | **44.1 kHz** | **8x** | **0.005495 dB** | **0.006274 dB** | **78.161 dB** | **Route 1 仅合并系数 RAM，RTL 输出不变** |
+| **434 基线 / Route 1** | **44.1 kHz** | **128x** | **0.006918 dB** | **0.008111 dB** | **72.348 dB** | **Route 1 仅合并系数 RAM，RTL 输出不变** |
+| **434 基线 / Route 1** | **48 kHz** | **4x** | **0.004610 dB** | **0.005703 dB** | **78.669 dB** | **Route 1 仅合并系数 RAM，RTL 输出不变** |
+| **434 基线 / Route 1** | **48 kHz** | **8x** | **0.005495 dB** | **0.005738 dB** | **78.161 dB** | **Route 1 仅合并系数 RAM，RTL 输出不变** |
+| **434 基线 / Route 1** | **48 kHz** | **128x** | **0.006918 dB** | **0.006917 dB** | **72.348 dB** | **Route 1 仅合并系数 RAM，RTL 输出不变** |
+| **Route 2B，5 DSP** | **44.1 kHz** | **4x** | **0.005985 dB** | **0.007584 dB** | **73.418 dB** | **MATLAB 定点系数；RTL 三类向量 0 LSB** |
+| **Route 2B，5 DSP** | **44.1 kHz** | **8x** | **0.010569 dB** | **0.010568 dB** | **73.438 dB** | **MATLAB 定点系数；RTL 三类向量 0 LSB** |
+| **Route 2B，5 DSP** | **44.1 kHz** | **128x** | **0.005872 dB** | **0.007976 dB** | **71.585 dB** | **MATLAB 定点系数；RTL 三类向量 0 LSB** |
+| **Route 2B，5 DSP** | **48 kHz** | **4x** | **0.005985 dB** | **0.006861 dB** | **73.418 dB** | **MATLAB 定点系数；RTL 三类向量 0 LSB** |
+| **Route 2B，5 DSP** | **48 kHz** | **8x** | **0.009555 dB** | **0.009555 dB** | **73.438 dB** | **MATLAB 定点系数；RTL 三类向量 0 LSB** |
+| **Route 2B，5 DSP** | **48 kHz** | **128x** | **0.005872 dB** | **0.006874 dB** | **71.585 dB** | **MATLAB 定点系数；RTL 三类向量 0 LSB** |
+| Route 2C，单 HB | 44.1 kHz | 4x | 0.005985 dB | 0.007584 dB | 73.418 dB | MATLAB + RTL 0 LSB；仅综合 |
+| Route 2C，单 HB | 44.1 kHz | 8x | 0.036819 dB | 0.036818 dB | 73.351 dB | MATLAB + RTL 0 LSB；仅综合 |
+| Route 2C，单 HB | 44.1 kHz | 128x | 0.005976 dB | 0.007464 dB | 73.476 dB | MATLAB + RTL 0 LSB；仅综合 |
+| Route 2C，单 HB | 48 kHz | 4x | 0.005985 dB | 0.006861 dB | 73.418 dB | MATLAB + RTL 0 LSB；仅综合 |
+| Route 2C，单 HB | 48 kHz | 8x | 0.033682 dB | 0.033681 dB | 73.351 dB | MATLAB + RTL 0 LSB；仅综合 |
+| Route 2C，单 HB | 48 kHz | 128x | 0.005976 dB | 0.006616 dB | 73.476 dB | MATLAB + RTL 0 LSB；仅综合 |
 
 ### 时序 Timing 统一结算
 
 Timing 以 Vivado 完成布局布线后的 timing summary 为准，不使用综合前估算。验收规则为：
 
-| 指标 | 含义 | PASS 条件 | 当前结果 |
+| 指标 | 含义 | PASS 条件 | 434-LUT 基线结果 |
 |---|---|---:|---:|
 | WNS | 最差建立时间余量 | `>= 0 ns` | **+45.539 ns** |
 | TNS | 所有建立违例的负余量总和 | `= 0 ns` | **0 ns** |
@@ -290,9 +342,11 @@ Timing 以 Vivado 完成布局布线后的 timing summary 为准，不使用综�
 | 728 LUT / 2 DSP 全 2x | +46.441 ns | +0.102 ns | +0.105 ns | +0.033 ns | 0/0 ns | PASS |
 | **440 LUT / 6 DSP 第五轮锚点** | **+46.046 ns** | **-0.293 ns** | **+0.127 ns** | **+0.055 ns** | **0/0 ns** | **PASS** |
 | **442 LUT / 432 FF 低 FF CIC** | **+45.617 ns** | **-0.722 ns** | **+0.106 ns** | **+0.034 ns** | **0/0 ns** | **PASS** |
-| **434 LUT / 6 DSP 当前最低 LUT CIC** | **+45.539 ns** | **-0.800 ns** | **+0.108 ns** | **+0.036 ns** | **0/0 ns** | **PASS** |
+| **434 LUT / 6 DSP 第七轮基线** | **+45.539 ns** | **-0.800 ns** | **+0.108 ns** | **+0.036 ns** | **0/0 ns** | **PASS** |
+| **Route 1：424 LUT / 6 DSP** | **+45.356 ns** | **-0.983 ns** | **+0.117 ns** | **+0.045 ns** | **0/0 ns** | **PASS** |
+| **Route 2B：570 LUT / 5 DSP** | **+46.258 ns** | **-0.081 ns** | **+0.118 ns** | **+0.046 ns** | **0/0 ns** | **PASS** |
 
-当前 434-LUT 版相对 573-LUT 基线减少 139 LUT 和 152 FF，WNS 减少 **0.800 ns**，WHS 反而增加 **0.036 ns**。所有版本均为正 WNS/WHS、零 TNS/THS、零失败端点，因此从验收角度都属于充分收敛，正式版本按 LUT 最低原则选择 434-LUT CIC。
+Route 1 相对 573-LUT 基线减少 149 LUT 和 150 FF，WNS 减少 **0.983 ns**，WHS增加 **0.045 ns**；Route 2B 用 5 DSP 时仍有 +46.258/+0.118 ns 的 setup/hold 余量。所有完成实现的版本均为正 WNS/WHS、零 TNS/THS、零失败端点，因此从验收角度都充分收敛；正式选择应按 LUT 与 DSP 的评分权重在 Route 1 和 Route 2B 两个 Pareto 点之间决定。
 
 第五轮实现策略也体现了面积与时序的取舍：`CARRYIN Default` 为 451 LUT、WNS/WHS `+45.647/+0.140 ns`，`ExploreArea` 为 475 LUT、`+46.154/+0.099 ns`。后者多用 24 LUT，只换得 0.507 ns setup 余量且 hold 余量更小；在当前已经没有任何时序违例的情况下不值得，因此选择 `Default`。随后 Stage3 证明字长版本达到 440 LUT，WNS/WHS 回到 **+46.046/+0.127 ns**。
 
@@ -321,15 +375,18 @@ Timing 以 Vivado 完成布局布线后的 timing summary 为准，不使用综�
 | 全国赛 6-DSP CIC 基线 | 全国赛板级 | 573 | 621 | 6 | 3 | 2 | +46.339/+0.072 ns | 0.271 W | 比 602-LUT/8-DSP 基线少 29 LUT、2 DSP | 9/9 RTL、实现、bitstream；未物理板测 |
 | **全国赛第五轮 440-LUT 锚点** | **全国赛板级** | **440** | **464** | **6** | **3** | **2** | **+46.046/+0.127 ns** | **0.271 W** | **比 573 基线少 133 LUT、157 FF，DSP/BRAM/MMCM 不变** | **9/9 RTL、GUI/脚本实现、bitstream；待物理板测** |
 | **全国赛低 FF Pareto 版** | **全国赛板级** | **442** | **432** | **6** | **3** | **2** | **+45.617/+0.106 ns** | **0.271 W** | **比 440-LUT 版少 32 FF，多 2 LUT/3 Slice** | **9/9 RTL、MATLAB 六工况、实现、bitstream；待物理板测** |
-| **全国赛当前最低 LUT 正式版** | **全国赛板级** | **434** | **469** | **6** | **3** | **2** | **+45.539/+0.108 ns** | **0.271 W** | **比 440-LUT 版少 6 LUT/1 Slice，多 5 FF；比 573 基线少 139 LUT/152 FF** | **9/9 RTL、MATLAB 六工况、实现、DRC、bitstream；待物理板测** |
+| **全国赛第七轮基线** | **全国赛板级** | **434** | **469** | **6** | **3** | **2** | **+45.539/+0.108 ns** | **0.271 W** | **比 440-LUT 版少 6 LUT/1 Slice，多 5 FF；比 573 基线少 139 LUT/152 FF** | **9/9 RTL、MATLAB 六工况、实现、DRC、bitstream；待物理板测** |
+| **Route 1 当前最低 LUT** | **全国赛板级** | **424** | **471** | **6** | **3** | **2** | **+45.356/+0.117 ns** | **0.271 W** | **比 434 基线少 10 LUT/2 Slice，多 2 FF；统一系数 RAM** | **10/10 RTL、六工况、实现、DRC、bitstream；待物理板测** |
+| **Route 2B 当前最低 DSP FIR-CIC** | **全国赛板级** | **570** | **551** | **5** | **3** | **2** | **+46.258/+0.118 ns** | **0.271 W** | **比 Route 1 多 146 LUT/80 FF，少 1 DSP；比 573 基线少 3 LUT/70 FF/1 DSP** | **公共 9/9 + 本结构三类逐位、六工况、实现、DRC、bitstream；待物理板测** |
+| Route 2C 单半带/CIC8 | 全国赛板级，**仅综合** | 512 | 473 | 6 | 3 | 2 | — | — | 同为 6 DSP 时被 Route 1 支配，按 Stop/Go 不继续实现 | MATLAB 六工况、三类 RTL 逐位、综合；无 routed/bitstream 数据 |
 
 综合结论：
 
-- **当前最低 LUT 且满足全国赛完整功能的方案是 434 LUT / 6 DSP FIR-CIC**；
+- **当前最低 LUT 且满足全国赛完整功能的方案是 Route 1：424 LUT / 6 DSP FIR-CIC**；
 - **当前最低 FF 的全国赛 6-DSP CIC 是 442 LUT / 432 FF 版本；它与 434 LUT / 469 FF 版本互为 Pareto 点**；
-- **当前最低 DSP 的全国赛方案是 728 LUT / 2 DSP 全 2x**；
-- 全 2x 最低 DSP 版相对当前 434-LUT 版多 294 LUT、少 4 DSP，并具有更高最终阻带；FIR-CIC 以仍高于 70 dB 的阻带余量换取最低 LUT；
-- 434-LUT 正式版和 442-LUT/432-FF Pareto 版均已完成 MATLAB、RTL、XSim、综合、布局布线、时序、DRC 和 bitstream 签核；两者仍需实物板下载复测，不能把区域赛 472-LUT 版本的实板结论直接代替。
+- **全局最低 DSP 仍是 728 LUT / 2 DSP 全 2x；若限定 FIR-CIC，Route 2B 将 DSP 从 6 降到 5，同时只用 570 LUT**；
+- Route 1 与 Route 2B 是本轮最有价值的两个 Pareto 点：前者最低 LUT，后者以 146 LUT/80 FF 换少 1 DSP；Route 2C 同为 6 DSP 却高于 Route 1 的 LUT，因此不做无意义的完整实现；
+- Route 1 和 Route 2B 均已完成 MATLAB、RTL、XSim、综合、布局布线、时序、DRC 和 bitstream 签核；它们仍需实物板下载复测，不能把区域赛 472-LUT 版本的实板结论直接代替。
 
 ## 全国总决赛双采样率版本（2026-07-31，6-DSP CIC 第七轮优化详细签核）
 
