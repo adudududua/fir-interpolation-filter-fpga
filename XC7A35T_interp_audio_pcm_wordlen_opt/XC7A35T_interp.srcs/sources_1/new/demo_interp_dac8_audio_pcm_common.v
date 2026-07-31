@@ -264,7 +264,9 @@ module demo_interp_dac8_audio_pcm_common #(
                 .USE_STAGE1_DSP48_PREADDER(
                     USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER),
                 .USE_NATIONAL_FINALS_NARROW_STAGE23(
-                    USE_NATIONAL_FINALS_NARROW_STAGE23)
+                    USE_NATIONAL_FINALS_NARROW_STAGE23),
+                .USE_UNIFIED_FIR_COEFF_BRAM(
+                    USE_NATIONAL_FINALS_DATAPATH)
             ) u_interp128_all2x_v7_folded_fir_cic_top_ce (
                 .clk(clk_audio_128x), .rst_n(rst_n),
                 .ce2_out(ce2_out), .ce4_out(ce4_out),

@@ -49,7 +49,9 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     parameter integer CIC_BURST_COUNTER_USE_DSP = 0,
     parameter integer USE_SERIAL_CIC_COMB = 0,
     parameter integer USE_STAGE1_DSP48_PREADDER = 0,
-    parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 0
+    parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 0,
+    parameter integer USE_UNIFIED_FIR_COEFF_BRAM =
+        USE_BRAM_STAGE23_COEFF
 )(
     input  wire                         clk,
     input  wire                         rst_n,
@@ -92,19 +94,43 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     wire cic_x_valid_w;
     wire signed [19:0] y128_w;
     wire y128_valid_w;
+    wire [4:0] stage1_coeff_addr_w;
+    wire signed [15:0] stage1_coeff_data_w;
+    wire [5:0] stage23_coeff_addr_w;
+    wire signed [15:0] stage23_coeff_data_w;
 
     wire unused_ce;
     assign unused_ce = ce16_out ^ ce32_out ^ ce64_out;
 
+    generate
+        if (USE_UNIFIED_FIR_COEFF_BRAM != 0) begin :
+                gen_unified_fir_coeff_bram
+            nf_unified_fir_coeff_bram u_nf_unified_fir_coeff_bram (
+                .clk(clk),
+                .stage1_addr(stage1_coeff_addr_w),
+                .stage1_coeff(stage1_coeff_data_w),
+                .stage23_addr(stage23_coeff_addr_w),
+                .stage23_coeff(stage23_coeff_data_w)
+            );
+        end
+        else begin : gen_no_unified_fir_coeff_bram
+            assign stage1_coeff_data_w = 16'sd0;
+            assign stage23_coeff_data_w = 16'sd0;
+        end
+    endgenerate
+
     interp2_stage1_strict_halfband_bram_ce #(
         .DATA_W (24),
         .ACC_W(STAGE1_ACC_W),
-        .USE_DSP48_PREADDER(USE_STAGE1_DSP48_PREADDER)
+        .USE_DSP48_PREADDER(USE_STAGE1_DSP48_PREADDER),
+        .USE_EXTERNAL_COEFF_BRAM(USE_UNIFIED_FIR_COEFF_BRAM)
     ) u_interp2_stage1_strict_halfband_bram_ce (
         .clk(clk), .rst_n(rst_n), .ce_out(ce2_out),
         .x_in(x_in), .x_in_valid(x_in_valid),
         .y_out(y2_w), .y_out_valid(y2_valid_w),
-        .phase_dbg(), .fir_in_dbg(), .fir_in_valid_dbg()
+        .phase_dbg(), .fir_in_dbg(), .fir_in_valid_dbg(),
+        .external_coeff_addr(stage1_coeff_addr_w),
+        .external_coeff_data(stage1_coeff_data_w)
     );
 
     bridge_valid_quantized_to_interp2_ce #(
@@ -138,7 +164,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
                 .STAGE3_FLAT(STAGE3_FLAT),
                 .USE_BRAM_HISTORY(USE_BRAM_STAGE23_HISTORY),
                 .USE_BRAM_COEFF(USE_BRAM_STAGE23_COEFF),
-                .USE_PACKED_BRAM(USE_PACKED_BRAM_STAGE23)
+                .USE_PACKED_BRAM(USE_PACKED_BRAM_STAGE23),
+                .USE_EXTERNAL_COEFF_BRAM(USE_UNIFIED_FIR_COEFF_BRAM)
             ) u_interp2_stage23_lutram_cic_dsp_ce (
                 .clk(clk), .rst_n(rst_n),
                 .stage2_ce_out(ce4_out),
@@ -153,10 +180,13 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
                 .stage3_y_out_valid(y8_valid_w),
                 .stage2_phase_dbg(), .stage3_phase_dbg(),
                 .scheduler_busy_dbg(), .scheduler_stage_dbg(),
-                .scheduler_mac_index_dbg()
+                .scheduler_mac_index_dbg(),
+                .external_coeff_addr(stage23_coeff_addr_w),
+                .external_coeff_data(stage23_coeff_data_w)
             );
         end
         else begin : gen_register_stage23
+            assign stage23_coeff_addr_w = 6'd0;
             interp2_stage23_folded_cic_dsp_ce #(
                 .DATA_W(24),
                 .STAGE2_DATA_W(22),

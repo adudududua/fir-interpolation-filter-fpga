@@ -56,6 +56,7 @@ if {![regexp {^[A-Za-z0-9_-]+$} $result_tag]} {
 set result_dir [file normalize [file join $script_dir .. vivado_results $result_tag]]
 
 set nf_sources [list \
+    [file join $nf_src_dir nf_unified_fir_coeff_bram.v] \
     [file join $nf_src_dir cic3_compensator_shiftadd_ce.v] \
     [file join $nf_src_dir cic_interp16_serial_comb_dsp_ce.v] \
     [file join $nf_src_dir dual_family_audio_clock.v] \

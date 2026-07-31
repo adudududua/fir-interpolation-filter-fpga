@@ -39,7 +39,8 @@ module interp2_stage1_strict_halfband_bram_ce #(
     parameter integer PAIR_COUNT  = `V3_S1_PAIR_COUNT,
     parameter integer DELAY_INDEX = `V3_S1_DELAY_INDEX,
     parameter integer RAM_DEPTH   = 64,
-    parameter integer USE_DSP48_PREADDER = 0
+    parameter integer USE_DSP48_PREADDER = 0,
+    parameter integer USE_EXTERNAL_COEFF_BRAM = 0
 )(
     input  wire                         clk,
     input  wire                         rst_n,
@@ -53,7 +54,14 @@ module interp2_stage1_strict_halfband_bram_ce #(
 
     output reg                          phase_dbg,
     output wire signed [DATA_W-1:0]     fir_in_dbg,
-    output wire                         fir_in_valid_dbg
+    output wire                         fir_in_valid_dbg,
+
+    // Route-1 unified dual-DSP coefficient plane.  The address is issued in
+    // lock-step with the Stage1 sample-BRAM reads; the external dual-port
+    // coefficient BRAM therefore returns a coefficient aligned with
+    // read_data_a/read_data_b one clock later.
+    output wire [4:0]                   external_coeff_addr,
+    input  wire signed [15:0]           external_coeff_data
 );
 
     localparam integer ADDR_W = 6;
@@ -119,6 +127,7 @@ module interp2_stage1_strict_halfband_bram_ce #(
     assign x_current = x_in_valid ? x_in : {DATA_W{1'b0}};
     assign fir_in_dbg = x_current;
     assign fir_in_valid_dbg = ce_out && (phase_cnt == 1'b0);
+    assign external_coeff_addr = issue_index;
 
     assign dsp_preadd_a = read_mask_a ?
         {{(25-DATA_W){read_data_a[DATA_W-1]}}, read_data_a} : 25'sd0;
@@ -228,35 +237,42 @@ module interp2_stage1_strict_halfband_bram_ce #(
             $signed({(read_mask_b ? read_data_b[DATA_W-1] : 1'b0),
                      (read_mask_b ? read_data_b : {DATA_W{1'b0}})});
 
-        case (read_coeff_index)
-            5'd0:  coeff_comb = `V3_S1_C00;
-            5'd1:  coeff_comb = `V3_S1_C01;
-            5'd2:  coeff_comb = `V3_S1_C02;
-            5'd3:  coeff_comb = `V3_S1_C03;
-            5'd4:  coeff_comb = `V3_S1_C04;
-            5'd5:  coeff_comb = `V3_S1_C05;
-            5'd6:  coeff_comb = `V3_S1_C06;
-            5'd7:  coeff_comb = `V3_S1_C07;
-            5'd8:  coeff_comb = `V3_S1_C08;
-            5'd9:  coeff_comb = `V3_S1_C09;
-            5'd10: coeff_comb = `V3_S1_C10;
-            5'd11: coeff_comb = `V3_S1_C11;
-            5'd12: coeff_comb = `V3_S1_C12;
-            5'd13: coeff_comb = `V3_S1_C13;
-            5'd14: coeff_comb = `V3_S1_C14;
-            5'd15: coeff_comb = `V3_S1_C15;
-            5'd16: coeff_comb = `V3_S1_C16;
-            5'd17: coeff_comb = `V3_S1_C17;
-            5'd18: coeff_comb = `V3_S1_C18;
-            5'd19: coeff_comb = `V3_S1_C19;
-            5'd20: coeff_comb = `V3_S1_C20;
-            5'd21: coeff_comb = `V3_S1_C21;
-            5'd22: coeff_comb = `V3_S1_C22;
-            5'd23: coeff_comb = `V3_S1_C23;
-            5'd24: coeff_comb = `V3_S1_C24;
-            5'd25: coeff_comb = `V3_S1_C25;
-            default: coeff_comb = {COEFF_W{1'b0}};
-        endcase
+        if (USE_EXTERNAL_COEFF_BRAM != 0) begin
+            coeff_comb =
+                {{(COEFF_W-16){external_coeff_data[15]}},
+                 external_coeff_data};
+        end
+        else begin
+            case (read_coeff_index)
+                5'd0:  coeff_comb = `V3_S1_C00;
+                5'd1:  coeff_comb = `V3_S1_C01;
+                5'd2:  coeff_comb = `V3_S1_C02;
+                5'd3:  coeff_comb = `V3_S1_C03;
+                5'd4:  coeff_comb = `V3_S1_C04;
+                5'd5:  coeff_comb = `V3_S1_C05;
+                5'd6:  coeff_comb = `V3_S1_C06;
+                5'd7:  coeff_comb = `V3_S1_C07;
+                5'd8:  coeff_comb = `V3_S1_C08;
+                5'd9:  coeff_comb = `V3_S1_C09;
+                5'd10: coeff_comb = `V3_S1_C10;
+                5'd11: coeff_comb = `V3_S1_C11;
+                5'd12: coeff_comb = `V3_S1_C12;
+                5'd13: coeff_comb = `V3_S1_C13;
+                5'd14: coeff_comb = `V3_S1_C14;
+                5'd15: coeff_comb = `V3_S1_C15;
+                5'd16: coeff_comb = `V3_S1_C16;
+                5'd17: coeff_comb = `V3_S1_C17;
+                5'd18: coeff_comb = `V3_S1_C18;
+                5'd19: coeff_comb = `V3_S1_C19;
+                5'd20: coeff_comb = `V3_S1_C20;
+                5'd21: coeff_comb = `V3_S1_C21;
+                5'd22: coeff_comb = `V3_S1_C22;
+                5'd23: coeff_comb = `V3_S1_C23;
+                5'd24: coeff_comb = `V3_S1_C24;
+                5'd25: coeff_comb = `V3_S1_C25;
+                default: coeff_comb = {COEFF_W{1'b0}};
+            endcase
+        end
     end
 
     // The result-commit DSP cycle has already added the exact signed Q15

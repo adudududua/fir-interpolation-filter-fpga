@@ -50,7 +50,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     parameter integer STAGE3_FLAT = 0,
     parameter integer USE_BRAM_HISTORY = 0,
     parameter integer USE_BRAM_COEFF = 0,
-    parameter integer USE_PACKED_BRAM = 0
+    parameter integer USE_PACKED_BRAM = 0,
+    parameter integer USE_EXTERNAL_COEFF_BRAM = 0
 )(
     input  wire                              clk,
     input  wire                              rst_n,
@@ -71,7 +72,10 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     output wire                              stage3_phase_dbg,
     output wire                              scheduler_busy_dbg,
     output wire [1:0]                        scheduler_stage_dbg,
-    output wire [3:0]                        scheduler_mac_index_dbg
+    output wire [3:0]                        scheduler_mac_index_dbg,
+
+    output wire [5:0]                        external_coeff_addr,
+    input  wire signed [15:0]                external_coeff_data
 );
 
     localparam integer MEM_ADDR_W = 4;
@@ -233,6 +237,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     assign coeff_bram_read_addr = {coeff_bram_stage3,
                                    coeff_bram_phase,
                                    coeff_bram_next_index};
+    assign external_coeff_addr = coeff_bram_read_addr;
     // 地址 0～15 保存历史；16～31 和 32～47 分别保存两相系数。
     assign packed_coeff_read_addr = {coeff_bram_phase,
                                      ~coeff_bram_phase,
@@ -274,8 +279,10 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     assign packed_coeff_raw = coeff_bram_stage3 ?
         stage2_packed_raw[COEFF_W-1:0] :
         stage3_packed_raw[COEFF_W-1:0];
-    assign dsp_coeff_b = (USE_PACKED_BRAM != 0) ? packed_coeff_raw :
-        ((USE_BRAM_COEFF != 0) ? coeff_bram_raw : coeff_comb);
+    assign dsp_coeff_b = (USE_EXTERNAL_COEFF_BRAM != 0) ?
+        {{2{external_coeff_data[15]}}, external_coeff_data} :
+        ((USE_PACKED_BRAM != 0) ? packed_coeff_raw :
+         ((USE_BRAM_COEFF != 0) ? coeff_bram_raw : coeff_comb));
     // PREG is synchronously cleared as a new job is accepted, then feeds the
     // DSP48 ALU Z input on every MAC cycle.  After the final MAC, one otherwise
     // idle cycle adds the exact signed Q15 rounding bias inside the same DSP:
@@ -584,7 +591,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
 
     generate
         if (USE_PACKED_BRAM == 0 &&
-            USE_BRAM_COEFF != 0) begin : gen_bram_coeff
+            USE_BRAM_COEFF != 0 &&
+            USE_EXTERNAL_COEFF_BRAM == 0) begin : gen_bram_coeff
             always @(posedge clk) begin
                 coeff_bram_raw <= coeff_sequence_bram[coeff_bram_read_addr];
             end
