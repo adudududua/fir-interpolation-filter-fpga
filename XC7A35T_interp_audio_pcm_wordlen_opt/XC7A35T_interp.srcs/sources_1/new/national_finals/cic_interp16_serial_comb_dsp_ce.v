@@ -32,7 +32,11 @@ module cic_interp16_serial_comb_dsp_ce #(
     parameter integer DATA_W = 20,
     parameter integer OUTPUT_W = DATA_W,
     parameter integer FINAL_PRUNE_LSB = 0,
-    parameter integer BURST_COUNTER_USE_DSP = 0
+    parameter integer BURST_COUNTER_USE_DSP = 0,
+    // The three high-rate integrators remain DSP-resident.  The low-rate
+    // serial comb has sixteen clocks per input and may use the LUT carry
+    // chain to save one DSP48E1 at a small LUT cost.
+    parameter integer COMB_USE_DSP = 0
 )(
     input  wire                         clk,
     input  wire                         rst_n,
@@ -100,8 +104,24 @@ module cic_interp16_serial_comb_dsp_ce #(
          comb_delay0};
 
     // Progressive widths are exact for the three finite differences.
-    assign comb_stage_result =
-        comb_operand - comb_delay_selected;
+    // Keep both mappings explicit so synthesis reports, rather than an
+    // inference heuristic, decide the 5-DSP candidate's Stop/Go result.
+    generate
+        if (COMB_USE_DSP != 0) begin : gen_comb_dsp
+            (* use_dsp = "yes" *)
+            wire signed [COMB_W-1:0] comb_stage_result_dsp;
+            assign comb_stage_result_dsp =
+                comb_operand - comb_delay_selected;
+            assign comb_stage_result = comb_stage_result_dsp;
+        end
+        else begin : gen_comb_lut
+            (* use_dsp = "no" *)
+            wire signed [COMB_W-1:0] comb_stage_result_lut;
+            assign comb_stage_result_lut =
+                comb_operand - comb_delay_selected;
+            assign comb_stage_result = comb_stage_result_lut;
+        end
+    endgenerate
 
     assign output_event = ce_out &&
                           (burst_pending || burst_remaining != 4'd0);
@@ -247,6 +267,8 @@ module cic_interp16_serial_comb_dsp_ce #(
             $fatal(1, "Serial CIC comb stage index out of range");
         if (rst_n && BURST_COUNTER_USE_DSP != 0)
             $fatal(1, "Serial CIC only supports LUT burst counter");
+        if (rst_n && COMB_USE_DSP != 0 && COMB_USE_DSP != 1)
+            $fatal(1, "COMB_USE_DSP must be 0 or 1");
         if (rst_n && OUTPUT_SHIFT < 1)
             $fatal(1, "Serial CIC output normalization shift is invalid");
     end
