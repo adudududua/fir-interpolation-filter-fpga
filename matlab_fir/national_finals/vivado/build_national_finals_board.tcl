@@ -18,7 +18,7 @@ set synthesis_only 0
 set synth_directive AreaOptimized_high
 set flatten_hierarchy rebuilt
 set resource_sharing on
-set result_tag board_dual_rate_cic6_round6_preg_opt
+set result_tag board_dual_rate_cic6_round7_headroom_opt
 set stage1_dsp48_preadder 0
 if {$argc > 0} {
     set reuse_current_synthesis [lindex $argv 0]
@@ -221,6 +221,7 @@ puts $manifest_handle "Bitstream: $bitstream_dst"
 puts $manifest_handle "44.1-kHz family 128x clock: 5.644796 MHz (-0.64 ppm nominal)"
 puts $manifest_handle "48-kHz family 128x clock: 6.144068 MHz (+11.03 ppm nominal)"
 puts $manifest_handle "Architecture: shared 2x/2x/2x FIR + shift-add CIC equalizer + CIC16"
+puts $manifest_handle "Equalizer headroom optimization: lossless 21-bit equalizer output feeds a 21-bit CIC input; clipping is deferred to the final 20-bit CIC quantizer"
 puts $manifest_handle "Synthesis directive: AreaOptimized_high"
 puts $manifest_handle "Stage1 DSP48 preadder: $stage1_dsp48_preadder"
 puts $manifest_handle "Rounding: constant 16383 plus DSP48 CARRYIN for non-negative MAC sums"

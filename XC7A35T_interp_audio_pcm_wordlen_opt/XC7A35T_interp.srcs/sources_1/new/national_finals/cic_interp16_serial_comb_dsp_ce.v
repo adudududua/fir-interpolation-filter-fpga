@@ -30,6 +30,7 @@
 (* use_dsp = "yes" *)
 module cic_interp16_serial_comb_dsp_ce #(
     parameter integer DATA_W = 20,
+    parameter integer OUTPUT_W = DATA_W,
     parameter integer FINAL_PRUNE_LSB = 0,
     parameter integer BURST_COUNTER_USE_DSP = 0
 )(
@@ -38,7 +39,7 @@ module cic_interp16_serial_comb_dsp_ce #(
     input  wire                         ce_out,
     input  wire signed [DATA_W-1:0]     x_in,
     input  wire                         x_in_valid,
-    output reg  signed [DATA_W-1:0]     y_out,
+    output reg  signed [OUTPUT_W-1:0]   y_out,
     output reg                          y_out_valid,
     output wire [4:0]                   burst_remaining_dbg,
     output wire                         pending_dbg,
@@ -85,7 +86,7 @@ module cic_interp16_serial_comb_dsp_ce #(
     wire signed [FULL_W-1:0] high_rate_input;
     wire signed [FINAL_W-1:0] final_input_rounded;
     wire signed [FINAL_W-1:0] final_integrator_next;
-    wire signed [DATA_W-1:0] normalized_output;
+    wire signed [OUTPUT_W-1:0] normalized_output;
     (* use_dsp = "no" *) wire [3:0] burst_remaining_decrement;
     (* use_dsp = "no" *) wire [1:0] comb_stage_index_increment;
 
@@ -139,7 +140,7 @@ module cic_interp16_serial_comb_dsp_ce #(
 
     round_sat_shift_compact #(
         .IN_W    (FINAL_W),
-        .OUT_W   (DATA_W),
+        .OUT_W   (OUTPUT_W),
         .SHIFT_N (OUTPUT_SHIFT)
     ) u_round_cic_normalized_output (
         .din  (final_integrator_next),
@@ -166,9 +167,11 @@ module cic_interp16_serial_comb_dsp_ce #(
             comb_stage_index <= 2'd0;
             comb_active <= 1'b0;
 
+            final_integrator_state <= {FINAL_W{1'b0}};
+
             burst_pending <= 1'b0;
             burst_remaining <= 4'd0;
-            y_out <= {DATA_W{1'b0}};
+            y_out <= {OUTPUT_W{1'b0}};
             y_out_valid <= 1'b0;
         end
         else begin
@@ -196,6 +199,7 @@ module cic_interp16_serial_comb_dsp_ce #(
             end
 
             if (output_event) begin
+                final_integrator_state <= final_integrator_next;
                 y_out <= normalized_output;
                 y_out_valid <= 1'b1;
 
@@ -213,9 +217,9 @@ module cic_interp16_serial_comb_dsp_ce #(
         end
     end
 
-    // All three integrator states use synchronous reset so Vivado can absorb
-    // them into DSP48E1 internal A/B/C registers.  Externally visible output
-    // registers and all transaction control retain asynchronous reset.
+    // The two hidden intermediate integrators use synchronous reset so Vivado
+    // can absorb them into DSP48E1 internal registers.  The externally visible
+    // output and final CIC state retain asynchronous reset.
     always @(posedge clk) begin
         if (!rst_n) begin
             for (integrator_state_idx = 0;
@@ -223,7 +227,6 @@ module cic_interp16_serial_comb_dsp_ce #(
                  integrator_state_idx = integrator_state_idx + 1)
                 integrator_state[integrator_state_idx] <=
                     {FULL_W{1'b0}};
-            final_integrator_state <= {FINAL_W{1'b0}};
         end
         else if (output_event) begin
             for (integrator_state_idx = 0;
@@ -231,7 +234,6 @@ module cic_interp16_serial_comb_dsp_ce #(
                  integrator_state_idx = integrator_state_idx + 1)
                 integrator_state[integrator_state_idx] <=
                     integrator_next[integrator_state_idx];
-            final_integrator_state <= final_integrator_next;
         end
     end
 

@@ -88,7 +88,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     wire y4_to_8_valid;
     wire signed [19:0] y8_w;
     wire y8_valid_w;
-    wire signed [19:0] cic_x_w;
+    wire signed [20:0] cic_x_w;
     wire cic_x_valid_w;
     wire signed [19:0] y128_w;
     wire y128_valid_w;
@@ -188,6 +188,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
                 gen_cic3_shiftadd_compensator
             cic3_compensator_shiftadd_ce #(
                 .DATA_W(20),
+                .OUTPUT_W(21),
                 .REGISTER_OUTPUT((USE_SERIAL_CIC_COMB != 0) ? 0 : 1)
             ) u_cic3_compensator_shiftadd_ce (
                 .clk(clk),
@@ -199,7 +200,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
             );
         end
         else begin : gen_no_cic3_shiftadd_compensator
-            assign cic_x_w = y8_w;
+            assign cic_x_w = {y8_w[19], y8_w};
             assign cic_x_valid_w = y8_valid_w;
         end
     endgenerate
@@ -207,7 +208,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     generate
         if (USE_SERIAL_CIC_COMB != 0) begin : gen_serial_cic_comb
             cic_interp16_serial_comb_dsp_ce #(
-                .DATA_W          (20),
+                .DATA_W          (21),
+                .OUTPUT_W        (20),
                 .FINAL_PRUNE_LSB (FINAL_PRUNE_LSB),
                 .BURST_COUNTER_USE_DSP(CIC_BURST_COUNTER_USE_DSP)
             ) u_cic_interp16_serial_comb_dsp_ce (
@@ -225,7 +227,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
         end
         else begin : gen_parallel_cic_comb
             cic_interp16_core_dsp_ce #(
-                .DATA_W          (20),
+                .DATA_W          (21),
+                .OUTPUT_W        (20),
                 .CIC_ORDER       (CIC_ORDER),
                 .FINAL_PRUNE_LSB (FINAL_PRUNE_LSB),
                 .BURST_COUNTER_USE_DSP(CIC_BURST_COUNTER_USE_DSP)

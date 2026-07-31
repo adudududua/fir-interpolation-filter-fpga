@@ -12,10 +12,13 @@ module tb_cic3_compensator_shiftadd_ce;
     reg x_in_valid;
     wire signed [DATA_W-1:0] y_out;
     wire y_out_valid;
+    wire signed [DATA_W:0] y_out_wide;
+    wire y_out_wide_valid;
 
     integer model_z1;
     integer model_z2;
     integer expected;
+    integer expected_wide;
     integer curvature;
     integer sample_count;
     integer seed;
@@ -29,6 +32,18 @@ module tb_cic3_compensator_shiftadd_ce;
         .x_in_valid(x_in_valid),
         .y_out(y_out),
         .y_out_valid(y_out_valid)
+    );
+
+    cic3_compensator_shiftadd_ce #(
+        .DATA_W(DATA_W),
+        .OUTPUT_W(DATA_W+1)
+    ) u_dut_wide (
+        .clk(clk),
+        .rst_n(rst_n),
+        .x_in(x_in),
+        .x_in_valid(x_in_valid),
+        .y_out(y_out_wide),
+        .y_out_valid(y_out_wide_valid)
     );
 
     initial begin
@@ -49,7 +64,8 @@ module tb_cic3_compensator_shiftadd_ce;
             x_in <= signed_value;
             x_in_valid <= 1'b1;
             curvature = 2*model_z1-signed_value-model_z2;
-            expected = model_z1+(curvature >>> 3);
+            expected_wide = model_z1+(curvature >>> 3);
+            expected = expected_wide;
             if (expected > OUT_MAX)
                 expected = OUT_MAX;
             else if (expected < OUT_MIN)
@@ -62,6 +78,12 @@ module tb_cic3_compensator_shiftadd_ce;
             if ($signed(y_out) !== expected)
                 $fatal(1, "Mismatch sample=%0d x=%0d actual=%0d expected=%0d",
                     sample_count, signed_value, $signed(y_out), expected);
+            if (!y_out_wide_valid)
+                $fatal(1, "Missing wide valid at sample %0d", sample_count);
+            if ($signed(y_out_wide) !== expected_wide)
+                $fatal(1, "Wide mismatch sample=%0d x=%0d actual=%0d expected=%0d",
+                    sample_count, signed_value, $signed(y_out_wide),
+                    expected_wide);
 
             model_z2 = model_z1;
             model_z1 = signed_value;
@@ -71,7 +93,7 @@ module tb_cic3_compensator_shiftadd_ce;
             for (one_gap = 0; one_gap < gap_cycles; one_gap = one_gap+1) begin
                 @(posedge clk);
                 #1;
-                if (y_out_valid)
+                if (y_out_valid || y_out_wide_valid)
                     $fatal(1, "Unexpected valid in input gap");
                 @(negedge clk);
             end

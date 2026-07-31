@@ -27,6 +27,7 @@
 (* use_dsp = "yes" *)
 module cic_interp16_core_dsp_ce #(
     parameter integer DATA_W = 20,
+    parameter integer OUTPUT_W = DATA_W,
     parameter integer CIC_ORDER = 3,
     parameter integer FINAL_PRUNE_LSB = 3,
     parameter integer BURST_COUNTER_USE_DSP = 0
@@ -36,7 +37,7 @@ module cic_interp16_core_dsp_ce #(
     input  wire                         ce_out,
     input  wire signed [DATA_W-1:0]     x_in,
     input  wire                         x_in_valid,
-    output reg  signed [DATA_W-1:0]     y_out,
+    output reg  signed [OUTPUT_W-1:0]   y_out,
     output reg                          y_out_valid,
     output wire [4:0]                   burst_remaining_dbg,
     output wire                         pending_dbg
@@ -69,7 +70,7 @@ module cic_interp16_core_dsp_ce #(
     wire signed [FULL_W-1:0] high_rate_input;
     wire signed [FINAL_W-1:0] final_input_rounded;
     wire signed [FINAL_W-1:0] final_integrator_next;
-    wire signed [DATA_W-1:0] normalized_output;
+    wire signed [OUTPUT_W-1:0] normalized_output;
 
     integer comb_idx;
     integer integrator_idx;
@@ -115,7 +116,7 @@ module cic_interp16_core_dsp_ce #(
 
     round_sat_shift_compact #(
         .IN_W    (FINAL_W),
-        .OUT_W   (DATA_W),
+        .OUT_W   (OUTPUT_W),
         .SHIFT_N (OUTPUT_SHIFT)
     ) u_round_cic_normalized_output (
         .din  (final_integrator_next),
@@ -155,7 +156,7 @@ module cic_interp16_core_dsp_ce #(
             burst_sample <= {FULL_W{1'b0}};
             burst_pending <= 1'b0;
             burst_remaining <= 5'd0;
-            y_out <= {DATA_W{1'b0}};
+            y_out <= {OUTPUT_W{1'b0}};
             y_out_valid <= 1'b0;
         end
         else begin

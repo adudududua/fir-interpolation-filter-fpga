@@ -2,7 +2,7 @@
 
 ## 优化演进总览（建议先读）
 
-本节按时间顺序统一整理“最初 4x+2x 结构、区域赛全 2x 优化、FIR-CIC 优化、全国赛全 2x 回退对照、全国赛 6-DSP CIC、440-LUT 最低 LUT 版以及 442-LUT/432-FF 低 FF Pareto 版”。后文保留各阶段的设计、仿真、实现和板测原始记录，作为本节结论的详细证据。
+本节按时间顺序统一整理“最初 4x+2x 结构、区域赛全 2x 优化、FIR-CIC 优化、全国赛全 2x 回退对照、全国赛 6-DSP CIC、440-LUT 锚点、442-LUT/432-FF 低 FF Pareto 版以及当前 434-LUT 最低 LUT 版”。后文保留各阶段的设计、仿真、实现和板测原始记录，作为本节结论的详细证据。
 
 ### 统计与比较口径
 
@@ -34,6 +34,7 @@
   -> 全国赛全 2x 回退对照：714 LUT/3 DSP 与 728 LUT/2 DSP
   -> 全国赛 6-DSP CIC：573 LUT 基线连续优化到 440 LUT
   -> 第六轮复位映射：442 LUT / 432 FF，形成低 FF Pareto 点
+  -> 第七轮余量后移：均衡器保留 21-bit 无损余量，CIC 末端统一量化，降至 434 LUT
 ```
 
 ### 第一阶段：最初 4x+2x 基线与全 2x 重构
@@ -145,7 +146,7 @@ FIR-CIC 正式 128x RTL 冲激的通带最大绝对偏差为 **0.00303062 dB**�
 - 若优先节省 LUT 和总体通用逻辑，`573 LUT / 6 DSP` FIR-CIC 比最优全 2x 少 141～155 LUT；
 - 全 2x 的 128x 阻带约 78.45～78.88 dB，优于 CIC 的约 72.35 dB；CIC 用仍满足赛题的频响余量换取更低 LUT。
 
-### 第五阶段：全国赛 6-DSP CIC 从 573 LUT 优化到 440 LUT，并形成 432-FF Pareto 点
+### 第五阶段：全国赛 6-DSP CIC 从 573 LUT 优化到 434 LUT，并形成 432-FF Pareto 点
 
 全国赛最初功能基线为 **602 LUT / 616 FF / 8 DSP / 3 BRAM / 2 MMCM**。第一轮先把三级 CIC comb 改为单 DSP 三周期串行差分，并禁止无价值的控制运算占用 DSP，形成用户指定的 **573 LUT / 621 FF / 6 DSP** 回退基线。随后每一轮都保持滤波系数、节点输出和定点舍入语义不变，并以完整 RTL 零误差回归为准入条件。
 
@@ -162,12 +163,13 @@ FIR-CIC 正式 128x RTL 冲激的通带最大绝对偏差为 **0.00303062 dB**�
 | DSP `CARRYIN` 精确舍入 | 451 | -10 | 464 | 0 | — | 6 | 3 | 2 | +45.647/+0.140 ns | — | 空闲提交周期实现正负对称 Q15 舍入 |
 | **第五轮最低 LUT 正式版** | **440** | **-11** | **464** | **0** | **191** | **6** | **3** | **2** | **+46.046/+0.127 ns** | **0.271 W** | Stage3 最坏界证明后删除不可能触发的饱和逻辑 |
 | **第六轮低 FF Pareto 版** | **442** | **+2** | **432** | **-32** | **194** | **6** | **3** | **2** | **+45.617/+0.106 ns** | **0.271 W** | 最终 CIC 积分状态改用同步复位并吸收到 DSP48 内部 A/B 寄存器 |
+| **第七轮最低 LUT 正式版** | **434** | **-8** | **469** | **+37** | **190** | **6** | **3** | **2** | **+45.539/+0.108 ns** | **0.271 W** | 均衡器 21-bit 无损余量直交 CIC，删除中间 20-bit 饱和选择器 |
 
-573-LUT 基线到第五轮最低 LUT 版的总变化为：
+573-LUT 基线到第七轮最低 LUT 版的总变化为：
 
-- LUT：`573 -> 440`，减少 **133（23.21%）**；
-- FF：`621 -> 464`，减少 **157（25.28%）**；
-- Slice：`255 -> 191`，减少 **64（25.10%）**；
+- LUT：`573 -> 434`，减少 **139（24.26%）**；
+- FF：`621 -> 469`，减少 **152（24.48%）**；
+- Slice：`255 -> 190`，减少 **65（25.49%）**；
 - DSP / BRAM / MMCM：保持 **6 / 3 / 2**；
 - Vectorless 功耗：报告精度下保持 **0.271 W**。
 
@@ -180,7 +182,18 @@ FIR-CIC 正式 128x RTL 冲激的通带最大绝对偏差为 **0.00303062 dB**�
 5. 任何微优化都重新跑 impulse、随机 PCM、复位、动态切档和完整实现；综合报告下降但 bit-true 不通过的候选不进入正式版；
 6. Stage1 DSP48 预加器也做了实测 A/B：显式 A/B 预加器为 491 LUT，织构预加加 DSP PREG 为 469 LUT，因此当前正式版保持预加器关闭，选择真实结果而不是结构直觉。
 
-第六轮继续检查 CIC 状态寄存器的物理映射。第五轮中两个内部积分状态已经采用同步复位，但最终积分状态仍因异步复位占用 32 个 Slice FF。把该内部状态移入同步复位进程后，Vivado 将它吸收到最终积分器 DSP48E1 的 A/B 输入寄存器，综合结果由 `459 LUT / 464 FF` 变为 `459 LUT / 432 FF`。完整布局布线为 `442 LUT / 432 FF / 194 Slice`：相对 440-LUT 正式版增加 2 LUT 和 3 Slice，但减少 32 FF；DSP/BRAM/MMCM 和 0.271 W 功耗不变。因此它是**低 FF Pareto 版本**，不取代仍然最低 LUT 的 440-LUT 版本。
+第六轮继续检查 CIC 状态寄存器的物理映射。第五轮中两个内部积分状态已经采用同步复位，但最终积分状态仍因异步复位占用 32 个 Slice FF。把该内部状态移入同步复位进程后，Vivado 将它吸收到最终积分器 DSP48E1 的 A/B 输入寄存器，综合结果由 `459 LUT / 464 FF` 变为 `459 LUT / 432 FF`。完整布局布线为 `442 LUT / 432 FF / 194 Slice`：相对 440-LUT 版增加 2 LUT 和 3 Slice，但减少 32 FF；DSP/BRAM/MMCM 和 0.271 W 功耗不变。因此它继续作为**低 FF Pareto 版本**保留，而最低 LUT 正式版本已在第七轮更新为 434 LUT。
+
+第七轮转而检查补偿均衡器与 CIC 之间的量化边界。对任意 signed 20-bit 的当前样本和两级历史，`[-1,10,-1]/8` 均衡器精确结果的范围只需要 **21 bit**；旧结构却先饱和回 20 bit，再进入具有 32-bit 内部动态范围的 CIC，形成一套可后移的中间饱和选择器。当前版让均衡器无损输出 21 bit、CIC 输入相应加宽 1 bit，并仍由 CIC 最终量化器输出 20 bit。均衡器由 60 LUT 降到 41 LUT，CIC 增加少量宽度开销后，整机综合由 459 LUT 降到 452 LUT，布局布线由 440 LUT 降到 **434 LUT**。这不是删除削顶保护：最终 20-bit 输出仍执行相同舍入和饱和，只是把量化边界移动到具有完整累加余量的位置。
+
+本轮的 Stop/Go 结果如下：
+
+| 第七轮候选 | 综合/实现结果 | 验证 | 结论 |
+|---|---|---|---|
+| 仅收紧均衡器内部理论位宽 | 459 LUT / 464 FF | 9/9 RTL PASS | Vivado 已自动裁掉冗余符号位，资源不变，回退 |
+| 单 LUT 加法器分时均衡 | 465 LUT / 510 FF | 2009 点单元逐位 PASS | 操作数复用和状态控制抵消收益，回退 |
+| 21-bit 余量后移 | 452 LUT / 469 FF；布局布线 434 LUT / 190 Slice | 9/9 RTL、六工况 MATLAB、实现/bitstream PASS | **保留为最低 LUT 正式版** |
+| `ExploreArea` 实现 | 468 LUT / 469 FF / 177 Slice | timing/DRC/bitstream PASS | Slice 更少但多 34 LUT，不采用 |
 
 这一轮还执行了三项 Stop/Go 候选和实现策略复扫：
 
@@ -225,13 +238,13 @@ Timing 以 Vivado 完成布局布线后的 timing summary 为准，不使用综�
 
 | 指标 | 含义 | PASS 条件 | 当前结果 |
 |---|---|---:|---:|
-| WNS | 最差建立时间余量 | `>= 0 ns` | **+45.617 ns** |
+| WNS | 最差建立时间余量 | `>= 0 ns` | **+45.539 ns** |
 | TNS | 所有建立违例的负余量总和 | `= 0 ns` | **0 ns** |
 | setup failing endpoints | 建立时间失败端点数 | `= 0` | **0** |
-| WHS | 最差保持时间余量 | `>= 0 ns` | **+0.106 ns** |
+| WHS | 最差保持时间余量 | `>= 0 ns` | **+0.108 ns** |
 | THS | 所有保持违例的负余量总和 | `= 0 ns` | **0 ns** |
 | hold failing endpoints | 保持时间失败端点数 | `= 0` | **0** |
-| 路由完整性 | 可布线网络与 routing error | 全部完成且 error=0 | **1300/1300，error=0** |
+| 路由完整性 | 可布线网络与 routing error | 全部完成且 error=0 | **1348/1348，error=0** |
 
 需要注意：WNS/WHS 只有在使用相同顶层、相同 XDC 和相同实现阶段时才能公平横向比较。早期独立链使用模块级测试时钟，区域赛板级是 44.1 kHz 单家族顶层，全国赛板级则包含 44.1/48 kHz 两套 MMCM 和异步时钟组；因此下面按三种口径分别结算。
 
@@ -275,14 +288,17 @@ Timing 以 Vivado 完成布局布线后的 timing summary 为准，不使用综�
 | 573 LUT / 6 DSP CIC 基线 | +46.339 ns | 基线 | +0.072 ns | 基线 | 0/0 ns | PASS |
 | 714 LUT / 3 DSP 全 2x | +46.438 ns | +0.099 ns | +0.105 ns | +0.033 ns | 0/0 ns | PASS |
 | 728 LUT / 2 DSP 全 2x | +46.441 ns | +0.102 ns | +0.105 ns | +0.033 ns | 0/0 ns | PASS |
-| **440 LUT / 6 DSP 最低 LUT CIC** | **+46.046 ns** | **-0.293 ns** | **+0.127 ns** | **+0.055 ns** | **0/0 ns** | **PASS** |
+| **440 LUT / 6 DSP 第五轮锚点** | **+46.046 ns** | **-0.293 ns** | **+0.127 ns** | **+0.055 ns** | **0/0 ns** | **PASS** |
 | **442 LUT / 432 FF 低 FF CIC** | **+45.617 ns** | **-0.722 ns** | **+0.106 ns** | **+0.034 ns** | **0/0 ns** | **PASS** |
+| **434 LUT / 6 DSP 当前最低 LUT CIC** | **+45.539 ns** | **-0.800 ns** | **+0.108 ns** | **+0.036 ns** | **0/0 ns** | **PASS** |
 
-当前版相对 573-LUT 基线减少 133 LUT 和 157 FF，代价只是 WNS 减少 **0.293 ns**；与此同时 WHS 增加 **0.055 ns**。所有版本均为正 WNS/WHS、零 TNS/THS、零失败端点，因此从验收角度都属于充分收敛，正式版本继续按 LUT 最低原则选择 440-LUT CIC。
+当前 434-LUT 版相对 573-LUT 基线减少 139 LUT 和 152 FF，WNS 减少 **0.800 ns**，WHS 反而增加 **0.036 ns**。所有版本均为正 WNS/WHS、零 TNS/THS、零失败端点，因此从验收角度都属于充分收敛，正式版本按 LUT 最低原则选择 434-LUT CIC。
 
 第五轮实现策略也体现了面积与时序的取舍：`CARRYIN Default` 为 451 LUT、WNS/WHS `+45.647/+0.140 ns`，`ExploreArea` 为 475 LUT、`+46.154/+0.099 ns`。后者多用 24 LUT，只换得 0.507 ns setup 余量且 hold 余量更小；在当前已经没有任何时序违例的情况下不值得，因此选择 `Default`。随后 Stage3 证明字长版本达到 440 LUT，WNS/WHS 回到 **+46.046/+0.127 ns**。
 
 第六轮低 FF 版的 WNS/WHS 为 **+45.617/+0.106 ns**，相对 440-LUT 版分别减少 0.429 ns 和 0.021 ns，但仍然没有 setup/hold 失败端点。`ExploreArea` 可把 Slice 从 194 降到 180，却把 LUT 提高到 460；`AddRemap` 与 `Default` 均为 442 LUT / 432 FF / 194 Slice，故保留 `Default`。
+
+第七轮 21-bit 余量版在 `Default` 下为 **434 LUT / 469 FF / 190 Slice**，WNS/WHS 为 **+45.539/+0.108 ns**；同一综合 DCP 的 `ExploreArea` 为 **468 LUT / 469 FF / 177 Slice**，WNS/WHS 为 `+46.357/+0.095 ns`。后者只减少 13 Slice，却增加 34 LUT，故当前正式流程仍选择 `Default`。
 
 由于全国赛顶层包含多个时钟和异步时钟组，不能只用“时钟周期减 WNS”推导一个全局 Fmax；输出采样率 6.144 MHz 也不等同于所有内部路径的约束频率。正式结论应写为“在完整 XDC 下 setup/hold 全部满足”，而不是从全局 WNS 反算一个可能误导的最高频率。原始数据见 [全国赛硬件签核摘要](matlab_fir/national_finals/results/nf_hardware_signoff_summary.txt) 和 [实现策略扫描表](matlab_fir/national_finals/results/cic6_implementation_strategy_scan.csv)。
 
@@ -303,22 +319,23 @@ Timing 以 Vivado 完成布局布线后的 timing summary 为准，不使用综�
 | 全国赛全 2x，最低 LUT | 全国赛板级 | 714 | 662 | 3 | 3 | 2 | +46.438/+0.105 ns | 0.271 W | 比 573-LUT CIC 多 141 LUT、41 FF，少 3 DSP | RTL/实现/bitstream；未物理板测 |
 | 全国赛全 2x，最低 DSP | 全国赛板级 | 728 | 662 | 2 | 3 | 2 | +46.441/+0.105 ns | 0.271 W | 比 573-LUT CIC 多 155 LUT、41 FF，少 4 DSP | RTL/实现/bitstream；未物理板测 |
 | 全国赛 6-DSP CIC 基线 | 全国赛板级 | 573 | 621 | 6 | 3 | 2 | +46.339/+0.072 ns | 0.271 W | 比 602-LUT/8-DSP 基线少 29 LUT、2 DSP | 9/9 RTL、实现、bitstream；未物理板测 |
-| **全国赛最低 LUT 正式版** | **全国赛板级** | **440** | **464** | **6** | **3** | **2** | **+46.046/+0.127 ns** | **0.271 W** | **比 573 基线少 133 LUT、157 FF，DSP/BRAM/MMCM 不变** | **9/9 RTL、GUI/脚本实现、bitstream；待物理板测** |
+| **全国赛第五轮 440-LUT 锚点** | **全国赛板级** | **440** | **464** | **6** | **3** | **2** | **+46.046/+0.127 ns** | **0.271 W** | **比 573 基线少 133 LUT、157 FF，DSP/BRAM/MMCM 不变** | **9/9 RTL、GUI/脚本实现、bitstream；待物理板测** |
 | **全国赛低 FF Pareto 版** | **全国赛板级** | **442** | **432** | **6** | **3** | **2** | **+45.617/+0.106 ns** | **0.271 W** | **比 440-LUT 版少 32 FF，多 2 LUT/3 Slice** | **9/9 RTL、MATLAB 六工况、实现、bitstream；待物理板测** |
+| **全国赛当前最低 LUT 正式版** | **全国赛板级** | **434** | **469** | **6** | **3** | **2** | **+45.539/+0.108 ns** | **0.271 W** | **比 440-LUT 版少 6 LUT/1 Slice，多 5 FF；比 573 基线少 139 LUT/152 FF** | **9/9 RTL、MATLAB 六工况、实现、DRC、bitstream；待物理板测** |
 
 综合结论：
 
-- **当前最低 LUT 且满足全国赛完整功能的方案是 440 LUT / 6 DSP FIR-CIC**；
-- **当前最低 FF 的全国赛 6-DSP CIC 是 442 LUT / 432 FF 版本；它与 440 LUT / 464 FF 版本互为 Pareto 点**；
+- **当前最低 LUT 且满足全国赛完整功能的方案是 434 LUT / 6 DSP FIR-CIC**；
+- **当前最低 FF 的全国赛 6-DSP CIC 是 442 LUT / 432 FF 版本；它与 434 LUT / 469 FF 版本互为 Pareto 点**；
 - **当前最低 DSP 的全国赛方案是 728 LUT / 2 DSP 全 2x**；
-- 全 2x 以 288 LUT 换取少 4 DSP 和更高最终阻带，FIR-CIC 以仍高于 70 dB 的阻带余量换取最低 LUT；
-- 440-LUT 正式版和 442-LUT/432-FF Pareto 版均已完成 MATLAB、RTL、XSim、综合、布局布线、时序、DRC 和 bitstream 签核；后者尚需 GUI 原生流程与实物板下载复测，不能把区域赛 472-LUT 版本的实板结论直接代替它。
+- 全 2x 最低 DSP 版相对当前 434-LUT 版多 294 LUT、少 4 DSP，并具有更高最终阻带；FIR-CIC 以仍高于 70 dB 的阻带余量换取最低 LUT；
+- 434-LUT 正式版和 442-LUT/432-FF Pareto 版均已完成 MATLAB、RTL、XSim、综合、布局布线、时序、DRC 和 bitstream 签核；两者仍需实物板下载复测，不能把区域赛 472-LUT 版本的实板结论直接代替。
 
-## 全国总决赛双采样率版本（2026-07-31，6-DSP CIC 第五轮优化详细签核）
+## 全国总决赛双采样率版本（2026-07-31，6-DSP CIC 第七轮优化详细签核）
 
-全国赛升级版当前位于分支 `codex/national-finals-cic6-round6-opt`：支持 signed 24 bit、44.1/48 kHz 输入家族以及 4x/8x/128x 正式输出。最终 RTL 六工况的通带最大绝对偏差为 **0.004610～0.006918 dB**，阻带衰减为 **72.348～78.669 dB**，冲激对称误差均为 **0 LSB**；完整 XSim 回归 **9/9 PASS**，全链路 impulse + 随机 PCM 的 4x/8x/128x 三节点均为 **0 LSB mismatch**，另通过 8 个内部状态复位场景和 10 次不停机倍率切换。
+全国赛升级版当前位于分支 `codex/national-finals-cic6-round7-lut-opt`：支持 signed 24 bit、44.1/48 kHz 输入家族以及 4x/8x/128x 正式输出。最终 RTL 六工况的通带最大绝对偏差为 **0.004610～0.006918 dB**，阻带衰减为 **72.348～78.669 dB**，冲激对称误差均为 **0 LSB**；完整 XSim 回归 **9/9 PASS**，全链路 impulse + 随机 PCM 的 4x/8x/128x 三节点均为 **0 LSB mismatch**，另通过 8 个内部状态复位场景和 10 次不停机倍率切换。
 
-Vivado 2018.3 对 `XC7A35T-FGG484-2` 的最终布局布线结果为 **440 LUT / 464 FF / 191 Slice / 6 DSP / 3 BRAM Tile / 2 MMCM**，WNS/WHS 为 **+46.046/+0.127 ns**，1335/1335 个可布线网络全部完成、路由错误 0、DRC Error 0；Vectorless 功耗估计为 **0.271 W（Medium confidence）**。最终 bitstream 已生成，SHA-256 为 `3E25025717617CEE2CECE32EB1FC16494006793655DBB502888B62CD35220720`。
+Vivado 2018.3 对 `XC7A35T-FGG484-2` 的最终布局布线结果为 **434 LUT / 469 FF / 190 Slice / 6 DSP / 3 BRAM Tile / 2 MMCM**，WNS/WHS 为 **+45.539/+0.108 ns**，1348/1348 个可布线网络全部完成、路由错误 0、DRC Error 0；Vectorless 功耗估计为 **0.271 W（Medium confidence）**。最终 bitstream 已生成，SHA-256 为 `8AA618986749BFDFF8A5FDBD8CF125E34F529DA1449356717B739B1E4545A0D4`。
 
 ### 全国赛版主要改进与优化方法
 
@@ -358,7 +375,7 @@ Serial CIC comb      = on
 Narrow Stage2/3      = on
 ```
 
-需要特别说明，Stage1 显式 DSP48 预加器不是当前启用项：在相同 PREG 累加结构上，开启预加器综合为 491 LUT，关闭并采用“织构对称预加 + DSP 乘加”时为 469 LUT，因此正式版按真实综合结果保持关闭。第五轮则把 Q15 舍入改为 DSP 内部的 `16383 + CARRYIN`，并用 Stage3 的系数/输入最坏界证明删除不可能触发的饱和逻辑，最终由上一正式版 461 LUT 降至 **440 LUT**。
+需要特别说明，Stage1 显式 DSP48 预加器不是当前启用项：在相同 PREG 累加结构上，开启预加器综合为 491 LUT，关闭并采用“织构对称预加 + DSP 乘加”时为 469 LUT，因此正式版按真实综合结果保持关闭。第五轮把 Q15 舍入改为 DSP 内部的 `16383 + CARRYIN`，并用 Stage3 的系数/输入最坏界证明删除不可能触发的饱和逻辑，降至 440 LUT；第七轮再把均衡器的 21-bit 精确余量直接送入 CIC、将饱和统一后移到 CIC 最终 20-bit 量化器，降至 **434 LUT**。
 
 1. **双采样率共用滤波数据通路**：44.1 kHz 和 48 kHz 共用同一套 FIR、CIC、DSP、BRAM、定点舍入及饱和逻辑，仅用两路 MMCM 产生两组音频主时钟，再由 `BUFGMUX_CTRL` 完成无毛刺家族切换，避免复制整条插值链。
 2. **三级 2x FIR 加 16x CIC 的 128x 分级结构**：前三级采用 `105 tap 严格半带 FIR -> 17 tap FIR -> 11 tap FIR`，分别形成 4x、8x 正式输出；后端以三级 CIC16 代替四级 2x FIR，把高倍率部分的乘法运算改为加减和累加。
@@ -376,7 +393,8 @@ Narrow Stage2/3      = on
 14. **重叠任务快照和共享读头优化**：Stage2/3 延迟增加后，启动任务时锁存环形历史的 `head/fill`，防止下一次写入改变正在执行任务的读地址；随后把两级重复快照选择器合并为一个共享 `history_read_head`。这一修复在完整链回归中真实暴露并修正，不依赖单元测试盲区。
 15. **第五轮实现策略复扫**：在 `CARRYIN` 候选的同一综合 DCP 上分别执行 `Default / AddRemap / ExploreArea`，结果为 451 / 451 / 475 LUT，正式流程继续选择 `Default`。
 16. **Stage 3 可证明字长裁剪**：全国赛平坦 Stage 3 的最大系数绝对值和为 22926，20-bit 输入下 MAC 绝对值小于 `22926 × 2^19 = 12019810304 < 2^34`。因此带符号 35-bit 视图足够，Q15 舍入结果必然落在 signed 20-bit 范围内，可删除永远不会触发的 Stage 3 饱和比较器和选择器。该项把最终结果由 451 LUT 降到 440 LUT。
-17. **GUI 与脚本配置统一**：工程文件现在显式登记串行 comb CIC 源文件，并固定 `SERIAL_CIC_COMB=1`、`NARROW_STAGE23=1`、Stage1 DSP 预加器关闭、`ResourceSharing=on` 和 `opt_design=Default`。GUI 原生 `synth_1/impl_1` 从头重建得到同样的 440 LUT / 6 DSP，修复了此前 GUI 误用旧并行 CIC 而显示 482 LUT / 542 FF / 8 DSP 的问题。
+17. **GUI 与脚本配置统一**：工程文件现在显式登记串行 comb CIC 源文件，并固定 `SERIAL_CIC_COMB=1`、`NARROW_STAGE23=1`、Stage1 DSP 预加器关闭、`ResourceSharing=on` 和 `opt_design=Default`。第五轮 GUI 原生 `synth_1/impl_1` 从头重建得到 440 LUT / 6 DSP，修复了此前 GUI 误用旧并行 CIC 而显示 482 LUT / 542 FF / 8 DSP 的问题；第七轮在同一工程配置和更新后的 RTL 上从头重建得到 434 LUT / 6 DSP。
+18. **均衡器余量后移与统一量化**：数学最坏界证明 `[-1,10,-1]/8` 对任意 20-bit 输入只需 21-bit 有符号结果。均衡器不再先执行 20-bit 饱和，而是无损输出 21 bit；串行/并行 CIC 接口均支持 21-bit 输入，并仍由最终输出舍入器产生 20-bit 结果。该项保留最终削顶保护，同时把均衡器从 60 LUT 降到 41 LUT，整机布局布线由 440 LUT 降到 434 LUT。新增双实例单元测试对 2009 组含满量程样本同时验证旧 20-bit 饱和输出和新 21-bit 未削顶输出。
 
 ### 4x / 8x / 128x 分级滤波指标
 
@@ -399,19 +417,19 @@ Narrow Stage2/3      = on
 
 | 资源 | 使用量 | 器件总量 | 利用率 |
 |---|---:|---:|---:|
-| Slice | **191** | 8,150 | **2.34%** |
-| LUT（Slice LUT） | **440** | 20,800 | **2.12%** |
-| FF（Slice Register） | **464** | 41,600 | **1.12%** |
+| Slice | **190** | 8,150 | **2.33%** |
+| LUT（Slice LUT） | **434** | 20,800 | **2.09%** |
+| FF（Slice Register） | **469** | 41,600 | **1.13%** |
 | DSP（DSP48E1） | **6** | 90 | **6.67%** |
 | BRAM（BRAM Tile） | **3** | 50 | **6.00%** |
 | MMCM（MMCME2_ADV） | **2** | 5 | **40.00%** |
 | BUFGCTRL | 2 | 32 | 6.25% |
 
-最终实现为 1335/1335 个可布线网络全部完成，WNS/TNS 为 `+46.046 ns / 0 ns`，WHS/THS 为 `+0.127 ns / 0 ns`，DRC Error 为 0。正式版选择 LUT 最低且 GUI/脚本复现一致的 `Default`。资源、时序、功耗和 bitstream 签核摘要见 [`nf_hardware_signoff_summary.txt`](matlab_fir/national_finals/results/nf_hardware_signoff_summary.txt)，策略扫描见 [`cic6_implementation_strategy_scan.csv`](matlab_fir/national_finals/results/cic6_implementation_strategy_scan.csv)，优化取舍见 [`cic6_further_optimization_summary.txt`](matlab_fir/national_finals/results/cic6_further_optimization_summary.txt)。
+最终实现为 1348/1348 个可布线网络全部完成，WNS/TNS 为 `+45.539 ns / 0 ns`，WHS/THS 为 `+0.108 ns / 0 ns`，setup/hold 失败端点均为 0，DRC Error 为 0。正式版选择 LUT 最低的 `Default`；同一 DCP 的 `ExploreArea` 虽把 Slice 降到 177，却把 LUT 提高到 468。第七轮原始报告见 [`board_dual_rate_cic6_round7_headroom_opt`](matlab_fir/national_finals/vivado_results/board_dual_rate_cic6_round7_headroom_opt)，频响原始精度见 [`nf_rtl_impulse_summary.txt`](matlab_fir/national_finals/results/nf_rtl_impulse_summary.txt)。
 
 软件、RTL 和 FPGA 实现签核已通过；物理开发板下载及示波器/频谱仪验收尚需现场执行。完整架构、指标、RTL 一键回归、bitstream、SW1～SW8 映射和板测清单见 [全国总决赛交付说明](matlab_fir/national_finals/README.md)。
 
-> **版本口径说明**：以上 440 LUT / 464 FF / 6 DSP / 3 BRAM / 2 MMCM 及六工况指标是当前全国总决赛双采样率正式版本。下面的 472 LUT 单采样率版及 Phase 6/7/8 内容是区域赛优化过程、Pareto 候选和回退版本，不能替代全国赛最终资源数据。
+> **版本口径说明**：以上 434 LUT / 469 FF / 6 DSP / 3 BRAM / 2 MMCM 及六工况指标是当前全国总决赛双采样率正式版本。下面的 472 LUT 单采样率版及 Phase 6/7/8 内容是区域赛优化过程、Pareto 候选和回退版本，不能替代全国赛最终资源数据。
 
 > 当前最低 LUT 实板通过版：44.1 kHz 专用、Phase 7 折叠补偿 FIR-CIC、Stage 2/3 BRAM 历史/系数、共享按键扫描、472 LUT / 8 DSP，自动化验证、完整实现与四档板测通过<br>
 > 上一面积策略候选：相同滤波算法与板级功能、478 LUT / 565 FF / 9 DSP / 3 BRAM Tile<br>
