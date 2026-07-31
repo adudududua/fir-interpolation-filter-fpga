@@ -1,0 +1,65 @@
+National-finals CIC6 round-6 FF optimization
+=============================================
+Date: 2026-07-31
+Branch: codex/national-finals-cic6-round6-opt
+Device/top: XC7A35T-FGG484-2 / board_demo_competition_dac8_top
+
+Selected change
+---------------
+Move the final hidden CIC integrator state from the asynchronous-reset
+control/output process into the synchronous-reset integrator-state process.
+The externally visible y_out/y_out_valid and transaction control retain
+asynchronous reset. Routed DSP48E1 properties show that the final state is
+absorbed by internal A/B input registers (AREG=1, BREG=1), not PREG.
+
+Resource comparison
+-------------------
+Round-5 LUT-min: synthesis 459 LUT / 464 FF
+                   routed 440 LUT / 464 FF / 191 Slice
+Round-6 low-FF:  synthesis 459 LUT / 432 FF
+                   routed 442 LUT / 432 FF / 194 Slice
+Unchanged: 6 DSP / 3 BRAM Tile / 2 MMCM
+Change: -32 FF, +2 LUT, +3 Slice; power remains 0.271 W vectorless.
+
+Implementation strategy scan
+----------------------------
+Default:     442 LUT / 432 FF / 194 Slice, WNS/WHS +45.617/+0.106 ns
+AddRemap:    442 LUT / 432 FF / 194 Slice, WNS/WHS +45.617/+0.106 ns
+ExploreArea: 460 LUT / 432 FF / 180 Slice, WNS/WHS +46.038/+0.135 ns
+Default is retained for LUT priority. ExploreArea is only a Slice-priority
+Pareto point.
+
+Rejected Stop/Go candidates
+---------------------------
+1. Time-share the shift-add equalizer in the serial-comb DSP:
+   490 LUT / 453 FF / 6 DSP synthesized; RTL 9/9 PASS, but area regressed.
+2. Arithmetic truncation at two stage bridges:
+   454 LUT / 426 FF / 6 DSP synthesized; 1412 impulse mismatches, rejected.
+3. BRAM startup scrub:
+   RTL 9/9 PASS, but inference regressed to 615 LUT / 517 FF / 1 BRAM Tile.
+4. Separate synchronous process for final integrator state:
+   459 LUT / 432 FF synthesized, identical to the selected simpler process.
+
+Verification
+------------
+RTL regression: 9/9 PASS
+Run: matlab_fir/national_finals/_work/rtl_regression/20260731_140213
+Full-chain impulse and fixed-seed random PCM: 0 LSB at 4x/8x/128x
+Reset recovery: 8/8 PASS
+Dynamic mode switching: 10/10 PASS
+MATLAB analysis of final RTL impulse: all six rate/node cases PASS
+Routed timing: WNS/TNS +45.617/0 ns, WHS/THS +0.106/0 ns
+Routing: 1300/1300 fully routed, 0 routing errors
+DRC: 34 Warning, 1 Advisory, 0 Error
+Power: 0.271 W total (0.199 W dynamic, 0.072 W static), Medium confidence
+
+Bitstream
+---------
+matlab_fir/national_finals/vivado_results/board_dual_rate_cic6_round6_preg_opt/national_finals_dual_rate_4x8x128x_areaopt.bit
+SHA-256: 49DF03B71C6D73A73EE282A5D1EEE0D9F5EB91ADDB96879ACBA381F0D999D47C
+
+Status
+------
+Software, RTL and FPGA implementation sign-off PASS.
+Physical board download, DA_CLK measurement and DAC spectrum verification
+remain pending for this round-6 bitstream.

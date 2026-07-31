@@ -2,7 +2,7 @@
 
 当前版本已完成 MATLAB 建模、24 bit 定点模型、RTL、9 项 XSim 回归、Vivado 综合/布局布线/时序/DRC/功耗评估和 bitstream 生成。所有软件与 FPGA 工具验收均已通过；由于当前环境无法接触实物开发板，物理板下载和仪器测量仍需按本文最后一节执行，不能把 bitstream 成功等同于实板通过。
 
-开发分支：`codex/national-finals-cic6-gui-fix-round5-opt`
+最低 LUT 正式版：`440 LUT / 464 FF / 191 Slice`；本轮开发分支 `codex/national-finals-cic6-round6-opt` 另形成 `442 LUT / 432 FF / 194 Slice` 的低 FF Pareto 版本。两者均保持 6 DSP / 3 BRAM / 2 MMCM，频响和逐点输出完全一致。
 
 ## 1. 完成状态
 
@@ -65,6 +65,27 @@ y[n] = x[n-1] + (2*x[n-1] - x[n] - x[n-2]) / 8
 
 Stage1 DSP48 预加器经过 A/B 综合后明确淘汰：开启时为 491 个综合 LUT，关闭并使用织构对称预加时为 469 个综合 LUT。因此当前结构是“织构预加 + DSP 乘法/PREG MAC”，不能再描述为已启用 DSP48 预加器。
 
+### 2.2 第六轮：最终积分状态吸收到 DSP48 内部寄存器
+
+第五轮已经让前两个 CIC 积分状态采用同步复位，但最终积分状态仍和输出/控制一起使用异步复位，因此占用 32 个 Slice FF。第六轮只把这个**内部、不可见**的最终积分状态移入同步复位进程；`y_out`、`y_out_valid`、burst/comb 控制仍保持原异步复位。板级复位会持续多个音频时钟，三组积分状态都能在释放前可靠清零。
+
+Vivado routed checkpoint 的 DSP48 属性核查表明，新增状态实际进入最终积分器 DSP48E1 的 A/B 输入寄存器（`AREG=1, BREG=1`），不是 PREG。综合由 `459 LUT / 464 FF` 变为 `459 LUT / 432 FF`；布局布线后是 `442 LUT / 432 FF / 194 Slice`，相对最低 LUT 正式版少 32 FF、多 2 LUT和 3 Slice，故将其作为低 FF Pareto 版本保留。
+
+| 实现策略 | LUT | FF | Slice | DSP | WNS / WHS | 结论 |
+|---|---:|---:|---:|---:|---:|---|
+| Default | **442** | **432** | 194 | 6 | +45.617 / +0.106 ns | 本分支默认 |
+| AddRemap | **442** | **432** | 194 | 6 | +45.617 / +0.106 ns | 与 Default 无面积收益 |
+| ExploreArea | 460 | **432** | **180** | 6 | +46.038 / +0.135 ns | 仅 Slice 优先时有意义 |
+
+本轮其余 Stop/Go 候选均未混入正式 RTL：
+
+- 均衡器复用串行 comb DSP：9/9 RTL 通过，但综合为 490 LUT / 453 FF，回退。
+- 两处级间算术截位：综合为 454 LUT / 426 FF，但旧 golden 冲激有 1412 点不一致，回退。
+- BRAM 上电 scrub：9/9 RTL 通过，但历史存储不再推断为 BRAM，综合恶化为 615 LUT / 517 FF / 1 BRAM Tile，回退。
+- 把最终状态拆成独立同步进程：仍为 459 LUT / 432 FF，与合并进程无差别，不继续实现。
+
+因此第六轮没有宣称“全面优于”440-LUT 版：比赛若按 LUT 为第一目标，继续使用 440/464；若总寄存器或 FF 权重更高，可使用 442/432。两个 bitstream 都保留为明确回退点。
+
 ## 3. 正式 RTL 冲激指标
 
 以下数据直接来自 XSim 导出的最终 RTL 冲激响应，不是只分析浮点系数。
@@ -98,7 +119,7 @@ Stage1 DSP48 预加器经过 A/B 综合后明确淘汰：开启时为 491 个综
 | 全链路复位恢复 | 8 个内部状态场景，每场景比较 4096 个 128x 输出 | PASS，8/8 |
 | 动态倍率切换 | 不复位连续切换 10 次；检查 runt、X、锁死和冻结 | PASS，10/10 |
 
-最终一次发布回归目录为 `_work/rtl_regression/20260731_034840`。九项测试全部通过；所有逐点比较节点无 X、无丢样、无数值失配。证据摘要见 [nf_rtl_regression_summary.txt](results/nf_rtl_regression_summary.txt)。
+第六轮最终一次发布回归目录为 `_work/rtl_regression/20260731_140213`。九项测试全部通过；所有逐点比较节点无 X、无丢样、无数值失配。证据摘要见 [nf_rtl_regression_summary.txt](results/nf_rtl_regression_summary.txt)。
 
 一键重跑：
 
@@ -181,7 +202,38 @@ SHA-256：`3E25025717617CEE2CECE32EB1FC16494006793655DBB502888B62CD35220720`
 
 淘汰项也进行了真实综合或仿真：均衡运算融合进串行 comb DSP 为 581 LUT / 622 FF；改为共享 Stage2/3 DSP 的版本在修正 signed 系数扩展后虽 0 LSB 通过，但综合为 592 LUT / 558 FF；早期只替换 Stage1 预加器、未让 PREG 保存累加状态的方案为 586 LUT / 578 FF；本轮在现有 PREG 结构上再次开启 DSP48 预加器，综合仍由 469 增至 491 LUT；把 pending 合并进 burst 计数则在第 16 个样点破坏等价性。其余 Stage2/3 BRAM 微码、Stage1 直接舍入、24 bit 结果寄存器和均衡器位宽收窄也均按 Stop/Go 淘汰。完整策略数据见 [cic6_implementation_strategy_scan.csv](results/cic6_implementation_strategy_scan.csv)，优化记录见 [cic6_further_optimization_summary.txt](results/cic6_further_optimization_summary.txt)。
 
-### 5.2 GUI 资源不一致问题与修复
+### 5.2 第六轮低 FF Pareto 版签核
+
+以下数据来自 `board_dual_rate_cic6_round6_preg_opt` 的最终 routed 报告，不是综合估算：
+
+| 项目 | 第五轮最低 LUT 版 | 第六轮低 FF 版 | 变化 |
+|---|---:|---:|---:|
+| Slice LUT | 440 | **442** | +2 |
+| Slice register | 464 | **432** | **-32** |
+| Slice | 191 | **194** | +3 |
+| DSP48E1 | 6 | **6** | 0 |
+| BRAM tile | 3 | **3** | 0 |
+| MMCM | 2 | **2** | 0 |
+| WNS / WHS | +46.046 / +0.127 ns | **+45.617 / +0.106 ns** | 均无违例 |
+| TNS / THS | 0 / 0 ns | **0 / 0 ns** | 0 |
+| Vectorless 功耗 | 0.271 W | **0.271 W** | 报告精度下不变 |
+
+最终实现 1300/1300 个网络全部完成，routing error 为 0；DRC 为 34 条 Warning、1 条 Advisory、**0 Error**。这些提示仍是面积优先 DSP 未加输入/输出流水、动态 OPMODE 以及 BRAM 异步控制检查，不影响 bitstream 生成，但首次上板仍须执行本文的复位和家族切换检查。
+
+bitstream：
+
+```text
+matlab_fir/national_finals/vivado_results/board_dual_rate_cic6_round6_preg_opt/
+national_finals_dual_rate_4x8x128x_areaopt.bit
+```
+
+SHA-256：`49DF03B71C6D73A73EE282A5D1EEE0D9F5EB91ADDB96879ACBA381F0D999D47C`
+
+本版本已通过最终 9/9 XSim、六组 MATLAB RTL 冲激验收、从头综合、布局布线、时序、DRC、功耗报告和 bitstream 生成；**尚未在实物板下载复测**。
+
+详细记录见 [cic6_round6_ff_optimization_summary.txt](results/cic6_round6_ff_optimization_summary.txt) 和 [cic6_round6_strategy_scan.csv](results/cic6_round6_strategy_scan.csv)。
+
+### 5.3 GUI 资源不一致问题与修复
 
 此前 GUI 显示 **482 LUT / 542 FF / 8 DSP**，不是 461-LUT 报告测错，而是 `.xpr` 只启用了 `USE_NATIONAL_FINALS_DATAPATH=1`，没有启用串行 comb CIC、全国赛 Stage2/3 窄系数和综合资源共享；GUI 因而综合了旧的 8-DSP 并行 CIC。工程文件现已显式登记串行 CIC 源文件并固定以下配置：
 
@@ -220,7 +272,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
   -Step all
 ```
 
-包装脚本先执行面积优化综合，再以低内存单进程完成布局布线、报告和 bitstream。默认实现指令是本轮扫描选出的 `Default`；本轮正式结果目录为 `vivado_results/board_dual_rate_cic6_round5_opt`。日志与 `.Xil` 均写入 `matlab_fir/national_finals/_work/vivado/<时间戳>`，不会污染项目根目录。
+包装脚本先执行面积优化综合，再以低内存单进程完成布局布线、报告和 bitstream。默认实现指令是本轮扫描选出的 `Default`；当前分支默认结果目录为 `vivado_results/board_dual_rate_cic6_round6_preg_opt`，第五轮 440-LUT 回退结果仍保留在 `vivado_results/board_dual_rate_cic6_round5_opt`。日志与 `.Xil` 均写入 `matlab_fir/national_finals/_work/vivado/<时间戳>`，不会污染项目根目录。
 
 ## 7. SW1～SW8 与预期 DA_CLK
 

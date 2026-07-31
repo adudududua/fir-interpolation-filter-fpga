@@ -12,7 +12,7 @@ set synth_dcp [file join $project_dir XC7A35T_interp.runs synth_1 \
     board_demo_competition_dac8_top.dcp]
 set board_xdc [file join $project_dir XC7A35T_interp.srcs constrs_1 new \
     board_demo_competition_dac8_top.xdc]
-set result_tag board_dual_rate_cic6_round5_opt
+set result_tag board_dual_rate_cic6_round6_preg_opt
 set implementation_opt_directive Default
 if {$argc > 0} {
     set result_tag [lindex $argv 0]
@@ -118,7 +118,7 @@ puts $manifest_handle [format "Routed hold slack: %.3f ns" $hold_slack]
 puts $manifest_handle "44.1-kHz family 128x clock: 5.644796 MHz (-0.64 ppm nominal)"
 puts $manifest_handle "48-kHz family 128x clock: 6.144068 MHz (+11.03 ppm nominal)"
 puts $manifest_handle "Architecture: 1-DSP Stage1 + 1-DSP shared Stage2/3 + shift-add equalizer + 4-DSP serial-comb CIC16"
-puts $manifest_handle "CIC state optimization: hidden integrators use DSP48E1 PREG synchronous reset"
+puts $manifest_handle "CIC state optimization: synchronous reset allows all hidden integrator states to use DSP48E1 internal A/B/C registers"
 puts $manifest_handle "Equalizer optimization: combinational hand-off into serial CIC input capture"
 puts $manifest_handle "Serial-comb optimization: rotating uniform 22-bit history removes the wide 3:1 DSP-input mux"
 puts $manifest_handle "Stage1 optimization: fabric symmetric pair sum plus DSP48E1 multiplier/PREG MAC state, 41-bit proven bound, and exact DSP-resident Q15 rounding"

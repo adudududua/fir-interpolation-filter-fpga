@@ -3,7 +3,7 @@ National-finals RTL regression summary
 Date: 2026-07-31
 Simulator: Vivado Simulator 2018.3
 Command: powershell.exe -NoProfile -ExecutionPolicy Bypass -File matlab_fir/national_finals/sim/run_national_finals_rtl_regression.ps1 -PublishImpulseOutputs
-Run directory: matlab_fir/national_finals/_work/rtl_regression/20260731_034840
+Run directory: matlab_fir/national_finals/_work/rtl_regression/20260731_140213
 
 1. dual-rate tone ROM
    PASS: 44.1/48 kHz data, address wrap and synchronous family reset

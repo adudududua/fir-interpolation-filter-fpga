@@ -14,7 +14,7 @@ param(
     [ValidateSet(0, 1)]
     [int]$Stage1Dsp48Preadder = 0,
     [ValidatePattern('^[A-Za-z0-9_-]+$')]
-    [string]$ResultTag = 'board_dual_rate_cic6_round5_opt'
+    [string]$ResultTag = 'board_dual_rate_cic6_round6_preg_opt'
 )
 
 $ErrorActionPreference = 'Stop'
