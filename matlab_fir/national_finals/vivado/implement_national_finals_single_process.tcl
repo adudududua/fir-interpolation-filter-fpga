@@ -140,10 +140,10 @@ puts $manifest_handle [format "AD9708 output hold slack: %.3f ns" \
     [get_property SLACK $dac_hold_path]]
 puts $manifest_handle "44.1-kHz family 128x clock: 5.644796 MHz (-0.64 ppm nominal)"
 puts $manifest_handle "48-kHz family 128x clock: 6.144068 MHz (+11.03 ppm nominal)"
-puts $manifest_handle "Architecture: 1-DSP Stage1 + 1-DSP shared Stage2/3 + shift-add equalizer + 4-DSP serial-comb CIC16"
-puts $manifest_handle "CIC state optimization: synchronous reset allows both hidden intermediate integrator states to use DSP48E1 internal registers"
+puts $manifest_handle "Architecture: 1-DSP Stage1 + 1-DSP shared Stage2/3 + shift-add equalizer + exact N3 Hold CIC16 with 2 DSP integrators"
+puts $manifest_handle "N3 Hold optimization: C^3 -> up16 -> I^3 is rewritten exactly as C^2 -> Hold16 -> I^2 at the same 33-bit modulo width and final normalization"
 puts $manifest_handle "Equalizer optimization: combinational hand-off plus lossless 21-bit headroom removes the intermediate 20-bit saturation mux; the CIC final quantizer remains 20-bit"
-puts $manifest_handle "Serial-comb optimization: rotating uniform 22-bit history removes the wide 3:1 DSP-input mux"
+puts $manifest_handle "CIC mapping: two low-rate comb stages use LUT CARRY4 and both high-rate integrators use DSP48E1"
 puts $manifest_handle "Stage1 optimization: fabric symmetric pair sum plus DSP48E1 multiplier/PREG MAC state, 41-bit proven bound, and exact DSP-resident Q15 rounding"
 puts $manifest_handle "Stage2/3 optimization: shared DSP48E1 PREG MAC state, constant 16383 plus CARRYIN exact rounding, and transaction-local BRAM history metadata"
 puts $manifest_handle "Stage3 correctness: true Q15 coefficients, complete 38-bit MAC view, and explicit signed 20-bit saturation"

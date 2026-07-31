@@ -59,6 +59,7 @@ set nf_sources [list \
     [file join $nf_src_dir nf_unified_fir_coeff_bram.v] \
     [file join $nf_src_dir cic3_compensator_shiftadd_ce.v] \
     [file join $nf_src_dir cic_interp16_serial_comb_dsp_ce.v] \
+    [file join $nf_src_dir cic_interp16_n3_hold2_dsp_ce.v] \
     [file join $nf_src_dir dual_family_audio_clock.v] \
     [file join $nf_src_dir nf_mode_cdc_handshake.v] \
     [file join $nf_src_dir dual_rate_test_tone_rom_source.v] \
@@ -124,6 +125,7 @@ set_property generic [list \
     USE_PHASE7_CIC_BURST_COUNTER_DSP=0 \
     USE_NATIONAL_FINALS_DATAPATH=1 \
     USE_NATIONAL_FINALS_SERIAL_CIC_COMB=1 \
+    USE_NATIONAL_FINALS_N3_HOLD_EQUIV=1 \
     USE_NATIONAL_FINALS_CIC_COMB_DSP=0 \
     USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER=$stage1_dsp48_preadder \
     USE_NATIONAL_FINALS_NARROW_STAGE23=1] [get_filesets sources_1]
@@ -223,7 +225,7 @@ puts $manifest_handle "Top: board_demo_competition_dac8_top"
 puts $manifest_handle "Bitstream: $bitstream_dst"
 puts $manifest_handle "44.1-kHz family 128x clock: 5.644796 MHz (-0.64 ppm nominal)"
 puts $manifest_handle "48-kHz family 128x clock: 6.144068 MHz (+11.03 ppm nominal)"
-puts $manifest_handle "Architecture: shared 2x/2x/2x FIR + shift-add CIC equalizer + CIC16"
+puts $manifest_handle "Architecture: shared 2x/2x/2x FIR + shift-add CIC equalizer + exact N3 Hold CIC16 with two DSP integrators"
 puts $manifest_handle "CIC DSP mapping: serial low-rate comb uses LUT CARRY4; three high-rate integrators use DSP48E1"
 puts $manifest_handle "Equalizer headroom optimization: lossless 21-bit equalizer output feeds a 21-bit CIC input; clipping is deferred to the final 20-bit CIC quantizer"
 puts $manifest_handle "Synthesis directive: AreaOptimized_high"

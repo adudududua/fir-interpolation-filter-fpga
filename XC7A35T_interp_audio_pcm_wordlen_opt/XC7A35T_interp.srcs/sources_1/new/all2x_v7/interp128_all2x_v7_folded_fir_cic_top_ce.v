@@ -49,6 +49,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     parameter integer CIC_BURST_COUNTER_USE_DSP = 0,
     parameter integer CIC_COMB_USE_DSP = 0,
     parameter integer USE_SERIAL_CIC_COMB = 0,
+    parameter integer USE_N3_HOLD_EQUIV = 0,
     parameter integer USE_STAGE1_DSP48_PREADDER = 0,
     parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 0,
     parameter integer USE_UNIFIED_FIR_COEFF_BRAM =
@@ -220,7 +221,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
             cic3_compensator_shiftadd_ce #(
                 .DATA_W(20),
                 .OUTPUT_W(21),
-                .REGISTER_OUTPUT((USE_SERIAL_CIC_COMB != 0) ? 0 : 1)
+                .REGISTER_OUTPUT((USE_SERIAL_CIC_COMB != 0 ||
+                                  USE_N3_HOLD_EQUIV != 0) ? 0 : 1)
             ) u_cic3_compensator_shiftadd_ce (
                 .clk(clk),
                 .rst_n(rst_n),
@@ -237,7 +239,26 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     endgenerate
 
     generate
-        if (USE_SERIAL_CIC_COMB != 0) begin : gen_serial_cic_comb
+        if (USE_N3_HOLD_EQUIV != 0) begin : gen_serial_cic_comb
+            cic_interp16_n3_hold2_dsp_ce #(
+                .DATA_W          (21),
+                .OUTPUT_W        (20),
+                .FINAL_PRUNE_LSB (FINAL_PRUNE_LSB),
+                .BURST_COUNTER_USE_DSP(CIC_BURST_COUNTER_USE_DSP)
+            ) u_cic_interp16_serial_comb_dsp_ce (
+                .clk                  (clk),
+                .rst_n                (rst_n),
+                .ce_out               (ce128_out),
+                .x_in                 (cic_x_w),
+                .x_in_valid           (cic_x_valid_w),
+                .y_out                (y128_w),
+                .y_out_valid          (y128_valid_w),
+                .burst_remaining_dbg  (),
+                .pending_dbg          (),
+                .comb_busy_dbg        ()
+            );
+        end
+        else if (USE_SERIAL_CIC_COMB != 0) begin : gen_serial_cic_comb_legacy
             cic_interp16_serial_comb_dsp_ce #(
                 .DATA_W          (21),
                 .OUTPUT_W        (20),
@@ -301,6 +322,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
             $fatal(1, "CIC3 shift-add compensator requires flat Stage3");
         if (USE_SERIAL_CIC_COMB != 0 && CIC_ORDER != 3)
             $fatal(1, "Serial CIC comb candidate requires CIC_ORDER=3");
+        if (USE_N3_HOLD_EQUIV != 0 && CIC_ORDER != 3)
+            $fatal(1, "N=3 Hold CIC rewrite requires CIC_ORDER=3");
     end
 
     always @(posedge clk) begin

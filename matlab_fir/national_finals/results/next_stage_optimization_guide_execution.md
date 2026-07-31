@@ -20,11 +20,11 @@
 | P1 Q 格式/绝对增益 | 完成 | Stage 3 改为真 Q15；4x/8x/128x 最大模式间增益差 0.001881 dB |
 | P2 验证闭环 | 完成 | 六工况频响、冲激/随机 0 LSB、负向增益测试和 XSim 回归恢复 |
 | P3 工程闭环 | 软件侧完成 | 原子模式 CDC、同步复位、MMCM 锁定同步、ODDR 时钟转发、IOB 数据寄存器、AD9708 STA；物理板切换仍待现场 |
-| P4-A N3 Hold | 待执行 | 目标 5 DSP -> 4 DSP，必须与修复后的 N3 输出逐点 0 LSB |
+| P4-A N3 Hold | 软件/工具侧完成 | 旧 `C³→↑16→I³` 严格改写为 `C²→Hold16→I²`；12/12 XSim、7680 个 CIC 输出和全链路均 0 LSB；post-route `491 LUT / 444 FF / 197 Slice / 4 DSP / 3 BRAM Tile` |
 | P4-B BRAM 调度 | 待执行 | Stage 1 单 RAM 串行双读和 Stage 2/3 合并历史分别验证，联合目标 3 -> 2 Tile |
 | P5 研究支线 | 暂不进入主线 | 仅从已经验证的标签另开分支 |
 
-P3 的详细实测证据见 [P3 工程闭环签核](p3_engineering_closure_summary.md)。
+P3 的详细实测证据见 [P3 工程闭环签核](p3_engineering_closure_summary.md)，P4-A 见 [N3 Hold 4-DSP 签核](p4a_n3_hold_4dsp_summary.md)。
 
 ## 继续执行规则
 

@@ -31,8 +31,10 @@ module tb_phase7_full_chain_reset_recovery;
 `else
 `define DUT_STAGE23 u_dut.gen_register_stage23.u_interp2_stage23_folded_cic_dsp_ce
 `endif
-`ifdef NATIONAL_FINALS_USE_SERIAL_CIC_COMB
+`ifdef NATIONAL_FINALS_USE_N3_HOLD
 `define DUT_CIC u_dut.gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce
+`elsif NATIONAL_FINALS_USE_SERIAL_CIC_COMB
+`define DUT_CIC u_dut.gen_serial_cic_comb_legacy.u_cic_interp16_serial_comb_dsp_ce
 `else
 `define DUT_CIC u_dut.gen_parallel_cic_comb.u_cic_interp16_core_dsp_ce
 `endif
@@ -108,9 +110,14 @@ module tb_phase7_full_chain_reset_recovery;
         .USE_NATIONAL_FINALS_NARROW_STAGE23(0),
 `endif
 `ifdef NATIONAL_FINALS_USE_SERIAL_CIC_COMB
-        .USE_SERIAL_CIC_COMB(1)
+        .USE_SERIAL_CIC_COMB(1),
 `else
-        .USE_SERIAL_CIC_COMB(0)
+        .USE_SERIAL_CIC_COMB(0),
+`endif
+`ifdef NATIONAL_FINALS_USE_N3_HOLD
+        .USE_N3_HOLD_EQUIV(1)
+`else
+        .USE_N3_HOLD_EQUIV(0)
 `endif
     ) u_dut (
         .clk(clk), .rst_n(rst_dut_n),
@@ -160,9 +167,14 @@ module tb_phase7_full_chain_reset_recovery;
         .USE_NATIONAL_FINALS_NARROW_STAGE23(0),
 `endif
 `ifdef NATIONAL_FINALS_USE_SERIAL_CIC_COMB
-        .USE_SERIAL_CIC_COMB(1)
+        .USE_SERIAL_CIC_COMB(1),
 `else
-        .USE_SERIAL_CIC_COMB(0)
+        .USE_SERIAL_CIC_COMB(0),
+`endif
+`ifdef NATIONAL_FINALS_USE_N3_HOLD
+        .USE_N3_HOLD_EQUIV(1)
+`else
+        .USE_N3_HOLD_EQUIV(0)
 `endif
     ) u_cold_reference (
         .clk(clk), .rst_n(rst_ref_n),

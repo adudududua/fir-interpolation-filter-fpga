@@ -20,6 +20,14 @@ P3 不改变 P1 的滤波系数、定点舍入和样点值。两位模式总线�
 
 CDC 报告中专用 `BUFGMUX_CTRL` 选择入口和 bundled-data shadow bus 分别保留书面 waiver；它们没有用 false path 隐藏，详细逐规则说明和板级待办见 [P3 工程闭环签核](results/p3_engineering_closure_summary.md)。
 
+## P4-A：严格等价 N3 Hold，5 DSP 降至 4 DSP
+
+利用插值 CIC 的多速率恒等式，把 `C³ → ↑16 → I³` 严格改写为 `C² → Hold16 → I²`。新实现保留 33-bit 模运算宽度、右移 8 bit 归一化、舍入饱和及输出有效周期；两级低速 comb 使用 LUT/CARRY4，两级高速 integrator 各使用一颗 DSP48E1。因此全机 DSP 分配由 `1 + 1 + 3 = 5` 变成 `1 + 1 + 2 = 4`。
+
+独立等价测试覆盖连续 320 组、随机停顿 480 组、复位中断与 7680 个输出样本；完整 RTL 回归扩展为 **12/12 PASS**，Stage1/2/3/128x 全链路仍为 0 LSB。post-route 为 **491 LUT / 444 FF / 197 Slice / 4 DSP / 3 BRAM Tile / 2 MMCM / 17 IO**，WNS/WHS 为 **+45.738/+0.052 ns**，AD9708 最差输出 setup/hold 仍为 **+76.116/+78.117 ns**，功耗 **0.271 W**。bitstream SHA-256 为 `D262BA94186D992016FE9FACD157E34FDB29EDF0F9A3433A38833A65B101C334`。
+
+这是 DSP 优先 Pareto 点：相对 P3 少 1 DSP、少 3 FF，但增加 29 LUT 和 17 Slice，不能表述为所有资源同时下降。详细验证和 waiver 见 [P4-A N3 Hold 签核](results/p4a_n3_hold_4dsp_summary.md)。
+
 ## 0.1 Route 1：统一双端口系数 RAM（历史资源点）
 
 Route 1保留Stage1和Stage2/3两颗FIR DSP。原因是48 kHz最紧工况下，一个128拍输入超周期内三段FIR最坏需要`27+42+60=129`拍，单DSP没有可靠调度余量。实际优化是把Stage1的26路`case`常量系数网络，与Stage2/3同步系数BRAM合并到一个显式true-dual-port `RAMB18E1`：

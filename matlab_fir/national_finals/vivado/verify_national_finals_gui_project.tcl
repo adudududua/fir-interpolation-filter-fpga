@@ -32,13 +32,18 @@ set source_set [get_filesets sources_1]
 set project_generics [get_property generic $source_set]
 require_generic $project_generics USE_NATIONAL_FINALS_DATAPATH 1
 require_generic $project_generics USE_NATIONAL_FINALS_SERIAL_CIC_COMB 1
+require_generic $project_generics USE_NATIONAL_FINALS_N3_HOLD_EQUIV 1
 require_generic $project_generics USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER 0
 require_generic $project_generics USE_NATIONAL_FINALS_NARROW_STAGE23 1
 
 set serial_cic_file [get_files -quiet \
     "*national_finals/cic_interp16_serial_comb_dsp_ce.v"]
+set n3_hold_cic_file [get_files -quiet \
+    "*national_finals/cic_interp16_n3_hold2_dsp_ce.v"]
 require_condition [expr {[llength $serial_cic_file] == 1}] \
     "Serial-comb CIC source is not registered exactly once in sources_1."
+require_condition [expr {[llength $n3_hold_cic_file] == 1}] \
+    "N=3 Hold CIC source is not registered exactly once in sources_1."
 
 set gui_resource_sharing [string tolower [get_property \
     STEPS.SYNTH_DESIGN.ARGS.RESOURCE_SHARING [get_runs synth_1]]]

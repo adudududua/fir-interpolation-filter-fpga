@@ -31,6 +31,12 @@ P3 保持 P1 的系数和位真样点不变，把两位模式选择改成 reques
 
 post-route 为 **462 LUT / 447 FF / 180 Slice / 5 DSP / 3 BRAM Tile / 2 MMCM**，WNS/WHS **+46.140/+0.050 ns**，功耗 **0.271 W**。AD9708 约束包含 2.0 ns setup、1.5 ns hold 和 0.5 ns 附加裕量，最差输出 setup/hold 为 **+76.116/+78.117 ns**。bitstream SHA-256 为 `A38C6D4F4B3C023DBD22897505B85864990CFC7C5D974A84FA38C5F0ADE21033`。详细证据和 CDC/DRC waiver 见 [P3 工程闭环签核](matlab_fir/national_finals/results/p3_engineering_closure_summary.md)，指导合理性与后续 P4/P5 分工见 [下一阶段优化指导执行记录](matlab_fir/national_finals/results/next_stage_optimization_guide_execution.md)。
 
+### P4-A 4-DSP Pareto 版：N3 Hold 严格等价改写
+
+P4-A 将三级 CIC 的 `C³ → ↑16 → I³` 按多速率恒等式改写为 `C² → Hold16 → I²`，保持 33-bit 模运算、输出归一化、valid 周期和所有滤波系数不变。新增测试与旧 CIC 比较 7680 个输出样本，连续输入、随机停顿和中途复位均为 0 LSB；完整 XSim 为 **12/12 PASS**。
+
+同一全国赛板级顶层 post-route 为 **491 LUT / 444 FF / 197 Slice / 4 DSP / 3 BRAM Tile / 2 MMCM**，WNS/WHS **+45.738/+0.052 ns**，功耗 **0.271 W**，bitstream SHA-256 为 `D262BA94186D992016FE9FACD157E34FDB29EDF0F9A3433A38833A65B101C334`。相对 P3 的变化为 `+29 LUT / -3 FF / +17 Slice / -1 DSP`，因此它是最低 DSP 的 Pareto 候选，不替代最低 LUT 的 P3 版本。完整证据见 [P4-A N3 Hold 签核](matlab_fir/national_finals/results/p4a_n3_hold_4dsp_summary.md)。
+
 通带指标也统一区分两种定义：
 
 - **通带最大绝对偏差**：通带内相对 0 dB 的最大偏离，直接对应赛题“±0.05 dB”门槛。

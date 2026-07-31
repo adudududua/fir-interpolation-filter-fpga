@@ -145,6 +145,17 @@ $cicSerialDir = Invoke-RtlCase -Name 'cic_serial_equivalence' `
     -Snapshot 'tb_nf_cic_serial_equiv_sim' `
     -ExpectedPassText 'CIC SERIAL COMB EQUIVALENCE PASS'
 
+$cicHoldDir = Invoke-RtlCase -Name 'cic_n3_hold_equivalence' `
+    -VerilogFiles @(
+        (Join-Path $sourceRoot 'all2x_v6\round_sat_shift_compact.v'),
+        (Join-Path $nfSource 'cic_interp16_serial_comb_dsp_ce.v'),
+        (Join-Path $nfSource 'cic_interp16_n3_hold2_dsp_ce.v'),
+        (Join-Path $nfSim 'tb_cic_interp16_n3_hold_equiv.v')
+    ) `
+    -Top 'tb_cic_interp16_n3_hold_equiv' `
+    -Snapshot 'tb_nf_cic_n3_hold_equiv_sim' `
+    -ExpectedPassText 'N3 HOLD CIC EQUIVALENCE PASS'
+
 $clockDir = Invoke-RtlCase -Name 'clock' `
     -VerilogFiles @(
         (Join-Path $nfSource 'dual_family_audio_clock.v'),
@@ -201,6 +212,7 @@ $fullDir = Invoke-RtlCase -Name 'full_chain_bittrue' `
         (Join-Path $nfSource 'cic3_compensator_shiftadd_ce.v'),
         (Join-Path $v7Source 'cic_interp16_core_dsp_ce.v'),
         (Join-Path $nfSource 'cic_interp16_serial_comb_dsp_ce.v'),
+        (Join-Path $nfSource 'cic_interp16_n3_hold2_dsp_ce.v'),
         (Join-Path $v7Source 'interp128_all2x_v7_folded_fir_cic_top_ce.v'),
         (Join-Path $v7Sim 'tb_phase7_full_chain_bittrue.v'),
         $glbl
@@ -211,6 +223,7 @@ $fullDir = Invoke-RtlCase -Name 'full_chain_bittrue' `
     -XvlogOptions @(
         '-d', 'NATIONAL_FINALS',
         '-d', 'NATIONAL_FINALS_USE_SERIAL_CIC_COMB',
+        '-d', 'NATIONAL_FINALS_USE_N3_HOLD',
         '-d', 'NATIONAL_FINALS_NARROW_STAGE23',
         '-d', 'PHASE7_USE_LUTRAM_STAGE23',
         '-d', 'PHASE7_USE_BRAM_STAGE23_HISTORY',
@@ -231,6 +244,7 @@ $resetDir = Invoke-RtlCase -Name 'full_chain_reset_recovery' `
         (Join-Path $nfSource 'cic3_compensator_shiftadd_ce.v'),
         (Join-Path $v7Source 'cic_interp16_core_dsp_ce.v'),
         (Join-Path $nfSource 'cic_interp16_serial_comb_dsp_ce.v'),
+        (Join-Path $nfSource 'cic_interp16_n3_hold2_dsp_ce.v'),
         (Join-Path $v7Source 'interp128_all2x_v7_folded_fir_cic_top_ce.v'),
         (Join-Path $v7Sim 'tb_phase7_full_chain_reset_recovery.v'),
         $glbl
@@ -241,6 +255,7 @@ $resetDir = Invoke-RtlCase -Name 'full_chain_reset_recovery' `
     -XvlogOptions @(
         '-d', 'NATIONAL_FINALS',
         '-d', 'NATIONAL_FINALS_USE_SERIAL_CIC_COMB',
+        '-d', 'NATIONAL_FINALS_USE_N3_HOLD',
         '-d', 'PHASE7_USE_LUTRAM_STAGE23',
         '-d', 'PHASE7_USE_BRAM_STAGE23_HISTORY',
         '-d', 'PHASE7_USE_BRAM_STAGE23_COEFF'
@@ -260,6 +275,7 @@ $dynamicDir = Invoke-RtlCase -Name 'dynamic_mode_switch' `
         (Join-Path $nfSource 'cic3_compensator_shiftadd_ce.v'),
         (Join-Path $v7Source 'cic_interp16_core_dsp_ce.v'),
         (Join-Path $nfSource 'cic_interp16_serial_comb_dsp_ce.v'),
+        (Join-Path $nfSource 'cic_interp16_n3_hold2_dsp_ce.v'),
         (Join-Path $v7Source 'interp128_all2x_v7_folded_fir_cic_top_ce.v'),
         (Join-Path $nfSource 'dual_rate_test_tone_rom_source.v'),
         (Join-Path $sourceRoot 'demo_interp_dac8_audio_pcm_common.v'),
@@ -289,5 +305,5 @@ if ($PublishImpulseOutputs) {
 }
 
 Write-Host ''
-Write-Host 'NATIONAL FINALS RTL REGRESSION PASS (11/11)'
+Write-Host 'NATIONAL FINALS RTL REGRESSION PASS (12/12)'
 Write-Host "Run directory: $runRoot"

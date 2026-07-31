@@ -160,6 +160,11 @@ module tb_phase7_full_chain_bittrue;
 `else
         .USE_SERIAL_CIC_COMB(0),
 `endif
+`ifdef NATIONAL_FINALS_USE_N3_HOLD
+        .USE_N3_HOLD_EQUIV(1),
+`else
+        .USE_N3_HOLD_EQUIV(0),
+`endif
 `ifdef NATIONAL_FINALS_USE_STAGE1_DSP48_PREADDER
         .USE_STAGE1_DSP48_PREADDER(1),
 `else

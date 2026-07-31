@@ -72,6 +72,7 @@ module tb_phase7_mode_switch_dynamic;
 `endif
         .USE_NATIONAL_FINALS_DATAPATH(1),
         .USE_NATIONAL_FINALS_SERIAL_CIC_COMB(1),
+        .USE_NATIONAL_FINALS_N3_HOLD_EQUIV(1),
         .USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER(0),
         .USE_NATIONAL_FINALS_NARROW_STAGE23(1)
     ) u_dut (
