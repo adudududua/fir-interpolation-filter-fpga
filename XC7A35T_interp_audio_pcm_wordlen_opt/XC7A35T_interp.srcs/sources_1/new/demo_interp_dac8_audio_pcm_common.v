@@ -56,7 +56,9 @@ module demo_interp_dac8_audio_pcm_common #(
     parameter integer USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER = 0,
     parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 0,
     parameter integer USE_NATIONAL_FINALS_SHARED_PCM_STAGE1_BRAM = 0,
-    parameter integer USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE = 2
+    parameter integer USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE = 2,
+    parameter integer USE_NATIONAL_FINALS_DISTRIBUTED_COEFF_ROM = 0,
+    parameter integer NATIONAL_FINALS_DISTRIBUTED_COEFF_REGISTER_OUTPUT = 0
 )(
     input  wire        force_mute,
     input  wire        clk_audio_128x,  // 5.6448MHz 连续音频 128x 时钟
@@ -299,6 +301,10 @@ module demo_interp_dac8_audio_pcm_common #(
                     USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE),
                 .USE_SHARED_PCM_STAGE1_BRAM(
                     USE_NATIONAL_FINALS_SHARED_PCM_STAGE1_BRAM),
+                .USE_DISTRIBUTED_FIR_COEFF_ROM(
+                    USE_NATIONAL_FINALS_DISTRIBUTED_COEFF_ROM),
+                .DISTRIBUTED_COEFF_REGISTER_OUTPUT(
+                    NATIONAL_FINALS_DISTRIBUTED_COEFF_REGISTER_OUTPUT),
                 .USE_UNIFIED_FIR_COEFF_BRAM(
                     USE_NATIONAL_FINALS_DATAPATH)
             ) u_interp128_all2x_v7_folded_fir_cic_top_ce (

@@ -21,6 +21,7 @@ set resource_sharing on
 set result_tag board_dual_rate_cic6_round7_headroom_opt
 set stage1_dsp48_preadder 1
 set cic_integrator_dsp_mode 2
+set distributed_coeff_rom_mode 0
 if {$argc > 0} {
     set reuse_current_synthesis [lindex $argv 0]
 }
@@ -45,6 +46,9 @@ if {$argc > 6} {
 if {$argc > 7} {
     set cic_integrator_dsp_mode [lindex $argv 7]
 }
+if {$argc > 8} {
+    set distributed_coeff_rom_mode [lindex $argv 8]
+}
 if {$reuse_current_synthesis != 0 && $reuse_current_synthesis != 1} {
     error "reuse_current_synthesis must be 0 or 1"
 }
@@ -57,6 +61,12 @@ if {$stage1_dsp48_preadder != 0 && $stage1_dsp48_preadder != 1} {
 if {$cic_integrator_dsp_mode < 0 || $cic_integrator_dsp_mode > 2} {
     error "cic_integrator_dsp_mode must be 0, 1, or 2"
 }
+if {$distributed_coeff_rom_mode < 0 || $distributed_coeff_rom_mode > 2} {
+    error "distributed_coeff_rom_mode must be 0, 1, or 2"
+}
+set use_distributed_coeff_rom [expr {$distributed_coeff_rom_mode != 0}]
+set distributed_coeff_register_output \
+    [expr {$distributed_coeff_rom_mode == 2}]
 if {![regexp {^[A-Za-z0-9_-]+$} $result_tag]} {
     error "result_tag may contain only letters, digits, underscore, and dash"
 }
@@ -65,6 +75,7 @@ set result_dir [file normalize [file join $script_dir .. vivado_results $result_
 set nf_sources [list \
     [file join $nf_src_dir nf_signedoff_filter_core.v] \
     [file join $nf_src_dir nf_unified_fir_coeff_bram.v] \
+    [file join $nf_src_dir p2_coeff_rom nf_dual_distributed_fir_coeff_rom.v] \
     [file join $nf_src_dir nf_stage1_history_ramb18_sdp.v] \
     [file join $nf_src_dir nf_pcm_stage1_shared_ramb18_sdp.v] \
     [file join $nf_src_dir interp2_stage1_single_bram_serial_ce.v] \
@@ -144,7 +155,9 @@ set_property generic [list \
     USE_NATIONAL_FINALS_CIC_COMB_DSP=0 \
     USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER=$stage1_dsp48_preadder \
     USE_NATIONAL_FINALS_NARROW_STAGE23=1 \
-    USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE=$cic_integrator_dsp_mode] \
+    USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE=$cic_integrator_dsp_mode \
+    USE_NATIONAL_FINALS_DISTRIBUTED_COEFF_ROM=$use_distributed_coeff_rom \
+    NATIONAL_FINALS_DISTRIBUTED_COEFF_REGISTER_OUTPUT=$distributed_coeff_register_output] \
     [get_filesets sources_1]
 
 # Keep the GUI simulation topology identical to the signed-off command-line
@@ -254,6 +267,7 @@ puts $manifest_handle "Equalizer headroom optimization: lossless 21-bit equalize
 puts $manifest_handle "Synthesis directive: AreaOptimized_high"
 puts $manifest_handle "Stage1 DSP48 preadder: $stage1_dsp48_preadder"
 puts $manifest_handle "CIC integrator DSP mode: $cic_integrator_dsp_mode"
+puts $manifest_handle "Distributed coefficient ROM mode: $distributed_coeff_rom_mode (0=RAMB18, 1=registered-address, 2=registered-output)"
 puts $manifest_handle "Stage1 history: one RAMB18, current-sample bypass plus serialized symmetric reads"
 puts $manifest_handle "Rounding: constant 16383 plus DSP48 CARRYIN for non-negative MAC sums"
 puts $manifest_handle "Stage3: proven 35-bit MAC bound removes unreachable 20-bit saturation logic"

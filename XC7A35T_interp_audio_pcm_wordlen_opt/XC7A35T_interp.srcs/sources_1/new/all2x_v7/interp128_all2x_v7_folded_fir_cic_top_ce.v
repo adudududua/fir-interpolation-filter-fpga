@@ -57,6 +57,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     parameter integer ASSUME_ALIGNED_POW2_CE = 0,
     parameter integer CIC_INTEGRATOR_DSP_MODE = 2,
     parameter integer USE_SHARED_PCM_STAGE1_BRAM = 0,
+    parameter integer USE_DISTRIBUTED_FIR_COEFF_ROM = 0,
+    parameter integer DISTRIBUTED_COEFF_REGISTER_OUTPUT = 0,
     parameter integer USE_UNIFIED_FIR_COEFF_BRAM =
         USE_BRAM_STAGE23_COEFF
 )(
@@ -115,12 +117,27 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     wire stage1_pcm_update_w;
     wire [7:0] stage1_pcm_addr_w;
     wire stage1_pcm_deadline_miss_w;
+    localparam integer USE_EXTERNAL_FIR_COEFF =
+        (USE_UNIFIED_FIR_COEFF_BRAM != 0) ||
+        (USE_DISTRIBUTED_FIR_COEFF_ROM != 0);
 
     wire unused_ce;
     assign unused_ce = ce16_out ^ ce32_out ^ ce64_out;
 
     generate
-        if (USE_UNIFIED_FIR_COEFF_BRAM != 0) begin :
+        if (USE_DISTRIBUTED_FIR_COEFF_ROM != 0) begin :
+                gen_distributed_fir_coeff_rom
+            nf_dual_distributed_fir_coeff_rom #(
+                .REGISTER_OUTPUT(DISTRIBUTED_COEFF_REGISTER_OUTPUT)
+            ) u_nf_dual_distributed_fir_coeff_rom (
+                .clk(clk),
+                .stage1_addr(stage1_coeff_addr_w),
+                .stage1_coeff(stage1_coeff_data_w),
+                .stage23_addr(stage23_coeff_addr_w),
+                .stage23_coeff(stage23_coeff_data_w)
+            );
+        end
+        else if (USE_UNIFIED_FIR_COEFF_BRAM != 0) begin :
                 gen_unified_fir_coeff_bram
             nf_unified_fir_coeff_bram u_nf_unified_fir_coeff_bram (
                 .clk(clk),
@@ -142,7 +159,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
                 .DATA_W(24),
                 .ACC_W(STAGE1_ACC_W),
                 .USE_DSP48_PREADDER(USE_STAGE1_DSP48_PREADDER),
-                .USE_EXTERNAL_COEFF_BRAM(USE_UNIFIED_FIR_COEFF_BRAM),
+                .USE_EXTERNAL_COEFF_BRAM(USE_EXTERNAL_FIR_COEFF),
                 .USE_SHARED_PCM_BRAM(USE_SHARED_PCM_STAGE1_BRAM)
             ) u_interp2_stage1_strict_halfband_bram_ce (
                 .clk(clk), .rst_n(rst_n), .ce_out(ce2_out),
@@ -168,7 +185,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
                 .DATA_W(24),
                 .ACC_W(STAGE1_ACC_W),
                 .USE_DSP48_PREADDER(USE_STAGE1_DSP48_PREADDER),
-                .USE_EXTERNAL_COEFF_BRAM(USE_UNIFIED_FIR_COEFF_BRAM)
+                .USE_EXTERNAL_COEFF_BRAM(USE_EXTERNAL_FIR_COEFF)
             ) u_interp2_stage1_strict_halfband_bram_ce (
                 .clk(clk), .rst_n(rst_n), .ce_out(ce2_out),
                 .x_in(x_in), .x_in_valid(x_in_valid),
@@ -214,7 +231,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
                     USE_UNIFIED_BRAM_STAGE23_HISTORY),
                 .USE_BRAM_COEFF(USE_BRAM_STAGE23_COEFF),
                 .USE_PACKED_BRAM(USE_PACKED_BRAM_STAGE23),
-                .USE_EXTERNAL_COEFF_BRAM(USE_UNIFIED_FIR_COEFF_BRAM),
+                .USE_EXTERNAL_COEFF_BRAM(USE_EXTERNAL_FIR_COEFF),
                 .ASSUME_ALIGNED_POW2_CE(ASSUME_ALIGNED_POW2_CE)
             ) u_interp2_stage23_lutram_cic_dsp_ce (
                 .clk(clk), .rst_n(rst_n),

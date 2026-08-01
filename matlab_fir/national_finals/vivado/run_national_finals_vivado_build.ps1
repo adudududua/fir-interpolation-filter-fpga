@@ -15,6 +15,8 @@ param(
     [int]$Stage1Dsp48Preadder = 1,
     [ValidateSet(0, 1, 2)]
     [int]$CicIntegratorDspMode = 2,
+    [ValidateSet(0, 1, 2)]
+    [int]$DistributedCoeffRom = 0,
     [ValidatePattern('^[A-Za-z0-9_-]+$')]
     [string]$ResultTag = 'board_dual_rate_cic6_round7_headroom_opt'
 )
@@ -23,16 +25,50 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 $nfRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
 $timestamp = Get-Date -Format 'yyyyMMdd_HHmmss'
 $runRoot = Join-Path $nfRoot "_work\vivado\$timestamp"
 $synthTcl = Join-Path $PSScriptRoot 'build_national_finals_board.tcl'
 $implementTcl = Join-Path $PSScriptRoot 'implement_national_finals_single_process.tcl'
+$projectFile = Join-Path $repoRoot 'XC7A35T_interp_audio_pcm_wordlen_opt\XC7A35T_interp.xpr'
 
-foreach ($requiredFile in @($VivadoExe, $synthTcl, $implementTcl)) {
+foreach ($requiredFile in @($VivadoExe, $synthTcl, $implementTcl, $projectFile)) {
     if (-not (Test-Path -LiteralPath $requiredFile)) {
         throw "Required build file not found: $requiredFile"
     }
 }
+
+$projectFileOriginalBytes = [System.IO.File]::ReadAllBytes($projectFile)
+$resultDir = Join-Path $nfRoot "vivado_results\$ResultTag"
+$safeDirectory = $repoRoot.Replace('\', '/')
+$gitStatusAll = @(& git -c "safe.directory=$safeDirectory" -C $repoRoot `
+    status --porcelain --untracked-files=all)
+if ($LASTEXITCODE -ne 0) {
+    throw 'Unable to capture Git source state before the Vivado build.'
+}
+$generatedPrefixes = @(
+    'matlab_fir/national_finals/_work/',
+    'matlab_fir/national_finals/vivado_results/'
+)
+$gitStatusSource = @($gitStatusAll | Where-Object {
+    $statusPath = if ($_.Length -gt 3) { $_.Substring(3).Replace('\', '/') } else { '' }
+    -not ($generatedPrefixes | Where-Object { $statusPath.StartsWith($_) })
+})
+$gitCommit = (@(& git -c "safe.directory=$safeDirectory" -C $repoRoot rev-parse HEAD) -join '').Trim()
+$gitBranch = (@(& git -c "safe.directory=$safeDirectory" -C $repoRoot branch --show-current) -join '').Trim()
+New-Item -ItemType Directory -Path $resultDir -Force | Out-Null
+$sourceState = [ordered]@{
+    captured_utc = (Get-Date).ToUniversalTime().ToString('o')
+    branch = $gitBranch
+    commit = $gitCommit
+    source_worktree_dirty = ($gitStatusSource.Count -ne 0)
+    source_status_porcelain = ($gitStatusSource -join "`n")
+    status_porcelain_all = ($gitStatusAll -join "`n")
+}
+[System.IO.File]::WriteAllText(
+    (Join-Path $resultDir 'source_state_at_build_start.json'),
+    (($sourceState | ConvertTo-Json -Depth 4) + [Environment]::NewLine),
+    [System.Text.UTF8Encoding]::new($false))
 
 New-Item -ItemType Directory -Path $runRoot -Force | Out-Null
 
@@ -74,26 +110,33 @@ function Invoke-VivadoStep {
     Write-Host "[$Name] PASS"
 }
 
-if ($Step -eq 'all' -or $Step -eq 'synth') {
-    Invoke-VivadoStep -Name 'synthesis' -TclPath $synthTcl `
-        -TclArguments @(
-            '0',
-            '1',
-            $SynthesisDirective,
-            $FlattenHierarchy,
-            $ResourceSharing,
-            $ResultTag,
-            $Stage1Dsp48Preadder,
-            $CicIntegratorDspMode
-        )
-}
+try {
+    if ($Step -eq 'all' -or $Step -eq 'synth') {
+        Invoke-VivadoStep -Name 'synthesis' -TclPath $synthTcl `
+            -TclArguments @(
+                '0',
+                '1',
+                $SynthesisDirective,
+                $FlattenHierarchy,
+                $ResourceSharing,
+                $ResultTag,
+                $Stage1Dsp48Preadder,
+                $CicIntegratorDspMode,
+                $DistributedCoeffRom
+            )
+    }
 
-if ($Step -eq 'all' -or $Step -eq 'implement') {
-    Invoke-VivadoStep -Name 'implementation' -TclPath $implementTcl `
-        -TclArguments @(
-            $ResultTag,
-            $ImplementationOptDirective
-        )
+    if ($Step -eq 'all' -or $Step -eq 'implement') {
+        Invoke-VivadoStep -Name 'implementation' -TclPath $implementTcl `
+            -TclArguments @(
+                $ResultTag,
+                $ImplementationOptDirective,
+                $DistributedCoeffRom
+            )
+    }
+}
+finally {
+    [System.IO.File]::WriteAllBytes($projectFile, $projectFileOriginalBytes)
 }
 
 Write-Host ''

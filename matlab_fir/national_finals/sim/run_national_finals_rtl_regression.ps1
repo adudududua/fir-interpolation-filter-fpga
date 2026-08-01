@@ -4,7 +4,9 @@ param(
     [ValidateSet('Smoke', 'Release')]
     [string]$RegressionScale = 'Smoke',
     [string]$VectorDir = '',
-    [switch]$PublishImpulseOutputs
+    [switch]$PublishImpulseOutputs,
+    [ValidateSet(0, 1, 2)]
+    [int]$DistributedCoeffRom = 0
 )
 
 $ErrorActionPreference = 'Stop'
@@ -115,8 +117,22 @@ $signedOffFullChainXvlogOptions = @(
     '-d', 'NATIONAL_FINALS_SINGLE_BRAM_STAGE1',
     '-d', 'PHASE7_USE_BRAM_STAGE23_COEFF'
 )
+$distributedCoeffXvlogOptions = @()
+if ($DistributedCoeffRom -ne 0) {
+    $distributedCoeffXvlogOptions += @(
+        '-d', 'NATIONAL_FINALS_USE_DISTRIBUTED_COEFF_ROM'
+    )
+    if ($DistributedCoeffRom -eq 2) {
+        $distributedCoeffXvlogOptions += @(
+            '-d', 'NATIONAL_FINALS_DISTRIBUTED_COEFF_DATA_Q'
+        )
+    }
+    $signedOffFullChainXvlogOptions += $distributedCoeffXvlogOptions
+}
 $v7Source = Join-Path $sourceRoot 'all2x_v7'
 $v7Sim = Join-Path $simRoot 'all2x_v7\verification'
+$p2CoeffSource = Join-Path $nfSource 'p2_coeff_rom'
+$p2CoeffSim = Join-Path $nfSim 'p2_coeff_rom'
 $coeffHeader = Join-Path $sourceRoot 'all2x_v2\all2x_v2_coeff_pkg.vh'
 
 if ([string]::IsNullOrWhiteSpace($VectorDir)) {
@@ -181,6 +197,17 @@ $coeffPrimitiveDir = Invoke-RtlCase -Name 'unified_coeff_ramb18_primitive' `
     -ExpectedPassText 'UNIFIED COEFFICIENT RAMB18 PRIMITIVE PASS: 32 Stage1 + 64 Stage23 addresses' `
     -XvlogOptions @('-d', 'SYNTHESIS') `
     -XelabOptions @('glbl', '-L', 'unisims_ver')
+
+if ($DistributedCoeffRom -ne 0) {
+    $null = Invoke-RtlCase -Name 'dual_distributed_coeff_rom' `
+        -VerilogFiles @(
+            (Join-Path $p2CoeffSource 'nf_dual_distributed_fir_coeff_rom.v'),
+            (Join-Path $p2CoeffSim 'tb_nf_dual_distributed_fir_coeff_rom.v')
+        ) `
+        -Top 'tb_nf_dual_distributed_fir_coeff_rom' `
+        -Snapshot 'tb_nf_dual_distributed_coeff_rom_sim' `
+        -ExpectedPassText 'P2 DUAL DISTRIBUTED COEFFICIENT ROM PASS: 96 addresses A/B equivalent, negative_flip_checks=96'
+}
 
 $historyPrimitiveDir = Invoke-RtlCase -Name 'history_ramb18_primitive' `
     -VerilogFiles @(
@@ -325,6 +352,7 @@ $fullDir = Invoke-RtlCase -Name 'full_chain_bittrue' `
         (Join-Path $v7Source 'interp2_stage23_folded_cic_dsp_ce.v'),
         (Join-Path $v7Source 'interp2_stage23_lutram_cic_dsp_ce.v'),
         (Join-Path $nfSource 'nf_unified_fir_coeff_bram.v'),
+        (Join-Path $p2CoeffSource 'nf_dual_distributed_fir_coeff_rom.v'),
         (Join-Path $nfSource 'nf_stage23_history_ramb18_sdp.v'),
         (Join-Path $nfSource 'cic3_compensator_shiftadd_ce.v'),
         (Join-Path $v7Source 'cic_interp16_core_dsp_ce.v'),
@@ -356,6 +384,7 @@ $resetDir = Invoke-RtlCase -Name 'full_chain_reset_recovery' `
         (Join-Path $v7Source 'interp2_stage23_folded_cic_dsp_ce.v'),
         (Join-Path $v7Source 'interp2_stage23_lutram_cic_dsp_ce.v'),
         (Join-Path $nfSource 'nf_unified_fir_coeff_bram.v'),
+        (Join-Path $p2CoeffSource 'nf_dual_distributed_fir_coeff_rom.v'),
         (Join-Path $nfSource 'nf_stage23_history_ramb18_sdp.v'),
         (Join-Path $nfSource 'cic3_compensator_shiftadd_ce.v'),
         (Join-Path $v7Source 'cic_interp16_core_dsp_ce.v'),
@@ -385,6 +414,7 @@ $dynamicDir = Invoke-RtlCase -Name 'dynamic_mode_switch' `
         (Join-Path $v7Source 'interp2_stage23_folded_cic_dsp_ce.v'),
         (Join-Path $v7Source 'interp2_stage23_lutram_cic_dsp_ce.v'),
         (Join-Path $nfSource 'nf_unified_fir_coeff_bram.v'),
+        (Join-Path $p2CoeffSource 'nf_dual_distributed_fir_coeff_rom.v'),
         (Join-Path $nfSource 'nf_stage23_history_ramb18_sdp.v'),
         (Join-Path $nfSource 'cic3_compensator_shiftadd_ce.v'),
         (Join-Path $v7Source 'cic_interp16_core_dsp_ce.v'),
@@ -399,10 +429,10 @@ $dynamicDir = Invoke-RtlCase -Name 'dynamic_mode_switch' `
     -Top 'tb_phase7_mode_switch_dynamic' `
     -Snapshot 'tb_nf_dynamic_mode_sim' `
     -ExpectedPassText 'PHASE7 DYNAMIC MODE PASS: 10 switches, no reset, no runt pulse or X.' `
-    -XvlogOptions @(
+    -XvlogOptions (@(
         '-d', 'PHASE7_USE_BRAM_STAGE23_HISTORY',
         '-d', 'PHASE7_USE_BRAM_STAGE23_COEFF'
-    ) `
+    ) + $distributedCoeffXvlogOptions) `
     -XelabOptions @('glbl', '-L', 'unisims_ver') `
     -Assets @(
         $coeffHeader,
@@ -419,5 +449,6 @@ if ($PublishImpulseOutputs) {
 }
 
 Write-Host ''
-Write-Host 'NATIONAL FINALS RTL REGRESSION PASS (16/16)'
+$caseCount = if ($DistributedCoeffRom -ne 0) { 17 } else { 16 }
+Write-Host "NATIONAL FINALS RTL REGRESSION PASS ($caseCount/$caseCount)"
 Write-Host "Run directory: $runRoot"
