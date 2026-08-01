@@ -23,8 +23,10 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 $nfRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
 $timestamp = Get-Date -Format 'yyyyMMdd_HHmmss'
 $runRoot = Join-Path $nfRoot "_work\vivado\$timestamp"
+$resultDir = Join-Path $nfRoot "vivado_results\$ResultTag"
 $synthTcl = Join-Path $PSScriptRoot 'build_national_finals_board.tcl'
 $implementTcl = Join-Path $PSScriptRoot 'implement_national_finals_single_process.tcl'
 
@@ -34,7 +36,38 @@ foreach ($requiredFile in @($VivadoExe, $synthTcl, $implementTcl)) {
     }
 }
 
+$safeDirectory = $repoRoot.Replace('\', '/')
+$gitStatusAll = @(& git -c "safe.directory=$safeDirectory" -C $repoRoot `
+    status --porcelain --untracked-files=all)
+if ($LASTEXITCODE -ne 0) {
+    throw 'Unable to capture Git source state before the Vivado build.'
+}
+$generatedPrefixes = @(
+    'matlab_fir/national_finals/_work/',
+    'matlab_fir/national_finals/vivado_results/'
+)
+$gitStatusSource = @($gitStatusAll | Where-Object {
+    $statusPath = if ($_.Length -gt 3) { $_.Substring(3).Replace('\', '/') } else { '' }
+    -not ($generatedPrefixes | Where-Object { $statusPath.StartsWith($_) })
+})
+$gitCommit = (& git -c "safe.directory=$safeDirectory" -C $repoRoot rev-parse HEAD).Trim()
+$gitBranch = (& git -c "safe.directory=$safeDirectory" -C $repoRoot branch --show-current).Trim()
+
 New-Item -ItemType Directory -Path $runRoot -Force | Out-Null
+New-Item -ItemType Directory -Path $resultDir -Force | Out-Null
+$sourceState = [ordered]@{
+    captured_utc = (Get-Date).ToUniversalTime().ToString('o')
+    branch = $gitBranch
+    commit = $gitCommit
+    source_worktree_dirty = ($gitStatusSource.Count -ne 0)
+    source_status_porcelain = ($gitStatusSource -join "`n")
+    status_porcelain_all = ($gitStatusAll -join "`n")
+}
+$sourceStateJson = $sourceState | ConvertTo-Json -Depth 4
+[System.IO.File]::WriteAllText(
+    (Join-Path $resultDir 'source_state_at_build_start.json'),
+    $sourceStateJson + [Environment]::NewLine,
+    [System.Text.UTF8Encoding]::new($false))
 
 function Invoke-VivadoStep {
     param(
