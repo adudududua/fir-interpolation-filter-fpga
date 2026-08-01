@@ -40,24 +40,32 @@ require_generic $project_generics USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE 2
 require_generic $project_generics USE_NATIONAL_FINALS_NARROW_STAGE23 1
 
 set sim_set [get_filesets sim_1]
-set expected_sim_defines [list \
-    NATIONAL_FINALS \
-    NATIONAL_FINALS_USE_SERIAL_CIC_COMB \
-    NATIONAL_FINALS_USE_N3_HOLD \
-    NATIONAL_FINALS_USE_STAGE1_DSP48_PREADDER \
-    NATIONAL_FINALS_NARROW_STAGE23 \
-    PHASE7_USE_LUTRAM_STAGE23 \
-    PHASE7_USE_BRAM_STAGE23_HISTORY \
-    NATIONAL_FINALS_UNIFIED_STAGE23_HISTORY \
-    NATIONAL_FINALS_SINGLE_BRAM_STAGE1 \
-    PHASE7_USE_BRAM_STAGE23_COEFF]
 set project_sim_defines [get_property verilog_define $sim_set]
 require_condition \
     [expr {[get_property top $sim_set] eq "tb_phase7_full_chain_bittrue"}] \
     "GUI sim_1 top must be tb_phase7_full_chain_bittrue."
 require_condition \
-    [expr {[lsort $project_sim_defines] eq [lsort $expected_sim_defines]}] \
-    "GUI sim_1 defines do not match the signed-off national-finals topology."
+    [expr {[llength $project_sim_defines] == 0}] \
+    "GUI sim_1 must not use macros to select the signed-off topology."
+
+set signedoff_wrapper [get_files -quiet \
+    "*national_finals/nf_signedoff_filter_core.v"]
+require_condition [expr {[llength $signedoff_wrapper] == 1}] \
+    "Signed-off filter wrapper is not registered exactly once."
+set daily_asset_patterns [list \
+    impulse_input_24bit.mem \
+    impulse_y4_golden_24bit.mem \
+    impulse_y8_golden_24bit.mem \
+    impulse_y128_golden_24bit.mem \
+    random_seed01_input_24bit.mem \
+    random_seed01_y4_golden_24bit.mem \
+    random_seed01_y8_golden_24bit.mem \
+    random_seed01_y128_golden_24bit.mem]
+foreach asset_name $daily_asset_patterns {
+    set asset_file [get_files -quiet -of_objects $sim_set "*$asset_name"]
+    require_condition [expr {[llength $asset_file] == 1}] \
+        "GUI simulation asset is not registered exactly once: $asset_name"
+}
 
 set serial_cic_file [get_files -quiet \
     "*national_finals/cic_interp16_serial_comb_dsp_ce.v"]
@@ -140,15 +148,15 @@ if {[get_property PROGRESS [get_runs impl_1]] eq "100%"} {
     puts "GUI_MMCM=$mmcm_count"
 
     require_condition [expr {$dsp_count == 4}] \
-        "GUI implementation is not the P4-B 4-DSP architecture."
+        "GUI implementation is not the P4-D 4-DSP architecture."
     require_condition [expr {$bram18_count == 4}] \
         "GUI implementation does not use the expected two BRAM tiles."
     require_condition [expr {$mmcm_count == 2}] \
         "GUI implementation does not use the expected two MMCMs."
     require_condition [expr {$lut_count <= 500}] \
-        "GUI implementation exceeds the signed-off 500-LUT P4-C guard."
+        "GUI implementation exceeds the signed-off 500-LUT P4-D guard."
     require_condition [expr {$ff_count <= 490}] \
-        "GUI implementation exceeds the signed-off 490-FF P4-C guard."
+        "GUI implementation exceeds the signed-off 490-FF P4-D guard."
 
     puts "NATIONAL_FINALS_GUI_IMPLEMENTATION_PASS"
     close_design

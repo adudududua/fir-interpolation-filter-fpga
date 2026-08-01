@@ -27,7 +27,17 @@
 
 module tb_phase7_full_chain_bittrue;
 
-`ifdef NATIONAL_FINALS
+`ifdef NF_RELEASE_REGRESSION
+    localparam integer MAX_INPUT_COUNT = 4096;
+    localparam integer MAX_Y4_COUNT = 16605;
+    localparam integer MAX_Y8_COUNT = 33219;
+    localparam integer MAX_Y128_COUNT = 531584;
+    localparam integer RANDOM_INPUT_COUNT = 4096;
+    localparam integer RANDOM_Y4_COUNT = 16605;
+    localparam integer RANDOM_Y8_COUNT = 33219;
+    localparam integer RANDOM_Y128_COUNT = 531584;
+    localparam integer CASE_COUNT = 11;
+`else
     localparam integer MAX_INPUT_COUNT = 1024;
     localparam integer MAX_Y4_COUNT = 4317;
     localparam integer MAX_Y8_COUNT = 8643;
@@ -37,49 +47,17 @@ module tb_phase7_full_chain_bittrue;
     localparam integer RANDOM_Y8_COUNT = 8643;
     localparam integer RANDOM_Y128_COUNT = 138368;
     localparam integer CASE_COUNT = 2;
-`elsif PHASE7_NIGHTLY
-    localparam integer MAX_INPUT_COUNT = 4096;
-    localparam integer MAX_Y4_COUNT = 16605;
-    localparam integer MAX_Y8_COUNT = 33219;
-    localparam integer MAX_Y128_COUNT = 531552;
-    localparam integer RANDOM_INPUT_COUNT = 4096;
-    localparam integer RANDOM_Y4_COUNT = 16605;
-    localparam integer RANDOM_Y8_COUNT = 33219;
-    localparam integer RANDOM_Y128_COUNT = 531552;
-    localparam integer CASE_COUNT = 11;
-`else
-    localparam integer MAX_INPUT_COUNT = 1024;
-    localparam integer MAX_Y4_COUNT = 4317;
-    localparam integer MAX_Y8_COUNT = 8643;
-    localparam integer MAX_Y128_COUNT = 138336;
-    localparam integer RANDOM_INPUT_COUNT = 1024;
-    localparam integer RANDOM_Y4_COUNT = 4317;
-    localparam integer RANDOM_Y8_COUNT = 8643;
-    localparam integer RANDOM_Y128_COUNT = 138336;
-    localparam integer CASE_COUNT = 5;
 `endif
     localparam integer IMPULSE_INPUT_COUNT = 256;
     localparam integer IMPULSE_Y4_COUNT = 1245;
     localparam integer IMPULSE_Y8_COUNT = 2499;
-`ifdef NATIONAL_FINALS
     localparam integer IMPULSE_Y128_COUNT = 40064;
-`else
-    localparam integer IMPULSE_Y128_COUNT = 40032;
-`endif
     localparam integer SHIFT_4X = 3;
     localparam integer SHIFT_8X = 7;
-`ifdef NATIONAL_FINALS
     localparam integer SHIFT_128X = 112;
-`else
-    localparam integer SHIFT_128X = 112;
-`endif
     localparam integer IR_LEN_4X = 225;
     localparam integer IR_LEN_8X = 459;
-`ifdef NATIONAL_FINALS
     localparam integer IR_LEN_128X = 7406;
-`else
-    localparam integer IR_LEN_128X = 7374;
-`endif
 
     reg clk;
     reg rst_n;
@@ -126,71 +104,7 @@ module tb_phase7_full_chain_bittrue;
     wire signed [23:0] dbg_y8;
     wire dbg_y8_valid;
 
-    interp128_all2x_v7_folded_fir_cic_top_ce #(
-        .STAGE1_ACC_W    (41),
-        .STAGE23_ACC_W   (38),
-        .CIC_ORDER       (3),
-        .FINAL_PRUNE_LSB (0),
-`ifdef NATIONAL_FINALS
-        .STAGE3_FLAT(1),
-        .USE_CIC3_SHIFTADD_COMPENSATOR(1),
-`endif
-`ifdef PHASE7_USE_LUTRAM_STAGE23
-        .USE_LUTRAM_STAGE23(1),
-`else
-        .USE_LUTRAM_STAGE23(0),
-`endif
-`ifdef PHASE7_USE_BRAM_STAGE23_HISTORY
-        .USE_BRAM_STAGE23_HISTORY(1),
-`else
-        .USE_BRAM_STAGE23_HISTORY(0),
-`endif
-`ifdef NATIONAL_FINALS_UNIFIED_STAGE23_HISTORY
-        .USE_UNIFIED_BRAM_STAGE23_HISTORY(1),
-`else
-        .USE_UNIFIED_BRAM_STAGE23_HISTORY(0),
-`endif
-`ifdef NATIONAL_FINALS_SINGLE_BRAM_STAGE1
-        .USE_SINGLE_BRAM_STAGE1(1),
-`else
-        .USE_SINGLE_BRAM_STAGE1(0),
-`endif
-`ifdef PHASE7_USE_BRAM_STAGE23_COEFF
-        .USE_BRAM_STAGE23_COEFF(1),
-`else
-        .USE_BRAM_STAGE23_COEFF(0),
-`endif
-`ifdef PHASE8_USE_PACKED_BRAM_STAGE23
-        .USE_PACKED_BRAM_STAGE23(1),
-`else
-        .USE_PACKED_BRAM_STAGE23(0),
-`endif
-`ifdef NATIONAL_FINALS_USE_SERIAL_CIC_COMB
-        .USE_SERIAL_CIC_COMB(1),
-`else
-        .USE_SERIAL_CIC_COMB(0),
-`endif
-`ifdef NATIONAL_FINALS_USE_N3_HOLD
-        .USE_N3_HOLD_EQUIV(1),
-`else
-        .USE_N3_HOLD_EQUIV(0),
-`endif
-`ifdef NATIONAL_FINALS_USE_STAGE1_DSP48_PREADDER
-        .USE_STAGE1_DSP48_PREADDER(1),
-`else
-        .USE_STAGE1_DSP48_PREADDER(0),
-`endif
-`ifdef NATIONAL_FINALS_NARROW_STAGE23
-        .USE_NATIONAL_FINALS_NARROW_STAGE23(1),
-`else
-        .USE_NATIONAL_FINALS_NARROW_STAGE23(0),
-`endif
-`ifdef NATIONAL_FINALS_UNIFIED_STAGE23_HISTORY
-        .ASSUME_ALIGNED_POW2_CE(1)
-`else
-        .ASSUME_ALIGNED_POW2_CE(0)
-`endif
-    ) u_dut (
+    nf_signedoff_filter_core u_dut (
         .clk(clk), .rst_n(rst_n),
         .ce2_out(ce2_out), .ce4_out(ce4_out),
         .ce8_out(ce8_out), .ce16_out(ce16_out),
@@ -302,6 +216,68 @@ module tb_phase7_full_chain_bittrue;
                 $display("Mismatch case=%0d rate=%0dx index=%0d actual=%0d expected=%0d",
                     active_case, rate_value, sample_index,
                     actual_value, expected_value);
+        end
+    endtask
+
+    task require_asset;
+        input [8*96-1:0] filename;
+        integer asset_file;
+        begin
+            asset_file = $fopen(filename, "r");
+            if (asset_file == 0)
+                $fatal(1, "NF_ASSET_MISSING: %0s", filename);
+            $fclose(asset_file);
+        end
+    endtask
+
+    task preflight_assets;
+        begin
+            require_asset("impulse_input_24bit.mem");
+            require_asset("impulse_y4_golden_24bit.mem");
+            require_asset("impulse_y8_golden_24bit.mem");
+            require_asset("impulse_y128_golden_24bit.mem");
+            require_asset("random_seed01_input_24bit.mem");
+            require_asset("random_seed01_y4_golden_24bit.mem");
+            require_asset("random_seed01_y8_golden_24bit.mem");
+            require_asset("random_seed01_y128_golden_24bit.mem");
+`ifdef NF_RELEASE_REGRESSION
+            require_asset("random_seed02_input_24bit.mem");
+            require_asset("random_seed02_y4_golden_24bit.mem");
+            require_asset("random_seed02_y8_golden_24bit.mem");
+            require_asset("random_seed02_y128_golden_24bit.mem");
+            require_asset("random_seed03_input_24bit.mem");
+            require_asset("random_seed03_y4_golden_24bit.mem");
+            require_asset("random_seed03_y8_golden_24bit.mem");
+            require_asset("random_seed03_y128_golden_24bit.mem");
+            require_asset("random_seed04_input_24bit.mem");
+            require_asset("random_seed04_y4_golden_24bit.mem");
+            require_asset("random_seed04_y8_golden_24bit.mem");
+            require_asset("random_seed04_y128_golden_24bit.mem");
+            require_asset("random_seed05_input_24bit.mem");
+            require_asset("random_seed05_y4_golden_24bit.mem");
+            require_asset("random_seed05_y8_golden_24bit.mem");
+            require_asset("random_seed05_y128_golden_24bit.mem");
+            require_asset("random_seed06_input_24bit.mem");
+            require_asset("random_seed06_y4_golden_24bit.mem");
+            require_asset("random_seed06_y8_golden_24bit.mem");
+            require_asset("random_seed06_y128_golden_24bit.mem");
+            require_asset("random_seed07_input_24bit.mem");
+            require_asset("random_seed07_y4_golden_24bit.mem");
+            require_asset("random_seed07_y8_golden_24bit.mem");
+            require_asset("random_seed07_y128_golden_24bit.mem");
+            require_asset("random_seed08_input_24bit.mem");
+            require_asset("random_seed08_y4_golden_24bit.mem");
+            require_asset("random_seed08_y8_golden_24bit.mem");
+            require_asset("random_seed08_y128_golden_24bit.mem");
+            require_asset("random_seed09_input_24bit.mem");
+            require_asset("random_seed09_y4_golden_24bit.mem");
+            require_asset("random_seed09_y8_golden_24bit.mem");
+            require_asset("random_seed09_y128_golden_24bit.mem");
+            require_asset("random_seed10_input_24bit.mem");
+            require_asset("random_seed10_y4_golden_24bit.mem");
+            require_asset("random_seed10_y8_golden_24bit.mem");
+            require_asset("random_seed10_y128_golden_24bit.mem");
+`endif
         end
     endtask
 
@@ -496,6 +472,8 @@ module tb_phase7_full_chain_bittrue;
         expected_y4_count = 0;
         expected_y8_count = 0;
         expected_y128_count = 0;
+
+        preflight_assets();
 
         impulse_y4_file = $fopen("rtl_impulse_y4.csv", "w");
         impulse_y8_file = $fopen("rtl_impulse_y8.csv", "w");

@@ -232,3 +232,16 @@ set_clock_groups -asynchronous \
 set_clock_groups -logically_exclusive \
     -group [get_clocks [list $nf_clk_44k1 dac_clk_44k1_128x]] \
     -group [get_clocks [list $nf_clk_48k dac_clk_48k_128x]]
+
+# mode_shadow[1:0] is a bundled-data CDC bus.  The source holds both bits
+# stable from request launch until the destination returns its synchronized
+# acknowledgement; the destination then waits three audio-clock cycles before
+# the atomic capture.  Constrain physical skew to one 20-MHz source period so
+# implementation cannot separate the two data bits enough to violate that
+# protocol assumption.  Vivado 2018.3 requires sequential cells, not Q/D pins,
+# as set_bus_skew endpoints.
+set nf_mode_shadow_cells [get_cells -hierarchical -regexp \
+    {.*u_nf_mode_cdc_handshake/mode_shadow_reg\[[01]\]}]
+set nf_audio_mode_cells [get_cells -hierarchical -regexp \
+    {.*u_nf_mode_cdc_handshake/audio_mode_reg\[[01]\]}]
+set_bus_skew 50.000 -from $nf_mode_shadow_cells -to $nf_audio_mode_cells

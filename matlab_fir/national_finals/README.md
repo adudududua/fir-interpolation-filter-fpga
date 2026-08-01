@@ -1,8 +1,8 @@
 # 全国总决赛：双采样率可配置插值滤波器
 
-当前 P4-C 候选已完成 MATLAB 建模、24 bit 定点模型、15 项 XSim 回归、Vivado 综合/布局布线/时序/DRC/CDC/功耗评估和 bitstream 生成。默认最低 LUT/FF 档为 **479 LUT / 468 FF / 198 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM**；同源 3-DSP、2-DSP 档也均完成实现与 bitstream。所有可在当前环境执行的软件与 FPGA 工具验收均已通过；由于当前环境无法接触实物开发板，物理板下载和仪器测量仍需按本文最后一节执行，不能把 bitstream 成功等同于实板通过。
+当前 P4-D 发布候选已完成 MATLAB 建模、24 bit 定点模型、Smoke 与 10-seed×4096 Release 两级 15 项 XSim 回归、GUI 行为仿真、Vivado 综合/布局布线/时序/DRC/CDC/功耗评估和两条路径的 bitstream 生成。默认最低 LUT/FF 档为 **479 LUT / 468 FF / 198 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM**；同源 P4-C 3-DSP、2-DSP 档也均完成实现与 bitstream。所有可在当前环境执行的软件与 FPGA 工具验收均已通过；由于当前环境无法接触实物开发板，物理板下载和仪器测量仍需按本文最后一节执行，不能把 bitstream 成功等同于实板通过。
 
-当前可发布 Pareto 点为 P3 `462 LUT / 447 FF / 5 DSP / 3 BRAM Tile`、P4-A `491 LUT / 444 FF / 4 DSP / 3 BRAM Tile`，以及 P4-C 的 `479 LUT / 4 DSP`、`504 LUT / 3 DSP`、`523 LUT / 2 DSP` 三档（均为 2 BRAM Tile）。这些版本均继承 P1 真 Q15 修复和 P3 的原子 CDC、同步复位、AD9708 输出时序闭环。复核发现旧 Route 1 `424 LUT / 6 DSP` 与低 DSP `436 LUT / 5 DSP` 的 Stage 3 系数实际为 Q14 幅度、MAC 却按 Q15 右移，导致 8x/128x 绝对增益约为 -6.02 dB；这些旧版本只保留为资源演进历史，不再作为发布候选。前一份指导的完整执行记录见 [P0～P4 执行反馈](results/next_stage_optimization_guide_execution.md)，本轮指导的逐项判断和实测见 [P4-B RTL 下一阶段指导执行反馈](results/p4b_rtl_next_optimization_guide_execution.md)。
+当前可发布 Pareto 点为 P3 `462 LUT / 447 FF / 5 DSP / 3 BRAM Tile`、P4-A `491 LUT / 444 FF / 4 DSP / 3 BRAM Tile`、P4-D `479 LUT / 4 DSP / 2 BRAM Tile`，以及 P4-C 的 `504 LUT / 3 DSP`、`523 LUT / 2 DSP` 两个低 DSP 档。这些版本均继承 P1 真 Q15 修复和 P3 的原子 CDC、同步复位、AD9708 输出时序闭环。复核发现旧 Route 1 `424 LUT / 6 DSP` 与低 DSP `436 LUT / 5 DSP` 的 Stage 3 系数实际为 Q14 幅度、MAC 却按 Q15 右移，导致 8x/128x 绝对增益约为 -6.02 dB；这些旧版本只保留为资源演进历史，不再作为发布候选。P4-D 签核见 [发布闭环总结](results/p4d_release_closure_summary.md)。
 
 ## 0. P1：Stage 3 真 Q15 与绝对增益闭环
 
@@ -51,6 +51,12 @@ P4-C 不改变 FIR/CIC 传递函数、系数、舍入、饱和或输出 valid �
 相对 P4-B，默认档减少 **25 LUT、25 FF、4 Slice**，DSP/BRAM/MMCM 不变；3-DSP 档以 `+25 LUT/+26 FF` 换 1 DSP，2-DSP 档以 `+44 LUT/+55 FF` 换 2 DSP。功耗是无 SAIF 的 vectorless 估算，0.001 W 差异不能当作实物省电结论。默认 bitstream SHA-256 为 `814465320512830C98D0EDA5352D36797BF5C442CD27E3520B5B89601F1C52D3`。
 
 本轮 MATLAB 直接分析当前 RTL 发布的 impulse CSV，六工况通带、阻带、绝对增益和严格线性相位全部 PASS；详细证明、策略扫描、三档 SHA 和未执行项见 [P4-C 指导执行反馈](results/p4b_rtl_next_optimization_guide_execution.md)。
+
+## P4-D：发布配置与验证闭环
+
+P4-D 用固定参数 wrapper 取代全链 testbench 的十个 topology 宏，Smoke/Release 只控制样本规模；GUI 工程显式包含 8 个日常向量并完成真实行为仿真。Release 门槛为冲激加 10 个固定 seed×4096，三节点全部逐样本 0 LSB，完整回归 **15/15 PASS**。同时为两位 bundled-data 模式总线增加 50 ns bus-skew 约束，布线后实测 1.816 ns、裕量 48.184 ns。
+
+资源、时序和功耗保持 **479 LUT / 468 FF / 198 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM、+45.734/+0.121 ns、0.271 W**。普通 Vivado `impl_1` 与独立低内存脚本均生成 bitstream，新 SHA-256 为 `44879C48B2A15481A2B7DE598EAA83DE02CD1DABBD9C9BD5D26F0E8399E3E378`。TIMING-18、CDC-13/15 的逐项证据和限制见 [P4-D 发布闭环签核](results/p4d_release_closure_summary.md)。
 
 ## 0.1 Route 1：统一双端口系数 RAM（历史资源点）
 

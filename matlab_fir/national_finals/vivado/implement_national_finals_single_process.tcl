@@ -111,6 +111,14 @@ catch {
     check_timing -verbose \
         -file [file join $result_dir check_timing_routed.rpt]
 }
+catch {
+    report_exceptions -coverage \
+        -file [file join $result_dir exceptions_coverage_routed.rpt]
+}
+catch {
+    report_bus_skew \
+        -file [file join $result_dir bus_skew_routed.rpt]
+}
 
 write_primitive_report \
     [file join $result_dir dsp_utilization_routed.rpt] \
@@ -157,6 +165,7 @@ puts $manifest_handle [format "AD9708 output hold slack: %.3f ns" \
     [get_property SLACK $dac_hold_path]]
 puts $manifest_handle "44.1-kHz family 128x clock: 5.644796 MHz (-0.64 ppm nominal)"
 puts $manifest_handle "48-kHz family 128x clock: 6.144068 MHz (+11.03 ppm nominal)"
+puts $manifest_handle "Bundled-data CDC: mode_shadow\[1:0\] has a 50.000 ns set_bus_skew requirement; verify actual routed skew in bus_skew_routed.rpt"
 puts $manifest_handle "Architecture: 1-DSP Stage1 + 1-DSP shared Stage2/3 + shift-add equalizer + exact N3 Hold CIC16 with $cic_integrator_dsp_count DSP integrator(s)"
 puts $manifest_handle "N3 Hold optimization: C^3 -> up16 -> I^3 is rewritten exactly as C^2 -> Hold16 -> I^2; proven 26-bit first and 29-bit final integrator widths replace the former conservative 33-bit states"
 puts $manifest_handle "Equalizer optimization: combinational hand-off plus lossless 21-bit headroom removes the intermediate 20-bit saturation mux; the CIC final quantizer remains 20-bit"

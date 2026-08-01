@@ -63,6 +63,7 @@ if {![regexp {^[A-Za-z0-9_-]+$} $result_tag]} {
 set result_dir [file normalize [file join $script_dir .. vivado_results $result_tag]]
 
 set nf_sources [list \
+    [file join $nf_src_dir nf_signedoff_filter_core.v] \
     [file join $nf_src_dir nf_unified_fir_coeff_bram.v] \
     [file join $nf_src_dir nf_stage1_history_ramb18_sdp.v] \
     [file join $nf_src_dir interp2_stage1_single_bram_serial_ce.v] \
@@ -148,17 +149,7 @@ set_property generic [list \
 # full-chain regression.  Without these defines sim_1 silently selects older
 # Phase-7 branches even though synthesis uses the national-finals generics.
 set_property top tb_phase7_full_chain_bittrue [get_filesets sim_1]
-set_property verilog_define [list \
-    NATIONAL_FINALS \
-    NATIONAL_FINALS_USE_SERIAL_CIC_COMB \
-    NATIONAL_FINALS_USE_N3_HOLD \
-    NATIONAL_FINALS_USE_STAGE1_DSP48_PREADDER \
-    NATIONAL_FINALS_NARROW_STAGE23 \
-    PHASE7_USE_LUTRAM_STAGE23 \
-    PHASE7_USE_BRAM_STAGE23_HISTORY \
-    NATIONAL_FINALS_UNIFIED_STAGE23_HISTORY \
-    NATIONAL_FINALS_SINGLE_BRAM_STAGE1 \
-    PHASE7_USE_BRAM_STAGE23_COEFF] [get_filesets sim_1]
+set_property verilog_define [list] [get_filesets sim_1]
 
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1

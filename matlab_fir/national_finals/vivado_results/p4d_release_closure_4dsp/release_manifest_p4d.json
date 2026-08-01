@@ -1,0 +1,189 @@
+﻿{
+    "schema":  "national-finals-release-manifest-v1",
+    "config_id":  "NF-P4D-479LUT-468FF-4DSP-2BRAM-2MMCM",
+    "generated_utc":  "2026-08-01T09:59:54.7871731Z",
+    "tool":  {
+                 "name":  "Vivado",
+                 "version":  "2018.3",
+                 "build":  "2405991",
+                 "part":  "xc7a35tfgg484-2"
+             },
+    "git":  {
+                "branch":  "codex/national-finals-p4d-release-closure",
+                "commit":  "4f3fa7649c5b624167a9615343de4580527b0538",
+                "tracked_worktree_dirty":  true
+            },
+    "topology":  {
+                     "stage1_dsp48_preadder":  1,
+                     "stage23_shared_dsp":  1,
+                     "cic_integrator_dsp_mode":  2,
+                     "serial_cic_comb":  1,
+                     "unified_stage23_history":  1,
+                     "single_bram_stage1":  1,
+                     "unified_fir_coefficient_bram":  1,
+                     "packed_stage23_bram":  0
+                 },
+    "resources_post_route":  {
+                                 "slice_lut":  479,
+                                 "slice_ff":  468,
+                                 "dsp48e1":  4,
+                                 "bram_tile":  2,
+                                 "mmcm":  2
+                             },
+    "timing_post_route_ns":  {
+                                 "wns":  45.734,
+                                 "whs":  0.121,
+                                 "dac_setup":  76.116,
+                                 "dac_hold":  78.117,
+                                 "mode_bus_skew_requirement":  50,
+                                 "mode_bus_skew_actual":  1.816
+                             },
+    "power_vectorless_w":  {
+                               "total":  0.271,
+                               "dynamic":  0.199,
+                               "static":  0.072
+                           },
+    "verification":  {
+                         "smoke":  {
+                                       "result":  "PASS",
+                                       "cases":  "15/15",
+                                       "full_chain":  "impulse + 1 seed x 1024",
+                                       "log":  "matlab_fir/national_finals/_work/rtl_regression/20260801_165902/full_chain_bittrue/xsim.log"
+                                   },
+                         "release":  {
+                                         "result":  "PASS",
+                                         "cases":  "15/15",
+                                         "full_chain":  "impulse + 10 seeds x 4096; 4x/8x/128x all 0 LSB",
+                                         "log":  "matlab_fir/national_finals/_work/rtl_regression/20260801_173309/full_chain_bittrue/xsim.log"
+                                     },
+                         "gui_behavioral":  "PASS: impulse + seed01, 0 LSB",
+                         "gui_implementation":  "PASS: bitstream and 479/468/4/4xRAMB18/2 resources"
+                     },
+    "reviewed_warnings":  [
+                              "TIMING-18: Vivado 2018.3 methodology warning retained; check_timing reports zero ports missing output delay and both generated-clock max/min delays are present.",
+                              "CDC-13: BUFGMUX_CTRL S0/S1 dedicated clock-select pins; functional family-switch stress test passes.",
+                              "CDC-15: request/ack bundled-data shadow bus; source holds stable through acknowledgement, destination waits three cycles, and 50 ns bus-skew constraint meets with margin."
+                          ],
+    "file_hashes":  [
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.xpr",
+                            "bytes":  35912,
+                            "sha256":  "CAAD5BA05F23FEDC0F641E88D053B6A6E555CBF47187E7947BD8295D0F540EF5"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/constrs_1/new/board_demo_competition_dac8_top.xdc",
+                            "bytes":  10772,
+                            "sha256":  "777F4BD8014DC1806C82C9B638F0880B28B9A5528C072A842A32869726A4A58F"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/board_demo_competition_dac8_top.v",
+                            "bytes":  23044,
+                            "sha256":  "1167FFFA0959462B87320779828939F22ADBA03163CD2305EFC31B07C5BD1B6A"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp128_all2x_v7_folded_fir_cic_top_ce.v",
+                            "bytes":  15704,
+                            "sha256":  "3D632AA63575A1C7DEA60BEBB2540CCF81F08368D6EA190024083FE69EC1CD38"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/nf_signedoff_filter_core.v",
+                            "bytes":  2779,
+                            "sha256":  "9D43E89DC2140A06722B0622DEF13C0B0C0C753FDA0FDE75F198EA3715BC9879"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sim_1/new/all2x_v7/verification/tb_phase7_full_chain_bittrue.v",
+                            "bytes":  21993,
+                            "sha256":  "593824D3B8581707E981BE2C46EE030C04EFFEF4F65CBEC6E23298E5E5355384"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/nf_04_generate_release_vectors.m",
+                            "bytes":  3511,
+                            "sha256":  "DCA34DE9F178DDD96FB6DDBFF87E0E936A0256EE388184C40F63D55A83D62C7A"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/sim/run_national_finals_rtl_regression.ps1",
+                            "bytes":  17540,
+                            "sha256":  "E02F52A0475358C32A8C799A8654AFB99FAE7C6BD74EC17AECFB413AF7B899F8"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado/build_national_finals_board.tcl",
+                            "bytes":  10988,
+                            "sha256":  "4AFDBA867FF3BBBB07E79686FEC1296AFEF03BBEE3FB6791A5710CAE4599AA2C"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado/implement_national_finals_single_process.tcl",
+                            "bytes":  8670,
+                            "sha256":  "5591A6D50C55795E262A3959C243BCD47161E4EEC3D75756A5C2A8B63F3E50FA"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado/configure_national_finals_gui_project.tcl",
+                            "bytes":  3396,
+                            "sha256":  "3ADA3D077F3D507924E8E97D66734431740B8905553916DF259AA9CA34B201A9"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado/verify_national_finals_gui_project.tcl",
+                            "bytes":  7163,
+                            "sha256":  "DB4E25B8F97C59312485DBADB2BB3B61FC7EF19623294895090799E8D338BC4A"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vectors/daily/impulse_input_24bit.mem",
+                            "bytes":  1792,
+                            "sha256":  "E551F4704D950FA6732F7BF24C4EAD8813CBDB22F714149EEFDA340C6B5DD8BB"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vectors/daily/impulse_y128_golden_24bit.mem",
+                            "bytes":  280448,
+                            "sha256":  "BC900FF2561EF9C9A208ED41BCDACD374644BABFADF2B16FDC7C074A543F5B06"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vectors/daily/impulse_y4_golden_24bit.mem",
+                            "bytes":  8715,
+                            "sha256":  "8B91F596EAD5E2C3C317502FED90F805E5BCF8B1340D4A886203B6BFA47E298B"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vectors/daily/impulse_y8_golden_24bit.mem",
+                            "bytes":  17493,
+                            "sha256":  "DA5C94EAE442B2372A4AE9E551AA73493CDE057E4FDCC5318504B077E926363E"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vectors/daily/random_seed01_input_24bit.mem",
+                            "bytes":  7168,
+                            "sha256":  "B7C921C10547E13B7DE0AD031F867B723EA41E23CC84977377AC68D2D2986C2F"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vectors/daily/random_seed01_y128_golden_24bit.mem",
+                            "bytes":  968576,
+                            "sha256":  "06660EF2D9F26804CE7B89180E7DEADAE954BABCAA37B14FCE5E191E6F914301"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vectors/daily/random_seed01_y4_golden_24bit.mem",
+                            "bytes":  30219,
+                            "sha256":  "6A9C709DEC329B6BB505A3FAD4A712D01556B93D9BB64FEE7CC266D98B1BE48B"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vectors/daily/random_seed01_y8_golden_24bit.mem",
+                            "bytes":  60501,
+                            "sha256":  "F2AF4AED94A670A8A027EBD765D38C668603F48C0A2DA12674494DD6DD60DEBE"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p4d_release_closure_4dsp/national_finals_dual_rate_4x8x128x_areaopt.bit",
+                            "bytes":  2192139,
+                            "sha256":  "44879C48B2A15481A2B7DE598EAA83DE02CD1DABBD9C9BD5D26F0E8399E3E378"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p4d_release_closure_4dsp/build_manifest.txt",
+                            "bytes":  2033,
+                            "sha256":  "469372222091088BA278B459CC8FF354013A71BE6E93F8F4A4AC896C3C8047E2"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/_work/rtl_regression/20260801_165902/full_chain_bittrue/xsim.log",
+                            "bytes":  1632,
+                            "sha256":  "DDC4C1C80A9E6393A414A28DA24BC0152BC2C412154CECCFDA8EF1E96E715975"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/_work/rtl_regression/20260801_173309/full_chain_bittrue/xsim.log",
+                            "bytes":  2179,
+                            "sha256":  "43FFA0389B9FB93A7600C4D3EF4EE360B929E63FB7B9B6E2E7E94C4FB88EDB05"
+                        }
+                    ]
+}

@@ -1,6 +1,9 @@
 [CmdletBinding()]
 param(
     [string]$VivadoBin = 'E:\app\Xilinx2018.3\Vivado\2018.3\bin',
+    [ValidateSet('Smoke', 'Release')]
+    [string]$RegressionScale = 'Smoke',
+    [string]$VectorDir = '',
     [switch]$PublishImpulseOutputs
 )
 
@@ -115,6 +118,47 @@ $signedOffFullChainXvlogOptions = @(
 $v7Source = Join-Path $sourceRoot 'all2x_v7'
 $v7Sim = Join-Path $simRoot 'all2x_v7\verification'
 $coeffHeader = Join-Path $sourceRoot 'all2x_v2\all2x_v2_coeff_pkg.vh'
+
+if ([string]::IsNullOrWhiteSpace($VectorDir)) {
+    if ($RegressionScale -eq 'Release') {
+        $VectorDir = Join-Path $nfRoot '_work\release_vectors'
+    }
+    else {
+        $VectorDir = Join-Path $nfRoot 'vectors\daily'
+    }
+}
+if (-not (Test-Path -LiteralPath $VectorDir)) {
+    throw "Vector directory not found for $RegressionScale regression: $VectorDir"
+}
+$VectorDir = (Resolve-Path -LiteralPath $VectorDir).Path
+$expectedSeedCount = if ($RegressionScale -eq 'Release') { 10 } else { 1 }
+$requiredVectorNames = @(
+    'impulse_input_24bit.mem',
+    'impulse_y4_golden_24bit.mem',
+    'impulse_y8_golden_24bit.mem',
+    'impulse_y128_golden_24bit.mem'
+)
+for ($seedIndex = 1; $seedIndex -le $expectedSeedCount; $seedIndex++) {
+    $seedName = 'random_seed{0:d2}' -f $seedIndex
+    $requiredVectorNames += @(
+        "${seedName}_input_24bit.mem",
+        "${seedName}_y4_golden_24bit.mem",
+        "${seedName}_y8_golden_24bit.mem",
+        "${seedName}_y128_golden_24bit.mem"
+    )
+}
+$vectorFiles = foreach ($vectorName in $requiredVectorNames) {
+    $vectorPath = Join-Path $VectorDir $vectorName
+    if (-not (Test-Path -LiteralPath $vectorPath)) {
+        throw "Required $RegressionScale vector is missing: $vectorPath"
+    }
+    $vectorPath
+}
+$fullChainXvlogOptions = @($signedOffFullChainXvlogOptions)
+if ($RegressionScale -eq 'Release') {
+    $fullChainXvlogOptions += @('-d', 'NF_RELEASE_REGRESSION')
+}
+$fullChainPassText = "PHASE7 FULL CHAIN BITTRUE PASS: impulse + $expectedSeedCount seeds, all nodes 0 LSB."
 
 $romDir = Invoke-RtlCase -Name 'rom' `
     -VerilogFiles @(
@@ -256,8 +300,6 @@ $boardDir = Invoke-RtlCase -Name 'board' `
     -Snapshot 'tb_nf_board_sim' `
     -ExpectedPassText 'NATIONAL FINALS BOARD INTEGRATION PASS'
 
-$vectorFiles = Get-ChildItem -LiteralPath (Join-Path $nfRoot 'vectors\daily') -Filter '*.mem' |
-    ForEach-Object { $_.FullName }
 $fullDir = Invoke-RtlCase -Name 'full_chain_bittrue' `
     -VerilogFiles @(
         (Join-Path $sourceRoot 'all2x_v6\round_sat_shift_compact.v'),
@@ -275,13 +317,14 @@ $fullDir = Invoke-RtlCase -Name 'full_chain_bittrue' `
         (Join-Path $nfSource 'cic_interp16_serial_comb_dsp_ce.v'),
         (Join-Path $nfSource 'cic_interp16_n3_hold2_dsp_ce.v'),
         (Join-Path $v7Source 'interp128_all2x_v7_folded_fir_cic_top_ce.v'),
+        (Join-Path $nfSource 'nf_signedoff_filter_core.v'),
         (Join-Path $v7Sim 'tb_phase7_full_chain_bittrue.v'),
         $glbl
     ) `
     -Top 'tb_phase7_full_chain_bittrue' `
     -Snapshot 'tb_nf_full_final_sim' `
-    -ExpectedPassText 'PHASE7 FULL CHAIN BITTRUE PASS: impulse + 1 seeds, all nodes 0 LSB.' `
-    -XvlogOptions $signedOffFullChainXvlogOptions `
+    -ExpectedPassText $fullChainPassText `
+    -XvlogOptions $fullChainXvlogOptions `
     -XelabOptions @('glbl', '-L', 'unisims_ver') `
     -Assets (@($coeffHeader) + $vectorFiles)
 
