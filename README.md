@@ -77,6 +77,18 @@ P4-E 将板级 PCM ROM 与 Stage1 历史映射到同一个 512×36 RAMB18E1：St
 
 P4-F 没有达到指导预估的约 500～510 LUT，而是用相对 P4-D 的 `+52 LUT/+19 FF/+6 Slice` 换掉 1 BRAM Tile，所以不能称为综合资源更优。补偿器与 CIC C² 共享串行 ALU 也实际实现并通过 Smoke，但为 504 LUT / 488 FF，面积反升，已按 No-Go 独立保留。完整的执行/问题/取舍见 [P4-C 深度审计指导执行反馈](matlab_fir/national_finals/results/p4c_rtl_deep_audit_and_next_optimization_guide_execution.md)。
 
+### X3：20 MHz 统一三级 FIR 创新结构（功能 Go，资源 No-Go）
+
+最新指导中尚未尝试的创新点也已在独立分支落地：把 Stage1/2/3 全部搬到 20 MHz 域，用 4-deep Gray FIFO 接收输入、用 y2/y4/y8 ping-pong bank 返回音频域，三级 FIR 共用一颗 DSP48E1；补偿器和 N3 Hold CIC 保持原音频域结构。160 个 sys clock 完成一帧，低于 48 kHz 的约 416.67-clock 最坏输入间隔。冲激加 10 个固定 seed×4096 的 Release 回归 **11/11 PASS**，三节点逐样本 **0 LSB**，因此六工况频响与 P4-D 完全相同。
+
+| 滤波核心口径 | LUT | FF | DSP | RAMB18 / BRAM Tile | 结论 |
+|---|---:|---:|---:|---:|---|
+| P4-D 已布线滤波层级 | 377 | 361 | 4 | 3 / 1.5 | 当前基准 |
+| X3 20 MHz 统一 FIR OOC post-route | 910 | 692 | 3 | 5 / 2.5 | 功能通过，资源 No-Go |
+| X3 增量 | **+533** | **+331** | **-1** | **+2 / +1.0** | 1 DSP 的收益不足以抵消控制与 CDC 存储 |
+
+X3 两个时钟域 WNS/WHS 分别为 20 MHz `+34.839/+0.072 ns`、6.144 MHz `+149.833/+0.081 ns`。OOC vectorless 功耗为 `0.076 W`，因不含双 MMCM 与板级包装，不能与 P4-D 的完整板级 `0.271 W` 直接比较。核心资源已明显越过停止线，所以没有污染 P4-D 工程，也没有继续生成 X3 板级 bitstream；默认推荐保持 P4-D。架构、修复、RTL 回归、CDC/DRC 和停止理由见 [X3 20 MHz 统一 FIR 执行报告](matlab_fir/national_finals/results/x3_20m_unified_fir_nogo.md)。
+
 通带指标也统一区分两种定义：
 
 - **通带最大绝对偏差**：通带内相对 0 dB 的最大偏离，直接对应赛题“±0.05 dB”门槛。
@@ -104,6 +116,7 @@ P4-F 没有达到指导预估的约 500～510 LUT，而是用相对 P4-D 的 `+5
   -> P4-D：固定签核 wrapper、Release 长回归、CDC bus-skew 与 bitstream 清单闭环
   -> P4-E：PCM/Stage1 共享 RAMB18，形成 491 LUT / 4 DSP / 1.5 BRAM Tile Pareto
   -> P4-F：Stage2/3 历史改 RAM32M，形成 531 LUT / 4 DSP / 1 BRAM Tile Pareto
+  -> X3：20 MHz 三级 FIR 共用 1 DSP，Release 0 LSB，但核心为 910 LUT / 692 FF / 3 DSP / 2.5 BRAM，资源 No-Go
 ```
 
 ### Route 1：历史 424-LUT 资源点做了什么
