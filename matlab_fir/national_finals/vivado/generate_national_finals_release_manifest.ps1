@@ -126,8 +126,11 @@ $fileRecords = foreach ($absolutePath in $absoluteCanonicalPaths) {
 }
 
 $safeDirectory = $repoRoot.Replace('\', '/')
-$branch = (& git -c "safe.directory=$safeDirectory" -C $repoRoot branch --show-current).Trim()
-$commit = (& git -c "safe.directory=$safeDirectory" -C $repoRoot rev-parse HEAD).Trim()
+$branch = (@(& git -c "safe.directory=$safeDirectory" -C $repoRoot branch --show-current) -join '').Trim()
+$commit = (@(& git -c "safe.directory=$safeDirectory" -C $repoRoot rev-parse HEAD) -join '').Trim()
+if ([string]::IsNullOrWhiteSpace($branch)) {
+    $branch = '(detached)'
+}
 $worktreeStatusAll = @(& git -c "safe.directory=$safeDirectory" -C $repoRoot `
     status --porcelain --untracked-files=all)
 $generatedPrefixes = @(

@@ -50,8 +50,11 @@ $gitStatusSource = @($gitStatusAll | Where-Object {
     $statusPath = if ($_.Length -gt 3) { $_.Substring(3).Replace('\', '/') } else { '' }
     -not ($generatedPrefixes | Where-Object { $statusPath.StartsWith($_) })
 })
-$gitCommit = (& git -c "safe.directory=$safeDirectory" -C $repoRoot rev-parse HEAD).Trim()
-$gitBranch = (& git -c "safe.directory=$safeDirectory" -C $repoRoot branch --show-current).Trim()
+$gitCommit = (@(& git -c "safe.directory=$safeDirectory" -C $repoRoot rev-parse HEAD) -join '').Trim()
+$gitBranch = (@(& git -c "safe.directory=$safeDirectory" -C $repoRoot branch --show-current) -join '').Trim()
+if ([string]::IsNullOrWhiteSpace($gitBranch)) {
+    $gitBranch = '(detached)'
+}
 
 New-Item -ItemType Directory -Path $runRoot -Force | Out-Null
 New-Item -ItemType Directory -Path $resultDir -Force | Out-Null
