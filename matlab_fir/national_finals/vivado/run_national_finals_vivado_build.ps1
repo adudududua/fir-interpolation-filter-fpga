@@ -27,6 +27,7 @@ $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
 $timestamp = Get-Date -Format 'yyyyMMdd_HHmmss'
 $runRoot = Join-Path $nfRoot "_work\vivado\$timestamp"
 $resultDir = Join-Path $nfRoot "vivado_results\$ResultTag"
+$projectFile = Join-Path $repoRoot 'XC7A35T_interp_audio_pcm_wordlen_opt\XC7A35T_interp.xpr'
 $synthTcl = Join-Path $PSScriptRoot 'build_national_finals_board.tcl'
 $implementTcl = Join-Path $PSScriptRoot 'implement_national_finals_single_process.tcl'
 
@@ -42,6 +43,10 @@ $gitStatusAll = @(& git -c "safe.directory=$safeDirectory" -C $repoRoot `
 if ($LASTEXITCODE -ne 0) {
     throw 'Unable to capture Git source state before the Vivado build.'
 }
+if (-not (Test-Path -LiteralPath $projectFile)) {
+    throw "Vivado project file not found: $projectFile"
+}
+$projectFileOriginalBytes = [System.IO.File]::ReadAllBytes($projectFile)
 $generatedPrefixes = @(
     'matlab_fir/national_finals/_work/',
     'matlab_fir/national_finals/vivado_results/'
@@ -110,26 +115,31 @@ function Invoke-VivadoStep {
     Write-Host "[$Name] PASS"
 }
 
-if ($Step -eq 'all' -or $Step -eq 'synth') {
-    Invoke-VivadoStep -Name 'synthesis' -TclPath $synthTcl `
-        -TclArguments @(
-            '0',
-            '1',
-            $SynthesisDirective,
-            $FlattenHierarchy,
-            $ResourceSharing,
-            $ResultTag,
-            $Stage1Dsp48Preadder,
-            $CicIntegratorDspMode
-        )
-}
+try {
+    if ($Step -eq 'all' -or $Step -eq 'synth') {
+        Invoke-VivadoStep -Name 'synthesis' -TclPath $synthTcl `
+            -TclArguments @(
+                '0',
+                '1',
+                $SynthesisDirective,
+                $FlattenHierarchy,
+                $ResourceSharing,
+                $ResultTag,
+                $Stage1Dsp48Preadder,
+                $CicIntegratorDspMode
+            )
+    }
 
-if ($Step -eq 'all' -or $Step -eq 'implement') {
-    Invoke-VivadoStep -Name 'implementation' -TclPath $implementTcl `
-        -TclArguments @(
-            $ResultTag,
-            $ImplementationOptDirective
-        )
+    if ($Step -eq 'all' -or $Step -eq 'implement') {
+        Invoke-VivadoStep -Name 'implementation' -TclPath $implementTcl `
+            -TclArguments @(
+                $ResultTag,
+                $ImplementationOptDirective
+            )
+    }
+}
+finally {
+    [System.IO.File]::WriteAllBytes($projectFile, $projectFileOriginalBytes)
 }
 
 Write-Host ''

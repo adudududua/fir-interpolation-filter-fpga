@@ -141,6 +141,13 @@ $worktreeStatusSource = @($worktreeStatusAll | Where-Object {
     $statusPath = if ($_.Length -gt 3) { $_.Substring(3).Replace('\', '/') } else { '' }
     -not ($generatedPrefixes | Where-Object { $statusPath.StartsWith($_) })
 })
+$submoduleStatus = ''
+if (Test-Path -LiteralPath (Join-Path $repoRoot '.gitmodules')) {
+    $submoduleStatus = (@(& git -c "safe.directory=$safeDirectory" -C $repoRoot submodule status) -join "`n")
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Unable to capture Git submodule status.'
+    }
+}
 $manifest = [ordered]@{
     schema = 'national-finals-release-manifest-v2'
     config_id = 'NF-P4D-R2-479LUT-468FF-4DSP-2BRAM-2MMCM'
@@ -154,7 +161,7 @@ $manifest = [ordered]@{
         source_worktree_dirty_at_manifest = ($worktreeStatusSource.Count -ne 0)
         source_status_at_manifest = ($worktreeStatusSource -join "`n")
         generated_status_at_manifest = ($worktreeStatusAll -join "`n")
-        submodule_status = ((& git -c "safe.directory=$safeDirectory" -C $repoRoot submodule status) -join "`n")
+        submodule_status = $submoduleStatus
     }
     topology = [ordered]@{
         stage1_dsp48_preadder = 1
