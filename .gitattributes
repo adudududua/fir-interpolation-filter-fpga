@@ -9,3 +9,7 @@
 *.png binary
 *.pdf binary
 *.wdb binary
+
+# Release-v2 hashes must survive a fresh Windows checkout byte-for-byte.
+matlab_fir/national_finals/release_v2/*.json text eol=lf
+matlab_fir/national_finals/release_v2/*.csv text eol=crlf
