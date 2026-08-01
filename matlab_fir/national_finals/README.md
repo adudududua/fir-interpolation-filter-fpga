@@ -2,7 +2,7 @@
 
 当前 P4-D 发布候选已完成 MATLAB 建模、24 bit 定点模型、Smoke 与 10-seed×4096 Release 两级 15 项 XSim 回归、GUI 行为仿真、Vivado 综合/布局布线/时序/DRC/CDC/功耗评估和两条路径的 bitstream 生成。默认最低 LUT/FF 档为 **479 LUT / 468 FF / 198 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM**；同源 P4-C 3-DSP、2-DSP 档也均完成实现与 bitstream。所有可在当前环境执行的软件与 FPGA 工具验收均已通过；由于当前环境无法接触实物开发板，物理板下载和仪器测量仍需按本文最后一节执行，不能把 bitstream 成功等同于实板通过。
 
-当前可发布 Pareto 点为 P3 `462 LUT / 447 FF / 5 DSP / 3 BRAM Tile`、P4-A `491 LUT / 444 FF / 4 DSP / 3 BRAM Tile`、P4-D `479 LUT / 4 DSP / 2 BRAM Tile`，以及 P4-C 的 `504 LUT / 3 DSP`、`523 LUT / 2 DSP` 两个低 DSP 档。这些版本均继承 P1 真 Q15 修复和 P3 的原子 CDC、同步复位、AD9708 输出时序闭环。复核发现旧 Route 1 `424 LUT / 6 DSP` 与低 DSP `436 LUT / 5 DSP` 的 Stage 3 系数实际为 Q14 幅度、MAC 却按 Q15 右移，导致 8x/128x 绝对增益约为 -6.02 dB；这些旧版本只保留为资源演进历史，不再作为发布候选。P4-D 签核见 [发布闭环总结](results/p4d_release_closure_summary.md)。
+当前可发布 Pareto 点为 P3 `462 LUT / 447 FF / 5 DSP / 3 BRAM Tile`、P4-A `491 LUT / 444 FF / 4 DSP / 3 BRAM Tile`、P4-D `479 LUT / 4 DSP / 2 BRAM Tile`、P4-E `491 LUT / 4 DSP / 1.5 BRAM Tile`、P4-F `531 LUT / 4 DSP / 1 BRAM Tile`，以及 P4-C 的 `504 LUT / 3 DSP`、`523 LUT / 2 DSP` 两个低 DSP 档。这些版本均继承 P1 真 Q15 修复和 P3 的原子 CDC、同步复位、AD9708 输出时序闭环。P4-D 仍是默认最低 LUT/FF 交付版，P4-E/F 仅在 BRAM 更宝贵时使用。复核发现旧 Route 1 `424 LUT / 6 DSP` 与低 DSP `436 LUT / 5 DSP` 的 Stage 3 系数实际为 Q14 幅度、MAC 却按 Q15 右移，导致 8x/128x 绝对增益约为 -6.02 dB；这些旧版本只保留为资源演进历史，不再作为发布候选。P4-D 签核见 [发布闭环总结](results/p4d_release_closure_summary.md)。
 
 ## 0. P1：Stage 3 真 Q15 与绝对增益闭环
 
@@ -57,6 +57,18 @@ P4-C 不改变 FIR/CIC 传递函数、系数、舍入、饱和或输出 valid �
 P4-D 用固定参数 wrapper 取代全链 testbench 的十个 topology 宏，Smoke/Release 只控制样本规模；GUI 工程显式包含 8 个日常向量并完成真实行为仿真。Release 门槛为冲激加 10 个固定 seed×4096，三节点全部逐样本 0 LSB，完整回归 **15/15 PASS**。同时为两位 bundled-data 模式总线增加 50 ns bus-skew 约束，布线后实测 1.816 ns、裕量 48.184 ns。
 
 资源、时序和功耗保持 **479 LUT / 468 FF / 198 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM、+45.734/+0.121 ns、0.271 W**。普通 Vivado `impl_1` 与独立低内存脚本均生成 bitstream，新 SHA-256 为 `44879C48B2A15481A2B7DE598EAA83DE02CD1DABBD9C9BD5D26F0E8399E3E378`。TIMING-18、CDC-13/15 的逐项证据和限制见 [P4-D 发布闭环签核](results/p4d_release_closure_summary.md)。
+
+## P4-E/P4-F：低 BRAM 研究分支
+
+P4-E 把板级 PCM ROM 与 Stage1 历史放入同一个 RAMB18E1，得到 **491 LUT / 487 FF / 202 Slice / 4 DSP / 1.5 BRAM Tile / 2 MMCM**，WNS/WHS **+46.132/+0.105 ns**。P4-F 再把 Stage2/3 历史改成 8 个 RAM32M，得到 **531 LUT / 487 FF / 204 Slice / 4 DSP / 1 BRAM Tile / 2 MMCM**，WNS/WHS **+45.898/+0.105 ns**。两版 Smoke/Release 均为 **16/16 PASS**，普通 GUI 行为仿真、实现和 bitstream 全部通过；P4-F 未达到指导预估的 500～510 LUT，因此定位为最低 BRAM Pareto，不替代 P4-D。
+
+| 分支 | 资源定位 | bitstream SHA-256 |
+|---|---|---|
+| `codex/national-finals-p4d-release-closure` | 默认：479 LUT / 468 FF / 4 DSP / 2 BRAM | `44879C48B2A15481A2B7DE598EAA83DE02CD1DABBD9C9BD5D26F0E8399E3E378` |
+| `codex/national-finals-p4e-bram15` | 491 LUT / 487 FF / 4 DSP / 1.5 BRAM | `8B873CBE619E3179A426C5A971C0D1F03329D18B2A58298BE6E5F1D172DD53DD` |
+| `codex/national-finals-p4f-bram1` | 531 LUT / 487 FF / 4 DSP / 1 BRAM | `32CBB432B53B84D6DE71E7751DFAD0A6F9B3668BBBEB6B8C39A3BE78A8AE3A22` |
+
+三版的滤波系数和定点数据路径相同，P4-E/F 的 Release 三节点又与 P4-D golden 逐样本 0 LSB，所以本文第 3 节六工况的通带纹波、阻带衰减、绝对增益和线性相位结论全部继承。指导逐项执行情况、失败修复、未执行项及原因见 [P4-C 深度审计指导执行反馈](results/p4c_rtl_deep_audit_and_next_optimization_guide_execution.md)。
 
 ## 0.1 Route 1：统一双端口系数 RAM（历史资源点）
 
