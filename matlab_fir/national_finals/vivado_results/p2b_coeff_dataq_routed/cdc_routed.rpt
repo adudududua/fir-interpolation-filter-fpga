@@ -1,0 +1,70 @@
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date         : Sun Aug  2 03:12:46 2026
+| Host         : LAPTOP-476JT8H0 running 64-bit major release  (build 9200)
+| Command      : report_cdc -details -file D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/tmp/p2_coeff_rom/matlab_fir/national_finals/vivado_results/p2b_coeff_dataq_routed/cdc_routed.rpt
+| Design       : board_demo_competition_dac8_top
+| Device       : 7a35t-fgg484
+| Speed File   : -2  PRODUCTION 1.23 2018-06-13
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CDC Report
+
+ID      Severity  Count  Description
+------  --------  -----  ----------------------------------------------
+CDC-3   Info         10  1-bit synchronized with ASYNC_REG property
+CDC-13  Critical      2  1-bit CDC path on a non-FD primitive
+CDC-15  Warning       4  Clock enable controlled CDC structure detected
+
+Source Clock: clk_44k1_raw
+Destination Clock: clk_20M
+CDC Type: No Common Period
+
+Row  ID     Severity  Description                                 Depth  Exception            Source (From)                           Destination (To)
+---  -----  --------  ------------------------------------------  -----  -------------------  --------------------------------------  --------------------------------------
+  1  CDC-3  Info      1-bit synchronized with ASYNC_REG property      2  Asynch Clock Groups  u_nf_mode_cdc_handshake/req_seen_reg/C  u_nf_mode_cdc_handshake/ack_meta_reg/D
+
+Source Clock: clk_48k_raw
+Destination Clock: clk_20M
+CDC Type: No Common Period
+
+Row  ID     Severity  Description                                 Depth  Exception            Source (From)                           Destination (To)
+---  -----  --------  ------------------------------------------  -----  -------------------  --------------------------------------  --------------------------------------
+  1  CDC-3  Info      1-bit synchronized with ASYNC_REG property      2  Asynch Clock Groups  u_nf_mode_cdc_handshake/req_seen_reg/C  u_nf_mode_cdc_handshake/ack_meta_reg/D
+
+Source Clock: input port clock
+Destination Clock: clk_20M
+CDC Type: No Common Primary Clock
+
+Row  ID     Severity  Description                                 Depth  Exception   Source (From)  Destination (To)
+---  -----  --------  ------------------------------------------  -----  ----------  -------------  ---------------------------------------------------------------------
+  1  CDC-3  Info      1-bit synchronized with ASYNC_REG property      2  False Path  key_kc[0]      gen_compact_keypad.u_matrix_keypad_mode_ctrl_compact/kc_meta_reg[0]/D
+  2  CDC-3  Info      1-bit synchronized with ASYNC_REG property      2  False Path  key_kc[1]      gen_compact_keypad.u_matrix_keypad_mode_ctrl_compact/kc_meta_reg[1]/D
+
+Source Clock: clk_20M
+Destination Clock: clk_44k1_raw
+CDC Type: No Common Period
+
+Row  ID      Severity  Description                                     Depth  Exception            Source (From)                                 Destination (To)
+---  ------  --------  ----------------------------------------------  -----  -------------------  --------------------------------------------  ---------------------------------------------------
+  1  CDC-3   Info      1-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  family_active_reg/C                           family_audio_meta_reg/D
+  2  CDC-3   Info      1-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  rst_audio_request_n_sys_reg/C                 rst_request_sync_reg[0]/D
+  3  CDC-13  Critical  1-bit CDC path on a non-FD primitive                0  Asynch Clock Groups  family_active_reg/C                           u_dual_family_audio_clock/u_bufgmux_audio_family/S0
+  4  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Asynch Clock Groups  u_nf_mode_cdc_handshake/mode_shadow_reg[0]/C  u_nf_mode_cdc_handshake/audio_mode_reg[0]/D
+  5  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Asynch Clock Groups  u_nf_mode_cdc_handshake/mode_shadow_reg[1]/C  u_nf_mode_cdc_handshake/audio_mode_reg[1]/D
+  6  CDC-3   Info      1-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  u_nf_mode_cdc_handshake/req_toggle_reg/C      u_nf_mode_cdc_handshake/req_meta_reg/D
+
+Source Clock: clk_20M
+Destination Clock: clk_48k_raw
+CDC Type: No Common Period
+
+Row  ID      Severity  Description                                     Depth  Exception            Source (From)                                 Destination (To)
+---  ------  --------  ----------------------------------------------  -----  -------------------  --------------------------------------------  ---------------------------------------------------
+  1  CDC-3   Info      1-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  family_active_reg/C                           family_audio_meta_reg/D
+  2  CDC-3   Info      1-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  rst_audio_request_n_sys_reg/C                 rst_request_sync_reg[0]/D
+  3  CDC-13  Critical  1-bit CDC path on a non-FD primitive                0  Asynch Clock Groups  family_active_reg/C                           u_dual_family_audio_clock/u_bufgmux_audio_family/S1
+  4  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Asynch Clock Groups  u_nf_mode_cdc_handshake/mode_shadow_reg[0]/C  u_nf_mode_cdc_handshake/audio_mode_reg[0]/D
+  5  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Asynch Clock Groups  u_nf_mode_cdc_handshake/mode_shadow_reg[1]/C  u_nf_mode_cdc_handshake/audio_mode_reg[1]/D
+  6  CDC-3   Info      1-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  u_nf_mode_cdc_handshake/req_toggle_reg/C      u_nf_mode_cdc_handshake/req_meta_reg/D
+

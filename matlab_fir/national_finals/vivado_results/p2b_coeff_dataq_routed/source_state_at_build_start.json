@@ -1,0 +1,8 @@
+{
+    "captured_utc":  "2026-08-01T19:11:21.0930601Z",
+    "branch":  "codex/national-finals-p2-coeff-distributed-rom",
+    "commit":  "9950b869c041eeec353a4616fe1a5008ef541a45",
+    "source_worktree_dirty":  false,
+    "source_status_porcelain":  "",
+    "status_porcelain_all":  "?? matlab_fir/national_finals/vivado_results/p2a_coeff_addrq_routed/build_manifest.txt\n?? matlab_fir/national_finals/vivado_results/p2a_coeff_addrq_routed/national_finals_dual_rate_4x8x128x_areaopt.bit\n?? matlab_fir/national_finals/vivado_results/p2a_coeff_addrq_routed/source_state_at_build_start.json"
+}
