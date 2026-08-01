@@ -481,8 +481,8 @@
         <Generic Name="USE_COMPACT_KEYPAD" Val="1"/>
         <Generic Name="COMPACT_KEYPAD_SCAN_DIV" Val="20000"/>
         <Generic Name="USE_SHARED_KEYPAD_SCAN_TICK" Val="1"/>
-        <Generic Name="USE_PHASE7_BRAM_STAGE23_HISTORY" Val="1"/>
-        <Generic Name="USE_PHASE7_UNIFIED_BRAM_STAGE23_HISTORY" Val="1"/>
+        <Generic Name="USE_PHASE7_BRAM_STAGE23_HISTORY" Val="0"/>
+        <Generic Name="USE_PHASE7_UNIFIED_BRAM_STAGE23_HISTORY" Val="0"/>
         <Generic Name="USE_NATIONAL_FINALS_SINGLE_BRAM_STAGE1" Val="1"/>
         <Generic Name="USE_NATIONAL_FINALS_SHARED_PCM_STAGE1_BRAM" Val="1"/>
         <Generic Name="USE_PHASE7_BRAM_STAGE23_COEFF" Val="1"/>

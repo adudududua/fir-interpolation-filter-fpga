@@ -33,7 +33,8 @@ set project_generics [get_property generic $source_set]
 require_generic $project_generics USE_NATIONAL_FINALS_DATAPATH 1
 require_generic $project_generics USE_NATIONAL_FINALS_SERIAL_CIC_COMB 1
 require_generic $project_generics USE_NATIONAL_FINALS_N3_HOLD_EQUIV 1
-require_generic $project_generics USE_PHASE7_UNIFIED_BRAM_STAGE23_HISTORY 1
+require_generic $project_generics USE_PHASE7_BRAM_STAGE23_HISTORY 0
+require_generic $project_generics USE_PHASE7_UNIFIED_BRAM_STAGE23_HISTORY 0
 require_generic $project_generics USE_NATIONAL_FINALS_SINGLE_BRAM_STAGE1 1
 require_generic $project_generics USE_NATIONAL_FINALS_SHARED_PCM_STAGE1_BRAM 1
 require_generic $project_generics USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER 1
@@ -143,6 +144,8 @@ if {[get_property PROGRESS [get_runs impl_1]] eq "100%"} {
         -filter {REF_NAME == DSP48E1}]]
     set bram18_count [llength [get_cells -hierarchical \
         -filter {REF_NAME == RAMB18E1}]]
+    set ram32m_count [llength [get_cells -hierarchical \
+        -filter {REF_NAME == RAM32M}]]
     set mmcm_count [llength [get_cells -hierarchical \
         -filter {REF_NAME == MMCME2_ADV}]]
 
@@ -150,16 +153,19 @@ if {[get_property PROGRESS [get_runs impl_1]] eq "100%"} {
     puts "GUI_FF=$ff_count"
     puts "GUI_DSP=$dsp_count"
     puts "GUI_BRAM18=$bram18_count"
+    puts "GUI_RAM32M=$ram32m_count"
     puts "GUI_MMCM=$mmcm_count"
 
     require_condition [expr {$dsp_count == 4}] \
         "GUI implementation is not the P4-D 4-DSP architecture."
-    require_condition [expr {$bram18_count == 3}] \
-        "GUI implementation does not use the expected three RAMB18 blocks."
+    require_condition [expr {$bram18_count == 2}] \
+        "GUI implementation does not use the expected two RAMB18 blocks."
+    require_condition [expr {$ram32m_count == 8}] \
+        "GUI implementation does not use the expected eight Stage2/3 RAM32M blocks."
     require_condition [expr {$mmcm_count == 2}] \
         "GUI implementation does not use the expected two MMCMs."
-    require_condition [expr {$lut_count <= 500}] \
-        "GUI implementation exceeds the 500-LUT P4-E guard."
+    require_condition [expr {$lut_count <= 540}] \
+        "GUI implementation exceeds the 540-LUT P4-F guard."
     require_condition [expr {$ff_count <= 490}] \
         "GUI implementation exceeds the 490-FF P4-E guard."
 

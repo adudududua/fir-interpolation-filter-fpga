@@ -110,8 +110,6 @@ $signedOffFullChainXvlogOptions = @(
     '-d', 'NATIONAL_FINALS_USE_STAGE1_DSP48_PREADDER',
     '-d', 'NATIONAL_FINALS_NARROW_STAGE23',
     '-d', 'PHASE7_USE_LUTRAM_STAGE23',
-    '-d', 'PHASE7_USE_BRAM_STAGE23_HISTORY',
-    '-d', 'NATIONAL_FINALS_UNIFIED_STAGE23_HISTORY',
     '-d', 'NATIONAL_FINALS_SINGLE_BRAM_STAGE1',
     '-d', 'PHASE7_USE_BRAM_STAGE23_COEFF'
 )
@@ -400,7 +398,6 @@ $dynamicDir = Invoke-RtlCase -Name 'dynamic_mode_switch' `
     -Snapshot 'tb_nf_dynamic_mode_sim' `
     -ExpectedPassText 'PHASE7 DYNAMIC MODE PASS: 10 switches, no reset, no runt pulse or X.' `
     -XvlogOptions @(
-        '-d', 'PHASE7_USE_BRAM_STAGE23_HISTORY',
         '-d', 'PHASE7_USE_BRAM_STAGE23_COEFF'
     ) `
     -XelabOptions @('glbl', '-L', 'unisims_ver') `

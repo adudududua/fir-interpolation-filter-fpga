@@ -6,7 +6,9 @@ param(
     [string]$ConfigId = 'NF-P4D-479LUT-468FF-4DSP-2BRAM-2MMCM',
     [int]$RegressionCaseCount = 15,
     [ValidateSet(0, 1)]
-    [int]$SharedPcmStage1Bram = 0
+    [int]$SharedPcmStage1Bram = 0,
+    [ValidateSet(0, 1)]
+    [int]$UnifiedStage23History = 1
 )
 
 $ErrorActionPreference = 'Stop'
@@ -108,7 +110,8 @@ $manifest = [ordered]@{
         stage23_shared_dsp = 1
         cic_integrator_dsp_mode = 2
         serial_cic_comb = 1
-        unified_stage23_history = 1
+        unified_stage23_history = $UnifiedStage23History
+        distributed_stage23_history = 1 - $UnifiedStage23History
         single_bram_stage1 = 1
         shared_pcm_stage1_bram = $SharedPcmStage1Bram
         unified_fir_coefficient_bram = 1
