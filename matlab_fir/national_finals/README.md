@@ -4,6 +4,22 @@
 
 当前可发布 Pareto 点为 P3 `462 LUT / 447 FF / 5 DSP / 3 BRAM Tile`、P4-A `491 LUT / 444 FF / 4 DSP / 3 BRAM Tile`、P4-D `479 LUT / 4 DSP / 2 BRAM Tile`、P4-E `491 LUT / 4 DSP / 1.5 BRAM Tile`、P4-F `531 LUT / 4 DSP / 1 BRAM Tile`，以及 P4-C 的 `504 LUT / 3 DSP`、`523 LUT / 2 DSP` 两个低 DSP 档。这些版本均继承 P1 真 Q15 修复和 P3 的原子 CDC、同步复位、AD9708 输出时序闭环。P4-D 仍是默认最低 LUT/FF 交付版，P4-E/F 仅在 BRAM 更宝贵时使用。复核发现旧 Route 1 `424 LUT / 6 DSP` 与低 DSP `436 LUT / 5 DSP` 的 Stage 3 系数实际为 Q14 幅度、MAC 却按 Q15 右移，导致 8x/128x 绝对增益约为 -6.02 dB；这些旧版本只保留为资源演进历史，不再作为发布候选。P4-D 签核见 [发布闭环总结](results/p4d_release_closure_summary.md)。
 
+## P4-D Release V2 与指导执行结果
+
+P4-D Release V2 已从 clean source 完成 21-bit golden、15/15 Release、频响、CDC、综合、布局布线和 bitstream 闭环。正式资源为 **479 LUT / 468 FF / 198 Slice / 4 DSP / 4 RAMB18E1（2 Tile）/ 2 MMCM**，WNS/WHS `+45.734/+0.121 ns`，DAC setup/hold `+76.116/+78.117 ns`，vectorless 功耗 `0.271 W`。bit SHA-256 为 `8630210663629357237AAA3F076348FBE65610EAAB61ADA4706E81F75AAF02A6`；标签为 `nf-p4d-r2-479lut-468ff-4dsp-2bram-2mmcm-clean`。
+
+后续指导的三个候选均采用独立分支：
+
+| 候选 | LUT | FF | DSP | RAMB18 / Tile | 验证与结论 |
+|---|---:|---:|---:|---:|---|
+| P1 TWO24 | 518 | 498 | 3 | 4 / 2.0 | Release 17/17；成功少 1 DSP，但被既有 504/494 3-DSP 点压制 |
+| P2-A distributed ROM | 513 | 496 | 4 | 2 / 1.0 | Release 17/17；当前推荐的 1-Tile Pareto |
+| P3 Stage3/均衡器联合设计 | 约450* | 约437* | 4* | 4 / 2.0* | MATLAB Go；*仅预测，尚无 RTL/post-route/bitstream |
+
+P1 TWO24 的核心创新是用 `DSP48E1/TWO24/PREG=1` 保存两级积分器低 24 位，以小型 CARRY4 补齐 2/5-bit 高位；完整板级以 `+39 LUT/+30 FF` 换 `-1 DSP`。P2-A 把 P4-E 的只读系数 RAMB18 拆成两组地址寄存 distributed ROM，相对 P4-D 以 `+34 LUT/+28 FF` 换 `-1 BRAM Tile`。P3 用 128x 专用 11-tap Q15/18-bit Stage3 bank 吸收原三抽头均衡器，预计净省约 29 LUT/31 FF，但必须经 RTL 和布局布线复核。
+
+P4-D/P1/P2 六工况绝对通带误差/阻带衰减为：44.1 kHz 的 4x `0.003011/78.670 dB`、8x `0.003470/78.565 dB`、128x `0.005146/72.335 dB`；48 kHz 分别为 `0.003011/78.670 dB`、`0.003033/78.565 dB`、`0.003477/72.335 dB`。详细逐项反馈、失败原因、时序、功耗、bit SHA 和回退路线见 [P4-D 导出审计与下一阶段优化指导 V2 执行反馈](results/p4d_export_audit_and_next_optimization_guide_v2_execution_feedback.md)。
+
 ## 0. P1：Stage 3 真 Q15 与绝对增益闭环
 
 P1 将 11-tap Stage 3 统一为真 Q15 系数 `[404,-148,-3272,522,19250,32016,19250,522,-3272,-148,404]`，同步修正 MATLAB 位真模型、统一 RAMB18E1 初始化、后备系数 ROM 和原语测试，并删除只对旧半幅系数成立的 35-bit 直通捷径。Stage 3 现在保留完整 38-bit MAC 视图和 signed 20-bit 饱和检查。

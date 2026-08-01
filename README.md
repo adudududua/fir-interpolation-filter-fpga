@@ -2123,3 +2123,25 @@ Phase 7 在正确 CIC 插值结构上先完成独立低速补偿 FIR，确认其
 在 578 LUT 基线上继续按层级热点收敛：紧凑键盘、Stage2/3 BRAM 历史、同步系数表和上电计数器复用依次把完整板级降到 557、521、506 和 496 LUT。随后保持 RTL、系数、字长、generic 和接口全部不变，仅将 Vivado 综合/逻辑优化指令设为 `AreaOptimized_high`/`ExploreArea`，布局布线结果进一步降至 478 LUT / 565 FF / 9 DSP / 3 BRAM Tile。最后阻止 5 bit CIC burst 计数器误占 DSP48E1，得到 472 LUT / 564 FF / 8 DSP / 3 BRAM Tile，WNS/WHS 为 +46.446/+0.093 ns，功耗 0.169 W。重新编译的 nightly 冲激与 10 组长随机输入在 4x/8x/128x 全部为 0 LSB；既有 8 场景复位恢复、10 次动态切档和板级共享扫描验证继续覆盖未改变的数据/控制协议。最终 bitstream SHA256 为 `8CD7CAEAE949204A4D86875C82379424209E169849E3BEAAD2AC010383C2237C`。实板四档 `DA_CLK` 分别为 44.09 kHz、176.43 kHz、352.86 kHz 和 5.64 MHz，四档 DA 输出均为正常正弦波，至此完成 MATLAB、RTL、实现与板级输出的验证闭环；578 LUT 推送基线与 478/496 LUT 候选仍可直接回退。
 
 Phase 8 进一步验证了两个边界方向。Stage2/3 交叉打包候选以 484 LUT / 564 FF / 8 DSP / 2.5 BRAM 通过完整 RTL 回归与实现，形成节省 0.5 BRAM Tile、增加 12 LUT 的存储优先 Pareto 点，但不替代最低 LUT 基线。随后针对理论 7 DSP 的 `两个2x Halfband + CIC4(N=2)` 路线，完成 Halfband、Stage3 和 Stage1 的多轮定点联合优化；最佳精确结果为 0.00515985 dB 通带误差和 71.58790137 dB 阻带，低于本阶段 72 dB 保守门槛。该路线按 Stop/Go 规则止步于 MATLAB，没有创建 RTL 或 bitstream。无论成功候选还是失败边界均已保留在 `matlab_fir/alt_all2x_v8`，当前正式提交继续采用经过四档实板验证的 472 LUT / 564 FF / 8 DSP / 3 BRAM 版本。
+
+---
+
+## 15. 全国赛 P4-D 导出审计 V2 与后续优化
+
+指导文件 `matlab_fir/p4d_export_audit_and_next_optimization_guide_v2.md` 已按 Stop/Go 顺序执行。P0 clean release-v2 修复了旧导出中的 20/21-bit golden 边界、绝对频响门禁、CDC absolute delay 和源码到 bitstream 哈希闭环；P1 用 DSP48E1 `TWO24` 尝试一颗 DSP 承担两级 CIC 积分器；P2 从 P4-E 把只读系数迁移为两组 distributed ROM；P3 只完成 Stage3/均衡器联合设计的 MATLAB 门禁。单纯 CREG→PREG 省 40～55 FF 的假设已被 routed DCP 否定，MMCM 动态关断留作独立 SAIF/实板功耗课题。
+
+| 版本 | LUT | FF | DSP | RAMB18 / Tile | WNS/WHS | 功耗估计 | 定位 |
+|---|---:|---:|---:|---:|---:|---:|---|
+| **P4-D R2** | **479** | **468** | **4** | **4 / 2.0** | +45.734/+0.121 ns | 0.271 W | 默认 clean 发布版 |
+| P4-C 低 DSP-A | 504 | 494 | 3 | 4 / 2.0 | +45.853/+0.121 ns | 0.271 W | 当前较小的 3-DSP 实现 |
+| P1 TWO24 | 518 | 498 | 3 | 4 / 2.0 | +45.933/+0.114 ns | 0.270 W | 原语创新通过，但未赢过 504/494 |
+| P4-E | 491 | 487 | 4 | 3 / 1.5 | +46.132/+0.105 ns | 0.271 W | 1.5-Tile Pareto |
+| **P2-A distributed ROM** | **513** | **496** | **4** | **2 / 1.0** | +45.949/+0.117 ns | 0.270 W | 推荐 1-Tile Pareto |
+| P4-F | 531 | 487 | 4 | 2 / 1.0 | +45.898/+0.105 ns | 0.271 W | 旧 1-Tile 对照 |
+| P3 联合设计 | 约450* | 约437* | 4* | 4 / 2.0* | 未实现 | 未实现 | *MATLAB 后的保守预测，非 Vivado 实测 |
+
+P4-D/P1/P2 都通过完整 RTL Release、post-route 与 bitstream。P1 相对 P4-D 以 `+39 LUT/+30 FF` 换 `-1 DSP`；P2-A 以 `+34 LUT/+28 FF` 换 `-1 BRAM Tile`。P3 候选预计通过删除 46 LUT/40 FF 的独立均衡器并增加约 17 LUT/9 FF 的 bank/模式逻辑，净省约 29 LUT/31 FF，但在完成独立 RTL、golden、动态切换和布局布线前不得作为正式资源数字。
+
+P4-D/P1/P2 的滤波传递函数不变，六工况绝对通带误差/阻带衰减为：44.1 kHz 下 4x `0.003011/78.670 dB`、8x `0.003470/78.565 dB`、128x `0.005146/72.335 dB`；48 kHz 下分别为 `0.003011/78.670 dB`、`0.003033/78.565 dB`、`0.003477/72.335 dB`。P3 MATLAB 候选的六工况最差绝对通带误差为 0.007730 dB，最差阻带为 72.371 dB，对称误差 0、相位残差不超过 `1.42e-13 rad`。
+
+默认分支/标签为 `codex/national-finals-p0-release-v2` / `nf-p4d-r2-479lut-468ff-4dsp-2bram-2mmcm-clean`；P1、P2、P3 均保留独立分支和标签，不把实验 RTL 混入默认发布版。逐项执行内容、失败原因、修复过程、验证证据和回退命令见 [P4-D 导出审计 V2 执行反馈](matlab_fir/national_finals/results/p4d_export_audit_and_next_optimization_guide_v2_execution_feedback.md)。
