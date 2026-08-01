@@ -147,6 +147,16 @@ for ($seedIndex = 1; $seedIndex -le $expectedSeedCount; $seedIndex++) {
         "${seedName}_y128_golden_24bit.mem"
     )
 }
+if ($RegressionScale -eq 'Release') {
+    foreach ($directedName in @('fullscale_positive', 'fullscale_negative')) {
+        $requiredVectorNames += @(
+            "${directedName}_input_24bit.mem",
+            "${directedName}_y4_golden_24bit.mem",
+            "${directedName}_y8_golden_24bit.mem",
+            "${directedName}_y128_golden_24bit.mem"
+        )
+    }
+}
 $vectorFiles = foreach ($vectorName in $requiredVectorNames) {
     $vectorPath = Join-Path $VectorDir $vectorName
     if (-not (Test-Path -LiteralPath $vectorPath)) {
@@ -158,7 +168,12 @@ $fullChainXvlogOptions = @($signedOffFullChainXvlogOptions)
 if ($RegressionScale -eq 'Release') {
     $fullChainXvlogOptions += @('-d', 'NF_RELEASE_REGRESSION')
 }
-$fullChainPassText = "PHASE7 FULL CHAIN BITTRUE PASS: impulse + $expectedSeedCount seeds, all nodes 0 LSB."
+$fullChainPassText = if ($RegressionScale -eq 'Release') {
+    'PHASE7 FULL CHAIN BITTRUE PASS: impulse + 10 seeds + 2 fullscale, reset-zero prefixes and all nodes 0 LSB.'
+}
+else {
+    'PHASE7 FULL CHAIN BITTRUE PASS: impulse + 1 seeds, reset-zero prefixes and all nodes 0 LSB.'
+}
 
 $romDir = Invoke-RtlCase -Name 'rom' `
     -VerilogFiles @(

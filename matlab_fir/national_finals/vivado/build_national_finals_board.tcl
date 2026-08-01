@@ -176,6 +176,16 @@ if {$reuse_current_synthesis == 0} {
 
 if {$synthesis_only != 0} {
     open_run synth_1
+    set source_manifest_handle [open \
+        [file join $result_dir synthesis_sources.txt] w]
+    foreach source_file [get_files -compile_order sources \
+            -used_in synthesis] {
+        puts $source_manifest_handle [file normalize $source_file]
+    }
+    foreach constraint_file [get_files -of_objects [get_filesets constrs_1]] {
+        puts $source_manifest_handle [file normalize $constraint_file]
+    }
+    close $source_manifest_handle
     report_utilization \
         -file [file join $result_dir utilization_synthesized.rpt]
     report_utilization -hierarchical \

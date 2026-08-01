@@ -1,0 +1,58 @@
+{
+  "schema": "national-finals-q-format-v2",
+  "config_id": "NF-P4D-R2-479LUT-468FF-4DSP-2BRAM-2MMCM",
+  "input": {
+    "signed_bits": 24,
+    "sample_rates_hz": [
+      44100,
+      48000
+    ]
+  },
+  "stage1": {
+    "frac_w": 15,
+    "input_w": 24,
+    "acc_w": 41,
+    "output_w": 24
+  },
+  "bridge1": {
+    "shift_w": 2,
+    "output_w": 22
+  },
+  "stage2": {
+    "frac_w": 15,
+    "input_w": 22,
+    "acc_w": 38,
+    "output_w": 22
+  },
+  "bridge2": {
+    "shift_w": 2,
+    "output_w": 20
+  },
+  "stage3": {
+    "frac_w": 15,
+    "input_w": 20,
+    "acc_w": 38,
+    "output_w": 20
+  },
+  "equalizer": {
+    "equation": "x[n-1]+ASR3(2*x[n-1]-x[n]-x[n-2])",
+    "input_w": 20,
+    "output_w": 21
+  },
+  "cic": {
+    "structure": "C2-Hold16-I2",
+    "rate": 16,
+    "order": 3,
+    "input_w": 21,
+    "first_integrator_w": 26,
+    "final_integrator_w": 29,
+    "normalization_shift": 8,
+    "output_w": 20
+  },
+  "formal_outputs": {
+    "x4": "stage2 signed-22 << 2",
+    "x8": "stage3 signed-20 << 4",
+    "x128": "CIC signed-20 << 4"
+  },
+  "rounding": "FIR Q15 uses bias 16383 plus signed carry before ASR15; bridges and CIC use their declared signed round-shift helpers"
+}

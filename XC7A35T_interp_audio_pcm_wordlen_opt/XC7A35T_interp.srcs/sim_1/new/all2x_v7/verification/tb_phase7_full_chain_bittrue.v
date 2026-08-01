@@ -36,7 +36,7 @@ module tb_phase7_full_chain_bittrue;
     localparam integer RANDOM_Y4_COUNT = 16605;
     localparam integer RANDOM_Y8_COUNT = 33219;
     localparam integer RANDOM_Y128_COUNT = 531584;
-    localparam integer CASE_COUNT = 11;
+    localparam integer CASE_COUNT = 13;
 `else
     localparam integer MAX_INPUT_COUNT = 1024;
     localparam integer MAX_Y4_COUNT = 4317;
@@ -161,8 +161,12 @@ module tb_phase7_full_chain_bittrue;
             if (dbg_y4_valid) begin
                 if (^dbg_y4 === 1'bx)
                     report_unknown(4, y4_index);
-                else if (y4_skip_count < SHIFT_4X)
+                else if (y4_skip_count < SHIFT_4X) begin
+                    if (dbg_y4 !== 24'sd0)
+                        report_mismatch(4, y4_skip_count-SHIFT_4X,
+                            dbg_y4, 24'sd0);
                     y4_skip_count <= y4_skip_count + 1;
+                end
                 else if (y4_index < expected_y4_count) begin
                     if (dbg_y4 !== y4_expected[y4_index])
                         report_mismatch(4, y4_index, dbg_y4,
@@ -176,8 +180,12 @@ module tb_phase7_full_chain_bittrue;
             if (dbg_y8_valid) begin
                 if (^dbg_y8 === 1'bx)
                     report_unknown(8, y8_index);
-                else if (y8_skip_count < SHIFT_8X)
+                else if (y8_skip_count < SHIFT_8X) begin
+                    if (dbg_y8 !== 24'sd0)
+                        report_mismatch(8, y8_skip_count-SHIFT_8X,
+                            dbg_y8, 24'sd0);
                     y8_skip_count <= y8_skip_count + 1;
+                end
                 else if (y8_index < expected_y8_count) begin
                     if (dbg_y8 !== y8_expected[y8_index])
                         report_mismatch(8, y8_index, dbg_y8,
@@ -191,8 +199,12 @@ module tb_phase7_full_chain_bittrue;
             if (y_out_valid) begin
                 if (^y_out === 1'bx)
                     report_unknown(128, y128_index);
-                else if (y128_skip_count < SHIFT_128X)
+                else if (y128_skip_count < SHIFT_128X) begin
+                    if (y_out !== 24'sd0)
+                        report_mismatch(128,
+                            y128_skip_count-SHIFT_128X, y_out, 24'sd0);
                     y128_skip_count <= y128_skip_count + 1;
+                end
                 else if (y128_index < expected_y128_count) begin
                     if (y_out !== y128_expected[y128_index])
                         report_mismatch(128, y128_index, y_out,
@@ -277,6 +289,14 @@ module tb_phase7_full_chain_bittrue;
             require_asset("random_seed10_y4_golden_24bit.mem");
             require_asset("random_seed10_y8_golden_24bit.mem");
             require_asset("random_seed10_y128_golden_24bit.mem");
+            require_asset("fullscale_positive_input_24bit.mem");
+            require_asset("fullscale_positive_y4_golden_24bit.mem");
+            require_asset("fullscale_positive_y8_golden_24bit.mem");
+            require_asset("fullscale_positive_y128_golden_24bit.mem");
+            require_asset("fullscale_negative_input_24bit.mem");
+            require_asset("fullscale_negative_y4_golden_24bit.mem");
+            require_asset("fullscale_negative_y8_golden_24bit.mem");
+            require_asset("fullscale_negative_y128_golden_24bit.mem");
 `endif
         end
     endtask
@@ -406,7 +426,7 @@ module tb_phase7_full_chain_bittrue;
                     expected_y8_count = RANDOM_Y8_COUNT;
                     expected_y128_count = RANDOM_Y128_COUNT;
                 end
-                default: begin
+                11: begin
                     $readmemh("random_seed10_input_24bit.mem", input_mem);
                     $readmemh("random_seed10_y4_golden_24bit.mem", y4_expected);
                     $readmemh("random_seed10_y8_golden_24bit.mem", y8_expected);
@@ -415,6 +435,26 @@ module tb_phase7_full_chain_bittrue;
                     expected_y4_count = RANDOM_Y4_COUNT;
                     expected_y8_count = RANDOM_Y8_COUNT;
                     expected_y128_count = RANDOM_Y128_COUNT;
+                end
+                12: begin
+                    $readmemh("fullscale_positive_input_24bit.mem", input_mem);
+                    $readmemh("fullscale_positive_y4_golden_24bit.mem", y4_expected);
+                    $readmemh("fullscale_positive_y8_golden_24bit.mem", y8_expected);
+                    $readmemh("fullscale_positive_y128_golden_24bit.mem", y128_expected);
+                    active_input_count = IMPULSE_INPUT_COUNT;
+                    expected_y4_count = IMPULSE_Y4_COUNT;
+                    expected_y8_count = IMPULSE_Y8_COUNT;
+                    expected_y128_count = IMPULSE_Y128_COUNT;
+                end
+                default: begin
+                    $readmemh("fullscale_negative_input_24bit.mem", input_mem);
+                    $readmemh("fullscale_negative_y4_golden_24bit.mem", y4_expected);
+                    $readmemh("fullscale_negative_y8_golden_24bit.mem", y8_expected);
+                    $readmemh("fullscale_negative_y128_golden_24bit.mem", y128_expected);
+                    active_input_count = IMPULSE_INPUT_COUNT;
+                    expected_y4_count = IMPULSE_Y4_COUNT;
+                    expected_y8_count = IMPULSE_Y8_COUNT;
+                    expected_y128_count = IMPULSE_Y128_COUNT;
                 end
             endcase
         end
@@ -490,8 +530,11 @@ module tb_phase7_full_chain_bittrue;
              case_index = case_index + 1)
             run_case(case_index);
 
-        $display("PHASE7 FULL CHAIN BITTRUE PASS: impulse + %0d seeds, all nodes 0 LSB.",
-            CASE_COUNT-1);
+`ifdef NF_RELEASE_REGRESSION
+        $display("PHASE7 FULL CHAIN BITTRUE PASS: impulse + 10 seeds + 2 fullscale, reset-zero prefixes and all nodes 0 LSB.");
+`else
+        $display("PHASE7 FULL CHAIN BITTRUE PASS: impulse + 1 seeds, reset-zero prefixes and all nodes 0 LSB.");
+`endif
         $finish;
     end
 

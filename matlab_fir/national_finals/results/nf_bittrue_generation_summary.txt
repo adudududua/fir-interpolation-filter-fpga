@@ -1,8 +1,8 @@
 National finals bit-true vector generation
 ==========================================
 Stage3: flat 11-tap Q15 FIR
-Equalizer: [-1 10 -1]/8, arithmetic shift, 20 bit sat
-CIC: R=16 M=1 N=3, full precision, 20 bit output
+Equalizer: [-1 10 -1]/8, arithmetic shift, 20-bit input -> lossless 21-bit output
+CIC: C2-Hold16-I2, signed-21 input, 26/29-bit modulo states, shift 8, signed-20 output
 
-impulse input=256 y4=1245 y8=2499 y128=40064 eq_sat=0 cic_sat=0
-random_seed01 input=1024 y4=4317 y8=8643 y128=138368 eq_sat=0 cic_sat=0
+impulse config=NF-P4D-R2-479LUT-468FF-4DSP-2BRAM-2MMCM input=256 y4=1245 y8=2499 y128=40064 eq_sat=0 eq_peak=263793 eq_cross20=0 cic_sat=0
+random_seed01 config=NF-P4D-R2-479LUT-468FF-4DSP-2BRAM-2MMCM input=1024 y4=4317 y8=8643 y128=138368 eq_sat=0 eq_peak=120042 eq_cross20=0 cic_sat=0

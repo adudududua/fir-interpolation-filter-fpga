@@ -22,6 +22,8 @@ module tb_cic3_compensator_shiftadd_ce;
     integer curvature;
     integer sample_count;
     integer seed;
+    integer signed20_boundary_cross_count;
+    integer legacy_clip_count;
 
     cic3_compensator_shiftadd_ce #(
         .DATA_W(DATA_W)
@@ -66,10 +68,17 @@ module tb_cic3_compensator_shiftadd_ce;
             curvature = 2*model_z1-signed_value-model_z2;
             expected_wide = model_z1+(curvature >>> 3);
             expected = expected_wide;
-            if (expected > OUT_MAX)
+            if (expected_wide > OUT_MAX || expected_wide < OUT_MIN)
+                signed20_boundary_cross_count =
+                    signed20_boundary_cross_count+1;
+            if (expected > OUT_MAX) begin
                 expected = OUT_MAX;
-            else if (expected < OUT_MIN)
+                legacy_clip_count = legacy_clip_count+1;
+            end
+            else if (expected < OUT_MIN) begin
                 expected = OUT_MIN;
+                legacy_clip_count = legacy_clip_count+1;
+            end
 
             @(posedge clk);
             #1;
@@ -107,6 +116,8 @@ module tb_cic3_compensator_shiftadd_ce;
         model_z1 = 0;
         model_z2 = 0;
         sample_count = 0;
+        signed20_boundary_cross_count = 0;
+        legacy_clip_count = 0;
         seed = 32'h5A17C3E1;
 
         repeat (4) @(negedge clk);
@@ -135,8 +146,14 @@ module tb_cic3_compensator_shiftadd_ce;
         send_sample(12345, 0);
         send_sample(-23456, 0);
 
-        $display("NF CIC3 SHIFTADD COMPENSATOR PASS samples=%0d",
-            sample_count);
+        if (signed20_boundary_cross_count == 0 || legacy_clip_count == 0)
+            $fatal(1, "Signed-20/21 directed boundary was not exercised");
+        if (signed20_boundary_cross_count != legacy_clip_count)
+            $fatal(1, "Boundary/legacy clip accounting mismatch %0d/%0d",
+                signed20_boundary_cross_count, legacy_clip_count);
+
+        $display("NF CIC3 SHIFTADD COMPENSATOR PASS samples=%0d boundary_crossings=%0d legacy_clips=%0d",
+            sample_count, signed20_boundary_cross_count, legacy_clip_count);
         $finish;
     end
 

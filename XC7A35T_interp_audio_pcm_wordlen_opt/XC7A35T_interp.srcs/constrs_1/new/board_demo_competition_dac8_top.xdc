@@ -244,4 +244,15 @@ set nf_mode_shadow_cells [get_cells -hierarchical -regexp \
     {.*u_nf_mode_cdc_handshake/mode_shadow_reg\[[01]\]}]
 set nf_audio_mode_cells [get_cells -hierarchical -regexp \
     {.*u_nf_mode_cdc_handshake/audio_mode_reg\[[01]\]}]
+if {[llength $nf_mode_shadow_cells] != 2 || \
+        [llength $nf_audio_mode_cells] != 2} {
+    error "Bundled-data CDC endpoint set changed: expected 2 source and 2 destination registers"
+}
 set_bus_skew 50.000 -from $nf_mode_shadow_cells -to $nf_audio_mode_cells
+
+# Relative skew alone cannot bound the flight time of both bits together.
+# The source holds mode_shadow until acknowledgement and the destination waits
+# three audio clocks before capture; one 20-MHz control period is therefore a
+# conservative absolute datapath limit with ample protocol margin.
+set_max_delay 50.000 -datapath_only \
+    -from $nf_mode_shadow_cells -to $nf_audio_mode_cells

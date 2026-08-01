@@ -1,0 +1,16 @@
+National finals P4-D release-v2 frequency acceptance
+====================================================
+CONFIG_ID=NF-P4D-R2-479LUT-468FF-4DSP-2BRAM-2MMCM
+ENGINE=MATLAB base fft (no freqz/toolbox dependency)
+SHA256_MANIFEST=PASS
+RTL_GOLDEN_PREFIX=0_LSB; GOLDEN_TAIL=ALL_ZERO
+VECTOR_CASES=13; EQ_SAT=0; CIC_SAT=0; BOUNDARY_CROSSES=2
+
+Fs=44100 node=4x shape_abs=0.004610111 dB shape_pp=0.005702880 dB abs_pass=0.003011246 dB abs_stop=78.670421578 dB worst_stop_hz=31398.570154 dc=-0.001598865 dB mode_delta=0.000000000 dB sym=0 LSB gd=112.000000 phase_res=5.68e-14 PASS=1
+Fs=44100 node=8x shape_abs=0.005394743 dB shape_pp=0.006155094 dB abs_pass=0.003469481 dB abs_stop=78.564517924 dB worst_stop_hz=31400.634650 dc=-0.002709130 dB mode_delta=-0.001110266 dB sym=0 LSB gd=229.000000 phase_res=5.68e-14 PASS=1
+Fs=44100 node=128x shape_abs=0.006116383 dB shape_pp=0.007782989 dB abs_pass=0.005146377 dB abs_stop=72.334540550 dB worst_stop_hz=331984.627734 dc=-0.003479771 dB mode_delta=-0.001880907 dB sym=0 LSB gd=3702.500000 phase_res=2.84e-14 PASS=1
+Fs=48000 node=4x shape_abs=0.004610111 dB shape_pp=0.005702880 dB abs_pass=0.003011246 dB abs_stop=78.670421578 dB worst_stop_hz=34175.312988 dc=-0.001598865 dB mode_delta=0.000000000 dB sym=0 LSB gd=112.000000 phase_res=5.68e-14 PASS=1
+Fs=48000 node=8x shape_abs=0.005394743 dB shape_pp=0.005718825 dB abs_pass=0.003033212 dB abs_stop=78.564517924 dB worst_stop_hz=34177.561523 dc=-0.002709130 dB mode_delta=-0.001110266 dB sym=0 LSB gd=229.000000 phase_res=5.68e-14 PASS=1
+Fs=48000 node=128x shape_abs=0.006116383 dB shape_pp=0.006113470 dB abs_pass=0.003476858 dB abs_stop=72.334540550 dB worst_stop_hz=361343.812500 dc=-0.003479771 dB mode_delta=-0.001880907 dB sym=0 LSB gd=3702.500000 phase_res=2.13e-14 PASS=1
+
+OVERALL_PASS=1
