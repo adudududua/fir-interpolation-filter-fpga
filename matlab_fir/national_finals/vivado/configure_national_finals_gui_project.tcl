@@ -31,7 +31,7 @@ require_generic $project_generics USE_NATIONAL_FINALS_N3_HOLD_EQUIV 1
 require_generic $project_generics USE_PHASE7_UNIFIED_BRAM_STAGE23_HISTORY 1
 require_generic $project_generics USE_NATIONAL_FINALS_SINGLE_BRAM_STAGE1 1
 require_generic $project_generics USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER 1
-require_generic $project_generics USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE 2
+require_generic $project_generics USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE 0
 require_generic $project_generics USE_NATIONAL_FINALS_NARROW_STAGE23 1
 
 set signedoff_sim_defines [list \

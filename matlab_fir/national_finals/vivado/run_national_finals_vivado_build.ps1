@@ -14,7 +14,7 @@ param(
     [ValidateSet(0, 1)]
     [int]$Stage1Dsp48Preadder = 1,
     [ValidateSet(0, 1, 2)]
-    [int]$CicIntegratorDspMode = 2,
+    [int]$CicIntegratorDspMode = 0,
     [ValidatePattern('^[A-Za-z0-9_-]+$')]
     [string]$ResultTag = 'board_dual_rate_cic6_round7_headroom_opt'
 )

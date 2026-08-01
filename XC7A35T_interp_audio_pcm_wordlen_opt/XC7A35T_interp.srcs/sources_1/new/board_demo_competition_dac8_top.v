@@ -55,7 +55,7 @@ module board_demo_competition_dac8_top #(
     parameter integer USE_NATIONAL_FINALS_CIC_COMB_DSP = 0,
     parameter integer USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER = 1,
     parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 1,
-    parameter integer USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE = 2
+    parameter integer USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE = 0
 )(
     input  wire       clk,       // 板载 20MHz 系统时钟
 

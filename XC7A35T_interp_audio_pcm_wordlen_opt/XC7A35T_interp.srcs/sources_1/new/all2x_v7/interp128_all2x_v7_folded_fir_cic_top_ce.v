@@ -55,7 +55,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     parameter integer USE_STAGE1_DSP48_PREADDER = 0,
     parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 0,
     parameter integer ASSUME_ALIGNED_POW2_CE = 0,
-    parameter integer CIC_INTEGRATOR_DSP_MODE = 2,
+    parameter integer CIC_INTEGRATOR_DSP_MODE = 0,
     parameter integer USE_UNIFIED_FIR_COEFF_BRAM =
         USE_BRAM_STAGE23_COEFF
 )(

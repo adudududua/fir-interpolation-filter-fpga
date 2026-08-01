@@ -36,7 +36,7 @@ require_generic $project_generics USE_NATIONAL_FINALS_N3_HOLD_EQUIV 1
 require_generic $project_generics USE_PHASE7_UNIFIED_BRAM_STAGE23_HISTORY 1
 require_generic $project_generics USE_NATIONAL_FINALS_SINGLE_BRAM_STAGE1 1
 require_generic $project_generics USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER 1
-require_generic $project_generics USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE 2
+require_generic $project_generics USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE 0
 require_generic $project_generics USE_NATIONAL_FINALS_NARROW_STAGE23 1
 
 set sim_set [get_filesets sim_1]
@@ -139,16 +139,16 @@ if {[get_property PROGRESS [get_runs impl_1]] eq "100%"} {
     puts "GUI_BRAM18=$bram18_count"
     puts "GUI_MMCM=$mmcm_count"
 
-    require_condition [expr {$dsp_count == 4}] \
-        "GUI implementation is not the P4-B 4-DSP architecture."
+    require_condition [expr {$dsp_count == 2}] \
+        "GUI implementation is not the P4-C 2-DSP architecture."
     require_condition [expr {$bram18_count == 4}] \
         "GUI implementation does not use the expected two BRAM tiles."
     require_condition [expr {$mmcm_count == 2}] \
         "GUI implementation does not use the expected two MMCMs."
-    require_condition [expr {$lut_count <= 500}] \
-        "GUI implementation exceeds the signed-off 500-LUT P4-C guard."
-    require_condition [expr {$ff_count <= 490}] \
-        "GUI implementation exceeds the signed-off 490-FF P4-C guard."
+    require_condition [expr {$lut_count <= 545}] \
+        "GUI implementation exceeds the 545-LUT P4-C 2-DSP guard."
+    require_condition [expr {$ff_count <= 545}] \
+        "GUI implementation exceeds the 545-FF P4-C 2-DSP guard."
 
     puts "NATIONAL_FINALS_GUI_IMPLEMENTATION_PASS"
     close_design
