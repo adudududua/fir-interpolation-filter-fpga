@@ -19,7 +19,7 @@
 | PCM ROM + Stage1 历史共享 | 491 LUT / 487 FF / 4 DSP / 1.5 BRAM；16/16 全通过 | **Go，低 BRAM Pareto** |
 | Stage2/3 历史改 LUTRAM | 531 LUT / 487 FF / 4 DSP / 1 BRAM；16/16 全通过 | **Go，最低 BRAM Pareto；不替代默认版** |
 | 未选 MMCM PWRDWN | 需要新的安全切换 FSM、故障注入、SAIF 与实板电源测量 | **本轮不进入稳定 RTL** |
-| 20 MHz 统一三级 FIR | 需要双 bank CDC、统一调度器和固定延迟证明 | **后续独立架构研究** |
+| 20 MHz 统一三级 FIR | 910 LUT / 692 FF / 3 DSP / 2.5 BRAM 核心；Release 11/11、0 LSB | **已执行；功能 Go、资源 No-Go** |
 | CIC PREG | 会改变状态提交、valid/tail 与复位边界 | **后续独立低 FF 研究** |
 
 指导预估的 1 BRAM 目标为约 500～510 LUT、FF≤480；真实 post-route 为 **531 LUT / 487 FF**。它确实少用了一个 BRAM Tile，但没有达到预计的 LUT/FF 区间，因此不能把预估值写成实现结果。
@@ -140,9 +140,9 @@ P4-E/P4-F 只改变存储映射，Release 全链对拍又证明 4x/8x/128x 与 P
 
 现有局部截止期已很紧，直接插入补偿 job 会产生调度气泡。串行前端 ALU 的实测又证明控制和操作数复用成本会抵消算术共享收益，因此没有继续把更复杂的 job 塞入当前 DSP 调度器。
 
-### 7.4 20 MHz 统一三级 FIR
+### 7.4 20 MHz 统一三级 FIR（后续已在独立分支执行）
 
-它有机会把 FIR 从两颗 DSP 降到一颗，是更有创新性的后续方向；但这不是局部优化，而是完整 CDC/调度架构重写，需要输入/输出双 bank、416.67-cycle 帧截止期、117/141 slot 证明、欠溢监视、固定延迟对拍及功耗 SAIF。应建立独立分支，不应混入已签核 P4-D。
+初版反馈将它列为后续研究，随后按指导建立 `codex/national-finals-x3-20m-unified-fir` 独立分支并完成实现。它使用 4-deep Gray 输入 FIFO、160-clock 统一调度器和 y2/y4/y8 ping-pong 输出 bank，把 Stage1/2/3 从两颗 FIR DSP 合并为一颗；功能与资源的最终结论见第 9 节。该实验没有混入已签核 P4-D。
 
 ### 7.5 CIC PREG
 
@@ -168,6 +168,40 @@ git switch codex/national-finals-p4f-bram1
 
 # 串行前端 ALU No-Go 研究记录
 git switch codex/national-finals-p4e-serial-front-alu
+
+# X3 20 MHz 统一 FIR：功能通过、资源 No-Go 的完整研究分支
+git switch codex/national-finals-x3-20m-unified-fir
 ```
 
 三个可用档位均只完成了工具侧签核。最终“板级验证通过”仍需在目标板上下载相应 bitstream，完成六个采样率/倍率组合、家族切换、DA_CLK、DAC 波形、镜像抑制和供电测量后才能声明。
+
+## 9. X3 20 MHz 统一三级 FIR：已执行，功能 Go / 资源 No-Go
+
+### 9.1 实际执行内容
+
+- 音频域输入通过 4-deep Gray 异步 FIFO 送到 20 MHz 系统域；
+- Stage1/2/3 使用同一共享 MAC/DSP48E1，160 个系统时钟完成一个输入帧，小于 48 kHz 最坏约 416.67 个系统时钟的帧间隔；
+- y2/y4/y8 使用 ping-pong bank，完整写入后才翻转 commit，音频域按原固定节拍读出；
+- 保留 P4-D 真 Q15 系数、舍入、饱和、补偿器和 N3 Hold CIC，不改变 golden；
+- 新增前端冲激对拍和完整 X3 全链 testbench，执行 Smoke 与 10-seed Release；
+- 对 `nf_x3_20m_filter_core` 从头执行 OOC 综合、布局布线、时序、功耗、CDC 和 DRC。
+
+### 9.2 遇到的问题与修复
+
+实际实现暴露并修复了 Stage1 启动历史掩码、6-bit 环形地址回绕、历史 Stage3 Q14 系数、Gray FIFO `wr_full` 组合自环、复位阻止 LUTRAM 推断和 BRAM 异步复位控制六类问题。最终 DRC 不再有 LUTLP 或 `REQP-1840`。剩余 `NSTD-1/UCIO-1` 来自 OOC 顶层未绑定引脚；CDC-15 对应 Gray 指针控制下的 FIFO payload 和 commit/select 控制下的稳定 bank payload，若将来重启板级路线仍需补物理 bus-skew/max-delay 约束。
+
+### 9.3 功能与频响
+
+前端冲激在 Stage1 物理历史地址回绕后仍为 0 LSB；完整 Release 为 **11/11 PASS**：冲激 y4/y8/y128 输出 `1245/2499/40064` 点，十组随机用例每组输出 `16605/33219/531584` 点，三节点全部逐样本 0 LSB，且没有 FIFO overflow、bank overrun 或 X 输出。因此 X3 与 P4-D 的六工况通带最大绝对偏差、峰峰纹波和阻带衰减完全相同，沿用第 6 节表格。
+
+### 9.4 实现结果与停止理由
+
+| 滤波核心口径 | LUT | FF | DSP | RAMB18 / BRAM Tile |
+|---|---:|---:|---:|---:|
+| P4-D 已布线滤波层级 | 377 | 361 | 4 | 3 / 1.5 |
+| X3 OOC post-route | 910 | 692 | 3 | 5 / 2.5 |
+| X3 相对 P4-D 核心 | **+533** | **+331** | **-1** | **+2 / +1.0** |
+
+X3 的 20 MHz 与 6.144 MHz WNS/WHS 分别为 `+34.839/+0.072 ns`、`+149.833/+0.081 ns`，时序通过；OOC vectorless 总/动态/静态功耗为 `0.076/0.005/0.070 W`，但因不含双 MMCM 和板级包装，不能与 P4-D 完整板级 0.271 W 直接比较。
+
+这个结果证明创新调度在功能上可行，但为了节省 1 DSP 引入的双时钟状态机、异步 FIFO、三组帧 bank 和提交控制造成了显著 LUT/FF/BRAM增长。核心级数据已经越过停止线，所以没有继续改 P4-D 板级工程，也没有生成不能代表发布候选的 X3 bitstream。当前推荐和最终停留分支仍为 P4-D。更完整的调度、修复、CDC/DRC 与复现路径见 [X3 独立执行报告](x3_20m_unified_fir_nogo.md)。

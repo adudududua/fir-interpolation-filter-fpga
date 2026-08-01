@@ -70,6 +70,18 @@ P4-E 把板级 PCM ROM 与 Stage1 历史放入同一个 RAMB18E1，得到 **491 
 
 三版的滤波系数和定点数据路径相同，P4-E/F 的 Release 三节点又与 P4-D golden 逐样本 0 LSB，所以本文第 3 节六工况的通带纹波、阻带衰减、绝对增益和线性相位结论全部继承。指导逐项执行情况、失败修复、未执行项及原因见 [P4-C 深度审计指导执行反馈](results/p4c_rtl_deep_audit_and_next_optimization_guide_execution.md)。
 
+## X3：20 MHz 统一三级 FIR（已验证，资源 No-Go）
+
+指导中的创新路线已经在 `codex/national-finals-x3-20m-unified-fir` 独立实现：输入经 4-deep Gray FIFO 进入 20 MHz 域，Stage1/2/3 在 160-clock 帧内共用一颗 DSP48E1，y2/y4/y8 通过双 bank commit 返回音频域，后接原补偿器和 N3 Hold CIC。Release 覆盖冲激与 10 个固定 seed×4096，**11/11 PASS**，三节点逐样本 **0 LSB**，没有 FIFO overflow、bank overrun 或未知输出，所以继承本文第 3 节的全部六工况频响。
+
+| 滤波核心口径 | LUT | FF | Slice | DSP | RAMB18 / BRAM Tile |
+|---|---:|---:|---:|---:|---:|
+| P4-D 已布线滤波层级 | 377 | 361 | — | 4 | 3 / 1.5 |
+| X3 OOC post-route | 910 | 692 | 307 | 3 | 5 / 2.5 |
+| X3 相对增量 | **+533** | **+331** | — | **-1** | **+2 / +1.0** |
+
+20 MHz 与 6.144 MHz 域的 WNS/WHS 分别为 `+34.839/+0.072 ns` 和 `+149.833/+0.081 ns`；OOC vectorless 总/动态/静态功耗为 `0.076/0.005/0.070 W`，由于实现范围不含板级 MMCM 和外设，不能与 P4-D 板级 0.271 W 直接相减。该结构用大量调度、CDC 和帧存储换来 1 DSP，资源明显劣化，因此停在核心 OOC，没有生成 X3 板级 bitstream，默认版本仍是 P4-D。完整记录见 [X3 20 MHz 统一 FIR 执行报告](results/x3_20m_unified_fir_nogo.md)。
+
 ## 0.1 Route 1：统一双端口系数 RAM（历史资源点）
 
 Route 1保留Stage1和Stage2/3两颗FIR DSP。原因是48 kHz最紧工况下，一个128拍输入超周期内三段FIR最坏需要`27+42+60=129`拍，单DSP没有可靠调度余量。实际优化是把Stage1的26路`case`常量系数网络，与Stage2/3同步系数BRAM合并到一个显式true-dual-port `RAMB18E1`：
