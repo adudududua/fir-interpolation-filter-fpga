@@ -65,6 +65,8 @@ P4-D 不改变 P4-C 的滤波系数、定点路径、吞吐或资源拓扑，而
 
 request/ack bundled-data CDC 新增 `50.000 ns` bus-skew 约束，post-route 实测 `1.816 ns`、裕量 `48.184 ns`。重新实现仍为 **479 LUT / 468 FF / 198 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM**，WNS/WHS **+45.734/+0.121 ns**，AD9708 setup/hold **+76.116/+78.117 ns**，vectorless 功耗 **0.271 W**；独立 Tcl 和普通 GUI `impl_1 -> write_bitstream` 均通过。新 bitstream SHA-256 为 `44879C48B2A15481A2B7DE598EAA83DE02CD1DABBD9C9BD5D26F0E8399E3E378`。完整 TIMING-18/CDC 证据、发布清单和物理板待办见 [P4-D 发布闭环签核](matlab_fir/national_finals/results/p4d_release_closure_summary.md)。
 
+P4-D Release V2 又完成了导出包深度审计：修正 20/21-bit golden，增加正负满量程边界用例和 reset-zero prefix 断言，将 CDC 改为精确 false path 加 50 ns bus-skew/absolute max-delay，并从干净提交 `e55dca0` 重建。Release/Smoke 均为 **15/15 PASS**，13 组 Release 向量的 4x/8x/128x 全部 **0 LSB**；post-route 仍为 **479 LUT / 468 FF / 4 DSP / 2 BRAM Tile / 2 MMCM**，WNS/WHS **+45.734/+0.121 ns**，mode bus skew **1.813 ns**、最大绝对延迟 **0.912 ns**，bit SHA-256 为 `8630210663629357237AAA3F076348FBE65610EAAB61ADA4706E81F75AAF02A6`。完整干净构建清单和六工况数值见 [P4-D Release V2 签核](matlab_fir/national_finals/results/p4d_release_v2_clean_signoff.md)。
+
 ### P4-E/P4-F：按深度审计指导验证低 BRAM Pareto
 
 P4-E 将板级 PCM ROM 与 Stage1 历史映射到同一个 512×36 RAMB18E1：Stage1 读优先，PCM 请求保持到已证明的空闲窗口，RAM 输出寄存器同时作为 PCM 预取缓冲。P4-F 再把 Stage2/3 历史从 RAMB18E1 改为 8 个 RAM32M。两版都不改变系数、DSP 数据通路、定点舍入、饱和或 valid 序列，Release 对拍证明 4x/8x/128x 与 P4-D 逐样本 0 LSB，因此继承相同六工况频响。
