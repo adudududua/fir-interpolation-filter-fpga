@@ -220,14 +220,19 @@ set_false_path -to [get_ports {key_kr[*]}]
 # 与两个音频域之间均按异步时钟组处理。
 #=============================================================
 
-# 使用自动派生时钟的稳定名称，避免 Vivado 2018.3 在 XDC 解析期间通过
-# get_clocks -of_objects 递归构造 timing graph 时触发内部异常。
-# 20 MHz 控制域与音频域之间均由同步器/异步复位保护；BUFGMUX_CTRL 下游的
-# 44.1 kHz 与 48 kHz 家族逻辑互斥，不应分析两路时钟之间的伪路径。
-set_clock_groups -asynchronous \
-    -group [get_clocks clk_20M] \
-    -group [get_clocks [list $nf_clk_44k1 $nf_clk_48k \
-        dac_clk_44k1_128x dac_clk_48k_128x]]
+# 不使用覆盖整个 20 MHz/音频域的 set_clock_groups -asynchronous。
+# 该粗粒度例外会吞掉 mode_shadow bundled-data 的 absolute max-delay。
+# 这里只对已审计的第一拍同步器和 BUFGMUX_CTRL 选择脚做精确 false path；
+# mode_shadow -> audio_mode 则保留为有界的异步 datapath-only 路径。
+set nf_ctrl_to_audio_sync_pins [get_pins -hierarchical -regexp \
+    {.*(family_audio_meta_reg|rst_request_sync_reg\[0\]|u_nf_mode_cdc_handshake/req_meta_reg)/D}]
+set nf_audio_to_ctrl_sync_pins [get_pins -hierarchical -regexp \
+    {.*u_nf_mode_cdc_handshake/ack_meta_reg/D}]
+set nf_bufgmux_select_pins [get_pins -hierarchical -regexp \
+    {.*u_dual_family_audio_clock/u_bufgmux_audio_family/S[01]}]
+set_false_path -to $nf_ctrl_to_audio_sync_pins
+set_false_path -to $nf_audio_to_ctrl_sync_pins
+set_false_path -to $nf_bufgmux_select_pins
 
 set_clock_groups -logically_exclusive \
     -group [get_clocks [list $nf_clk_44k1 dac_clk_44k1_128x]] \
@@ -244,10 +249,6 @@ set nf_mode_shadow_cells [get_cells -hierarchical -regexp \
     {.*u_nf_mode_cdc_handshake/mode_shadow_reg\[[01]\]}]
 set nf_audio_mode_cells [get_cells -hierarchical -regexp \
     {.*u_nf_mode_cdc_handshake/audio_mode_reg\[[01]\]}]
-if {[llength $nf_mode_shadow_cells] != 2 || \
-        [llength $nf_audio_mode_cells] != 2} {
-    error "Bundled-data CDC endpoint set changed: expected 2 source and 2 destination registers"
-}
 set_bus_skew 50.000 -from $nf_mode_shadow_cells -to $nf_audio_mode_cells
 
 # Relative skew alone cannot bound the flight time of both bits together.

@@ -59,6 +59,32 @@ file mkdir $result_dir
 open_checkpoint $synth_dcp
 read_xdc $board_xdc
 
+# Vivado 2018.3 XDC accepts constraint commands but not Tcl `if'.  Keep the
+# endpoint drift assertions in the build script after the XDC has resolved.
+set ctrl_to_audio_sync_pins [get_pins -hierarchical -regexp \
+    {.*(family_audio_meta_reg|rst_request_sync_reg\[0\]|u_nf_mode_cdc_handshake/req_meta_reg)/D}]
+set audio_to_ctrl_sync_pins [get_pins -hierarchical -regexp \
+    {.*u_nf_mode_cdc_handshake/ack_meta_reg/D}]
+set bufgmux_select_pins [get_pins -hierarchical -regexp \
+    {.*u_dual_family_audio_clock/u_bufgmux_audio_family/S[01]}]
+set mode_shadow_cells [get_cells -hierarchical -regexp \
+    {.*u_nf_mode_cdc_handshake/mode_shadow_reg\[[01]\]}]
+set audio_mode_cells [get_cells -hierarchical -regexp \
+    {.*u_nf_mode_cdc_handshake/audio_mode_reg\[[01]\]}]
+if {[llength $ctrl_to_audio_sync_pins] != 3 || \
+        [llength $audio_to_ctrl_sync_pins] != 1 || \
+        [llength $bufgmux_select_pins] != 2 || \
+        [llength $mode_shadow_cells] != 2 || \
+        [llength $audio_mode_cells] != 2} {
+    error "Audited CDC endpoint set changed; update constraints and waivers"
+}
+
+proc write_text_report {report_file report_text} {
+    set report_handle [open $report_file w]
+    puts -nonewline $report_handle $report_text
+    close $report_handle
+}
+
 if {$implementation_opt_directive eq "Default"} {
     opt_design
 } else {
@@ -100,12 +126,22 @@ report_clock_interaction -delay_type min_max \
 report_route_status -file [file join $result_dir route_status_routed.rpt]
 report_power -file [file join $result_dir power_vectorless_routed.rpt]
 report_drc -file [file join $result_dir drc_routed.rpt]
-catch {
-    report_methodology \
-        -file [file join $result_dir methodology_routed.rpt]
+set methodology_text [report_methodology -return_string]
+write_text_report [file join $result_dir methodology_routed.rpt] \
+    $methodology_text
+if {![regexp {\| TIMING-18 \| Warning\s+\|[^\n]+\| 8\s+\|} \
+        $methodology_text]} {
+    error "Methodology warning set changed: expected TIMING-18 count 8"
 }
-catch {
-    report_cdc -details -file [file join $result_dir cdc_routed.rpt]
+set cdc_text [report_cdc -details -return_string]
+write_text_report [file join $result_dir cdc_routed.rpt] $cdc_text
+foreach expected_cdc_pattern [list \
+        {CDC-3\s+Info\s+10\s} \
+        {CDC-13\s+Critical\s+2\s} \
+        {CDC-15\s+Warning\s+4\s}] {
+    if {![regexp $expected_cdc_pattern $cdc_text]} {
+        error "CDC warning ID/count changed: $expected_cdc_pattern"
+    }
 }
 catch {
     check_timing -verbose \
@@ -123,17 +159,20 @@ catch {
     report_bus_skew \
         -file [file join $result_dir bus_skew_routed.rpt]
 }
-set mode_shadow_cells [get_cells -hierarchical -regexp \
-    {.*u_nf_mode_cdc_handshake/mode_shadow_reg\[[01]\]}]
-set audio_mode_cells [get_cells -hierarchical -regexp \
-    {.*u_nf_mode_cdc_handshake/audio_mode_reg\[[01]\]}]
-if {[llength $mode_shadow_cells] != 2 || \
-        [llength $audio_mode_cells] != 2} {
-    error "Bundled-data CDC routed endpoints changed"
-}
 report_timing -from $mode_shadow_cells -to $audio_mode_cells \
     -delay_type max -max_paths 4 \
     -file [file join $result_dir mode_absolute_delay_routed.rpt]
+set mode_delay_paths [get_timing_paths -from $mode_shadow_cells \
+    -to $audio_mode_cells -delay_type max -max_paths 4]
+if {[llength $mode_delay_paths] != 4} {
+    error "Expected four family/bit bundled-data max-delay paths"
+}
+foreach mode_delay_path $mode_delay_paths {
+    set mode_delay_slack [get_property SLACK $mode_delay_path]
+    if {$mode_delay_slack < 0.0 || $mode_delay_slack > 50.0} {
+        error "Bundled-data absolute max-delay is failed or overridden: slack=$mode_delay_slack"
+    }
+}
 
 write_primitive_report \
     [file join $result_dir dsp_utilization_routed.rpt] \
