@@ -1,0 +1,2136 @@
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date         : Sun Aug  2 02:14:49 2026
+| Host         : LAPTOP-476JT8H0 running 64-bit major release  (build 9200)
+| Command      : report_timing_summary -delay_type min_max -max_paths 20 -file D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/p1_two24/results/p1c_ooc/timing_summary_routed.rpt
+| Design       : cic_interp16_n3_hold2_two24_p1s_ce
+| Device       : 7a35t-fgg484
+| Speed File   : -2  PRODUCTION 1.23 2018-06-13
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Timing Summary Report
+
+------------------------------------------------------------------------------------------------
+| Timer Settings
+| --------------
+------------------------------------------------------------------------------------------------
+
+  Enable Multi Corner Analysis               :  Yes
+  Enable Pessimism Removal                   :  Yes
+  Pessimism Removal Resolution               :  Nearest Common Node
+  Enable Input Delay Default Clock           :  No
+  Enable Preset / Clear Arcs                 :  No
+  Disable Flight Delays                      :  No
+  Ignore I/O Paths                           :  No
+  Timing Early Launch at Borrowing Latches   :  false
+
+  Corner  Analyze    Analyze    
+  Name    Max Paths  Min Paths  
+  ------  ---------  ---------  
+  Slow    Yes        Yes        
+  Fast    Yes        Yes        
+
+
+
+check_timing report
+
+Table of Contents
+-----------------
+1. checking no_clock
+2. checking constant_clock
+3. checking pulse_width_clock
+4. checking unconstrained_internal_endpoints
+5. checking no_input_delay
+6. checking no_output_delay
+7. checking multiple_clock
+8. checking generated_clocks
+9. checking loops
+10. checking partial_input_delay
+11. checking partial_output_delay
+12. checking latch_loops
+
+1. checking no_clock
+--------------------
+ There are 0 register/latch pins with no clock.
+
+
+2. checking constant_clock
+--------------------------
+ There are 0 register/latch pins with constant_clock.
+
+
+3. checking pulse_width_clock
+-----------------------------
+ There are 0 register/latch pins which need pulse_width check
+
+
+4. checking unconstrained_internal_endpoints
+--------------------------------------------
+ There are 0 pins that are not constrained for maximum delay.
+
+ There are 0 pins that are not constrained for maximum delay due to constant clock.
+
+
+5. checking no_input_delay
+--------------------------
+ There are 24 input ports with no input delay specified. (HIGH)
+
+ There are 0 input ports with no input delay but user has a false path constraint.
+
+
+6. checking no_output_delay
+---------------------------
+ There are 27 ports with no output delay specified. (HIGH)
+
+ There are 0 ports with no output delay but user has a false path constraint
+
+ There are 0 ports with no output delay but with a timing clock defined on it or propagating through it
+
+
+7. checking multiple_clock
+--------------------------
+ There are 0 register/latch pins with multiple clocks.
+
+
+8. checking generated_clocks
+----------------------------
+ There are 0 generated clocks that are not connected to a clock source.
+
+
+9. checking loops
+-----------------
+ There are 0 combinational loops in the design.
+
+
+10. checking partial_input_delay
+--------------------------------
+ There are 0 input ports with partial input delay specified.
+
+
+11. checking partial_output_delay
+---------------------------------
+ There are 0 ports with partial output delay specified.
+
+
+12. checking latch_loops
+------------------------
+ There are 0 combinational latch loops in the design through latch input
+
+
+
+------------------------------------------------------------------------------------------------
+| Design Timing Summary
+| ---------------------
+------------------------------------------------------------------------------------------------
+
+    WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
+    -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
+    158.129        0.000                      0                  316        0.158        0.000                      0                  316       80.880        0.000                       0                   138  
+
+
+All user specified timing constraints are met.
+
+
+------------------------------------------------------------------------------------------------
+| Clock Summary
+| -------------
+------------------------------------------------------------------------------------------------
+
+Clock           Waveform(ns)         Period(ns)      Frequency(MHz)
+-----           ------------         ----------      --------------
+clk_audio_128x  {0.000 81.380}       162.760         6.144           
+
+
+------------------------------------------------------------------------------------------------
+| Intra Clock Table
+| -----------------
+------------------------------------------------------------------------------------------------
+
+Clock               WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
+-----               -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
+clk_audio_128x      158.129        0.000                      0                  316        0.158        0.000                      0                  316       80.880        0.000                       0                   138  
+
+
+------------------------------------------------------------------------------------------------
+| Inter Clock Table
+| -----------------
+------------------------------------------------------------------------------------------------
+
+From Clock    To Clock          WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints  
+----------    --------          -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------  
+
+
+------------------------------------------------------------------------------------------------
+| Other Path Groups Table
+| -----------------------
+------------------------------------------------------------------------------------------------
+
+Path Group    From Clock    To Clock          WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints  
+----------    ----------    --------          -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------  
+
+
+------------------------------------------------------------------------------------------------
+| Timing Details
+| --------------
+------------------------------------------------------------------------------------------------
+
+
+---------------------------------------------------------------------------------------------------
+From Clock:  clk_audio_128x
+  To Clock:  clk_audio_128x
+
+Setup :            0  Failing Endpoints,  Worst Slack      158.129ns,  Total Violation        0.000ns
+Hold  :            0  Failing Endpoints,  Worst Slack        0.158ns,  Total Violation        0.000ns
+PW    :            0  Failing Endpoints,  Worst Slack       80.880ns,  Total Violation        0.000ns
+---------------------------------------------------------------------------------------------------
+
+
+Max Delay Paths
+--------------------------------------------------------------------------------------
+Slack (MET) :             158.129ns  (required time - arrival time)
+  Source:                 burst_remaining_reg[1]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[2]
+                            (rising edge-triggered cell DSP48E1 clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            162.760ns  (clk_audio_128x rise@162.760ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        3.129ns  (logic 0.643ns (20.550%)  route 2.486ns (79.450%))
+  Logic Levels:           2  (LUT3=1 LUT6=1)
+  Clock Path Skew:        -0.039ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.748ns = ( 163.508 - 162.760 ) 
+    Source Clock Delay      (SCD):    0.787ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.787     0.787    clk
+    SLICE_X14Y74         FDRE                                         r  burst_remaining_reg[1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y74         FDRE (Prop_fdre_C_Q)         0.433     1.220 f  burst_remaining_reg[1]/Q
+                         net (fo=5, routed)           0.726     1.946    u_two24_integrator_pair/u_two24_integrator_dsp48e1_3[1]
+    SLICE_X14Y74         LUT6 (Prop_lut6_I3_O)        0.105     2.051 r  u_two24_integrator_pair/burst_remaining[3]_i_3/O
+                         net (fo=53, routed)          1.279     3.330    u_two24_integrator_pair/burst_pending_reg
+    SLICE_X12Y67         LUT3 (Prop_lut3_I1_O)        0.105     3.435 r  u_two24_integrator_pair/u_two24_integrator_dsp48e1_i_22/O
+                         net (fo=1, routed)           0.481     3.916    u_two24_integrator_pair/high_rate_input[2]
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[2]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                    162.760   162.760 r  
+                                                      0.000   162.760 r  clk (IN)
+                         net (fo=137, unset)          0.748   163.508    u_two24_integrator_pair/clk
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/CLK
+                         clock pessimism              0.000   163.508    
+                         clock uncertainty           -0.035   163.472    
+    DSP48_X0Y28          DSP48E1 (Setup_dsp48e1_CLK_C[2])
+                                                     -1.427   162.045    u_two24_integrator_pair/u_two24_integrator_dsp48e1
+  -------------------------------------------------------------------
+                         required time                        162.045    
+                         arrival time                          -3.916    
+  -------------------------------------------------------------------
+                         slack                                158.129    
+
+Slack (MET) :             158.162ns  (required time - arrival time)
+  Source:                 burst_remaining_reg[1]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[1]
+                            (rising edge-triggered cell DSP48E1 clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            162.760ns  (clk_audio_128x rise@162.760ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        3.097ns  (logic 0.643ns (20.764%)  route 2.454ns (79.236%))
+  Logic Levels:           2  (LUT3=1 LUT6=1)
+  Clock Path Skew:        -0.039ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.748ns = ( 163.508 - 162.760 ) 
+    Source Clock Delay      (SCD):    0.787ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.787     0.787    clk
+    SLICE_X14Y74         FDRE                                         r  burst_remaining_reg[1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y74         FDRE (Prop_fdre_C_Q)         0.433     1.220 f  burst_remaining_reg[1]/Q
+                         net (fo=5, routed)           0.726     1.946    u_two24_integrator_pair/u_two24_integrator_dsp48e1_3[1]
+    SLICE_X14Y74         LUT6 (Prop_lut6_I3_O)        0.105     2.051 r  u_two24_integrator_pair/burst_remaining[3]_i_3/O
+                         net (fo=53, routed)          1.270     3.321    u_two24_integrator_pair/burst_pending_reg
+    SLICE_X12Y67         LUT3 (Prop_lut3_I1_O)        0.105     3.426 r  u_two24_integrator_pair/u_two24_integrator_dsp48e1_i_23/O
+                         net (fo=1, routed)           0.458     3.884    u_two24_integrator_pair/high_rate_input[1]
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[1]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                    162.760   162.760 r  
+                                                      0.000   162.760 r  clk (IN)
+                         net (fo=137, unset)          0.748   163.508    u_two24_integrator_pair/clk
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/CLK
+                         clock pessimism              0.000   163.508    
+                         clock uncertainty           -0.035   163.472    
+    DSP48_X0Y28          DSP48E1 (Setup_dsp48e1_CLK_C[1])
+                                                     -1.427   162.045    u_two24_integrator_pair/u_two24_integrator_dsp48e1
+  -------------------------------------------------------------------
+                         required time                        162.045    
+                         arrival time                          -3.884    
+  -------------------------------------------------------------------
+                         slack                                158.162    
+
+Slack (MET) :             158.327ns  (required time - arrival time)
+  Source:                 burst_remaining_reg[1]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[13]
+                            (rising edge-triggered cell DSP48E1 clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            162.760ns  (clk_audio_128x rise@162.760ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        2.931ns  (logic 0.643ns (21.939%)  route 2.288ns (78.061%))
+  Logic Levels:           2  (LUT3=1 LUT6=1)
+  Clock Path Skew:        -0.039ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.748ns = ( 163.508 - 162.760 ) 
+    Source Clock Delay      (SCD):    0.787ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.787     0.787    clk
+    SLICE_X14Y74         FDRE                                         r  burst_remaining_reg[1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y74         FDRE (Prop_fdre_C_Q)         0.433     1.220 f  burst_remaining_reg[1]/Q
+                         net (fo=5, routed)           0.726     1.946    u_two24_integrator_pair/u_two24_integrator_dsp48e1_3[1]
+    SLICE_X14Y74         LUT6 (Prop_lut6_I3_O)        0.105     2.051 r  u_two24_integrator_pair/burst_remaining[3]_i_3/O
+                         net (fo=53, routed)          1.028     3.079    u_two24_integrator_pair/burst_pending_reg
+    SLICE_X11Y71         LUT3 (Prop_lut3_I1_O)        0.105     3.184 r  u_two24_integrator_pair/u_two24_integrator_dsp48e1_i_11/O
+                         net (fo=1, routed)           0.534     3.718    u_two24_integrator_pair/high_rate_input[13]
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[13]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                    162.760   162.760 r  
+                                                      0.000   162.760 r  clk (IN)
+                         net (fo=137, unset)          0.748   163.508    u_two24_integrator_pair/clk
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/CLK
+                         clock pessimism              0.000   163.508    
+                         clock uncertainty           -0.035   163.472    
+    DSP48_X0Y28          DSP48E1 (Setup_dsp48e1_CLK_C[13])
+                                                     -1.427   162.045    u_two24_integrator_pair/u_two24_integrator_dsp48e1
+  -------------------------------------------------------------------
+                         required time                        162.045    
+                         arrival time                          -3.718    
+  -------------------------------------------------------------------
+                         slack                                158.327    
+
+Slack (MET) :             158.349ns  (required time - arrival time)
+  Source:                 burst_remaining_reg[1]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[0]
+                            (rising edge-triggered cell DSP48E1 clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            162.760ns  (clk_audio_128x rise@162.760ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        2.909ns  (logic 0.643ns (22.104%)  route 2.266ns (77.896%))
+  Logic Levels:           2  (LUT3=1 LUT6=1)
+  Clock Path Skew:        -0.039ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.748ns = ( 163.508 - 162.760 ) 
+    Source Clock Delay      (SCD):    0.787ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.787     0.787    clk
+    SLICE_X14Y74         FDRE                                         r  burst_remaining_reg[1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y74         FDRE (Prop_fdre_C_Q)         0.433     1.220 f  burst_remaining_reg[1]/Q
+                         net (fo=5, routed)           0.726     1.946    u_two24_integrator_pair/u_two24_integrator_dsp48e1_3[1]
+    SLICE_X14Y74         LUT6 (Prop_lut6_I3_O)        0.105     2.051 r  u_two24_integrator_pair/burst_remaining[3]_i_3/O
+                         net (fo=53, routed)          0.939     2.990    u_two24_integrator_pair/burst_pending_reg
+    SLICE_X12Y67         LUT3 (Prop_lut3_I1_O)        0.105     3.095 r  u_two24_integrator_pair/u_two24_integrator_dsp48e1_i_24/O
+                         net (fo=1, routed)           0.601     3.696    u_two24_integrator_pair/high_rate_input[0]
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[0]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                    162.760   162.760 r  
+                                                      0.000   162.760 r  clk (IN)
+                         net (fo=137, unset)          0.748   163.508    u_two24_integrator_pair/clk
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/CLK
+                         clock pessimism              0.000   163.508    
+                         clock uncertainty           -0.035   163.472    
+    DSP48_X0Y28          DSP48E1 (Setup_dsp48e1_CLK_C[0])
+                                                     -1.427   162.045    u_two24_integrator_pair/u_two24_integrator_dsp48e1
+  -------------------------------------------------------------------
+                         required time                        162.045    
+                         arrival time                          -3.696    
+  -------------------------------------------------------------------
+                         slack                                158.349    
+
+Slack (MET) :             158.453ns  (required time - arrival time)
+  Source:                 burst_remaining_reg[1]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[20]
+                            (rising edge-triggered cell DSP48E1 clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            162.760ns  (clk_audio_128x rise@162.760ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        2.805ns  (logic 0.643ns (22.922%)  route 2.162ns (77.078%))
+  Logic Levels:           2  (LUT3=1 LUT6=1)
+  Clock Path Skew:        -0.039ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.748ns = ( 163.508 - 162.760 ) 
+    Source Clock Delay      (SCD):    0.787ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.787     0.787    clk
+    SLICE_X14Y74         FDRE                                         r  burst_remaining_reg[1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y74         FDRE (Prop_fdre_C_Q)         0.433     1.220 f  burst_remaining_reg[1]/Q
+                         net (fo=5, routed)           0.726     1.946    u_two24_integrator_pair/u_two24_integrator_dsp48e1_3[1]
+    SLICE_X14Y74         LUT6 (Prop_lut6_I3_O)        0.105     2.051 r  u_two24_integrator_pair/burst_remaining[3]_i_3/O
+                         net (fo=53, routed)          0.876     2.927    u_two24_integrator_pair/burst_pending_reg
+    SLICE_X15Y70         LUT3 (Prop_lut3_I1_O)        0.105     3.032 r  u_two24_integrator_pair/u_two24_integrator_dsp48e1_i_4/O
+                         net (fo=1, routed)           0.560     3.592    u_two24_integrator_pair/high_rate_input[20]
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[20]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                    162.760   162.760 r  
+                                                      0.000   162.760 r  clk (IN)
+                         net (fo=137, unset)          0.748   163.508    u_two24_integrator_pair/clk
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/CLK
+                         clock pessimism              0.000   163.508    
+                         clock uncertainty           -0.035   163.472    
+    DSP48_X0Y28          DSP48E1 (Setup_dsp48e1_CLK_C[20])
+                                                     -1.427   162.045    u_two24_integrator_pair/u_two24_integrator_dsp48e1
+  -------------------------------------------------------------------
+                         required time                        162.045    
+                         arrival time                          -3.592    
+  -------------------------------------------------------------------
+                         slack                                158.453    
+
+Slack (MET) :             158.537ns  (required time - arrival time)
+  Source:                 burst_remaining_reg[1]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[15]
+                            (rising edge-triggered cell DSP48E1 clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            162.760ns  (clk_audio_128x rise@162.760ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        2.722ns  (logic 0.643ns (23.625%)  route 2.079ns (76.375%))
+  Logic Levels:           2  (LUT3=1 LUT6=1)
+  Clock Path Skew:        -0.039ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.748ns = ( 163.508 - 162.760 ) 
+    Source Clock Delay      (SCD):    0.787ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.787     0.787    clk
+    SLICE_X14Y74         FDRE                                         r  burst_remaining_reg[1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y74         FDRE (Prop_fdre_C_Q)         0.433     1.220 f  burst_remaining_reg[1]/Q
+                         net (fo=5, routed)           0.726     1.946    u_two24_integrator_pair/u_two24_integrator_dsp48e1_3[1]
+    SLICE_X14Y74         LUT6 (Prop_lut6_I3_O)        0.105     2.051 r  u_two24_integrator_pair/burst_remaining[3]_i_3/O
+                         net (fo=53, routed)          0.827     2.878    u_two24_integrator_pair/burst_pending_reg
+    SLICE_X11Y71         LUT3 (Prop_lut3_I1_O)        0.105     2.983 r  u_two24_integrator_pair/u_two24_integrator_dsp48e1_i_9/O
+                         net (fo=1, routed)           0.526     3.509    u_two24_integrator_pair/high_rate_input[15]
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[15]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                    162.760   162.760 r  
+                                                      0.000   162.760 r  clk (IN)
+                         net (fo=137, unset)          0.748   163.508    u_two24_integrator_pair/clk
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/CLK
+                         clock pessimism              0.000   163.508    
+                         clock uncertainty           -0.035   163.472    
+    DSP48_X0Y28          DSP48E1 (Setup_dsp48e1_CLK_C[15])
+                                                     -1.427   162.045    u_two24_integrator_pair/u_two24_integrator_dsp48e1
+  -------------------------------------------------------------------
+                         required time                        162.045    
+                         arrival time                          -3.509    
+  -------------------------------------------------------------------
+                         slack                                158.537    
+
+Slack (MET) :             158.579ns  (required time - arrival time)
+  Source:                 burst_remaining_reg[1]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[22]
+                            (rising edge-triggered cell DSP48E1 clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            162.760ns  (clk_audio_128x rise@162.760ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        2.679ns  (logic 0.643ns (24.002%)  route 2.036ns (75.998%))
+  Logic Levels:           2  (LUT3=1 LUT6=1)
+  Clock Path Skew:        -0.039ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.748ns = ( 163.508 - 162.760 ) 
+    Source Clock Delay      (SCD):    0.787ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.787     0.787    clk
+    SLICE_X14Y74         FDRE                                         r  burst_remaining_reg[1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y74         FDRE (Prop_fdre_C_Q)         0.433     1.220 f  burst_remaining_reg[1]/Q
+                         net (fo=5, routed)           0.726     1.946    u_two24_integrator_pair/u_two24_integrator_dsp48e1_3[1]
+    SLICE_X14Y74         LUT6 (Prop_lut6_I3_O)        0.105     2.051 r  u_two24_integrator_pair/burst_remaining[3]_i_3/O
+                         net (fo=53, routed)          0.527     2.577    u_two24_integrator_pair/burst_pending_reg
+    SLICE_X13Y75         LUT3 (Prop_lut3_I1_O)        0.105     2.682 r  u_two24_integrator_pair/u_two24_integrator_dsp48e1_i_2/O
+                         net (fo=2, routed)           0.783     3.466    u_two24_integrator_pair/high_rate_input[22]
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[22]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                    162.760   162.760 r  
+                                                      0.000   162.760 r  clk (IN)
+                         net (fo=137, unset)          0.748   163.508    u_two24_integrator_pair/clk
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/CLK
+                         clock pessimism              0.000   163.508    
+                         clock uncertainty           -0.035   163.472    
+    DSP48_X0Y28          DSP48E1 (Setup_dsp48e1_CLK_C[22])
+                                                     -1.427   162.045    u_two24_integrator_pair/u_two24_integrator_dsp48e1
+  -------------------------------------------------------------------
+                         required time                        162.045    
+                         arrival time                          -3.466    
+  -------------------------------------------------------------------
+                         slack                                158.579    
+
+Slack (MET) :             158.585ns  (required time - arrival time)
+  Source:                 burst_remaining_reg[1]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[3]
+                            (rising edge-triggered cell DSP48E1 clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            162.760ns  (clk_audio_128x rise@162.760ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        2.674ns  (logic 0.643ns (24.050%)  route 2.031ns (75.950%))
+  Logic Levels:           2  (LUT3=1 LUT6=1)
+  Clock Path Skew:        -0.039ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.748ns = ( 163.508 - 162.760 ) 
+    Source Clock Delay      (SCD):    0.787ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.787     0.787    clk
+    SLICE_X14Y74         FDRE                                         r  burst_remaining_reg[1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y74         FDRE (Prop_fdre_C_Q)         0.433     1.220 f  burst_remaining_reg[1]/Q
+                         net (fo=5, routed)           0.726     1.946    u_two24_integrator_pair/u_two24_integrator_dsp48e1_3[1]
+    SLICE_X14Y74         LUT6 (Prop_lut6_I3_O)        0.105     2.051 r  u_two24_integrator_pair/burst_remaining[3]_i_3/O
+                         net (fo=53, routed)          0.823     2.874    u_two24_integrator_pair/burst_pending_reg
+    SLICE_X11Y71         LUT3 (Prop_lut3_I1_O)        0.105     2.979 r  u_two24_integrator_pair/u_two24_integrator_dsp48e1_i_21/O
+                         net (fo=1, routed)           0.482     3.461    u_two24_integrator_pair/high_rate_input[3]
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[3]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                    162.760   162.760 r  
+                                                      0.000   162.760 r  clk (IN)
+                         net (fo=137, unset)          0.748   163.508    u_two24_integrator_pair/clk
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/CLK
+                         clock pessimism              0.000   163.508    
+                         clock uncertainty           -0.035   163.472    
+    DSP48_X0Y28          DSP48E1 (Setup_dsp48e1_CLK_C[3])
+                                                     -1.427   162.045    u_two24_integrator_pair/u_two24_integrator_dsp48e1
+  -------------------------------------------------------------------
+                         required time                        162.045    
+                         arrival time                          -3.461    
+  -------------------------------------------------------------------
+                         slack                                158.585    
+
+Slack (MET) :             158.589ns  (required time - arrival time)
+  Source:                 burst_remaining_reg[1]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[7]
+                            (rising edge-triggered cell DSP48E1 clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            162.760ns  (clk_audio_128x rise@162.760ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        2.669ns  (logic 0.643ns (24.089%)  route 2.026ns (75.911%))
+  Logic Levels:           2  (LUT3=1 LUT6=1)
+  Clock Path Skew:        -0.039ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.748ns = ( 163.508 - 162.760 ) 
+    Source Clock Delay      (SCD):    0.787ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.787     0.787    clk
+    SLICE_X14Y74         FDRE                                         r  burst_remaining_reg[1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y74         FDRE (Prop_fdre_C_Q)         0.433     1.220 f  burst_remaining_reg[1]/Q
+                         net (fo=5, routed)           0.726     1.946    u_two24_integrator_pair/u_two24_integrator_dsp48e1_3[1]
+    SLICE_X14Y74         LUT6 (Prop_lut6_I3_O)        0.105     2.051 r  u_two24_integrator_pair/burst_remaining[3]_i_3/O
+                         net (fo=53, routed)          0.817     2.868    u_two24_integrator_pair/burst_pending_reg
+    SLICE_X12Y70         LUT3 (Prop_lut3_I1_O)        0.105     2.973 r  u_two24_integrator_pair/u_two24_integrator_dsp48e1_i_17/O
+                         net (fo=1, routed)           0.483     3.456    u_two24_integrator_pair/high_rate_input[7]
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[7]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                    162.760   162.760 r  
+                                                      0.000   162.760 r  clk (IN)
+                         net (fo=137, unset)          0.748   163.508    u_two24_integrator_pair/clk
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/CLK
+                         clock pessimism              0.000   163.508    
+                         clock uncertainty           -0.035   163.472    
+    DSP48_X0Y28          DSP48E1 (Setup_dsp48e1_CLK_C[7])
+                                                     -1.427   162.045    u_two24_integrator_pair/u_two24_integrator_dsp48e1
+  -------------------------------------------------------------------
+                         required time                        162.045    
+                         arrival time                          -3.456    
+  -------------------------------------------------------------------
+                         slack                                158.589    
+
+Slack (MET) :             158.667ns  (required time - arrival time)
+  Source:                 burst_remaining_reg[1]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[19]
+                            (rising edge-triggered cell DSP48E1 clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            162.760ns  (clk_audio_128x rise@162.760ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        2.591ns  (logic 0.643ns (24.818%)  route 1.948ns (75.182%))
+  Logic Levels:           2  (LUT3=1 LUT6=1)
+  Clock Path Skew:        -0.039ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.748ns = ( 163.508 - 162.760 ) 
+    Source Clock Delay      (SCD):    0.787ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.787     0.787    clk
+    SLICE_X14Y74         FDRE                                         r  burst_remaining_reg[1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y74         FDRE (Prop_fdre_C_Q)         0.433     1.220 f  burst_remaining_reg[1]/Q
+                         net (fo=5, routed)           0.726     1.946    u_two24_integrator_pair/u_two24_integrator_dsp48e1_3[1]
+    SLICE_X14Y74         LUT6 (Prop_lut6_I3_O)        0.105     2.051 r  u_two24_integrator_pair/burst_remaining[3]_i_3/O
+                         net (fo=53, routed)          0.710     2.761    u_two24_integrator_pair/burst_pending_reg
+    SLICE_X13Y74         LUT3 (Prop_lut3_I1_O)        0.105     2.866 r  u_two24_integrator_pair/u_two24_integrator_dsp48e1_i_5/O
+                         net (fo=1, routed)           0.512     3.378    u_two24_integrator_pair/high_rate_input[19]
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[19]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                    162.760   162.760 r  
+                                                      0.000   162.760 r  clk (IN)
+                         net (fo=137, unset)          0.748   163.508    u_two24_integrator_pair/clk
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/CLK
+                         clock pessimism              0.000   163.508    
+                         clock uncertainty           -0.035   163.472    
+    DSP48_X0Y28          DSP48E1 (Setup_dsp48e1_CLK_C[19])
+                                                     -1.427   162.045    u_two24_integrator_pair/u_two24_integrator_dsp48e1
+  -------------------------------------------------------------------
+                         required time                        162.045    
+                         arrival time                          -3.378    
+  -------------------------------------------------------------------
+                         slack                                158.667    
+
+Slack (MET) :             158.715ns  (required time - arrival time)
+  Source:                 burst_remaining_reg[1]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[8]
+                            (rising edge-triggered cell DSP48E1 clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            162.760ns  (clk_audio_128x rise@162.760ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        2.543ns  (logic 0.643ns (25.286%)  route 1.900ns (74.714%))
+  Logic Levels:           2  (LUT3=1 LUT6=1)
+  Clock Path Skew:        -0.039ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.748ns = ( 163.508 - 162.760 ) 
+    Source Clock Delay      (SCD):    0.787ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.787     0.787    clk
+    SLICE_X14Y74         FDRE                                         r  burst_remaining_reg[1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y74         FDRE (Prop_fdre_C_Q)         0.433     1.220 f  burst_remaining_reg[1]/Q
+                         net (fo=5, routed)           0.726     1.946    u_two24_integrator_pair/u_two24_integrator_dsp48e1_3[1]
+    SLICE_X14Y74         LUT6 (Prop_lut6_I3_O)        0.105     2.051 r  u_two24_integrator_pair/burst_remaining[3]_i_3/O
+                         net (fo=53, routed)          0.582     2.633    u_two24_integrator_pair/burst_pending_reg
+    SLICE_X12Y70         LUT3 (Prop_lut3_I1_O)        0.105     2.738 r  u_two24_integrator_pair/u_two24_integrator_dsp48e1_i_16/O
+                         net (fo=1, routed)           0.592     3.330    u_two24_integrator_pair/high_rate_input[8]
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[8]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                    162.760   162.760 r  
+                                                      0.000   162.760 r  clk (IN)
+                         net (fo=137, unset)          0.748   163.508    u_two24_integrator_pair/clk
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/CLK
+                         clock pessimism              0.000   163.508    
+                         clock uncertainty           -0.035   163.472    
+    DSP48_X0Y28          DSP48E1 (Setup_dsp48e1_CLK_C[8])
+                                                     -1.427   162.045    u_two24_integrator_pair/u_two24_integrator_dsp48e1
+  -------------------------------------------------------------------
+                         required time                        162.045    
+                         arrival time                          -3.330    
+  -------------------------------------------------------------------
+                         slack                                158.715    
+
+Slack (MET) :             158.717ns  (required time - arrival time)
+  Source:                 burst_remaining_reg[1]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[6]
+                            (rising edge-triggered cell DSP48E1 clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            162.760ns  (clk_audio_128x rise@162.760ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        2.542ns  (logic 0.643ns (25.298%)  route 1.899ns (74.702%))
+  Logic Levels:           2  (LUT3=1 LUT6=1)
+  Clock Path Skew:        -0.039ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.748ns = ( 163.508 - 162.760 ) 
+    Source Clock Delay      (SCD):    0.787ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.787     0.787    clk
+    SLICE_X14Y74         FDRE                                         r  burst_remaining_reg[1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y74         FDRE (Prop_fdre_C_Q)         0.433     1.220 f  burst_remaining_reg[1]/Q
+                         net (fo=5, routed)           0.726     1.946    u_two24_integrator_pair/u_two24_integrator_dsp48e1_3[1]
+    SLICE_X14Y74         LUT6 (Prop_lut6_I3_O)        0.105     2.051 r  u_two24_integrator_pair/burst_remaining[3]_i_3/O
+                         net (fo=53, routed)          0.832     2.883    u_two24_integrator_pair/burst_pending_reg
+    SLICE_X12Y70         LUT3 (Prop_lut3_I1_O)        0.105     2.988 r  u_two24_integrator_pair/u_two24_integrator_dsp48e1_i_18/O
+                         net (fo=1, routed)           0.341     3.329    u_two24_integrator_pair/high_rate_input[6]
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[6]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                    162.760   162.760 r  
+                                                      0.000   162.760 r  clk (IN)
+                         net (fo=137, unset)          0.748   163.508    u_two24_integrator_pair/clk
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/CLK
+                         clock pessimism              0.000   163.508    
+                         clock uncertainty           -0.035   163.472    
+    DSP48_X0Y28          DSP48E1 (Setup_dsp48e1_CLK_C[6])
+                                                     -1.427   162.045    u_two24_integrator_pair/u_two24_integrator_dsp48e1
+  -------------------------------------------------------------------
+                         required time                        162.045    
+                         arrival time                          -3.329    
+  -------------------------------------------------------------------
+                         slack                                158.717    
+
+Slack (MET) :             158.722ns  (required time - arrival time)
+  Source:                 burst_remaining_reg[1]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[23]
+                            (rising edge-triggered cell DSP48E1 clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            162.760ns  (clk_audio_128x rise@162.760ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        2.536ns  (logic 0.643ns (25.354%)  route 1.893ns (74.646%))
+  Logic Levels:           2  (LUT3=1 LUT6=1)
+  Clock Path Skew:        -0.039ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.748ns = ( 163.508 - 162.760 ) 
+    Source Clock Delay      (SCD):    0.787ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.787     0.787    clk
+    SLICE_X14Y74         FDRE                                         r  burst_remaining_reg[1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y74         FDRE (Prop_fdre_C_Q)         0.433     1.220 f  burst_remaining_reg[1]/Q
+                         net (fo=5, routed)           0.726     1.946    u_two24_integrator_pair/u_two24_integrator_dsp48e1_3[1]
+    SLICE_X14Y74         LUT6 (Prop_lut6_I3_O)        0.105     2.051 r  u_two24_integrator_pair/burst_remaining[3]_i_3/O
+                         net (fo=53, routed)          0.527     2.577    u_two24_integrator_pair/burst_pending_reg
+    SLICE_X13Y75         LUT3 (Prop_lut3_I1_O)        0.105     2.682 r  u_two24_integrator_pair/u_two24_integrator_dsp48e1_i_2/O
+                         net (fo=2, routed)           0.641     3.323    u_two24_integrator_pair/high_rate_input[22]
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[23]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                    162.760   162.760 r  
+                                                      0.000   162.760 r  clk (IN)
+                         net (fo=137, unset)          0.748   163.508    u_two24_integrator_pair/clk
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/CLK
+                         clock pessimism              0.000   163.508    
+                         clock uncertainty           -0.035   163.472    
+    DSP48_X0Y28          DSP48E1 (Setup_dsp48e1_CLK_C[23])
+                                                     -1.427   162.045    u_two24_integrator_pair/u_two24_integrator_dsp48e1
+  -------------------------------------------------------------------
+                         required time                        162.045    
+                         arrival time                          -3.323    
+  -------------------------------------------------------------------
+                         slack                                158.722    
+
+Slack (MET) :             158.778ns  (required time - arrival time)
+  Source:                 burst_remaining_reg[1]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[21]
+                            (rising edge-triggered cell DSP48E1 clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            162.760ns  (clk_audio_128x rise@162.760ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        2.481ns  (logic 0.643ns (25.922%)  route 1.838ns (74.078%))
+  Logic Levels:           2  (LUT3=1 LUT6=1)
+  Clock Path Skew:        -0.039ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.748ns = ( 163.508 - 162.760 ) 
+    Source Clock Delay      (SCD):    0.787ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.787     0.787    clk
+    SLICE_X14Y74         FDRE                                         r  burst_remaining_reg[1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y74         FDRE (Prop_fdre_C_Q)         0.433     1.220 f  burst_remaining_reg[1]/Q
+                         net (fo=5, routed)           0.726     1.946    u_two24_integrator_pair/u_two24_integrator_dsp48e1_3[1]
+    SLICE_X14Y74         LUT6 (Prop_lut6_I3_O)        0.105     2.051 r  u_two24_integrator_pair/burst_remaining[3]_i_3/O
+                         net (fo=53, routed)          0.674     2.725    u_two24_integrator_pair/burst_pending_reg
+    SLICE_X15Y70         LUT3 (Prop_lut3_I1_O)        0.105     2.830 r  u_two24_integrator_pair/u_two24_integrator_dsp48e1_i_3/O
+                         net (fo=1, routed)           0.437     3.268    u_two24_integrator_pair/high_rate_input[21]
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[21]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                    162.760   162.760 r  
+                                                      0.000   162.760 r  clk (IN)
+                         net (fo=137, unset)          0.748   163.508    u_two24_integrator_pair/clk
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/CLK
+                         clock pessimism              0.000   163.508    
+                         clock uncertainty           -0.035   163.472    
+    DSP48_X0Y28          DSP48E1 (Setup_dsp48e1_CLK_C[21])
+                                                     -1.427   162.045    u_two24_integrator_pair/u_two24_integrator_dsp48e1
+  -------------------------------------------------------------------
+                         required time                        162.045    
+                         arrival time                          -3.268    
+  -------------------------------------------------------------------
+                         slack                                158.778    
+
+Slack (MET) :             158.806ns  (required time - arrival time)
+  Source:                 burst_remaining_reg[1]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[10]
+                            (rising edge-triggered cell DSP48E1 clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            162.760ns  (clk_audio_128x rise@162.760ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        2.452ns  (logic 0.643ns (26.225%)  route 1.809ns (73.775%))
+  Logic Levels:           2  (LUT3=1 LUT6=1)
+  Clock Path Skew:        -0.039ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.748ns = ( 163.508 - 162.760 ) 
+    Source Clock Delay      (SCD):    0.787ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.787     0.787    clk
+    SLICE_X14Y74         FDRE                                         r  burst_remaining_reg[1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y74         FDRE (Prop_fdre_C_Q)         0.433     1.220 f  burst_remaining_reg[1]/Q
+                         net (fo=5, routed)           0.726     1.946    u_two24_integrator_pair/u_two24_integrator_dsp48e1_3[1]
+    SLICE_X14Y74         LUT6 (Prop_lut6_I3_O)        0.105     2.051 r  u_two24_integrator_pair/burst_remaining[3]_i_3/O
+                         net (fo=53, routed)          0.594     2.645    u_two24_integrator_pair/burst_pending_reg
+    SLICE_X11Y71         LUT3 (Prop_lut3_I1_O)        0.105     2.750 r  u_two24_integrator_pair/u_two24_integrator_dsp48e1_i_14/O
+                         net (fo=1, routed)           0.489     3.239    u_two24_integrator_pair/high_rate_input[10]
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[10]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                    162.760   162.760 r  
+                                                      0.000   162.760 r  clk (IN)
+                         net (fo=137, unset)          0.748   163.508    u_two24_integrator_pair/clk
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/CLK
+                         clock pessimism              0.000   163.508    
+                         clock uncertainty           -0.035   163.472    
+    DSP48_X0Y28          DSP48E1 (Setup_dsp48e1_CLK_C[10])
+                                                     -1.427   162.045    u_two24_integrator_pair/u_two24_integrator_dsp48e1
+  -------------------------------------------------------------------
+                         required time                        162.045    
+                         arrival time                          -3.239    
+  -------------------------------------------------------------------
+                         slack                                158.806    
+
+Slack (MET) :             158.850ns  (required time - arrival time)
+  Source:                 burst_remaining_reg[1]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[17]
+                            (rising edge-triggered cell DSP48E1 clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            162.760ns  (clk_audio_128x rise@162.760ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        2.408ns  (logic 0.643ns (26.698%)  route 1.765ns (73.302%))
+  Logic Levels:           2  (LUT3=1 LUT6=1)
+  Clock Path Skew:        -0.039ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.748ns = ( 163.508 - 162.760 ) 
+    Source Clock Delay      (SCD):    0.787ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.787     0.787    clk
+    SLICE_X14Y74         FDRE                                         r  burst_remaining_reg[1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y74         FDRE (Prop_fdre_C_Q)         0.433     1.220 f  burst_remaining_reg[1]/Q
+                         net (fo=5, routed)           0.726     1.946    u_two24_integrator_pair/u_two24_integrator_dsp48e1_3[1]
+    SLICE_X14Y74         LUT6 (Prop_lut6_I3_O)        0.105     2.051 r  u_two24_integrator_pair/burst_remaining[3]_i_3/O
+                         net (fo=53, routed)          0.712     2.763    u_two24_integrator_pair/burst_pending_reg
+    SLICE_X13Y74         LUT3 (Prop_lut3_I1_O)        0.105     2.868 r  u_two24_integrator_pair/u_two24_integrator_dsp48e1_i_7/O
+                         net (fo=1, routed)           0.327     3.195    u_two24_integrator_pair/high_rate_input[17]
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[17]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                    162.760   162.760 r  
+                                                      0.000   162.760 r  clk (IN)
+                         net (fo=137, unset)          0.748   163.508    u_two24_integrator_pair/clk
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/CLK
+                         clock pessimism              0.000   163.508    
+                         clock uncertainty           -0.035   163.472    
+    DSP48_X0Y28          DSP48E1 (Setup_dsp48e1_CLK_C[17])
+                                                     -1.427   162.045    u_two24_integrator_pair/u_two24_integrator_dsp48e1
+  -------------------------------------------------------------------
+                         required time                        162.045    
+                         arrival time                          -3.195    
+  -------------------------------------------------------------------
+                         slack                                158.850    
+
+Slack (MET) :             158.851ns  (required time - arrival time)
+  Source:                 burst_remaining_reg[1]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[18]
+                            (rising edge-triggered cell DSP48E1 clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            162.760ns  (clk_audio_128x rise@162.760ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        2.408ns  (logic 0.643ns (26.706%)  route 1.765ns (73.294%))
+  Logic Levels:           2  (LUT3=1 LUT6=1)
+  Clock Path Skew:        -0.039ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.748ns = ( 163.508 - 162.760 ) 
+    Source Clock Delay      (SCD):    0.787ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.787     0.787    clk
+    SLICE_X14Y74         FDRE                                         r  burst_remaining_reg[1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y74         FDRE (Prop_fdre_C_Q)         0.433     1.220 f  burst_remaining_reg[1]/Q
+                         net (fo=5, routed)           0.726     1.946    u_two24_integrator_pair/u_two24_integrator_dsp48e1_3[1]
+    SLICE_X14Y74         LUT6 (Prop_lut6_I3_O)        0.105     2.051 r  u_two24_integrator_pair/burst_remaining[3]_i_3/O
+                         net (fo=53, routed)          0.710     2.761    u_two24_integrator_pair/burst_pending_reg
+    SLICE_X13Y74         LUT3 (Prop_lut3_I1_O)        0.105     2.866 r  u_two24_integrator_pair/u_two24_integrator_dsp48e1_i_6/O
+                         net (fo=1, routed)           0.329     3.195    u_two24_integrator_pair/high_rate_input[18]
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[18]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                    162.760   162.760 r  
+                                                      0.000   162.760 r  clk (IN)
+                         net (fo=137, unset)          0.748   163.508    u_two24_integrator_pair/clk
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/CLK
+                         clock pessimism              0.000   163.508    
+                         clock uncertainty           -0.035   163.472    
+    DSP48_X0Y28          DSP48E1 (Setup_dsp48e1_CLK_C[18])
+                                                     -1.427   162.045    u_two24_integrator_pair/u_two24_integrator_dsp48e1
+  -------------------------------------------------------------------
+                         required time                        162.045    
+                         arrival time                          -3.195    
+  -------------------------------------------------------------------
+                         slack                                158.851    
+
+Slack (MET) :             158.853ns  (required time - arrival time)
+  Source:                 burst_remaining_reg[1]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[9]
+                            (rising edge-triggered cell DSP48E1 clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            162.760ns  (clk_audio_128x rise@162.760ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        2.406ns  (logic 0.643ns (26.729%)  route 1.763ns (73.271%))
+  Logic Levels:           2  (LUT3=1 LUT6=1)
+  Clock Path Skew:        -0.039ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.748ns = ( 163.508 - 162.760 ) 
+    Source Clock Delay      (SCD):    0.787ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.787     0.787    clk
+    SLICE_X14Y74         FDRE                                         r  burst_remaining_reg[1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y74         FDRE (Prop_fdre_C_Q)         0.433     1.220 f  burst_remaining_reg[1]/Q
+                         net (fo=5, routed)           0.726     1.946    u_two24_integrator_pair/u_two24_integrator_dsp48e1_3[1]
+    SLICE_X14Y74         LUT6 (Prop_lut6_I3_O)        0.105     2.051 r  u_two24_integrator_pair/burst_remaining[3]_i_3/O
+                         net (fo=53, routed)          0.586     2.637    u_two24_integrator_pair/burst_pending_reg
+    SLICE_X12Y70         LUT3 (Prop_lut3_I1_O)        0.105     2.742 r  u_two24_integrator_pair/u_two24_integrator_dsp48e1_i_15/O
+                         net (fo=1, routed)           0.450     3.193    u_two24_integrator_pair/high_rate_input[9]
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[9]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                    162.760   162.760 r  
+                                                      0.000   162.760 r  clk (IN)
+                         net (fo=137, unset)          0.748   163.508    u_two24_integrator_pair/clk
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/CLK
+                         clock pessimism              0.000   163.508    
+                         clock uncertainty           -0.035   163.472    
+    DSP48_X0Y28          DSP48E1 (Setup_dsp48e1_CLK_C[9])
+                                                     -1.427   162.045    u_two24_integrator_pair/u_two24_integrator_dsp48e1
+  -------------------------------------------------------------------
+                         required time                        162.045    
+                         arrival time                          -3.193    
+  -------------------------------------------------------------------
+                         slack                                158.853    
+
+Slack (MET) :             158.920ns  (required time - arrival time)
+  Source:                 burst_remaining_reg[1]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[4]
+                            (rising edge-triggered cell DSP48E1 clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            162.760ns  (clk_audio_128x rise@162.760ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        2.338ns  (logic 0.643ns (27.497%)  route 1.695ns (72.503%))
+  Logic Levels:           2  (LUT3=1 LUT6=1)
+  Clock Path Skew:        -0.039ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.748ns = ( 163.508 - 162.760 ) 
+    Source Clock Delay      (SCD):    0.787ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.787     0.787    clk
+    SLICE_X14Y74         FDRE                                         r  burst_remaining_reg[1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y74         FDRE (Prop_fdre_C_Q)         0.433     1.220 f  burst_remaining_reg[1]/Q
+                         net (fo=5, routed)           0.726     1.946    u_two24_integrator_pair/u_two24_integrator_dsp48e1_3[1]
+    SLICE_X14Y74         LUT6 (Prop_lut6_I3_O)        0.105     2.051 r  u_two24_integrator_pair/burst_remaining[3]_i_3/O
+                         net (fo=53, routed)          0.524     2.574    u_two24_integrator_pair/burst_pending_reg
+    SLICE_X15Y72         LUT3 (Prop_lut3_I1_O)        0.105     2.679 r  u_two24_integrator_pair/u_two24_integrator_dsp48e1_i_20/O
+                         net (fo=1, routed)           0.446     3.125    u_two24_integrator_pair/high_rate_input[4]
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[4]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                    162.760   162.760 r  
+                                                      0.000   162.760 r  clk (IN)
+                         net (fo=137, unset)          0.748   163.508    u_two24_integrator_pair/clk
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/CLK
+                         clock pessimism              0.000   163.508    
+                         clock uncertainty           -0.035   163.472    
+    DSP48_X0Y28          DSP48E1 (Setup_dsp48e1_CLK_C[4])
+                                                     -1.427   162.045    u_two24_integrator_pair/u_two24_integrator_dsp48e1
+  -------------------------------------------------------------------
+                         required time                        162.045    
+                         arrival time                          -3.125    
+  -------------------------------------------------------------------
+                         slack                                158.920    
+
+Slack (MET) :             158.990ns  (required time - arrival time)
+  Source:                 burst_remaining_reg[1]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[11]
+                            (rising edge-triggered cell DSP48E1 clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            162.760ns  (clk_audio_128x rise@162.760ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        2.268ns  (logic 0.643ns (28.353%)  route 1.625ns (71.647%))
+  Logic Levels:           2  (LUT3=1 LUT6=1)
+  Clock Path Skew:        -0.039ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.748ns = ( 163.508 - 162.760 ) 
+    Source Clock Delay      (SCD):    0.787ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.787     0.787    clk
+    SLICE_X14Y74         FDRE                                         r  burst_remaining_reg[1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y74         FDRE (Prop_fdre_C_Q)         0.433     1.220 f  burst_remaining_reg[1]/Q
+                         net (fo=5, routed)           0.726     1.946    u_two24_integrator_pair/u_two24_integrator_dsp48e1_3[1]
+    SLICE_X14Y74         LUT6 (Prop_lut6_I3_O)        0.105     2.051 r  u_two24_integrator_pair/burst_remaining[3]_i_3/O
+                         net (fo=53, routed)          0.448     2.499    u_two24_integrator_pair/burst_pending_reg
+    SLICE_X15Y70         LUT3 (Prop_lut3_I1_O)        0.105     2.604 r  u_two24_integrator_pair/u_two24_integrator_dsp48e1_i_13/O
+                         net (fo=1, routed)           0.451     3.055    u_two24_integrator_pair/high_rate_input[11]
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/C[11]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                    162.760   162.760 r  
+                                                      0.000   162.760 r  clk (IN)
+                         net (fo=137, unset)          0.748   163.508    u_two24_integrator_pair/clk
+    DSP48_X0Y28          DSP48E1                                      r  u_two24_integrator_pair/u_two24_integrator_dsp48e1/CLK
+                         clock pessimism              0.000   163.508    
+                         clock uncertainty           -0.035   163.472    
+    DSP48_X0Y28          DSP48E1 (Setup_dsp48e1_CLK_C[11])
+                                                     -1.427   162.045    u_two24_integrator_pair/u_two24_integrator_dsp48e1
+  -------------------------------------------------------------------
+                         required time                        162.045    
+                         arrival time                          -3.055    
+  -------------------------------------------------------------------
+                         slack                                158.990    
+
+
+
+
+
+Min Delay Paths
+--------------------------------------------------------------------------------------
+Slack (MET) :             0.158ns  (arrival time - required time)
+  Source:                 comb_delay1_reg[3]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            comb_delay0_reg[3]/D
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_audio_128x rise@0.000ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        0.201ns  (logic 0.148ns (73.524%)  route 0.053ns (26.476%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.021ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.411ns
+    Source Clock Delay      (SCD):    0.390ns
+    Clock Pessimism Removal (CPR):    -0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.390     0.390    clk
+    SLICE_X12Y68         FDRE                                         r  comb_delay1_reg[3]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X12Y68         FDRE (Prop_fdre_C_Q)         0.148     0.538 r  comb_delay1_reg[3]/Q
+                         net (fo=1, routed)           0.053     0.592    comb_delay1[3]
+    SLICE_X12Y68         FDRE                                         r  comb_delay0_reg[3]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.411     0.411    clk
+    SLICE_X12Y68         FDRE                                         r  comb_delay0_reg[3]/C
+                         clock pessimism              0.000     0.411    
+    SLICE_X12Y68         FDRE (Hold_fdre_C_D)         0.023     0.434    comb_delay0_reg[3]
+  -------------------------------------------------------------------
+                         required time                         -0.434    
+                         arrival time                           0.592    
+  -------------------------------------------------------------------
+                         slack                                  0.158    
+
+Slack (MET) :             0.158ns  (arrival time - required time)
+  Source:                 comb_delay1_reg[7]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            comb_delay0_reg[7]/D
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_audio_128x rise@0.000ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        0.201ns  (logic 0.148ns (73.524%)  route 0.053ns (26.476%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.021ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.411ns
+    Source Clock Delay      (SCD):    0.390ns
+    Clock Pessimism Removal (CPR):    -0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.390     0.390    clk
+    SLICE_X12Y69         FDRE                                         r  comb_delay1_reg[7]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X12Y69         FDRE (Prop_fdre_C_Q)         0.148     0.538 r  comb_delay1_reg[7]/Q
+                         net (fo=1, routed)           0.053     0.592    comb_delay1[7]
+    SLICE_X12Y69         FDRE                                         r  comb_delay0_reg[7]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.411     0.411    clk
+    SLICE_X12Y69         FDRE                                         r  comb_delay0_reg[7]/C
+                         clock pessimism              0.000     0.411    
+    SLICE_X12Y69         FDRE (Hold_fdre_C_D)         0.023     0.434    comb_delay0_reg[7]
+  -------------------------------------------------------------------
+                         required time                         -0.434    
+                         arrival time                           0.592    
+  -------------------------------------------------------------------
+                         slack                                  0.158    
+
+Slack (MET) :             0.158ns  (arrival time - required time)
+  Source:                 comb_delay1_reg[9]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            comb_delay0_reg[9]/D
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_audio_128x rise@0.000ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        0.201ns  (logic 0.148ns (73.524%)  route 0.053ns (26.476%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.021ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.411ns
+    Source Clock Delay      (SCD):    0.390ns
+    Clock Pessimism Removal (CPR):    -0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.390     0.390    clk
+    SLICE_X14Y70         FDRE                                         r  comb_delay1_reg[9]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y70         FDRE (Prop_fdre_C_Q)         0.148     0.538 r  comb_delay1_reg[9]/Q
+                         net (fo=1, routed)           0.053     0.592    comb_delay1[9]
+    SLICE_X14Y70         FDRE                                         r  comb_delay0_reg[9]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.411     0.411    clk
+    SLICE_X14Y70         FDRE                                         r  comb_delay0_reg[9]/C
+                         clock pessimism              0.000     0.411    
+    SLICE_X14Y70         FDRE (Hold_fdre_C_D)         0.023     0.434    comb_delay0_reg[9]
+  -------------------------------------------------------------------
+                         required time                         -0.434    
+                         arrival time                           0.592    
+  -------------------------------------------------------------------
+                         slack                                  0.158    
+
+Slack (MET) :             0.160ns  (arrival time - required time)
+  Source:                 comb_delay1_reg[17]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            comb_delay0_reg[17]/D
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_audio_128x rise@0.000ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        0.203ns  (logic 0.148ns (72.867%)  route 0.055ns (27.133%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.021ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.411ns
+    Source Clock Delay      (SCD):    0.390ns
+    Clock Pessimism Removal (CPR):    -0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.390     0.390    clk
+    SLICE_X14Y73         FDRE                                         r  comb_delay1_reg[17]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y73         FDRE (Prop_fdre_C_Q)         0.148     0.538 r  comb_delay1_reg[17]/Q
+                         net (fo=1, routed)           0.055     0.593    comb_delay1[17]
+    SLICE_X14Y73         FDRE                                         r  comb_delay0_reg[17]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.411     0.411    clk
+    SLICE_X14Y73         FDRE                                         r  comb_delay0_reg[17]/C
+                         clock pessimism              0.000     0.411    
+    SLICE_X14Y73         FDRE (Hold_fdre_C_D)         0.023     0.434    comb_delay0_reg[17]
+  -------------------------------------------------------------------
+                         required time                         -0.434    
+                         arrival time                           0.593    
+  -------------------------------------------------------------------
+                         slack                                  0.160    
+
+Slack (MET) :             0.163ns  (arrival time - required time)
+  Source:                 comb_delay1_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            comb_delay0_reg[0]/D
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_audio_128x rise@0.000ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        0.205ns  (logic 0.148ns (72.157%)  route 0.057ns (27.843%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.021ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.411ns
+    Source Clock Delay      (SCD):    0.390ns
+    Clock Pessimism Removal (CPR):    -0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.390     0.390    clk
+    SLICE_X12Y68         FDRE                                         r  comb_delay1_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X12Y68         FDRE (Prop_fdre_C_Q)         0.148     0.538 r  comb_delay1_reg[0]/Q
+                         net (fo=1, routed)           0.057     0.595    comb_delay1[0]
+    SLICE_X12Y68         FDRE                                         r  comb_delay0_reg[0]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.411     0.411    clk
+    SLICE_X12Y68         FDRE                                         r  comb_delay0_reg[0]/C
+                         clock pessimism              0.000     0.411    
+    SLICE_X12Y68         FDRE (Hold_fdre_C_D)         0.022     0.433    comb_delay0_reg[0]
+  -------------------------------------------------------------------
+                         required time                         -0.433    
+                         arrival time                           0.595    
+  -------------------------------------------------------------------
+                         slack                                  0.163    
+
+Slack (MET) :             0.163ns  (arrival time - required time)
+  Source:                 comb_delay1_reg[10]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            comb_delay0_reg[10]/D
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_audio_128x rise@0.000ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        0.205ns  (logic 0.148ns (72.157%)  route 0.057ns (27.843%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.021ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.411ns
+    Source Clock Delay      (SCD):    0.390ns
+    Clock Pessimism Removal (CPR):    -0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.390     0.390    clk
+    SLICE_X14Y70         FDRE                                         r  comb_delay1_reg[10]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y70         FDRE (Prop_fdre_C_Q)         0.148     0.538 r  comb_delay1_reg[10]/Q
+                         net (fo=1, routed)           0.057     0.595    comb_delay1[10]
+    SLICE_X14Y70         FDRE                                         r  comb_delay0_reg[10]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.411     0.411    clk
+    SLICE_X14Y70         FDRE                                         r  comb_delay0_reg[10]/C
+                         clock pessimism              0.000     0.411    
+    SLICE_X14Y70         FDRE (Hold_fdre_C_D)         0.022     0.433    comb_delay0_reg[10]
+  -------------------------------------------------------------------
+                         required time                         -0.433    
+                         arrival time                           0.595    
+  -------------------------------------------------------------------
+                         slack                                  0.163    
+
+Slack (MET) :             0.163ns  (arrival time - required time)
+  Source:                 comb_delay1_reg[4]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            comb_delay0_reg[4]/D
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_audio_128x rise@0.000ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        0.205ns  (logic 0.148ns (72.157%)  route 0.057ns (27.843%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.021ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.411ns
+    Source Clock Delay      (SCD):    0.390ns
+    Clock Pessimism Removal (CPR):    -0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.390     0.390    clk
+    SLICE_X12Y69         FDRE                                         r  comb_delay1_reg[4]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X12Y69         FDRE (Prop_fdre_C_Q)         0.148     0.538 r  comb_delay1_reg[4]/Q
+                         net (fo=1, routed)           0.057     0.595    comb_delay1[4]
+    SLICE_X12Y69         FDRE                                         r  comb_delay0_reg[4]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.411     0.411    clk
+    SLICE_X12Y69         FDRE                                         r  comb_delay0_reg[4]/C
+                         clock pessimism              0.000     0.411    
+    SLICE_X12Y69         FDRE (Hold_fdre_C_D)         0.022     0.433    comb_delay0_reg[4]
+  -------------------------------------------------------------------
+                         required time                         -0.433    
+                         arrival time                           0.595    
+  -------------------------------------------------------------------
+                         slack                                  0.163    
+
+Slack (MET) :             0.169ns  (arrival time - required time)
+  Source:                 u_two24_integrator_pair/q_high_reg[3]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            u_two24_integrator_pair/b_out_reg[27]/D
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_audio_128x rise@0.000ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        0.323ns  (logic 0.250ns (77.285%)  route 0.073ns (22.715%))
+  Logic Levels:           2  (CARRY4=1 LUT5=1)
+  Clock Path Skew:        0.021ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.411ns
+    Source Clock Delay      (SCD):    0.390ns
+    Clock Pessimism Removal (CPR):    -0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.390     0.390    u_two24_integrator_pair/clk
+    SLICE_X13Y77         FDRE                                         r  u_two24_integrator_pair/q_high_reg[3]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X13Y77         FDRE (Prop_fdre_C_Q)         0.141     0.531 r  u_two24_integrator_pair/q_high_reg[3]/Q
+                         net (fo=4, routed)           0.073     0.605    u_two24_integrator_pair/q_high[3]
+    SLICE_X12Y77         LUT5 (Prop_lut5_I4_O)        0.045     0.650 r  u_two24_integrator_pair/b_commit_extended_carry_i_2__5/O
+                         net (fo=1, routed)           0.000     0.650    u_two24_integrator_pair/b_commit_extended_carry_i_2__5_n_0
+    SLICE_X12Y77         CARRY4 (Prop_carry4_S[3]_O[3])
+                                                      0.064     0.714 r  u_two24_integrator_pair/b_commit_extended_carry__5/O[3]
+                         net (fo=1, routed)           0.000     0.714    u_two24_integrator_pair/b_commit[27]
+    SLICE_X12Y77         FDRE                                         r  u_two24_integrator_pair/b_out_reg[27]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.411     0.411    u_two24_integrator_pair/clk
+    SLICE_X12Y77         FDRE                                         r  u_two24_integrator_pair/b_out_reg[27]/C
+                         clock pessimism              0.000     0.411    
+    SLICE_X12Y77         FDRE (Hold_fdre_C_D)         0.134     0.545    u_two24_integrator_pair/b_out_reg[27]
+  -------------------------------------------------------------------
+                         required time                         -0.545    
+                         arrival time                           0.714    
+  -------------------------------------------------------------------
+                         slack                                  0.169    
+
+Slack (MET) :             0.170ns  (arrival time - required time)
+  Source:                 comb_operand_reg[12]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            hold_sample_reg[12]/D
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_audio_128x rise@0.000ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        0.261ns  (logic 0.141ns (54.072%)  route 0.120ns (45.928%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.021ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.411ns
+    Source Clock Delay      (SCD):    0.390ns
+    Clock Pessimism Removal (CPR):    -0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.390     0.390    clk
+    SLICE_X13Y71         FDRE                                         r  comb_operand_reg[12]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X13Y71         FDRE (Prop_fdre_C_Q)         0.141     0.531 r  comb_operand_reg[12]/Q
+                         net (fo=4, routed)           0.120     0.651    comb_operand[12]
+    SLICE_X15Y72         FDRE                                         r  hold_sample_reg[12]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.411     0.411    clk
+    SLICE_X15Y72         FDRE                                         r  hold_sample_reg[12]/C
+                         clock pessimism              0.000     0.411    
+    SLICE_X15Y72         FDRE (Hold_fdre_C_D)         0.070     0.481    hold_sample_reg[12]
+  -------------------------------------------------------------------
+                         required time                         -0.481    
+                         arrival time                           0.651    
+  -------------------------------------------------------------------
+                         slack                                  0.170    
+
+Slack (MET) :             0.175ns  (arrival time - required time)
+  Source:                 comb_operand_reg[14]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            hold_sample_reg[14]/D
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_audio_128x rise@0.000ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        0.262ns  (logic 0.141ns (53.866%)  route 0.121ns (46.134%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.021ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.411ns
+    Source Clock Delay      (SCD):    0.390ns
+    Clock Pessimism Removal (CPR):    -0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.390     0.390    clk
+    SLICE_X13Y71         FDRE                                         r  comb_operand_reg[14]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X13Y71         FDRE (Prop_fdre_C_Q)         0.141     0.531 r  comb_operand_reg[14]/Q
+                         net (fo=4, routed)           0.121     0.652    comb_operand[14]
+    SLICE_X15Y72         FDRE                                         r  hold_sample_reg[14]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.411     0.411    clk
+    SLICE_X15Y72         FDRE                                         r  hold_sample_reg[14]/C
+                         clock pessimism              0.000     0.411    
+    SLICE_X15Y72         FDRE (Hold_fdre_C_D)         0.066     0.477    hold_sample_reg[14]
+  -------------------------------------------------------------------
+                         required time                         -0.477    
+                         arrival time                           0.652    
+  -------------------------------------------------------------------
+                         slack                                  0.175    
+
+Slack (MET) :             0.180ns  (arrival time - required time)
+  Source:                 comb_operand_reg[6]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            hold_sample_reg[6]/D
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_audio_128x rise@0.000ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        0.260ns  (logic 0.141ns (54.291%)  route 0.119ns (45.709%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.021ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.411ns
+    Source Clock Delay      (SCD):    0.390ns
+    Clock Pessimism Removal (CPR):    -0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.390     0.390    clk
+    SLICE_X13Y69         FDRE                                         r  comb_operand_reg[6]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X13Y69         FDRE (Prop_fdre_C_Q)         0.141     0.531 r  comb_operand_reg[6]/Q
+                         net (fo=4, routed)           0.119     0.650    comb_operand[6]
+    SLICE_X12Y70         FDRE                                         r  hold_sample_reg[6]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.411     0.411    clk
+    SLICE_X12Y70         FDRE                                         r  hold_sample_reg[6]/C
+                         clock pessimism              0.000     0.411    
+    SLICE_X12Y70         FDRE (Hold_fdre_C_D)         0.059     0.470    hold_sample_reg[6]
+  -------------------------------------------------------------------
+                         required time                         -0.470    
+                         arrival time                           0.650    
+  -------------------------------------------------------------------
+                         slack                                  0.180    
+
+Slack (MET) :             0.182ns  (arrival time - required time)
+  Source:                 comb_operand_reg[10]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            comb_delay1_reg[10]/D
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_audio_128x rise@0.000ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        0.262ns  (logic 0.141ns (53.756%)  route 0.121ns (46.244%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.021ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.411ns
+    Source Clock Delay      (SCD):    0.390ns
+    Clock Pessimism Removal (CPR):    -0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.390     0.390    clk
+    SLICE_X13Y70         FDRE                                         r  comb_operand_reg[10]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X13Y70         FDRE (Prop_fdre_C_Q)         0.141     0.531 r  comb_operand_reg[10]/Q
+                         net (fo=4, routed)           0.121     0.653    comb_operand[10]
+    SLICE_X14Y70         FDRE                                         r  comb_delay1_reg[10]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.411     0.411    clk
+    SLICE_X14Y70         FDRE                                         r  comb_delay1_reg[10]/C
+                         clock pessimism              0.000     0.411    
+    SLICE_X14Y70         FDRE (Hold_fdre_C_D)         0.060     0.471    comb_delay1_reg[10]
+  -------------------------------------------------------------------
+                         required time                         -0.471    
+                         arrival time                           0.653    
+  -------------------------------------------------------------------
+                         slack                                  0.182    
+
+Slack (MET) :             0.183ns  (arrival time - required time)
+  Source:                 comb_delay1_reg[16]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            comb_delay0_reg[16]/D
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_audio_128x rise@0.000ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        0.278ns  (logic 0.164ns (58.973%)  route 0.114ns (41.027%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.021ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.411ns
+    Source Clock Delay      (SCD):    0.390ns
+    Clock Pessimism Removal (CPR):    -0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.390     0.390    clk
+    SLICE_X14Y73         FDRE                                         r  comb_delay1_reg[16]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y73         FDRE (Prop_fdre_C_Q)         0.164     0.554 r  comb_delay1_reg[16]/Q
+                         net (fo=1, routed)           0.114     0.668    comb_delay1[16]
+    SLICE_X14Y73         FDRE                                         r  comb_delay0_reg[16]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.411     0.411    clk
+    SLICE_X14Y73         FDRE                                         r  comb_delay0_reg[16]/C
+                         clock pessimism              0.000     0.411    
+    SLICE_X14Y73         FDRE (Hold_fdre_C_D)         0.075     0.486    comb_delay0_reg[16]
+  -------------------------------------------------------------------
+                         required time                         -0.486    
+                         arrival time                           0.668    
+  -------------------------------------------------------------------
+                         slack                                  0.183    
+
+Slack (MET) :             0.184ns  (arrival time - required time)
+  Source:                 comb_operand_reg[2]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            hold_sample_reg[2]/D
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_audio_128x rise@0.000ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        0.268ns  (logic 0.141ns (52.672%)  route 0.127ns (47.328%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.021ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.411ns
+    Source Clock Delay      (SCD):    0.390ns
+    Clock Pessimism Removal (CPR):    -0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.390     0.390    clk
+    SLICE_X13Y68         FDRE                                         r  comb_operand_reg[2]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X13Y68         FDRE (Prop_fdre_C_Q)         0.141     0.531 r  comb_operand_reg[2]/Q
+                         net (fo=4, routed)           0.127     0.658    comb_operand[2]
+    SLICE_X12Y67         FDRE                                         r  hold_sample_reg[2]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.411     0.411    clk
+    SLICE_X12Y67         FDRE                                         r  hold_sample_reg[2]/C
+                         clock pessimism              0.000     0.411    
+    SLICE_X12Y67         FDRE (Hold_fdre_C_D)         0.063     0.474    hold_sample_reg[2]
+  -------------------------------------------------------------------
+                         required time                         -0.474    
+                         arrival time                           0.658    
+  -------------------------------------------------------------------
+                         slack                                  0.184    
+
+Slack (MET) :             0.185ns  (arrival time - required time)
+  Source:                 comb_operand_reg[21]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            comb_delay1_reg[21]/D
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_audio_128x rise@0.000ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        0.258ns  (logic 0.141ns (54.580%)  route 0.117ns (45.420%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.021ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.411ns
+    Source Clock Delay      (SCD):    0.390ns
+    Clock Pessimism Removal (CPR):    -0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.390     0.390    clk
+    SLICE_X13Y73         FDRE                                         r  comb_operand_reg[21]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X13Y73         FDRE (Prop_fdre_C_Q)         0.141     0.531 r  comb_operand_reg[21]/Q
+                         net (fo=4, routed)           0.117     0.649    comb_operand[21]
+    SLICE_X14Y72         FDRE                                         r  comb_delay1_reg[21]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.411     0.411    clk
+    SLICE_X14Y72         FDRE                                         r  comb_delay1_reg[21]/C
+                         clock pessimism              0.000     0.411    
+    SLICE_X14Y72         FDRE (Hold_fdre_C_D)         0.053     0.464    comb_delay1_reg[21]
+  -------------------------------------------------------------------
+                         required time                         -0.464    
+                         arrival time                           0.649    
+  -------------------------------------------------------------------
+                         slack                                  0.185    
+
+Slack (MET) :             0.186ns  (arrival time - required time)
+  Source:                 comb_operand_reg[12]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            comb_delay1_reg[12]/D
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_audio_128x rise@0.000ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        0.272ns  (logic 0.141ns (51.762%)  route 0.131ns (48.238%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.021ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.411ns
+    Source Clock Delay      (SCD):    0.390ns
+    Clock Pessimism Removal (CPR):    -0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.390     0.390    clk
+    SLICE_X13Y71         FDRE                                         r  comb_operand_reg[12]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X13Y71         FDRE (Prop_fdre_C_Q)         0.141     0.531 r  comb_operand_reg[12]/Q
+                         net (fo=4, routed)           0.131     0.663    comb_operand[12]
+    SLICE_X15Y71         FDRE                                         r  comb_delay1_reg[12]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.411     0.411    clk
+    SLICE_X15Y71         FDRE                                         r  comb_delay1_reg[12]/C
+                         clock pessimism              0.000     0.411    
+    SLICE_X15Y71         FDRE (Hold_fdre_C_D)         0.066     0.477    comb_delay1_reg[12]
+  -------------------------------------------------------------------
+                         required time                         -0.477    
+                         arrival time                           0.663    
+  -------------------------------------------------------------------
+                         slack                                  0.186    
+
+Slack (MET) :             0.187ns  (arrival time - required time)
+  Source:                 comb_operand_reg[20]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            comb_delay1_reg[20]/D
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_audio_128x rise@0.000ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        0.267ns  (logic 0.141ns (52.725%)  route 0.126ns (47.275%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.021ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.411ns
+    Source Clock Delay      (SCD):    0.390ns
+    Clock Pessimism Removal (CPR):    -0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.390     0.390    clk
+    SLICE_X13Y73         FDRE                                         r  comb_operand_reg[20]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X13Y73         FDRE (Prop_fdre_C_Q)         0.141     0.531 r  comb_operand_reg[20]/Q
+                         net (fo=4, routed)           0.126     0.658    comb_operand[20]
+    SLICE_X14Y72         FDRE                                         r  comb_delay1_reg[20]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.411     0.411    clk
+    SLICE_X14Y72         FDRE                                         r  comb_delay1_reg[20]/C
+                         clock pessimism              0.000     0.411    
+    SLICE_X14Y72         FDRE (Hold_fdre_C_D)         0.060     0.471    comb_delay1_reg[20]
+  -------------------------------------------------------------------
+                         required time                         -0.471    
+                         arrival time                           0.658    
+  -------------------------------------------------------------------
+                         slack                                  0.187    
+
+Slack (MET) :             0.188ns  (arrival time - required time)
+  Source:                 comb_operand_reg[14]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            comb_delay1_reg[14]/D
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_audio_128x rise@0.000ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        0.272ns  (logic 0.141ns (51.927%)  route 0.131ns (48.073%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.021ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.411ns
+    Source Clock Delay      (SCD):    0.390ns
+    Clock Pessimism Removal (CPR):    -0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.390     0.390    clk
+    SLICE_X13Y71         FDRE                                         r  comb_operand_reg[14]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X13Y71         FDRE (Prop_fdre_C_Q)         0.141     0.531 r  comb_operand_reg[14]/Q
+                         net (fo=4, routed)           0.131     0.662    comb_operand[14]
+    SLICE_X14Y71         FDRE                                         r  comb_delay1_reg[14]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.411     0.411    clk
+    SLICE_X14Y71         FDRE                                         r  comb_delay1_reg[14]/C
+                         clock pessimism              0.000     0.411    
+    SLICE_X14Y71         FDRE (Hold_fdre_C_D)         0.063     0.474    comb_delay1_reg[14]
+  -------------------------------------------------------------------
+                         required time                         -0.474    
+                         arrival time                           0.662    
+  -------------------------------------------------------------------
+                         slack                                  0.188    
+
+Slack (MET) :             0.192ns  (arrival time - required time)
+  Source:                 comb_operand_reg[2]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            comb_delay1_reg[2]/D
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_audio_128x rise@0.000ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        0.276ns  (logic 0.141ns (51.026%)  route 0.135ns (48.974%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.021ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.411ns
+    Source Clock Delay      (SCD):    0.390ns
+    Clock Pessimism Removal (CPR):    -0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.390     0.390    clk
+    SLICE_X13Y68         FDRE                                         r  comb_operand_reg[2]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X13Y68         FDRE (Prop_fdre_C_Q)         0.141     0.531 r  comb_operand_reg[2]/Q
+                         net (fo=4, routed)           0.135     0.667    comb_operand[2]
+    SLICE_X12Y68         FDRE                                         r  comb_delay1_reg[2]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.411     0.411    clk
+    SLICE_X12Y68         FDRE                                         r  comb_delay1_reg[2]/C
+                         clock pessimism              0.000     0.411    
+    SLICE_X12Y68         FDRE (Hold_fdre_C_D)         0.064     0.475    comb_delay1_reg[2]
+  -------------------------------------------------------------------
+                         required time                         -0.475    
+                         arrival time                           0.667    
+  -------------------------------------------------------------------
+                         slack                                  0.192    
+
+Slack (MET) :             0.192ns  (arrival time - required time)
+  Source:                 comb_operand_reg[17]/C
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            comb_delay1_reg[17]/D
+                            (rising edge-triggered cell FDRE clocked by clk_audio_128x  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             clk_audio_128x
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_audio_128x rise@0.000ns - clk_audio_128x rise@0.000ns)
+  Data Path Delay:        0.272ns  (logic 0.141ns (51.757%)  route 0.131ns (48.243%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.021ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.411ns
+    Source Clock Delay      (SCD):    0.390ns
+    Clock Pessimism Removal (CPR):    -0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.390     0.390    clk
+    SLICE_X13Y72         FDRE                                         r  comb_operand_reg[17]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X13Y72         FDRE (Prop_fdre_C_Q)         0.141     0.531 r  comb_operand_reg[17]/Q
+                         net (fo=4, routed)           0.131     0.663    comb_operand[17]
+    SLICE_X14Y73         FDRE                                         r  comb_delay1_reg[17]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_audio_128x rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=137, unset)          0.411     0.411    clk
+    SLICE_X14Y73         FDRE                                         r  comb_delay1_reg[17]/C
+                         clock pessimism              0.000     0.411    
+    SLICE_X14Y73         FDRE (Hold_fdre_C_D)         0.060     0.471    comb_delay1_reg[17]
+  -------------------------------------------------------------------
+                         required time                         -0.471    
+                         arrival time                           0.663    
+  -------------------------------------------------------------------
+                         slack                                  0.192    
+
+
+
+
+
+Pulse Width Checks
+--------------------------------------------------------------------------------------
+Clock Name:         clk_audio_128x
+Waveform(ns):       { 0.000 81.380 }
+Period(ns):         162.760
+Sources:            { clk }
+
+Check Type        Corner  Lib Pin      Reference Pin  Required(ns)  Actual(ns)  Slack(ns)  Location      Pin
+Min Period        n/a     DSP48E1/CLK  n/a            1.816         162.760     160.944    DSP48_X0Y28   u_two24_integrator_pair/u_two24_integrator_dsp48e1/CLK
+Min Period        n/a     FDRE/C       n/a            1.000         162.760     161.760    SLICE_X15Y73  align_pending_reg/C
+Min Period        n/a     FDRE/C       n/a            1.000         162.760     161.760    SLICE_X15Y74  burst_pending_reg/C
+Min Period        n/a     FDRE/C       n/a            1.000         162.760     161.760    SLICE_X14Y74  burst_remaining_reg[0]/C
+Min Period        n/a     FDRE/C       n/a            1.000         162.760     161.760    SLICE_X14Y74  burst_remaining_reg[1]/C
+Min Period        n/a     FDRE/C       n/a            1.000         162.760     161.760    SLICE_X14Y74  burst_remaining_reg[2]/C
+Min Period        n/a     FDRE/C       n/a            1.000         162.760     161.760    SLICE_X14Y74  burst_remaining_reg[3]/C
+Min Period        n/a     FDRE/C       n/a            1.000         162.760     161.760    SLICE_X15Y73  comb_active_reg/C
+Min Period        n/a     FDRE/C       n/a            1.000         162.760     161.760    SLICE_X12Y68  comb_delay0_reg[0]/C
+Min Period        n/a     FDRE/C       n/a            1.000         162.760     161.760    SLICE_X14Y70  comb_delay0_reg[10]/C
+Min Period        n/a     FDRE/C       n/a            1.000         162.760     161.760    SLICE_X14Y70  comb_delay0_reg[11]/C
+Min Period        n/a     FDRE/C       n/a            1.000         162.760     161.760    SLICE_X14Y71  comb_delay0_reg[12]/C
+Min Period        n/a     FDRE/C       n/a            1.000         162.760     161.760    SLICE_X14Y71  comb_delay0_reg[13]/C
+Min Period        n/a     FDRE/C       n/a            1.000         162.760     161.760    SLICE_X14Y71  comb_delay0_reg[14]/C
+Min Period        n/a     FDRE/C       n/a            1.000         162.760     161.760    SLICE_X15Y71  comb_delay0_reg[15]/C
+Min Period        n/a     FDRE/C       n/a            1.000         162.760     161.760    SLICE_X14Y73  comb_delay0_reg[16]/C
+Min Period        n/a     FDRE/C       n/a            1.000         162.760     161.760    SLICE_X14Y73  comb_delay0_reg[17]/C
+Min Period        n/a     FDRE/C       n/a            1.000         162.760     161.760    SLICE_X14Y73  comb_delay0_reg[18]/C
+Min Period        n/a     FDRE/C       n/a            1.000         162.760     161.760    SLICE_X14Y72  comb_delay0_reg[19]/C
+Min Period        n/a     FDRE/C       n/a            1.000         162.760     161.760    SLICE_X12Y68  comb_delay0_reg[1]/C
+Low Pulse Width   Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X15Y73  align_pending_reg/C
+Low Pulse Width   Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X15Y74  burst_pending_reg/C
+Low Pulse Width   Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X14Y74  burst_remaining_reg[0]/C
+Low Pulse Width   Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X14Y74  burst_remaining_reg[1]/C
+Low Pulse Width   Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X14Y74  burst_remaining_reg[2]/C
+Low Pulse Width   Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X14Y74  burst_remaining_reg[3]/C
+Low Pulse Width   Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X15Y73  comb_active_reg/C
+Low Pulse Width   Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X12Y68  comb_delay0_reg[0]/C
+Low Pulse Width   Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X14Y70  comb_delay0_reg[10]/C
+Low Pulse Width   Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X14Y70  comb_delay0_reg[11]/C
+Low Pulse Width   Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X14Y71  comb_delay0_reg[12]/C
+Low Pulse Width   Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X14Y71  comb_delay0_reg[13]/C
+Low Pulse Width   Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X14Y71  comb_delay0_reg[14]/C
+Low Pulse Width   Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X15Y71  comb_delay0_reg[15]/C
+Low Pulse Width   Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X14Y73  comb_delay0_reg[16]/C
+Low Pulse Width   Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X14Y73  comb_delay0_reg[17]/C
+Low Pulse Width   Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X14Y73  comb_delay0_reg[18]/C
+Low Pulse Width   Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X14Y72  comb_delay0_reg[19]/C
+Low Pulse Width   Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X12Y68  comb_delay0_reg[1]/C
+Low Pulse Width   Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X14Y72  comb_delay0_reg[20]/C
+High Pulse Width  Slow    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X15Y73  align_pending_reg/C
+High Pulse Width  Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X15Y73  align_pending_reg/C
+High Pulse Width  Slow    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X15Y74  burst_pending_reg/C
+High Pulse Width  Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X15Y74  burst_pending_reg/C
+High Pulse Width  Slow    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X14Y74  burst_remaining_reg[0]/C
+High Pulse Width  Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X14Y74  burst_remaining_reg[0]/C
+High Pulse Width  Slow    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X14Y74  burst_remaining_reg[1]/C
+High Pulse Width  Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X14Y74  burst_remaining_reg[1]/C
+High Pulse Width  Slow    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X14Y74  burst_remaining_reg[2]/C
+High Pulse Width  Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X14Y74  burst_remaining_reg[2]/C
+High Pulse Width  Slow    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X14Y74  burst_remaining_reg[3]/C
+High Pulse Width  Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X14Y74  burst_remaining_reg[3]/C
+High Pulse Width  Slow    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X15Y73  comb_active_reg/C
+High Pulse Width  Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X15Y73  comb_active_reg/C
+High Pulse Width  Slow    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X12Y68  comb_delay0_reg[0]/C
+High Pulse Width  Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X12Y68  comb_delay0_reg[0]/C
+High Pulse Width  Slow    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X14Y70  comb_delay0_reg[10]/C
+High Pulse Width  Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X14Y70  comb_delay0_reg[10]/C
+High Pulse Width  Slow    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X14Y70  comb_delay0_reg[11]/C
+High Pulse Width  Fast    FDRE/C       n/a            0.500         81.380      80.880     SLICE_X14Y70  comb_delay0_reg[11]/C
+
+
+

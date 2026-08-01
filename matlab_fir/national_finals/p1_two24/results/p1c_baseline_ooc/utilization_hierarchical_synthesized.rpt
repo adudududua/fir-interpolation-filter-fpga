@@ -1,0 +1,29 @@
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date         : Sun Aug  2 02:19:11 2026
+| Host         : LAPTOP-476JT8H0 running 64-bit major release  (build 9200)
+| Command      : report_utilization -hierarchical -file D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/p1_two24/results/p1c_baseline_ooc/utilization_hierarchical_synthesized.rpt
+| Design       : cic_interp16_n3_hold2_dsp_ce
+| Device       : 7a35tfgg484-2
+| Design State : Synthesized
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++----------------------------------+-------------------------+------------+------------+---------+------+-----+--------+--------+--------------+
+|             Instance             |          Module         | Total LUTs | Logic LUTs | LUTRAMs | SRLs | FFs | RAMB36 | RAMB18 | DSP48 Blocks |
++----------------------------------+-------------------------+------------+------------+---------+------+-----+--------+--------+--------------+
+| cic_interp16_n3_hold2_dsp_ce     |                   (top) |         71 |         71 |       0 |    0 | 119 |      0 |      0 |            2 |
+|   (cic_interp16_n3_hold2_dsp_ce) |                   (top) |         58 |         58 |       0 |    0 | 119 |      0 |      0 |            2 |
+|   u_round_cic_normalized_output  | round_sat_shift_compact |         13 |         13 |       0 |    0 |   0 |      0 |      0 |            0 |
++----------------------------------+-------------------------+------------+------------+---------+------+-----+--------+--------+--------------+
+
+

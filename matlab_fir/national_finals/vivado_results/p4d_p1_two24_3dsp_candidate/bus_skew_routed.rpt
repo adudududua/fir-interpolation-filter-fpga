@@ -1,0 +1,142 @@
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date         : Sun Aug  2 02:46:02 2026
+| Host         : LAPTOP-476JT8H0 running 64-bit major release  (build 9200)
+| Command      : report_bus_skew -file D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/vivado_results/p4d_p1_two24_3dsp_candidate/bus_skew_routed.rpt
+| Design       : board_demo_competition_dac8_top
+| Device       : 7a35t-fgg484
+| Speed File   : -2  PRODUCTION 1.23 2018-06-13
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Bus Skew Report
+
+Table of Contents
+-----------------
+1. Bus Skew Report Summary
+2. Bus Skew Report Per Constraint
+
+1. Bus Skew Report Summary
+--------------------------
+
+Id  Position  From                            To                              Corner  Requirement(ns)  Actual(ns)  Slack(ns)
+--  --------  ------------------------------  ------------------------------  ------  ---------------  ----------  ---------
+1   14        [get_cells -hierarchical -regexp {.*u_nf_mode_cdc_handshake/mode_shadow_reg\[[01]\]}]
+                                              [get_cells -hierarchical -regexp {.*u_nf_mode_cdc_handshake/audio_mode_reg\[[01]\]}]
+                                                                              Slow             50.000       1.809     48.191
+
+
+2. Bus Skew Report Per Constraint
+---------------------------------
+
+Id: 1
+set_bus_skew -from [get_cells -hierarchical -regexp {.*u_nf_mode_cdc_handshake/mode_shadow_reg\[[01]\]}] -to [get_cells -hierarchical -regexp {.*u_nf_mode_cdc_handshake/audio_mode_reg\[[01]\]}] 50.000
+Requirement: 50.000ns
+Endpoints: 2
+
+From Clock            To Clock              Endpoint Pin                    Reference Pin                   Corner  Actual(ns)  Slack(ns)
+--------------------  --------------------  ------------------------------  ------------------------------  ------  ----------  ---------
+clk_20M               clk_44k1_raw          u_nf_mode_cdc_handshake/audio_mode_reg[0]/D
+                                                                            u_nf_mode_cdc_handshake/audio_mode_reg[1]/D
+                                                                                                            Slow         1.809     48.191
+
+
+Slack (MET) :             48.191ns  (requirement - actual skew)
+  Endpoint Source:        u_nf_mode_cdc_handshake/mode_shadow_reg[0]/C
+                            (rising edge-triggered cell FDSE clocked by clk_20M)
+  Endpoint Destination:   u_nf_mode_cdc_handshake/audio_mode_reg[0]/D
+                            (rising edge-triggered cell FDSE clocked by clk_44k1_raw)
+  Reference Source:       u_nf_mode_cdc_handshake/mode_shadow_reg[1]/C
+                            (rising edge-triggered cell FDSE clocked by clk_20M)
+  Reference Destination:  u_nf_mode_cdc_handshake/audio_mode_reg[1]/D
+                            (rising edge-triggered cell FDSE clocked by clk_44k1_raw)
+  Path Type:              Bus Skew (Max at Slow Process Corner)
+  Requirement:            50.000ns
+  Endpoint Relative Delay:   -2.001ns
+  Reference Relative Delay:  -2.877ns
+  Relative CRPR:              0.412ns
+  Uncertainty:                1.344ns
+  Actual Bus Skew:            1.809ns  (Endpoint Relative Delay - Reference Relative Delay - Relative CRPR + Uncertainty)
+
+Endpoint path:
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_20M rise edge)    0.000     0.000 r  
+    Y18                                               0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    Y18                  IBUF (Prop_ibuf_I_O)         1.427     1.427 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           1.693     3.120    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.081     3.201 r  u_bufg_sys_clk/O
+                         net (fo=68, routed)          1.410     4.611    u_nf_mode_cdc_handshake/clk_sys_bufg
+    SLICE_X3Y77          FDSE                                         r  u_nf_mode_cdc_handshake/mode_shadow_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X3Y77          FDSE (Prop_fdse_C_Q)         0.348     4.959 r  u_nf_mode_cdc_handshake/mode_shadow_reg[0]/Q
+                         net (fo=2, routed)           0.551     5.510    u_nf_mode_cdc_handshake/mode_shadow[0]
+    SLICE_X4Y77          FDSE                                         r  u_nf_mode_cdc_handshake/audio_mode_reg[0]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_44k1_raw rise edge)
+                                                      0.000     0.000 r  
+    Y18                                               0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    Y18                  IBUF (Prop_ibuf_I_O)         1.361     1.361 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           1.604     2.965    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.077     3.042 r  u_bufg_sys_clk/O
+                         net (fo=68, routed)          1.426     4.468    u_dual_family_audio_clock/clk_sys_bufg
+    MMCME2_ADV_X0Y2      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.073     4.541 r  u_dual_family_audio_clock/u_mmcm_44k1/CLKOUT0
+                         net (fo=1, routed)           1.617     6.158    u_dual_family_audio_clock/clk_44k1_raw
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I0_O)
+                                                      0.077     6.235 r  u_dual_family_audio_clock/u_bufgmux_audio_family/O
+                         net (fo=453, routed)         1.301     7.536    u_nf_mode_cdc_handshake/clk_audio_128x
+    SLICE_X4Y77          FDSE                                         r  u_nf_mode_cdc_handshake/audio_mode_reg[0]/C
+                         clock pessimism              0.159     7.695    
+    SLICE_X4Y77          FDSE (Setup_fdse_C_D)       -0.184     7.511    u_nf_mode_cdc_handshake/audio_mode_reg[0]
+  -------------------------------------------------------------------
+                         data arrival                           5.510    
+                         clock arrival                          7.511    
+  -------------------------------------------------------------------
+                         relative delay                        -2.001    
+
+Reference path:
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_20M rise edge)    0.000     0.000 r  
+    Y18                                               0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    Y18                  IBUF (Prop_ibuf_I_O)         1.361     1.361 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           1.604     2.965    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.077     3.042 r  u_bufg_sys_clk/O
+                         net (fo=68, routed)          1.304     4.346    u_nf_mode_cdc_handshake/clk_sys_bufg
+    SLICE_X3Y77          FDSE                                         r  u_nf_mode_cdc_handshake/mode_shadow_reg[1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X3Y77          FDSE (Prop_fdse_C_Q)         0.304     4.650 r  u_nf_mode_cdc_handshake/mode_shadow_reg[1]/Q
+                         net (fo=2, routed)           0.463     5.113    u_nf_mode_cdc_handshake/mode_shadow[1]
+    SLICE_X4Y77          FDSE                                         r  u_nf_mode_cdc_handshake/audio_mode_reg[1]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_44k1_raw rise edge)
+                                                      0.000     0.000 r  
+    Y18                                               0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    Y18                  IBUF (Prop_ibuf_I_O)         1.427     1.427 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           1.693     3.120    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.081     3.201 r  u_bufg_sys_clk/O
+                         net (fo=68, routed)          1.538     4.739    u_dual_family_audio_clock/clk_sys_bufg
+    MMCME2_ADV_X0Y2      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.077     4.816 r  u_dual_family_audio_clock/u_mmcm_44k1/CLKOUT0
+                         net (fo=1, routed)           1.698     6.513    u_dual_family_audio_clock/clk_44k1_raw
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I0_O)
+                                                      0.081     6.594 r  u_dual_family_audio_clock/u_bufgmux_audio_family/O
+                         net (fo=453, routed)         1.406     8.001    u_nf_mode_cdc_handshake/clk_audio_128x
+    SLICE_X4Y77          FDSE                                         r  u_nf_mode_cdc_handshake/audio_mode_reg[1]/C
+                         clock pessimism             -0.159     7.842    
+    SLICE_X4Y77          FDSE (Hold_fdse_C_D)         0.148     7.990    u_nf_mode_cdc_handshake/audio_mode_reg[1]
+  -------------------------------------------------------------------
+                         data arrival                           5.113    
+                         clock arrival                          7.990    
+  -------------------------------------------------------------------
+                         relative delay                        -2.877    
+
+
+
