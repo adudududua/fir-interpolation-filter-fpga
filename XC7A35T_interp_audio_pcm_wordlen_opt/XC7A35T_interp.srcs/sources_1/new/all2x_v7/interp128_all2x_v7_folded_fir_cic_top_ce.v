@@ -56,6 +56,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 0,
     parameter integer ASSUME_ALIGNED_POW2_CE = 0,
     parameter integer CIC_INTEGRATOR_DSP_MODE = 2,
+    parameter integer USE_SHARED_PCM_STAGE1_BRAM = 0,
     parameter integer USE_UNIFIED_FIR_COEFF_BRAM =
         USE_BRAM_STAGE23_COEFF
 )(
@@ -70,6 +71,12 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     input  wire                         ce128_out,
     input  wire signed [23:0]           x_in,
     input  wire                         x_in_valid,
+    input  wire                         pcm_sample_ce,
+    input  wire                         pcm_family_48k,
+    output wire signed [23:0]           pcm_sample_out,
+    output wire                         pcm_sample_update,
+    output wire [7:0]                   pcm_sample_addr_dbg,
+    output wire                         pcm_deadline_miss_dbg,
     output wire signed [23:0]           y_out,
     output wire                         y_out_valid,
     output wire signed [23:0]           dbg_y2,
@@ -104,6 +111,10 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     wire signed [15:0] stage1_coeff_data_w;
     wire [5:0] stage23_coeff_addr_w;
     wire signed [15:0] stage23_coeff_data_w;
+    wire signed [23:0] stage1_pcm_sample_w;
+    wire stage1_pcm_update_w;
+    wire [7:0] stage1_pcm_addr_w;
+    wire stage1_pcm_deadline_miss_w;
 
     wire unused_ce;
     assign unused_ce = ce16_out ^ ce32_out ^ ce64_out;
@@ -131,17 +142,28 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
                 .DATA_W(24),
                 .ACC_W(STAGE1_ACC_W),
                 .USE_DSP48_PREADDER(USE_STAGE1_DSP48_PREADDER),
-                .USE_EXTERNAL_COEFF_BRAM(USE_UNIFIED_FIR_COEFF_BRAM)
+                .USE_EXTERNAL_COEFF_BRAM(USE_UNIFIED_FIR_COEFF_BRAM),
+                .USE_SHARED_PCM_BRAM(USE_SHARED_PCM_STAGE1_BRAM)
             ) u_interp2_stage1_strict_halfband_bram_ce (
                 .clk(clk), .rst_n(rst_n), .ce_out(ce2_out),
                 .x_in(x_in), .x_in_valid(x_in_valid),
                 .y_out(y2_w), .y_out_valid(y2_valid_w),
                 .phase_dbg(), .fir_in_dbg(), .fir_in_valid_dbg(),
                 .external_coeff_addr(stage1_coeff_addr_w),
-                .external_coeff_data(stage1_coeff_data_w)
+                .external_coeff_data(stage1_coeff_data_w),
+                .pcm_sample_ce(pcm_sample_ce),
+                .pcm_family_48k(pcm_family_48k),
+                .pcm_sample_out(stage1_pcm_sample_w),
+                .pcm_sample_update(stage1_pcm_update_w),
+                .pcm_sample_addr_dbg(stage1_pcm_addr_w),
+                .pcm_deadline_miss_dbg(stage1_pcm_deadline_miss_w)
             );
         end
         else begin : gen_dual_bram_stage1
+            assign stage1_pcm_sample_w = 24'sd0;
+            assign stage1_pcm_update_w = 1'b0;
+            assign stage1_pcm_addr_w = 8'd0;
+            assign stage1_pcm_deadline_miss_w = 1'b0;
             interp2_stage1_strict_halfband_bram_ce #(
                 .DATA_W(24),
                 .ACC_W(STAGE1_ACC_W),
@@ -327,6 +349,10 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     endgenerate
 
     assign y_out = {y128_w, 4'b0};
+    assign pcm_sample_out = stage1_pcm_sample_w;
+    assign pcm_sample_update = stage1_pcm_update_w;
+    assign pcm_sample_addr_dbg = stage1_pcm_addr_w;
+    assign pcm_deadline_miss_dbg = stage1_pcm_deadline_miss_w;
     assign y_out_valid = y128_valid_w;
     assign dbg_y2 = y2_w;
     assign dbg_y2_valid = y2_valid_w;

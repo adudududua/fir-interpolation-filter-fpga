@@ -31,7 +31,7 @@
     <Option Name="EnableBDX" Val="FALSE"/>
     <Option Name="DSAVendor" Val="xilinx"/>
     <Option Name="DSANumComputeUnits" Val="60"/>
-    <Option Name="WTXSimLaunchSim" Val="3"/>
+    <Option Name="WTXSimLaunchSim" Val="4"/>
     <Option Name="WTModelSimLaunchSim" Val="0"/>
     <Option Name="WTQuestaLaunchSim" Val="0"/>
     <Option Name="WTIesLaunchSim" Val="0"/>
@@ -242,6 +242,13 @@
         </FileInfo>
       </File>
       <File Path="$PSRCDIR/sources_1/new/national_finals/nf_mode_cdc_handshake.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/new/national_finals/nf_pcm_stage1_shared_ramb18_sdp.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -477,6 +484,7 @@
         <Generic Name="USE_PHASE7_BRAM_STAGE23_HISTORY" Val="1"/>
         <Generic Name="USE_PHASE7_UNIFIED_BRAM_STAGE23_HISTORY" Val="1"/>
         <Generic Name="USE_NATIONAL_FINALS_SINGLE_BRAM_STAGE1" Val="1"/>
+        <Generic Name="USE_NATIONAL_FINALS_SHARED_PCM_STAGE1_BRAM" Val="1"/>
         <Generic Name="USE_PHASE7_BRAM_STAGE23_COEFF" Val="1"/>
         <Generic Name="USE_PHASE8_PACKED_BRAM_STAGE23" Val="0"/>
         <Generic Name="USE_PHASE7_CIC_BURST_COUNTER_DSP" Val="0"/>

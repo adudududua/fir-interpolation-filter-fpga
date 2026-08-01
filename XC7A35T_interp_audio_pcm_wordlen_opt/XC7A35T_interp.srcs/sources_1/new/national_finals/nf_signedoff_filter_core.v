@@ -51,6 +51,7 @@ module nf_signedoff_filter_core (
         .USE_NATIONAL_FINALS_NARROW_STAGE23(1),
         .ASSUME_ALIGNED_POW2_CE(1),
         .CIC_INTEGRATOR_DSP_MODE(2),
+        .USE_SHARED_PCM_STAGE1_BRAM(1),
         .USE_UNIFIED_FIR_COEFF_BRAM(1)
     ) u_signedoff_core (
         .clk(clk),
@@ -64,6 +65,12 @@ module nf_signedoff_filter_core (
         .ce128_out(ce128_out),
         .x_in(x_in),
         .x_in_valid(x_in_valid),
+        .pcm_sample_ce(1'b0),
+        .pcm_family_48k(1'b0),
+        .pcm_sample_out(),
+        .pcm_sample_update(),
+        .pcm_sample_addr_dbg(),
+        .pcm_deadline_miss_dbg(),
         .y_out(y_out),
         .y_out_valid(y_out_valid),
         .dbg_y2(dbg_y2),

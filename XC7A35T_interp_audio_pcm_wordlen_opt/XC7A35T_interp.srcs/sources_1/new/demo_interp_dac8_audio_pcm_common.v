@@ -55,6 +55,7 @@ module demo_interp_dac8_audio_pcm_common #(
     parameter integer USE_NATIONAL_FINALS_CIC_COMB_DSP = 0,
     parameter integer USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER = 0,
     parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 0,
+    parameter integer USE_NATIONAL_FINALS_SHARED_PCM_STAGE1_BRAM = 0,
     parameter integer USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE = 2
 )(
     input  wire        force_mute,
@@ -164,21 +165,33 @@ module demo_interp_dac8_audio_pcm_common #(
     wire signed [23:0] audio_sample_w;
     wire               audio_sample_update_w;
     wire [7:0] audio_sample_addr_dbg_w;
+    wire signed [23:0] shared_pcm_sample_w;
+    wire shared_pcm_sample_update_w;
+    wire [7:0] shared_pcm_sample_addr_w;
+    wire shared_pcm_deadline_miss_w;
 
     generate
         if (USE_NATIONAL_FINALS_DATAPATH != 0) begin :
                 gen_dual_rate_test_tone
-            dual_rate_test_tone_rom_source #(
-                .MEM_FILE("nf_sine_15k_dual_rate_24bit_256.mem")
-            ) u_dual_rate_test_tone_rom_source (
-                .clk(clk_audio_128x),
-                .rst_n(rst_n),
-                .sample_ce(x_in_update_ce),
-                .family_48k(family_48k),
-                .sample_out(audio_sample_w),
-                .sample_update(audio_sample_update_w),
-                .sample_addr_dbg(audio_sample_addr_dbg_w)
-            );
+            if (USE_NATIONAL_FINALS_SHARED_PCM_STAGE1_BRAM != 0) begin :
+                    gen_shared_pcm_stage1_bram
+                assign audio_sample_w = shared_pcm_sample_w;
+                assign audio_sample_update_w = shared_pcm_sample_update_w;
+                assign audio_sample_addr_dbg_w = shared_pcm_sample_addr_w;
+            end
+            else begin : gen_separate_pcm_bram
+                dual_rate_test_tone_rom_source #(
+                    .MEM_FILE("nf_sine_15k_dual_rate_24bit_256.mem")
+                ) u_dual_rate_test_tone_rom_source (
+                    .clk(clk_audio_128x),
+                    .rst_n(rst_n),
+                    .sample_ce(x_in_update_ce),
+                    .family_48k(family_48k),
+                    .sample_out(audio_sample_w),
+                    .sample_update(audio_sample_update_w),
+                    .sample_addr_dbg(audio_sample_addr_dbg_w)
+                );
+            end
         end
         else begin : gen_regional_test_tone
             audio_pcm_rom_source #(
@@ -284,6 +297,8 @@ module demo_interp_dac8_audio_pcm_common #(
                     USE_PHASE7_UNIFIED_BRAM_STAGE23_HISTORY),
                 .CIC_INTEGRATOR_DSP_MODE(
                     USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE),
+                .USE_SHARED_PCM_STAGE1_BRAM(
+                    USE_NATIONAL_FINALS_SHARED_PCM_STAGE1_BRAM),
                 .USE_UNIFIED_FIR_COEFF_BRAM(
                     USE_NATIONAL_FINALS_DATAPATH)
             ) u_interp128_all2x_v7_folded_fir_cic_top_ce (
@@ -293,6 +308,12 @@ module demo_interp_dac8_audio_pcm_common #(
                 .ce32_out(ce32_out), .ce64_out(ce64_out),
                 .ce128_out(ce128_out),
                 .x_in(x_in), .x_in_valid(x_in_valid),
+                .pcm_sample_ce(x_in_update_ce),
+                .pcm_family_48k(family_48k),
+                .pcm_sample_out(shared_pcm_sample_w),
+                .pcm_sample_update(shared_pcm_sample_update_w),
+                .pcm_sample_addr_dbg(shared_pcm_sample_addr_w),
+                .pcm_deadline_miss_dbg(shared_pcm_deadline_miss_w),
                 .y_out(y_out_w), .y_out_valid(y_out_valid_w),
                 .dbg_y2(), .dbg_y2_valid(),
                 .dbg_y4(dbg_y4_w), .dbg_y4_valid(dbg_y4_valid_w),

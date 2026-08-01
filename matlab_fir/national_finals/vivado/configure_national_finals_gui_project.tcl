@@ -11,6 +11,8 @@ set project_src_dir [file join $repo_dir XC7A35T_interp_audio_pcm_wordlen_opt \
     XC7A35T_interp.srcs sources_1 new]
 set signedoff_wrapper [file join $project_src_dir national_finals \
     nf_signedoff_filter_core.v]
+set shared_pcm_stage1 [file join $project_src_dir national_finals \
+    nf_pcm_stage1_shared_ramb18_sdp.v]
 set daily_vector_dir [file join $repo_dir matlab_fir national_finals \
     vectors daily]
 
@@ -32,8 +34,13 @@ open_project $project_file
 set source_set [get_filesets sources_1]
 require_condition [file exists $signedoff_wrapper] \
     "Signed-off wrapper is missing: $signedoff_wrapper"
+require_condition [file exists $shared_pcm_stage1] \
+    "Shared PCM/Stage1 RAM source is missing: $shared_pcm_stage1"
 if {[llength [get_files -quiet -of_objects $source_set $signedoff_wrapper]] == 0} {
     add_files -fileset sources_1 -norecurse $signedoff_wrapper
+}
+if {[llength [get_files -quiet -of_objects $source_set $shared_pcm_stage1]] == 0} {
+    add_files -fileset sources_1 -norecurse $shared_pcm_stage1
 }
 set project_generics [get_property generic $source_set]
 require_generic $project_generics USE_NATIONAL_FINALS_DATAPATH 1
@@ -41,6 +48,7 @@ require_generic $project_generics USE_NATIONAL_FINALS_SERIAL_CIC_COMB 1
 require_generic $project_generics USE_NATIONAL_FINALS_N3_HOLD_EQUIV 1
 require_generic $project_generics USE_PHASE7_UNIFIED_BRAM_STAGE23_HISTORY 1
 require_generic $project_generics USE_NATIONAL_FINALS_SINGLE_BRAM_STAGE1 1
+require_generic $project_generics USE_NATIONAL_FINALS_SHARED_PCM_STAGE1_BRAM 1
 require_generic $project_generics USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER 1
 require_generic $project_generics USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE 2
 require_generic $project_generics USE_NATIONAL_FINALS_NARROW_STAGE23 1

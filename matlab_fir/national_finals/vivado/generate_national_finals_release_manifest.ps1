@@ -2,7 +2,11 @@
 param(
     [ValidatePattern('^[A-Za-z0-9_-]+$')]
     [string]$ResultTag = 'p4d_release_closure_4dsp',
-    [string]$OutputName = 'release_manifest_p4d.json'
+    [string]$OutputName = 'release_manifest_p4d.json',
+    [string]$ConfigId = 'NF-P4D-479LUT-468FF-4DSP-2BRAM-2MMCM',
+    [int]$RegressionCaseCount = 15,
+    [ValidateSet(0, 1)]
+    [int]$SharedPcmStage1Bram = 0
 )
 
 $ErrorActionPreference = 'Stop'
@@ -63,6 +67,8 @@ $canonicalPaths = @(
     'XC7A35T_interp_audio_pcm_wordlen_opt\XC7A35T_interp.srcs\sources_1\new\board_demo_competition_dac8_top.v',
     'XC7A35T_interp_audio_pcm_wordlen_opt\XC7A35T_interp.srcs\sources_1\new\all2x_v7\interp128_all2x_v7_folded_fir_cic_top_ce.v',
     'XC7A35T_interp_audio_pcm_wordlen_opt\XC7A35T_interp.srcs\sources_1\new\national_finals\nf_signedoff_filter_core.v',
+    'XC7A35T_interp_audio_pcm_wordlen_opt\XC7A35T_interp.srcs\sources_1\new\national_finals\nf_pcm_stage1_shared_ramb18_sdp.v',
+    'XC7A35T_interp_audio_pcm_wordlen_opt\XC7A35T_interp.srcs\sim_1\new\national_finals\tb_nf_pcm_stage1_shared_ramb18.v',
     'XC7A35T_interp_audio_pcm_wordlen_opt\XC7A35T_interp.srcs\sim_1\new\all2x_v7\verification\tb_phase7_full_chain_bittrue.v',
     'matlab_fir\national_finals\nf_04_generate_release_vectors.m',
     'matlab_fir\national_finals\sim\run_national_finals_rtl_regression.ps1',
@@ -93,7 +99,7 @@ $commit = (& git -C $repoRoot rev-parse HEAD).Trim()
 $trackedStatus = (& git -C $repoRoot status --porcelain --untracked-files=no) -join "`n"
 $manifest = [ordered]@{
     schema = 'national-finals-release-manifest-v1'
-    config_id = 'NF-P4D-479LUT-468FF-4DSP-2BRAM-2MMCM'
+    config_id = $ConfigId
     generated_utc = (Get-Date).ToUniversalTime().ToString('o')
     tool = [ordered]@{ name = 'Vivado'; version = '2018.3'; build = '2405991'; part = 'xc7a35tfgg484-2' }
     git = [ordered]@{ branch = $branch; commit = $commit; tracked_worktree_dirty = -not [string]::IsNullOrWhiteSpace($trackedStatus) }
@@ -104,6 +110,7 @@ $manifest = [ordered]@{
         serial_cic_comb = 1
         unified_stage23_history = 1
         single_bram_stage1 = 1
+        shared_pcm_stage1_bram = $SharedPcmStage1Bram
         unified_fir_coefficient_bram = 1
         packed_stage23_bram = 0
     }
@@ -111,7 +118,7 @@ $manifest = [ordered]@{
         slice_lut = [int](Get-RegexNumber $utilizationText '^\| Slice LUTs\s*\|\s*([0-9]+)' 'LUT count')
         slice_ff = [int](Get-RegexNumber $utilizationText '^\| Slice Registers\s*\|\s*([0-9]+)' 'FF count')
         dsp48e1 = [int](Get-RegexNumber $utilizationText '^\| DSPs\s*\|\s*([0-9]+)' 'DSP count')
-        bram_tile = [int](Get-RegexNumber $utilizationText '^\| Block RAM Tile\s*\|\s*([0-9]+)' 'BRAM count')
+        bram_tile = Get-RegexNumber $utilizationText '^\| Block RAM Tile\s*\|\s*([0-9.]+)' 'BRAM count'
         mmcm = [int](Get-RegexNumber $utilizationText '^\| MMCME2_ADV\s*\|\s*([0-9]+)' 'MMCM count')
     }
     timing_post_route_ns = [ordered]@{
@@ -128,10 +135,10 @@ $manifest = [ordered]@{
         static = Get-RegexNumber $powerText '^\| Device Static \(W\)\s*\|\s*([0-9.]+)' 'static power'
     }
     verification = [ordered]@{
-        smoke = [ordered]@{ result = 'PASS'; cases = '15/15'; full_chain = 'impulse + 1 seed x 1024'; log = $smokeLog.FullName.Substring($repoRoot.Length + 1).Replace('\', '/') }
-        release = [ordered]@{ result = 'PASS'; cases = '15/15'; full_chain = 'impulse + 10 seeds x 4096; 4x/8x/128x all 0 LSB'; log = $releaseLog.FullName.Substring($repoRoot.Length + 1).Replace('\', '/') }
+        smoke = [ordered]@{ result = 'PASS'; cases = "$RegressionCaseCount/$RegressionCaseCount"; full_chain = 'impulse + 1 seed x 1024'; log = $smokeLog.FullName.Substring($repoRoot.Length + 1).Replace('\', '/') }
+        release = [ordered]@{ result = 'PASS'; cases = "$RegressionCaseCount/$RegressionCaseCount"; full_chain = 'impulse + 10 seeds x 4096; 4x/8x/128x all 0 LSB'; log = $releaseLog.FullName.Substring($repoRoot.Length + 1).Replace('\', '/') }
         gui_behavioral = 'PASS: impulse + seed01, 0 LSB'
-        gui_implementation = 'PASS: bitstream and 479/468/4/4xRAMB18/2 resources'
+        gui_implementation = 'PASS: bitstream and resource guards verified by GUI project script'
     }
     reviewed_warnings = @(
         'TIMING-18: Vivado 2018.3 methodology warning retained; check_timing reports zero ports missing output delay and both generated-clock max/min delays are present.',

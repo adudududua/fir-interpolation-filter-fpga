@@ -19,7 +19,10 @@ module interp2_stage1_single_bram_serial_ce #(
     parameter integer PAIR_COUNT  = `V3_S1_PAIR_COUNT,
     parameter integer DELAY_INDEX = `V3_S1_DELAY_INDEX,
     parameter integer USE_DSP48_PREADDER = 0,
-    parameter integer USE_EXTERNAL_COEFF_BRAM = 0
+    parameter integer USE_EXTERNAL_COEFF_BRAM = 0,
+    parameter integer USE_SHARED_PCM_BRAM = 0,
+    parameter SHARED_PCM_MEM_FILE =
+        "nf_sine_15k_dual_rate_24bit_256.mem"
 )(
     input  wire                         clk,
     input  wire                         rst_n,
@@ -32,7 +35,13 @@ module interp2_stage1_single_bram_serial_ce #(
     output wire signed [DATA_W-1:0]     fir_in_dbg,
     output wire                         fir_in_valid_dbg,
     output wire [4:0]                   external_coeff_addr,
-    input  wire signed [15:0]           external_coeff_data
+    input  wire signed [15:0]           external_coeff_data,
+    input  wire                         pcm_sample_ce,
+    input  wire                         pcm_family_48k,
+    output wire signed [23:0]           pcm_sample_out,
+    output wire                         pcm_sample_update,
+    output wire [7:0]                   pcm_sample_addr_dbg,
+    output wire                         pcm_deadline_miss_dbg
 );
 
     localparam integer ADDR_W = 6;
@@ -99,17 +108,47 @@ module interp2_stage1_single_bram_serial_ce #(
     assign fir_in_valid_dbg = ce_out && (phase_cnt == 1'b0);
     assign external_coeff_addr = issue_index;
 
-    nf_stage1_history_ramb18_sdp #(
-        .DATA_W(DATA_W),
-        .ADDR_W(ADDR_W)
-    ) u_nf_stage1_history_ramb18_sdp (
-        .clk(clk),
-        .read_addr(read_addr),
-        .read_data(read_data),
-        .write_enable(rst_n && ce_out && phase_cnt == 1'b0),
-        .write_addr(wr_ptr),
-        .write_data(x_current)
-    );
+    generate
+        if (USE_SHARED_PCM_BRAM != 0) begin : gen_shared_pcm_bram
+            nf_pcm_stage1_shared_ramb18_sdp #(
+                .MEM_FILE(SHARED_PCM_MEM_FILE)
+            ) u_nf_pcm_stage1_shared_ramb18_sdp (
+                .clk(clk),
+                .rst_n(rst_n),
+                .history_read_enable(read_issue_valid),
+                .history_read_addr(read_addr),
+                .history_read_data(read_data),
+                .history_write_enable(
+                    rst_n && ce_out && phase_cnt == 1'b0),
+                .history_write_addr(wr_ptr),
+                .history_write_data(x_current),
+                .pcm_sample_ce(pcm_sample_ce),
+                .family_48k(pcm_family_48k),
+                .pcm_sample_out(pcm_sample_out),
+                .pcm_sample_update(pcm_sample_update),
+                .pcm_sample_addr_dbg(pcm_sample_addr_dbg),
+                .pcm_deadline_miss_dbg(pcm_deadline_miss_dbg),
+                .pcm_request_pending_dbg()
+            );
+        end
+        else begin : gen_separate_history_bram
+            nf_stage1_history_ramb18_sdp #(
+                .DATA_W(DATA_W),
+                .ADDR_W(ADDR_W)
+            ) u_nf_stage1_history_ramb18_sdp (
+                .clk(clk),
+                .read_addr(read_addr),
+                .read_data(read_data),
+                .write_enable(rst_n && ce_out && phase_cnt == 1'b0),
+                .write_addr(wr_ptr),
+                .write_data(x_current)
+            );
+            assign pcm_sample_out = 24'sd0;
+            assign pcm_sample_update = 1'b0;
+            assign pcm_sample_addr_dbg = 8'd0;
+            assign pcm_deadline_miss_dbg = 1'b0;
+        end
+    endgenerate
 
     assign dsp_preadd_a =
         {{(25-DATA_W){left_sample[DATA_W-1]}}, left_sample};

@@ -66,6 +66,7 @@ set nf_sources [list \
     [file join $nf_src_dir nf_signedoff_filter_core.v] \
     [file join $nf_src_dir nf_unified_fir_coeff_bram.v] \
     [file join $nf_src_dir nf_stage1_history_ramb18_sdp.v] \
+    [file join $nf_src_dir nf_pcm_stage1_shared_ramb18_sdp.v] \
     [file join $nf_src_dir interp2_stage1_single_bram_serial_ce.v] \
     [file join $nf_src_dir nf_stage23_history_ramb18_sdp.v] \
     [file join $nf_src_dir cic3_compensator_shiftadd_ce.v] \
@@ -133,6 +134,7 @@ set_property generic [list \
     USE_PHASE7_BRAM_STAGE23_HISTORY=1 \
     USE_PHASE7_UNIFIED_BRAM_STAGE23_HISTORY=1 \
     USE_NATIONAL_FINALS_SINGLE_BRAM_STAGE1=1 \
+    USE_NATIONAL_FINALS_SHARED_PCM_STAGE1_BRAM=1 \
     USE_PHASE7_BRAM_STAGE23_COEFF=1 \
     USE_PHASE8_PACKED_BRAM_STAGE23=0 \
     USE_PHASE7_CIC_BURST_COUNTER_DSP=0 \

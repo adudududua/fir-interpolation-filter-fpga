@@ -39,7 +39,10 @@ module tb_stage1_single_bram_equiv;
         .x_in(x_in), .x_in_valid(1'b1),
         .y_out(candidate_y), .y_out_valid(candidate_valid),
         .phase_dbg(), .fir_in_dbg(), .fir_in_valid_dbg(),
-        .external_coeff_addr(), .external_coeff_data(16'sd0)
+        .external_coeff_addr(), .external_coeff_data(16'sd0),
+        .pcm_sample_ce(1'b0), .pcm_family_48k(1'b0),
+        .pcm_sample_out(), .pcm_sample_update(),
+        .pcm_sample_addr_dbg(), .pcm_deadline_miss_dbg()
     );
 
     initial begin

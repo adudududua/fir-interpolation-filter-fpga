@@ -194,10 +194,23 @@ $historyPrimitiveDir = Invoke-RtlCase -Name 'history_ramb18_primitive' `
     -ExpectedPassText 'HISTORY RAMB18 PRIMITIVE PASS: Stage1 64x24 and Stage2/3 32x22, sweep=128 random=5000' `
     -XelabOptions @('glbl', '-L', 'unisims_ver')
 
+$pcmStage1SharedDir = Invoke-RtlCase -Name 'pcm_stage1_shared_ramb18' `
+    -VerilogFiles @(
+        (Join-Path $nfSource 'nf_pcm_stage1_shared_ramb18_sdp.v'),
+        (Join-Path $nfSim 'tb_nf_pcm_stage1_shared_ramb18.v'),
+        $glbl
+    ) `
+    -Top 'tb_nf_pcm_stage1_shared_ramb18' `
+    -Snapshot 'tb_nf_pcm_stage1_shared_sim' `
+    -ExpectedPassText 'PCM/STAGE1 SHARED RAMB18 PASS' `
+    -XelabOptions @('glbl', '-L', 'unisims_ver') `
+    -Assets @((Join-Path $nfSource 'nf_sine_15k_dual_rate_24bit_256.mem'))
+
 $stage1SingleBramDir = Invoke-RtlCase -Name 'stage1_single_bram_equivalence' `
     -VerilogFiles @(
         (Join-Path $sourceRoot 'all2x_v3\interp2_stage1_strict_halfband_bram_ce.v'),
         (Join-Path $nfSource 'nf_stage1_history_ramb18_sdp.v'),
+        (Join-Path $nfSource 'nf_pcm_stage1_shared_ramb18_sdp.v'),
         (Join-Path $nfSource 'interp2_stage1_single_bram_serial_ce.v'),
         (Join-Path $nfSim 'tb_stage1_single_bram_equiv.v'),
         $glbl
@@ -305,6 +318,7 @@ $fullDir = Invoke-RtlCase -Name 'full_chain_bittrue' `
         (Join-Path $sourceRoot 'all2x_v6\round_sat_shift_compact.v'),
         (Join-Path $sourceRoot 'all2x_v3\interp2_stage1_strict_halfband_bram_ce.v'),
         (Join-Path $nfSource 'nf_stage1_history_ramb18_sdp.v'),
+        (Join-Path $nfSource 'nf_pcm_stage1_shared_ramb18_sdp.v'),
         (Join-Path $nfSource 'interp2_stage1_single_bram_serial_ce.v'),
         (Join-Path $sourceRoot 'all2x_v6\bridge_valid_quantized_to_interp2_ce.v'),
         (Join-Path $sourceRoot 'all2x_v5\round_sat_q15_compact_to24.v'),
@@ -326,13 +340,16 @@ $fullDir = Invoke-RtlCase -Name 'full_chain_bittrue' `
     -ExpectedPassText $fullChainPassText `
     -XvlogOptions $fullChainXvlogOptions `
     -XelabOptions @('glbl', '-L', 'unisims_ver') `
-    -Assets (@($coeffHeader) + $vectorFiles)
+    -Assets (@($coeffHeader,
+        (Join-Path $nfSource 'nf_sine_15k_dual_rate_24bit_256.mem')) +
+        $vectorFiles)
 
 $resetDir = Invoke-RtlCase -Name 'full_chain_reset_recovery' `
     -VerilogFiles @(
         (Join-Path $sourceRoot 'all2x_v6\round_sat_shift_compact.v'),
         (Join-Path $sourceRoot 'all2x_v3\interp2_stage1_strict_halfband_bram_ce.v'),
         (Join-Path $nfSource 'nf_stage1_history_ramb18_sdp.v'),
+        (Join-Path $nfSource 'nf_pcm_stage1_shared_ramb18_sdp.v'),
         (Join-Path $nfSource 'interp2_stage1_single_bram_serial_ce.v'),
         (Join-Path $sourceRoot 'all2x_v6\bridge_valid_quantized_to_interp2_ce.v'),
         (Join-Path $sourceRoot 'all2x_v5\round_sat_q15_compact_to24.v'),
@@ -353,13 +370,15 @@ $resetDir = Invoke-RtlCase -Name 'full_chain_reset_recovery' `
     -ExpectedPassText 'PHASE7 FULL RESET RECOVERY PASS: 8 internal-state scenarios clean.' `
     -XvlogOptions $signedOffFullChainXvlogOptions `
     -XelabOptions @('glbl', '-L', 'unisims_ver') `
-    -Assets @($coeffHeader)
+    -Assets @($coeffHeader,
+        (Join-Path $nfSource 'nf_sine_15k_dual_rate_24bit_256.mem'))
 
 $dynamicDir = Invoke-RtlCase -Name 'dynamic_mode_switch' `
     -VerilogFiles @(
         (Join-Path $sourceRoot 'all2x_v6\round_sat_shift_compact.v'),
         (Join-Path $sourceRoot 'all2x_v3\interp2_stage1_strict_halfband_bram_ce.v'),
         (Join-Path $nfSource 'nf_stage1_history_ramb18_sdp.v'),
+        (Join-Path $nfSource 'nf_pcm_stage1_shared_ramb18_sdp.v'),
         (Join-Path $nfSource 'interp2_stage1_single_bram_serial_ce.v'),
         (Join-Path $sourceRoot 'all2x_v6\bridge_valid_quantized_to_interp2_ce.v'),
         (Join-Path $sourceRoot 'all2x_v5\round_sat_q15_compact_to24.v'),
@@ -400,5 +419,5 @@ if ($PublishImpulseOutputs) {
 }
 
 Write-Host ''
-Write-Host 'NATIONAL FINALS RTL REGRESSION PASS (15/15)'
+Write-Host 'NATIONAL FINALS RTL REGRESSION PASS (16/16)'
 Write-Host "Run directory: $runRoot"

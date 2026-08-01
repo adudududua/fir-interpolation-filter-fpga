@@ -35,6 +35,7 @@ require_generic $project_generics USE_NATIONAL_FINALS_SERIAL_CIC_COMB 1
 require_generic $project_generics USE_NATIONAL_FINALS_N3_HOLD_EQUIV 1
 require_generic $project_generics USE_PHASE7_UNIFIED_BRAM_STAGE23_HISTORY 1
 require_generic $project_generics USE_NATIONAL_FINALS_SINGLE_BRAM_STAGE1 1
+require_generic $project_generics USE_NATIONAL_FINALS_SHARED_PCM_STAGE1_BRAM 1
 require_generic $project_generics USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER 1
 require_generic $project_generics USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE 2
 require_generic $project_generics USE_NATIONAL_FINALS_NARROW_STAGE23 1
@@ -77,6 +78,8 @@ set stage1_history_file [get_files -quiet \
     "*national_finals/nf_stage1_history_ramb18_sdp.v"]
 set stage1_serial_file [get_files -quiet \
     "*national_finals/interp2_stage1_single_bram_serial_ce.v"]
+set shared_pcm_stage1_file [get_files -quiet \
+    "*national_finals/nf_pcm_stage1_shared_ramb18_sdp.v"]
 require_condition [expr {[llength $serial_cic_file] == 1}] \
     "Serial-comb CIC source is not registered exactly once in sources_1."
 require_condition [expr {[llength $n3_hold_cic_file] == 1}] \
@@ -87,6 +90,8 @@ require_condition [expr {[llength $stage1_history_file] == 1}] \
     "Stage1 history RAMB18 source is not registered exactly once."
 require_condition [expr {[llength $stage1_serial_file] == 1}] \
     "Stage1 serialized-read source is not registered exactly once."
+require_condition [expr {[llength $shared_pcm_stage1_file] == 1}] \
+    "Shared PCM/Stage1 RAMB18 source is not registered exactly once."
 
 set gui_resource_sharing [string tolower [get_property \
     STEPS.SYNTH_DESIGN.ARGS.RESOURCE_SHARING [get_runs synth_1]]]
@@ -149,14 +154,14 @@ if {[get_property PROGRESS [get_runs impl_1]] eq "100%"} {
 
     require_condition [expr {$dsp_count == 4}] \
         "GUI implementation is not the P4-D 4-DSP architecture."
-    require_condition [expr {$bram18_count == 4}] \
-        "GUI implementation does not use the expected two BRAM tiles."
+    require_condition [expr {$bram18_count == 3}] \
+        "GUI implementation does not use the expected three RAMB18 blocks."
     require_condition [expr {$mmcm_count == 2}] \
         "GUI implementation does not use the expected two MMCMs."
     require_condition [expr {$lut_count <= 500}] \
-        "GUI implementation exceeds the signed-off 500-LUT P4-D guard."
+        "GUI implementation exceeds the 500-LUT P4-E guard."
     require_condition [expr {$ff_count <= 490}] \
-        "GUI implementation exceeds the signed-off 490-FF P4-D guard."
+        "GUI implementation exceeds the 490-FF P4-E guard."
 
     puts "NATIONAL_FINALS_GUI_IMPLEMENTATION_PASS"
     close_design
