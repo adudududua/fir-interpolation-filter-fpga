@@ -130,9 +130,19 @@ module tb_phase7_full_chain_reset_recovery;
         .USE_SERIAL_CIC_COMB(0),
 `endif
 `ifdef NATIONAL_FINALS_USE_N3_HOLD
-        .USE_N3_HOLD_EQUIV(1)
+        .USE_N3_HOLD_EQUIV(1),
 `else
-        .USE_N3_HOLD_EQUIV(0)
+        .USE_N3_HOLD_EQUIV(0),
+`endif
+`ifdef NATIONAL_FINALS_USE_STAGE1_DSP48_PREADDER
+        .USE_STAGE1_DSP48_PREADDER(1),
+`else
+        .USE_STAGE1_DSP48_PREADDER(0),
+`endif
+`ifdef NATIONAL_FINALS_UNIFIED_STAGE23_HISTORY
+        .ASSUME_ALIGNED_POW2_CE(1)
+`else
+        .ASSUME_ALIGNED_POW2_CE(0)
 `endif
     ) u_dut (
         .clk(clk), .rst_n(rst_dut_n),
@@ -197,9 +207,19 @@ module tb_phase7_full_chain_reset_recovery;
         .USE_SERIAL_CIC_COMB(0),
 `endif
 `ifdef NATIONAL_FINALS_USE_N3_HOLD
-        .USE_N3_HOLD_EQUIV(1)
+        .USE_N3_HOLD_EQUIV(1),
 `else
-        .USE_N3_HOLD_EQUIV(0)
+        .USE_N3_HOLD_EQUIV(0),
+`endif
+`ifdef NATIONAL_FINALS_USE_STAGE1_DSP48_PREADDER
+        .USE_STAGE1_DSP48_PREADDER(1),
+`else
+        .USE_STAGE1_DSP48_PREADDER(0),
+`endif
+`ifdef NATIONAL_FINALS_UNIFIED_STAGE23_HISTORY
+        .ASSUME_ALIGNED_POW2_CE(1)
+`else
+        .ASSUME_ALIGNED_POW2_CE(0)
 `endif
     ) u_cold_reference (
         .clk(clk), .rst_n(rst_ref_n),

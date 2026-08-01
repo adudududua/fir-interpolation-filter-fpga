@@ -21,6 +21,9 @@ module nf_mode_cdc_handshake #(
     output reg        audio_mute
 );
 
+    localparam integer SETTLE_COUNT_W =
+        (SETTLE_CYCLES < 1) ? 1 : $clog2(SETTLE_CYCLES + 1);
+
     reg [1:0] mode_shadow = 2'b11;
     reg       req_toggle = 1'b0;
     (* ASYNC_REG = "TRUE" *) reg ack_meta = 1'b0;
@@ -31,7 +34,7 @@ module nf_mode_cdc_handshake #(
     (* ASYNC_REG = "TRUE" *) reg req_sync = 1'b0;
     reg       req_seen = 1'b0;
     reg       transfer_pending = 1'b1;
-    reg [1:0] settle_count = 2'd3;
+    reg [SETTLE_COUNT_W-1:0] settle_count = SETTLE_CYCLES;
 
     assign ctrl_busy = (req_toggle != ack_sync);
 
@@ -74,8 +77,8 @@ module nf_mode_cdc_handshake #(
 
             if (transfer_pending) begin
                 audio_mute <= 1'b1;
-                if (settle_count != 2'd0)
-                    settle_count <= settle_count - 2'd1;
+                if (settle_count != {SETTLE_COUNT_W{1'b0}})
+                    settle_count <= settle_count - 1'b1;
                 else begin
                     audio_mode <= mode_shadow;
                     req_seen <= req_sync;

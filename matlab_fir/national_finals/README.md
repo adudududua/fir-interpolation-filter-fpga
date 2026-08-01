@@ -1,8 +1,8 @@
 # 全国总决赛：双采样率可配置插值滤波器
 
-当前 P4-B 候选已完成 MATLAB 建模、24 bit 定点模型、14 项 XSim 回归、Vivado 综合/布局布线/时序/DRC/CDC/功耗评估和 bitstream 生成。所有可在当前环境执行的软件与 FPGA 工具验收均已通过；由于当前环境无法接触实物开发板，物理板下载和仪器测量仍需按本文最后一节执行，不能把 bitstream 成功等同于实板通过。
+当前 P4-C 候选已完成 MATLAB 建模、24 bit 定点模型、15 项 XSim 回归、Vivado 综合/布局布线/时序/DRC/CDC/功耗评估和 bitstream 生成。默认最低 LUT/FF 档为 **479 LUT / 468 FF / 198 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM**；同源 3-DSP、2-DSP 档也均完成实现与 bitstream。所有可在当前环境执行的软件与 FPGA 工具验收均已通过；由于当前环境无法接触实物开发板，物理板下载和仪器测量仍需按本文最后一节执行，不能把 bitstream 成功等同于实板通过。
 
-当前可发布 Pareto 点为 P3 `462 LUT / 447 FF / 5 DSP / 3 BRAM Tile`、P4-A `491 LUT / 444 FF / 4 DSP / 3 BRAM Tile` 和 P4-B `504 LUT / 493 FF / 4 DSP / 2 BRAM Tile`。三版均继承 P1 真 Q15 修复和 P3 的原子 CDC、同步复位、AD9708 输出时序闭环。复核发现旧 Route 1 `424 LUT / 6 DSP` 与低 DSP `436 LUT / 5 DSP` 的 Stage 3 系数实际为 Q14 幅度、MAC 却按 Q15 右移，导致 8x/128x 绝对增益约为 -6.02 dB；这些旧版本只保留为资源演进历史，不再作为发布候选。指导评估、阶段进度和回退规则见 [下一阶段优化指导执行记录](results/next_stage_optimization_guide_execution.md)。
+当前可发布 Pareto 点为 P3 `462 LUT / 447 FF / 5 DSP / 3 BRAM Tile`、P4-A `491 LUT / 444 FF / 4 DSP / 3 BRAM Tile`，以及 P4-C 的 `479 LUT / 4 DSP`、`504 LUT / 3 DSP`、`523 LUT / 2 DSP` 三档（均为 2 BRAM Tile）。这些版本均继承 P1 真 Q15 修复和 P3 的原子 CDC、同步复位、AD9708 输出时序闭环。复核发现旧 Route 1 `424 LUT / 6 DSP` 与低 DSP `436 LUT / 5 DSP` 的 Stage 3 系数实际为 Q14 幅度、MAC 却按 Q15 右移，导致 8x/128x 绝对增益约为 -6.02 dB；这些旧版本只保留为资源演进历史，不再作为发布候选。前一份指导的完整执行记录见 [P0～P4 执行反馈](results/next_stage_optimization_guide_execution.md)，本轮指导的逐项判断和实测见 [P4-B RTL 下一阶段指导执行反馈](results/p4b_rtl_next_optimization_guide_execution.md)。
 
 ## 0. P1：Stage 3 真 Q15 与绝对增益闭环
 
@@ -35,6 +35,22 @@ P4-B 保持 P4-A 的 4-DSP N3 Hold 数值路径，只优化历史存储。Stage 
 完整回归为 **14/14 PASS**：Stage 1 新旧核 1400 输出 0 LSB、Stage 2/3 分别 336/671 输出 0 LSB、N3 Hold 7680 输出 0 LSB，并通过全链随机/冲激、8 种内部状态复位、1200 次原子 CDC、100 次家族切换和 10 次不停机倍率切换。post-route 为 **504 LUT / 493 FF / 202 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM / 17 IO**，WNS/WHS **+45.637/+0.119 ns**，功耗 **0.271 W**，bitstream SHA-256 为 `DA0665E43A8DA5230AB93FC786AB0EED47BD83FE393C9B1416BA3360B8DE5E85`。
 
 相对 P4-A，P4-B 多 13 LUT、49 FF 和 5 Slice，少 1 BRAM Tile；因此 P4-A 与 P4-B 分别作为低 LUT/FF 与低 BRAM 的 4-DSP 回退点保留。详细证据见 [P4-B 单 BRAM 签核](results/p4b_single_bram_4dsp_summary.md)。
+
+## P4-C：固定 CE 精简、DSP48 预加器与 26/29-bit CIC
+
+P4-C 不改变 FIR/CIC 传递函数、系数、舍入、饱和或输出 valid 序列，完成三项严格等价优化。第一，证明全国赛连续 2 的幂 CE 下 Stage2 与 Stage3 的 phase0 历史写集合不相交，仅在板级签核配置删除不可达的 25-bit 待写队列；通用模块默认仍保留队列。第二，在当前 Stage1 单 BRAM 串行核上重新 A/B，DSP48E1 `D+A` 预加器比 LUT 对称加法再减少 7 个综合 LUT。第三，把 N3 Hold CIC 的两个保守 33-bit 状态按解析界收紧为 26/29 bit，并提供全机 4/3/2-DSP 三档。
+
+同时修复了 48 kHz 家族切换后首个 ROM 地址可能错误的问题、`SETTLE_CYCLES>3` 的 CDC 计数器截断问题，并把 GUI `sim_1` 的顶层和宏锁定到签核结构。历史 RAMB18 新增 primitive-vs-behavioral 独立对拍；最终 XSim 为 **15/15 PASS**。
+
+| P4-C 档位 | LUT | FF | Slice | DSP | BRAM Tile | MMCM | WNS/WHS | 功耗估计 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| 默认低 LUT/FF | **479** | **468** | **198** | **4** | 2 | 2 | +45.734/+0.121 ns | 0.271 W |
+| 低 DSP-A | 504 | 494 | 198 | 3 | 2 | 2 | +45.853/+0.121 ns | 0.271 W |
+| 低 DSP-B | 523 | 523 | 197 | 2 | 2 | 2 | +45.802/+0.121 ns | 0.270 W |
+
+相对 P4-B，默认档减少 **25 LUT、25 FF、4 Slice**，DSP/BRAM/MMCM 不变；3-DSP 档以 `+25 LUT/+26 FF` 换 1 DSP，2-DSP 档以 `+44 LUT/+55 FF` 换 2 DSP。功耗是无 SAIF 的 vectorless 估算，0.001 W 差异不能当作实物省电结论。默认 bitstream SHA-256 为 `814465320512830C98D0EDA5352D36797BF5C442CD27E3520B5B89601F1C52D3`。
+
+本轮 MATLAB 直接分析当前 RTL 发布的 impulse CSV，六工况通带、阻带、绝对增益和严格线性相位全部 PASS；详细证明、策略扫描、三档 SHA 和未执行项见 [P4-C 指导执行反馈](results/p4b_rtl_next_optimization_guide_execution.md)。
 
 ## 0.1 Route 1：统一双端口系数 RAM（历史资源点）
 
@@ -101,7 +117,7 @@ y[n] = x[n-1] + (2*x[n-1] - x[n] - x[n-2]) / 8
 
 它仅用加减和算术右移，不增加乘法器；4x/8x 输出保持平坦 FIR 响应。双采样率板级测试正弦也打包在同一个 256×24 bit ROM 中。
 
-第七轮434-LUT基线布局布线后为 **434 LUT / 469 FF / 190 Slice / 6 DSP / 3 BRAM / 2 MMCM**。相对最初指定的573 LUT / 621 FF / 255 Slice / 6 DSP CIC基线，减少139 LUT、152 FF和65 Slice；Route 1和第八轮是后续历史资源点。完成 P1 标度修复和 P3 工程闭环后，P4-A 以 N3 Hold 降至4 DSP，P4-B 再把历史存储从3降至2 BRAM Tile；当前 post-route 为 **504 LUT / 493 FF / 202 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM**。
+第七轮434-LUT基线布局布线后为 **434 LUT / 469 FF / 190 Slice / 6 DSP / 3 BRAM / 2 MMCM**。相对最初指定的573 LUT / 621 FF / 255 Slice / 6 DSP CIC基线，减少139 LUT、152 FF和65 Slice；Route 1和第八轮是后续历史资源点。完成 P1 标度修复和 P3 工程闭环后，P4-A 以 N3 Hold 降至4 DSP，P4-B 再把历史存储从3降至2 BRAM Tile；P4-C 删除板级不可达队列、启用当前结构有效的 DSP48 预加器并收紧 CIC 状态，当前默认 post-route 为 **479 LUT / 468 FF / 198 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM**。
 
 ### 2.1 第七轮434-LUT基线优化方法
 
@@ -341,7 +357,7 @@ SHA-256：`49DF03B71C6D73A73EE282A5D1EEE0D9F5EB91ADDB96879ACBA381F0D999D47C`
 - `ResourceSharing=on`
 - `opt_design Directive=Default`
 
-第五轮用普通工程 `synth_1/impl_1` 从头重建得到 440 LUT / 464 FF；第七轮在同一工程配置和更新后的 RTL 上从头重建为 **434 LUT / 469 FF / 6 DSP / 3 BRAM Tile / 2 MMCM**。随后 comb-LUT 历史版为 **436 LUT / 471 FF / 5 DSP / 3 BRAM Tile / 2 MMCM**。当前 XPR 已进一步固定 N3 Hold、Stage 1 单 RAM 和 Stage 2/3 统一历史，普通工程从头实现为 **504 LUT / 493 FF / 4 DSP / 2 BRAM Tile / 2 MMCM**，与独立签核流程一致。可用以下命令检查配置并重建：
+第五轮用普通工程 `synth_1/impl_1` 从头重建得到 440 LUT / 464 FF；第七轮在同一工程配置和更新后的 RTL 上从头重建为 **434 LUT / 469 FF / 6 DSP / 3 BRAM Tile / 2 MMCM**。随后 comb-LUT 历史版为 **436 LUT / 471 FF / 5 DSP / 3 BRAM Tile / 2 MMCM**。当前 XPR 已进一步固定 N3 Hold、Stage 1 单 RAM、Stage 2/3 统一历史、Stage1 DSP48 预加器和 CIC 4-DSP 默认映射，正式签核为 **479 LUT / 468 FF / 4 DSP / 2 BRAM Tile / 2 MMCM**。可用以下命令检查配置并重建：
 
 ```powershell
 vivado.bat -mode batch -source `
@@ -370,7 +386,14 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
   -Step all
 ```
 
-包装脚本先执行面积优化综合，再以低内存单进程完成布局布线、报告和 bitstream。默认实现指令是本轮复核后的 `Default`；P4-B 正式结果目录为 `vivado_results/board_dual_rate_p4b2_bram2_v1`，P4-A、P3、Route 1、第五轮 440-LUT 与第六轮低 FF 回退结果仍分别保留在原结果目录。日志与 `.Xil` 均写入 `matlab_fir/national_finals/_work/vivado/<时间戳>`，不会污染项目根目录。
+包装脚本先执行面积优化综合，再以低内存单进程完成布局布线、报告和 bitstream。默认实现指令是本轮复核后的 `Default`；P4-C 三个正式目录为 `vivado_results/p4c_signed_479lut_468ff_4dsp_2bram`、`p4c_signed_3dsp_2bram` 和 `p4c_signed_2dsp_2bram`，P4-B、P4-A、P3、Route 1及此前回退结果仍保留。日志与 `.Xil` 均写入 `matlab_fir/national_finals/_work/<tool>/<时间戳>`，不会污染项目根目录。
+
+需要使用 Vivado GUI 时，不要从仓库根目录直接运行 `vivado.bat`，也不要依赖双击 `.xpr` 的当前工作目录。使用以下入口可把 GUI 的 `.Xil`、journal 和 log 隔离到 `national_finals/_work/vivado_gui/<时间戳>`：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
+  .\matlab_fir\national_finals\vivado\open_national_finals_gui_clean.ps1
+```
 
 ## 7. SW1～SW8 与预期 DA_CLK
 

@@ -7,7 +7,8 @@
 // write arbiter commits one history update.
 module nf_stage23_history_ramb18_sdp #(
     parameter integer DATA_W = 22,
-    parameter integer ADDR_W = 5
+    parameter integer ADDR_W = 5,
+    parameter integer SIM_USE_PRIMITIVE = 0
 )(
     input  wire                         clk,
     input  wire [ADDR_W-1:0]            read_addr,
@@ -18,6 +19,13 @@ module nf_stage23_history_ramb18_sdp #(
 );
 
 `ifdef SYNTHESIS
+    localparam integer USE_PRIMITIVE = 1;
+`else
+    localparam integer USE_PRIMITIVE = SIM_USE_PRIMITIVE;
+`endif
+
+generate
+if (USE_PRIMITIVE != 0) begin : gen_primitive
     wire [15:0] doa;
     wire [1:0] dopa;
     wire [15:0] dob;
@@ -60,7 +68,7 @@ module nf_stage23_history_ramb18_sdp #(
     );
 
     assign read_data = {dob[DATA_W-17:0], doa};
-`else
+end else begin : gen_behavioral
     reg signed [DATA_W-1:0] memory [0:(1<<ADDR_W)-1];
     reg signed [DATA_W-1:0] read_data_q;
 
@@ -71,7 +79,8 @@ module nf_stage23_history_ramb18_sdp #(
     end
 
     assign read_data = read_data_q;
-`endif
+end
+endgenerate
 
 `ifndef SYNTHESIS
     initial begin
@@ -79,6 +88,8 @@ module nf_stage23_history_ramb18_sdp #(
             $fatal(1, "Stage2/3 RAMB18 SDP DATA_W must be 17..32");
         if (ADDR_W != 5)
             $fatal(1, "Stage2/3 RAMB18 SDP expects 32 logical words");
+        if (SIM_USE_PRIMITIVE != 0 && SIM_USE_PRIMITIVE != 1)
+            $fatal(1, "SIM_USE_PRIMITIVE must be 0 or 1");
     end
 `endif
 

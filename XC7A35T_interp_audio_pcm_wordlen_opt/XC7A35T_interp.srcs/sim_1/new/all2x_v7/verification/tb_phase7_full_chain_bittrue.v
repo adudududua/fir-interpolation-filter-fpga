@@ -181,9 +181,14 @@ module tb_phase7_full_chain_bittrue;
         .USE_STAGE1_DSP48_PREADDER(0),
 `endif
 `ifdef NATIONAL_FINALS_NARROW_STAGE23
-        .USE_NATIONAL_FINALS_NARROW_STAGE23(1)
+        .USE_NATIONAL_FINALS_NARROW_STAGE23(1),
 `else
-        .USE_NATIONAL_FINALS_NARROW_STAGE23(0)
+        .USE_NATIONAL_FINALS_NARROW_STAGE23(0),
+`endif
+`ifdef NATIONAL_FINALS_UNIFIED_STAGE23_HISTORY
+        .ASSUME_ALIGNED_POW2_CE(1)
+`else
+        .ASSUME_ALIGNED_POW2_CE(0)
 `endif
     ) u_dut (
         .clk(clk), .rst_n(rst_n),

@@ -6,14 +6,18 @@
 //     == comb^2 -> hold each sample for 16 enables -> integrator^2
 //
 // One low-rate comb/high-rate integrator pair is replaced by the exact
-// length-16 hold response.  The full 33-bit modulo width and the original
-// right-shift-by-8 output normalization are retained.
-(* use_dsp = "yes" *)
+// length-16 hold response.  The first integrator has the exact bound
+// 32*max|x| (DATA_W+5 bits); the second integrator is the non-negative
+// triangular interpolation kernel with DC gain 16^2 (DATA_W+8 bits).
+// These widths preserve the original right-shift-by-8 output exactly while
+// avoiding eleven unreachable state bits.  INTEGRATOR_DSP_MODE selects the
+// resource Pareto point: 2=both DSP, 1=first CARRY/final DSP, 0=both CARRY.
 module cic_interp16_n3_hold2_dsp_ce #(
     parameter integer DATA_W = 21,
     parameter integer OUTPUT_W = 20,
     parameter integer FINAL_PRUNE_LSB = 0,
-    parameter integer BURST_COUNTER_USE_DSP = 0
+    parameter integer BURST_COUNTER_USE_DSP = 0,
+    parameter integer INTEGRATOR_DSP_MODE = 2
 )(
     input  wire                         clk,
     input  wire                         rst_n,
@@ -29,10 +33,11 @@ module cic_interp16_n3_hold2_dsp_ce #(
 
     localparam integer CIC_ORDER = 3;
     localparam integer RATE_LOG2 = 4;
-    localparam integer FULL_W = DATA_W + CIC_ORDER*RATE_LOG2;
+    localparam integer LEGACY_FULL_W = DATA_W + CIC_ORDER*RATE_LOG2;
     localparam integer COMB_W = DATA_W + 2;
     localparam integer COMB_DELAY_W = DATA_W + 1;
-    localparam integer FINAL_W = FULL_W - FINAL_PRUNE_LSB;
+    localparam integer FIRST_INT_W = DATA_W + 5;
+    localparam integer FINAL_W = DATA_W + 8 - FINAL_PRUNE_LSB;
     localparam integer OUTPUT_SHIFT =
         (CIC_ORDER-1)*RATE_LOG2 - FINAL_PRUNE_LSB;
 
@@ -49,7 +54,7 @@ module cic_interp16_n3_hold2_dsp_ce #(
 
     // One hidden high-rate integrator plus the externally visible final
     // integrator gives the two integrators required after the Hold16 block.
-    reg signed [FULL_W-1:0] integrator_state;
+    reg signed [FIRST_INT_W-1:0] integrator_state;
     reg signed [FINAL_W-1:0] final_integrator_state;
 
     reg burst_pending;
@@ -60,8 +65,8 @@ module cic_interp16_n3_hold2_dsp_ce #(
     (* use_dsp = "no" *) wire signed [COMB_W-1:0] comb_stage_result;
     wire output_event;
     wire first_output_event;
-    wire signed [FULL_W-1:0] high_rate_input;
-    wire signed [FULL_W-1:0] integrator_next;
+    wire signed [FIRST_INT_W-1:0] high_rate_input;
+    wire signed [FIRST_INT_W-1:0] integrator_next;
     wire signed [FINAL_W-1:0] final_input_rounded;
     wire signed [FINAL_W-1:0] final_integrator_next;
     wire signed [OUTPUT_W-1:0] normalized_output;
@@ -82,11 +87,40 @@ module cic_interp16_n3_hold2_dsp_ce #(
     // hold burst has finished.  Keep hold_sample as the active burst value
     // and use comb_operand only on the first output of the next burst.
     assign high_rate_input = first_output_event ?
-        {{(FULL_W-COMB_W){comb_operand[COMB_W-1]}}, comb_operand} :
-        {{(FULL_W-COMB_W){hold_sample[COMB_W-1]}}, hold_sample};
-    assign integrator_next = integrator_state + high_rate_input;
-    assign final_integrator_next = final_integrator_state +
-                                   final_input_rounded;
+        {{(FIRST_INT_W-COMB_W){comb_operand[COMB_W-1]}}, comb_operand} :
+        {{(FIRST_INT_W-COMB_W){hold_sample[COMB_W-1]}}, hold_sample};
+
+    generate
+        if (INTEGRATOR_DSP_MODE >= 2) begin : gen_first_integrator_dsp
+            (* use_dsp = "yes" *) wire signed [FIRST_INT_W-1:0]
+                first_integrator_sum;
+            assign first_integrator_sum = integrator_state + high_rate_input;
+            assign integrator_next = first_integrator_sum;
+        end
+        else begin : gen_first_integrator_carry
+            (* use_dsp = "no" *) wire signed [FIRST_INT_W-1:0]
+                first_integrator_sum;
+            assign first_integrator_sum = integrator_state + high_rate_input;
+            assign integrator_next = first_integrator_sum;
+        end
+    endgenerate
+
+    generate
+        if (INTEGRATOR_DSP_MODE >= 1) begin : gen_final_integrator_dsp
+            (* use_dsp = "yes" *) wire signed [FINAL_W-1:0]
+                final_integrator_sum;
+            assign final_integrator_sum = final_integrator_state +
+                                          final_input_rounded;
+            assign final_integrator_next = final_integrator_sum;
+        end
+        else begin : gen_final_integrator_carry
+            (* use_dsp = "no" *) wire signed [FINAL_W-1:0]
+                final_integrator_sum;
+            assign final_integrator_sum = final_integrator_state +
+                                          final_input_rounded;
+            assign final_integrator_next = final_integrator_sum;
+        end
+    endgenerate
 
     assign burst_remaining_dbg = {1'b0, burst_remaining};
     assign pending_dbg = burst_pending;
@@ -99,7 +133,7 @@ module cic_interp16_n3_hold2_dsp_ce #(
         end
         else begin : gen_final_pruning
             round_sat_shift_compact #(
-                .IN_W    (FULL_W),
+                .IN_W    (FIRST_INT_W),
                 .OUT_W   (FINAL_W),
                 .SHIFT_N (FINAL_PRUNE_LSB)
             ) u_round_final_integrator_input (
@@ -128,7 +162,7 @@ module cic_interp16_n3_hold2_dsp_ce #(
             align_pending <= 1'b0;
             hold_sample <= {COMB_W{1'b0}};
 
-            integrator_state <= {FULL_W{1'b0}};
+            integrator_state <= {FIRST_INT_W{1'b0}};
             final_integrator_state <= {FINAL_W{1'b0}};
             burst_pending <= 1'b0;
             burst_remaining <= 4'd0;
@@ -195,6 +229,11 @@ module cic_interp16_n3_hold2_dsp_ce #(
             $fatal(1, "N3 Hold CIC only supports LUT burst counter");
         if (rst_n && OUTPUT_SHIFT < 1)
             $fatal(1, "N3 Hold CIC output normalization shift is invalid");
+        if (rst_n && (INTEGRATOR_DSP_MODE < 0 ||
+                      INTEGRATOR_DSP_MODE > 2))
+            $fatal(1, "N3 Hold CIC INTEGRATOR_DSP_MODE must be 0, 1, or 2");
+        if (rst_n && LEGACY_FULL_W < FINAL_W)
+            $fatal(1, "N3 Hold CIC derived width exceeds legacy width");
     end
 `endif
 

@@ -35,8 +35,29 @@ require_generic $project_generics USE_NATIONAL_FINALS_SERIAL_CIC_COMB 1
 require_generic $project_generics USE_NATIONAL_FINALS_N3_HOLD_EQUIV 1
 require_generic $project_generics USE_PHASE7_UNIFIED_BRAM_STAGE23_HISTORY 1
 require_generic $project_generics USE_NATIONAL_FINALS_SINGLE_BRAM_STAGE1 1
-require_generic $project_generics USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER 0
+require_generic $project_generics USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER 1
+require_generic $project_generics USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE 2
 require_generic $project_generics USE_NATIONAL_FINALS_NARROW_STAGE23 1
+
+set sim_set [get_filesets sim_1]
+set expected_sim_defines [list \
+    NATIONAL_FINALS \
+    NATIONAL_FINALS_USE_SERIAL_CIC_COMB \
+    NATIONAL_FINALS_USE_N3_HOLD \
+    NATIONAL_FINALS_USE_STAGE1_DSP48_PREADDER \
+    NATIONAL_FINALS_NARROW_STAGE23 \
+    PHASE7_USE_LUTRAM_STAGE23 \
+    PHASE7_USE_BRAM_STAGE23_HISTORY \
+    NATIONAL_FINALS_UNIFIED_STAGE23_HISTORY \
+    NATIONAL_FINALS_SINGLE_BRAM_STAGE1 \
+    PHASE7_USE_BRAM_STAGE23_COEFF]
+set project_sim_defines [get_property verilog_define $sim_set]
+require_condition \
+    [expr {[get_property top $sim_set] eq "tb_phase7_full_chain_bittrue"}] \
+    "GUI sim_1 top must be tb_phase7_full_chain_bittrue."
+require_condition \
+    [expr {[lsort $project_sim_defines] eq [lsort $expected_sim_defines]}] \
+    "GUI sim_1 defines do not match the signed-off national-finals topology."
 
 set serial_cic_file [get_files -quiet \
     "*national_finals/cic_interp16_serial_comb_dsp_ce.v"]
@@ -71,6 +92,7 @@ require_condition [expr {$gui_opt_directive eq "Default"}] \
 
 puts "NATIONAL_FINALS_GUI_CONFIG_PASS"
 puts "GUI_GENERICS=$project_generics"
+puts "GUI_SIM_DEFINES=$project_sim_defines"
 puts "GUI_RESOURCE_SHARING=$gui_resource_sharing"
 puts "GUI_OPT_DIRECTIVE=$gui_opt_directive"
 
@@ -123,10 +145,10 @@ if {[get_property PROGRESS [get_runs impl_1]] eq "100%"} {
         "GUI implementation does not use the expected two BRAM tiles."
     require_condition [expr {$mmcm_count == 2}] \
         "GUI implementation does not use the expected two MMCMs."
-    require_condition [expr {$lut_count <= 525}] \
-        "GUI implementation exceeds the signed-off 525-LUT P4-B guard."
-    require_condition [expr {$ff_count <= 510}] \
-        "GUI implementation exceeds the signed-off 510-FF P4-B guard."
+    require_condition [expr {$lut_count <= 500}] \
+        "GUI implementation exceeds the signed-off 500-LUT P4-C guard."
+    require_condition [expr {$ff_count <= 490}] \
+        "GUI implementation exceeds the signed-off 490-FF P4-C guard."
 
     puts "NATIONAL_FINALS_GUI_IMPLEMENTATION_PASS"
     close_design

@@ -54,6 +54,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     parameter integer USE_N3_HOLD_EQUIV = 0,
     parameter integer USE_STAGE1_DSP48_PREADDER = 0,
     parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 0,
+    parameter integer ASSUME_ALIGNED_POW2_CE = 0,
+    parameter integer CIC_INTEGRATOR_DSP_MODE = 2,
     parameter integer USE_UNIFIED_FIR_COEFF_BRAM =
         USE_BRAM_STAGE23_COEFF
 )(
@@ -190,7 +192,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
                     USE_UNIFIED_BRAM_STAGE23_HISTORY),
                 .USE_BRAM_COEFF(USE_BRAM_STAGE23_COEFF),
                 .USE_PACKED_BRAM(USE_PACKED_BRAM_STAGE23),
-                .USE_EXTERNAL_COEFF_BRAM(USE_UNIFIED_FIR_COEFF_BRAM)
+                .USE_EXTERNAL_COEFF_BRAM(USE_UNIFIED_FIR_COEFF_BRAM),
+                .ASSUME_ALIGNED_POW2_CE(ASSUME_ALIGNED_POW2_CE)
             ) u_interp2_stage23_lutram_cic_dsp_ce (
                 .clk(clk), .rst_n(rst_n),
                 .stage2_ce_out(ce4_out),
@@ -267,7 +270,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
                 .DATA_W          (21),
                 .OUTPUT_W        (20),
                 .FINAL_PRUNE_LSB (FINAL_PRUNE_LSB),
-                .BURST_COUNTER_USE_DSP(CIC_BURST_COUNTER_USE_DSP)
+                .BURST_COUNTER_USE_DSP(CIC_BURST_COUNTER_USE_DSP),
+                .INTEGRATOR_DSP_MODE(CIC_INTEGRATOR_DSP_MODE)
             ) u_cic_interp16_serial_comb_dsp_ce (
                 .clk                  (clk),
                 .rst_n                (rst_n),

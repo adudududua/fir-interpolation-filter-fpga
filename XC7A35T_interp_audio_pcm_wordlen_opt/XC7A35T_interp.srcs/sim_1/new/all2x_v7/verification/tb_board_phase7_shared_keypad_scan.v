@@ -139,6 +139,8 @@ module tb_board_phase7_shared_keypad_scan;
             $fatal(1, "Family clock changed outside the protected reset window");
         wait (u_dut.family_switch_busy === 1'b0);
         wait (u_dut.rst_audio_n === 1'b1);
+        if (u_dut.family_audio_sync !== 1'b1)
+            $fatal(1, "48 kHz family was not valid on audio reset release; first ROM address would be wrong");
         if (u_dut.key_mode_sel !== 2'b01)
             $fatal(1, "SW6 did not retain 4x mode");
 
@@ -207,7 +209,8 @@ module demo_interp_dac8_audio_pcm_common #(
     parameter integer USE_NATIONAL_FINALS_N3_HOLD_EQUIV = 0,
     parameter integer USE_NATIONAL_FINALS_CIC_COMB_DSP = 0,
     parameter integer USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER = 0,
-    parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 0
+    parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 0,
+    parameter integer USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE = 2
 )(
     input  wire       clk_audio_128x,
     input  wire       rst_n,

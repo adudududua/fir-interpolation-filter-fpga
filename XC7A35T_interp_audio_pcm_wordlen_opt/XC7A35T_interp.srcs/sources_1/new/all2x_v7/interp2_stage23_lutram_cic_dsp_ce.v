@@ -52,7 +52,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     parameter integer USE_UNIFIED_BRAM_HISTORY = 0,
     parameter integer USE_BRAM_COEFF = 0,
     parameter integer USE_PACKED_BRAM = 0,
-    parameter integer USE_EXTERNAL_COEFF_BRAM = 0
+    parameter integer USE_EXTERNAL_COEFF_BRAM = 0,
+    parameter integer ASSUME_ALIGNED_POW2_CE = 0
 )(
     input  wire                              clk,
     input  wire                              rst_n,
@@ -277,14 +278,18 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         stage2_ce_out && stage2_phase == 1'b0;
     assign stage3_history_write_event =
         stage3_ce_out && stage3_phase == 1'b0;
-    assign unified_write_enable = stage3_write_queued ||
+    assign unified_write_enable =
+                                  ((ASSUME_ALIGNED_POW2_CE == 0) &&
+                                   stage3_write_queued) ||
                                   stage2_history_write_event ||
                                   stage3_history_write_event;
-    assign unified_write_addr = stage3_write_queued ?
+    assign unified_write_addr =
+        ((ASSUME_ALIGNED_POW2_CE == 0) && stage3_write_queued) ?
         {1'b1, stage3_queued_write_addr} :
         (stage2_history_write_event ? {1'b0, stage2_write_addr} :
                                       {1'b1, stage3_write_addr});
-    assign unified_write_data = stage3_write_queued ?
+    assign unified_write_data =
+        ((ASSUME_ALIGNED_POW2_CE == 0) && stage3_write_queued) ?
         {{(STAGE2_DATA_W-STAGE3_DATA_W){
             stage3_queued_write_data[STAGE3_DATA_W-1]}},
          stage3_queued_write_data} :
@@ -599,24 +604,28 @@ module interp2_stage23_lutram_cic_dsp_ce #(
                 .write_data(unified_write_data)
             );
 
-            // Dedicated write port.  A one-entry queue is sufficient because
-            // phase-zero history writes are separated by at least 16 clocks;
-            // the only collision is a coincident Stage2/Stage3 request.
-            always @(posedge clk) begin
-                if (!rst_n) begin
-                    stage3_write_queued <= 1'b0;
-                    stage3_queued_write_addr <= {MEM_ADDR_W{1'b0}};
-                    stage3_queued_write_data <=
-                        {STAGE3_DATA_W{1'b0}};
-                end
-                else if (stage3_write_queued) begin
-                    stage3_write_queued <= 1'b0;
-                end
-                else if (stage2_history_write_event) begin
-                    if (stage3_history_write_event) begin
-                        stage3_write_queued <= 1'b1;
-                        stage3_queued_write_addr <= stage3_write_addr;
-                        stage3_queued_write_data <= stage3_x_current;
+            // Generic callers retain a one-entry collision queue.  The signed
+            // national-finals clock-enable schedule is stronger: ce4 and ce8
+            // are aligned powers of two, both phases reset to one, and every
+            // coincident CE therefore sees opposite write phases.  Enabling
+            // the assumption removes the otherwise unreachable 25-bit queue.
+            if (ASSUME_ALIGNED_POW2_CE == 0) begin : gen_write_queue
+                always @(posedge clk) begin
+                    if (!rst_n) begin
+                        stage3_write_queued <= 1'b0;
+                        stage3_queued_write_addr <= {MEM_ADDR_W{1'b0}};
+                        stage3_queued_write_data <=
+                            {STAGE3_DATA_W{1'b0}};
+                    end
+                    else if (stage3_write_queued) begin
+                        stage3_write_queued <= 1'b0;
+                    end
+                    else if (stage2_history_write_event) begin
+                        if (stage3_history_write_event) begin
+                            stage3_write_queued <= 1'b1;
+                            stage3_queued_write_addr <= stage3_write_addr;
+                            stage3_queued_write_data <= stage3_x_current;
+                        end
                     end
                 end
             end
@@ -779,6 +788,9 @@ module interp2_stage23_lutram_cic_dsp_ce #(
             $fatal(1, "USE_UNIFIED_BRAM_HISTORY must be 0 or 1");
         if (USE_BRAM_COEFF != 0 && USE_BRAM_COEFF != 1)
             $fatal(1, "USE_BRAM_COEFF must be 0 or 1");
+        if (ASSUME_ALIGNED_POW2_CE != 0 &&
+            ASSUME_ALIGNED_POW2_CE != 1)
+            $fatal(1, "ASSUME_ALIGNED_POW2_CE must be 0 or 1");
     end
 
     always @(posedge clk) begin
@@ -792,6 +804,10 @@ module interp2_stage23_lutram_cic_dsp_ce #(
                 (stage2_history_write_event ||
                  stage3_history_write_event))
                 $fatal(1, "Unified Stage2/3 history write queue overflow");
+            if (USE_UNIFIED_BRAM_HISTORY != 0 &&
+                ASSUME_ALIGNED_POW2_CE != 0 &&
+                stage2_history_write_event && stage3_history_write_event)
+                $fatal(1, "Aligned Stage2/3 CE assumption violated");
         end
     end
 `endif

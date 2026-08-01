@@ -122,6 +122,23 @@ write_primitive_report \
     [file join $result_dir mmcm_utilization_routed.rpt] \
     "MMCME2*" "National-finals MMCM utilization"
 
+set total_dsp_count [llength [get_cells -hierarchical \
+    -filter {REF_NAME =~ DSP48*}]]
+set cic_integrator_dsp_count [expr {$total_dsp_count - 2}]
+if {$cic_integrator_dsp_count < 0 || $cic_integrator_dsp_count > 2} {
+    error "Unexpected DSP mapping: total DSP count is $total_dsp_count"
+}
+if {$cic_integrator_dsp_count == 2} {
+    set cic_mapping_description \
+        "both high-rate integrators use DSP48E1"
+} elseif {$cic_integrator_dsp_count == 1} {
+    set cic_mapping_description \
+        "the 26-bit first integrator uses LUT CARRY4 and the 29-bit final integrator uses DSP48E1"
+} else {
+    set cic_mapping_description \
+        "both high-rate integrators use LUT CARRY4"
+}
+
 set manifest_handle [open [file join $result_dir build_manifest.txt] w]
 puts $manifest_handle "National-finals dual-rate board build"
 puts $manifest_handle "Synthesis checkpoint: $synth_dcp"
@@ -140,12 +157,12 @@ puts $manifest_handle [format "AD9708 output hold slack: %.3f ns" \
     [get_property SLACK $dac_hold_path]]
 puts $manifest_handle "44.1-kHz family 128x clock: 5.644796 MHz (-0.64 ppm nominal)"
 puts $manifest_handle "48-kHz family 128x clock: 6.144068 MHz (+11.03 ppm nominal)"
-puts $manifest_handle "Architecture: 1-DSP Stage1 + 1-DSP shared Stage2/3 + shift-add equalizer + exact N3 Hold CIC16 with 2 DSP integrators"
-puts $manifest_handle "N3 Hold optimization: C^3 -> up16 -> I^3 is rewritten exactly as C^2 -> Hold16 -> I^2 at the same 33-bit modulo width and final normalization"
+puts $manifest_handle "Architecture: 1-DSP Stage1 + 1-DSP shared Stage2/3 + shift-add equalizer + exact N3 Hold CIC16 with $cic_integrator_dsp_count DSP integrator(s)"
+puts $manifest_handle "N3 Hold optimization: C^3 -> up16 -> I^3 is rewritten exactly as C^2 -> Hold16 -> I^2; proven 26-bit first and 29-bit final integrator widths replace the former conservative 33-bit states"
 puts $manifest_handle "Equalizer optimization: combinational hand-off plus lossless 21-bit headroom removes the intermediate 20-bit saturation mux; the CIC final quantizer remains 20-bit"
-puts $manifest_handle "CIC mapping: two low-rate comb stages use LUT CARRY4 and both high-rate integrators use DSP48E1"
-puts $manifest_handle "Stage1 optimization: fabric symmetric pair sum plus DSP48E1 multiplier/PREG MAC state, 41-bit proven bound, and exact DSP-resident Q15 rounding"
-puts $manifest_handle "Stage2/3 optimization: shared DSP48E1 PREG MAC state, constant 16383 plus CARRYIN exact rounding, and transaction-local BRAM history metadata"
+puts $manifest_handle "CIC mapping: two low-rate comb stages use LUT CARRY4; $cic_mapping_description"
+puts $manifest_handle "Stage1 optimization: DSP48E1 A+D preadder plus multiplier/PREG MAC state, 41-bit proven bound, and exact DSP-resident Q15 rounding"
+puts $manifest_handle "Stage2/3 optimization: shared DSP48E1 PREG MAC state, constant 16383 plus CARRYIN exact rounding, and board-only elimination of the unreachable aligned-CE pending-history queue"
 puts $manifest_handle "Stage3 correctness: true Q15 coefficients, complete 38-bit MAC view, and explicit signed 20-bit saturation"
 puts $manifest_handle "Stage2/3 correctness: job head/fill snapshots protect an active MAC from the next ring-buffer write"
 puts $manifest_handle "Synthesis directive: AreaOptimized_high"

@@ -32,7 +32,7 @@ module tb_nf_mode_cdc_handshake;
     reg [1:0] transfer_old_mode = 2'b11;
 
     nf_mode_cdc_handshake #(
-        .SETTLE_CYCLES(3)
+        .SETTLE_CYCLES(7)
     ) u_dut (
         .ctrl_clk(ctrl_clk),
         .ctrl_rst_n(ctrl_rst_n),
@@ -147,6 +147,11 @@ module tb_nf_mode_cdc_handshake;
         repeat (8) @(posedge ctrl_clk);
         ctrl_rst_n = 1'b1;
         repeat (5) @(posedge audio_clk);
+        if (u_dut.settle_count !== 7) begin
+            errors = errors + 1;
+            $display("ERROR: SETTLE_CYCLES=7 was truncated to %0d",
+                     u_dut.settle_count);
+        end
         audio_rst_n = 1'b1;
 
         timeout = 0;

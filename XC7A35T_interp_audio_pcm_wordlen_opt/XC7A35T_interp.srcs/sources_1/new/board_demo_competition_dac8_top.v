@@ -53,8 +53,9 @@ module board_demo_competition_dac8_top #(
     parameter integer USE_NATIONAL_FINALS_SERIAL_CIC_COMB = 1,
     parameter integer USE_NATIONAL_FINALS_N3_HOLD_EQUIV = 1,
     parameter integer USE_NATIONAL_FINALS_CIC_COMB_DSP = 0,
-    parameter integer USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER = 0,
-    parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 1
+    parameter integer USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER = 1,
+    parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 1,
+    parameter integer USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE = 2
 )(
     input  wire       clk,       // 板载 20MHz 系统时钟
 
@@ -303,15 +304,13 @@ module board_demo_competition_dac8_top #(
     (* ASYNC_REG = "TRUE" *) reg family_audio_meta = 1'b0;
     (* ASYNC_REG = "TRUE" *) reg family_audio_sync = 1'b0;
 
+    // Track the selected family while the datapath is held in reset.  The
+    // dual-rate ROM samples this value in its reset branch to choose address
+    // 0 (44.1 kHz) or 147 (48 kHz), so clearing this synchronizer with the
+    // datapath reset would make the first 48 kHz sample come from address 0.
     always @(posedge clk_audio_128x) begin
-        if (!rst_audio_n) begin
-            family_audio_meta <= 1'b0;
-            family_audio_sync <= 1'b0;
-        end
-        else begin
-            family_audio_meta <= family_active;
-            family_audio_sync <= family_audio_meta;
-        end
+        family_audio_meta <= family_active;
+        family_audio_sync <= family_audio_meta;
     end
 
     //=========================================================
@@ -341,7 +340,9 @@ module board_demo_competition_dac8_top #(
         .USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER(
             USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER),
         .USE_NATIONAL_FINALS_NARROW_STAGE23(
-            USE_NATIONAL_FINALS_NARROW_STAGE23)
+            USE_NATIONAL_FINALS_NARROW_STAGE23),
+        .USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE(
+            USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE)
     ) u_demo_interp_dac8_audio_pcm_common (
         .clk_audio_128x (clk_audio_128x),
         .rst_n          (rst_audio_n),

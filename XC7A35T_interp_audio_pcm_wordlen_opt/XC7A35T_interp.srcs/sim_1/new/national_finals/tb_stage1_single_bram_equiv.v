@@ -32,7 +32,8 @@ module tb_stage1_single_bram_equiv;
     );
 
     interp2_stage1_single_bram_serial_ce #(
-        .ACC_W(41)
+        .ACC_W(41),
+        .USE_DSP48_PREADDER(1)
     ) u_candidate (
         .clk(clk), .rst_n(rst_n), .ce_out(ce2_out),
         .x_in(x_in), .x_in_valid(1'b1),

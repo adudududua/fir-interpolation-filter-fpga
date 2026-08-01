@@ -19,7 +19,8 @@ set synth_directive AreaOptimized_high
 set flatten_hierarchy rebuilt
 set resource_sharing on
 set result_tag board_dual_rate_cic6_round7_headroom_opt
-set stage1_dsp48_preadder 0
+set stage1_dsp48_preadder 1
+set cic_integrator_dsp_mode 2
 if {$argc > 0} {
     set reuse_current_synthesis [lindex $argv 0]
 }
@@ -41,6 +42,9 @@ if {$argc > 5} {
 if {$argc > 6} {
     set stage1_dsp48_preadder [lindex $argv 6]
 }
+if {$argc > 7} {
+    set cic_integrator_dsp_mode [lindex $argv 7]
+}
 if {$reuse_current_synthesis != 0 && $reuse_current_synthesis != 1} {
     error "reuse_current_synthesis must be 0 or 1"
 }
@@ -49,6 +53,9 @@ if {$synthesis_only != 0 && $synthesis_only != 1} {
 }
 if {$stage1_dsp48_preadder != 0 && $stage1_dsp48_preadder != 1} {
     error "stage1_dsp48_preadder must be 0 or 1"
+}
+if {$cic_integrator_dsp_mode < 0 || $cic_integrator_dsp_mode > 2} {
+    error "cic_integrator_dsp_mode must be 0, 1, or 2"
 }
 if {![regexp {^[A-Za-z0-9_-]+$} $result_tag]} {
     error "result_tag may contain only letters, digits, underscore, and dash"
@@ -133,7 +140,25 @@ set_property generic [list \
     USE_NATIONAL_FINALS_N3_HOLD_EQUIV=1 \
     USE_NATIONAL_FINALS_CIC_COMB_DSP=0 \
     USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER=$stage1_dsp48_preadder \
-    USE_NATIONAL_FINALS_NARROW_STAGE23=1] [get_filesets sources_1]
+    USE_NATIONAL_FINALS_NARROW_STAGE23=1 \
+    USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE=$cic_integrator_dsp_mode] \
+    [get_filesets sources_1]
+
+# Keep the GUI simulation topology identical to the signed-off command-line
+# full-chain regression.  Without these defines sim_1 silently selects older
+# Phase-7 branches even though synthesis uses the national-finals generics.
+set_property top tb_phase7_full_chain_bittrue [get_filesets sim_1]
+set_property verilog_define [list \
+    NATIONAL_FINALS \
+    NATIONAL_FINALS_USE_SERIAL_CIC_COMB \
+    NATIONAL_FINALS_USE_N3_HOLD \
+    NATIONAL_FINALS_USE_STAGE1_DSP48_PREADDER \
+    NATIONAL_FINALS_NARROW_STAGE23 \
+    PHASE7_USE_LUTRAM_STAGE23 \
+    PHASE7_USE_BRAM_STAGE23_HISTORY \
+    NATIONAL_FINALS_UNIFIED_STAGE23_HISTORY \
+    NATIONAL_FINALS_SINGLE_BRAM_STAGE1 \
+    PHASE7_USE_BRAM_STAGE23_COEFF] [get_filesets sim_1]
 
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
@@ -235,6 +260,7 @@ puts $manifest_handle "CIC DSP mapping: two low-rate combs use LUT CARRY4; exact
 puts $manifest_handle "Equalizer headroom optimization: lossless 21-bit equalizer output feeds a 21-bit CIC input; clipping is deferred to the final 20-bit CIC quantizer"
 puts $manifest_handle "Synthesis directive: AreaOptimized_high"
 puts $manifest_handle "Stage1 DSP48 preadder: $stage1_dsp48_preadder"
+puts $manifest_handle "CIC integrator DSP mode: $cic_integrator_dsp_mode"
 puts $manifest_handle "Stage1 history: one RAMB18, current-sample bypass plus serialized symmetric reads"
 puts $manifest_handle "Rounding: constant 16383 plus DSP48 CARRYIN for non-negative MAC sums"
 puts $manifest_handle "Stage3: proven 35-bit MAC bound removes unreachable 20-bit saturation logic"

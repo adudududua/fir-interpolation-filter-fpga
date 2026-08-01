@@ -476,8 +476,9 @@
         <Generic Name="USE_NATIONAL_FINALS_SERIAL_CIC_COMB" Val="1"/>
         <Generic Name="USE_NATIONAL_FINALS_N3_HOLD_EQUIV" Val="1"/>
         <Generic Name="USE_NATIONAL_FINALS_CIC_COMB_DSP" Val="0"/>
-        <Generic Name="USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER" Val="0"/>
+        <Generic Name="USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER" Val="1"/>
         <Generic Name="USE_NATIONAL_FINALS_NARROW_STAGE23" Val="1"/>
+        <Generic Name="USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE" Val="2"/>
       </Config>
     </FileSet>
     <FileSet Name="constrs_1" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1">
@@ -593,6 +594,16 @@
         <Option Name="TransportPathDelay" Val="0"/>
         <Option Name="TransportIntDelay" Val="0"/>
         <Option Name="SrcSet" Val="sources_1"/>
+        <Define Name="NATIONAL_FINALS"/>
+        <Define Name="NATIONAL_FINALS_USE_SERIAL_CIC_COMB"/>
+        <Define Name="NATIONAL_FINALS_USE_N3_HOLD"/>
+        <Define Name="NATIONAL_FINALS_USE_STAGE1_DSP48_PREADDER"/>
+        <Define Name="NATIONAL_FINALS_NARROW_STAGE23"/>
+        <Define Name="PHASE7_USE_LUTRAM_STAGE23"/>
+        <Define Name="PHASE7_USE_BRAM_STAGE23_HISTORY"/>
+        <Define Name="NATIONAL_FINALS_UNIFIED_STAGE23_HISTORY"/>
+        <Define Name="NATIONAL_FINALS_SINGLE_BRAM_STAGE1"/>
+        <Define Name="PHASE7_USE_BRAM_STAGE23_COEFF"/>
       </Config>
     </FileSet>
     <FileSet Name="utils_1" Type="Utils" RelSrcDir="$PSRCDIR/utils_1">
@@ -656,7 +667,7 @@
       <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2018"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>
-    <Run Id="impl_1" Type="Ft2:EntireDesign" Part="xc7a35tfgg484-2" ConstrsSet="constrs_1" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" State="current" Dir="$PRUNDIR/impl_1" SynthRun="synth_1" IncludeInArchive="true" GenFullBitstream="true">
+    <Run Id="impl_1" Type="Ft2:EntireDesign" Part="xc7a35tfgg484-2" ConstrsSet="constrs_1" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" State="current" SynthRun="synth_1" IncludeInArchive="true" GenFullBitstream="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018"/>
         <Step Id="init_design"/>
@@ -671,7 +682,6 @@
           <Option Id="BinFile">1</Option>
         </Step>
       </Strategy>
-      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
       <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2018"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>

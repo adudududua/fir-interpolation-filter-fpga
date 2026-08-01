@@ -100,6 +100,18 @@ function Invoke-RtlCase {
 
 $nfSource = Join-Path $sourceRoot 'national_finals'
 $nfSim = Join-Path $simRoot 'national_finals'
+$signedOffFullChainXvlogOptions = @(
+    '-d', 'NATIONAL_FINALS',
+    '-d', 'NATIONAL_FINALS_USE_SERIAL_CIC_COMB',
+    '-d', 'NATIONAL_FINALS_USE_N3_HOLD',
+    '-d', 'NATIONAL_FINALS_USE_STAGE1_DSP48_PREADDER',
+    '-d', 'NATIONAL_FINALS_NARROW_STAGE23',
+    '-d', 'PHASE7_USE_LUTRAM_STAGE23',
+    '-d', 'PHASE7_USE_BRAM_STAGE23_HISTORY',
+    '-d', 'NATIONAL_FINALS_UNIFIED_STAGE23_HISTORY',
+    '-d', 'NATIONAL_FINALS_SINGLE_BRAM_STAGE1',
+    '-d', 'PHASE7_USE_BRAM_STAGE23_COEFF'
+)
 $v7Source = Join-Path $sourceRoot 'all2x_v7'
 $v7Sim = Join-Path $simRoot 'all2x_v7\verification'
 $coeffHeader = Join-Path $sourceRoot 'all2x_v2\all2x_v2_coeff_pkg.vh'
@@ -124,6 +136,18 @@ $coeffPrimitiveDir = Invoke-RtlCase -Name 'unified_coeff_ramb18_primitive' `
     -Snapshot 'tb_nf_unified_coeff_primitive_sim' `
     -ExpectedPassText 'UNIFIED COEFFICIENT RAMB18 PRIMITIVE PASS: 32 Stage1 + 64 Stage23 addresses' `
     -XvlogOptions @('-d', 'SYNTHESIS') `
+    -XelabOptions @('glbl', '-L', 'unisims_ver')
+
+$historyPrimitiveDir = Invoke-RtlCase -Name 'history_ramb18_primitive' `
+    -VerilogFiles @(
+        (Join-Path $nfSource 'nf_stage1_history_ramb18_sdp.v'),
+        (Join-Path $nfSource 'nf_stage23_history_ramb18_sdp.v'),
+        (Join-Path $nfSim 'tb_nf_history_ramb18_primitive.v'),
+        $glbl
+    ) `
+    -Top 'tb_nf_history_ramb18_primitive' `
+    -Snapshot 'tb_nf_history_primitive_sim' `
+    -ExpectedPassText 'HISTORY RAMB18 PRIMITIVE PASS: Stage1 64x24 and Stage2/3 32x22, sweep=128 random=5000' `
     -XelabOptions @('glbl', '-L', 'unisims_ver')
 
 $stage1SingleBramDir = Invoke-RtlCase -Name 'stage1_single_bram_equivalence' `
@@ -257,17 +281,7 @@ $fullDir = Invoke-RtlCase -Name 'full_chain_bittrue' `
     -Top 'tb_phase7_full_chain_bittrue' `
     -Snapshot 'tb_nf_full_final_sim' `
     -ExpectedPassText 'PHASE7 FULL CHAIN BITTRUE PASS: impulse + 1 seeds, all nodes 0 LSB.' `
-    -XvlogOptions @(
-        '-d', 'NATIONAL_FINALS',
-        '-d', 'NATIONAL_FINALS_USE_SERIAL_CIC_COMB',
-        '-d', 'NATIONAL_FINALS_USE_N3_HOLD',
-        '-d', 'NATIONAL_FINALS_NARROW_STAGE23',
-        '-d', 'PHASE7_USE_LUTRAM_STAGE23',
-        '-d', 'PHASE7_USE_BRAM_STAGE23_HISTORY',
-        '-d', 'NATIONAL_FINALS_UNIFIED_STAGE23_HISTORY',
-        '-d', 'NATIONAL_FINALS_SINGLE_BRAM_STAGE1',
-        '-d', 'PHASE7_USE_BRAM_STAGE23_COEFF'
-    ) `
+    -XvlogOptions $signedOffFullChainXvlogOptions `
     -XelabOptions @('glbl', '-L', 'unisims_ver') `
     -Assets (@($coeffHeader) + $vectorFiles)
 
@@ -294,16 +308,7 @@ $resetDir = Invoke-RtlCase -Name 'full_chain_reset_recovery' `
     -Top 'tb_phase7_full_chain_reset_recovery' `
     -Snapshot 'tb_nf_full_reset_sim' `
     -ExpectedPassText 'PHASE7 FULL RESET RECOVERY PASS: 8 internal-state scenarios clean.' `
-    -XvlogOptions @(
-        '-d', 'NATIONAL_FINALS',
-        '-d', 'NATIONAL_FINALS_USE_SERIAL_CIC_COMB',
-        '-d', 'NATIONAL_FINALS_USE_N3_HOLD',
-        '-d', 'PHASE7_USE_LUTRAM_STAGE23',
-        '-d', 'PHASE7_USE_BRAM_STAGE23_HISTORY',
-        '-d', 'NATIONAL_FINALS_UNIFIED_STAGE23_HISTORY',
-        '-d', 'NATIONAL_FINALS_SINGLE_BRAM_STAGE1',
-        '-d', 'PHASE7_USE_BRAM_STAGE23_COEFF'
-    ) `
+    -XvlogOptions $signedOffFullChainXvlogOptions `
     -XelabOptions @('glbl', '-L', 'unisims_ver') `
     -Assets @($coeffHeader)
 
@@ -352,5 +357,5 @@ if ($PublishImpulseOutputs) {
 }
 
 Write-Host ''
-Write-Host 'NATIONAL FINALS RTL REGRESSION PASS (14/14)'
+Write-Host 'NATIONAL FINALS RTL REGRESSION PASS (15/15)'
 Write-Host "Run directory: $runRoot"
