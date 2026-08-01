@@ -20,7 +20,7 @@ set flatten_hierarchy rebuilt
 set resource_sharing on
 set result_tag board_dual_rate_cic6_round7_headroom_opt
 set stage1_dsp48_preadder 1
-set cic_integrator_dsp_mode 2
+set cic_integrator_dsp_mode 1
 if {$argc > 0} {
     set reuse_current_synthesis [lindex $argv 0]
 }
