@@ -1,0 +1,26 @@
+{
+  "schema": "national-finals-p3-matlab-config-v1",
+  "config_id": "NF-P3-JOINT-STAGE3-EQ-MATLAB-R1",
+  "parent_config_id": "NF-P4D-R2-479LUT-468FF-4DSP-2BRAM-2MMCM",
+  "mode_4x_8x_stage3": "P4-D flat Q15 bank",
+  "mode_128x_stage3": "legacy_phase7_seed_trim_0.99945",
+  "stage3_fraction_bits": 15,
+  "stage3_coefficient_bits": 18,
+  "stage3_coefficients_integer": [
+    561,
+    137,
+    -4232,
+    -1554,
+    20046,
+    35584,
+    20046,
+    -1554,
+    -4232,
+    137,
+    561
+  ],
+  "external_equalizer_128x": false,
+  "stage3_output_bits_128x": 21,
+  "cic_input_bits": 21,
+  "rtl_status": "NOT_IMPLEMENTED_MATLAB_GATE_ONLY"
+}
