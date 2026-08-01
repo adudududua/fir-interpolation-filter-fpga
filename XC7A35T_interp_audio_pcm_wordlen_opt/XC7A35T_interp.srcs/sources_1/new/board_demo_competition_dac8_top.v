@@ -55,7 +55,8 @@ module board_demo_competition_dac8_top #(
     parameter integer USE_NATIONAL_FINALS_CIC_COMB_DSP = 0,
     parameter integer USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER = 1,
     parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 1,
-    parameter integer USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE = 2
+    parameter integer USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE = 2,
+    parameter integer USE_NATIONAL_FINALS_TWO24_CIC_P1S = 0
 )(
     input  wire       clk,       // 板载 20MHz 系统时钟
 
@@ -342,7 +343,9 @@ module board_demo_competition_dac8_top #(
         .USE_NATIONAL_FINALS_NARROW_STAGE23(
             USE_NATIONAL_FINALS_NARROW_STAGE23),
         .USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE(
-            USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE)
+            USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE),
+        .USE_NATIONAL_FINALS_TWO24_CIC_P1S(
+            USE_NATIONAL_FINALS_TWO24_CIC_P1S)
     ) u_demo_interp_dac8_audio_pcm_common (
         .clk_audio_128x (clk_audio_128x),
         .rst_n          (rst_audio_n),

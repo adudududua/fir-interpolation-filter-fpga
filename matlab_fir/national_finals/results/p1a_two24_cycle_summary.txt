@@ -1,0 +1,10 @@
+P1 TWO24 INTEGER CYCLE MODEL PASS
+Directed low limbs: FFFFFE, FFFFFF, 000000, 000001
+Random seeds: 20; events per continuous/stall-reset test: 1000
+P1-S state/output mismatches: 0
+P1-L Q_n=B_(n-1) mapping mismatches: 0
+Q invariant mismatches: 0
+Finite high-rate updates/reference outputs: 11392/11392
+P1-L outputs after latency without extra update: 11391
+Last nonzero reference output index: 7182; final A/B: 0/0
+P1-S: GO to UNISIM. P1-L: NO-GO on exact finite output count.

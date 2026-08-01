@@ -190,7 +190,16 @@ set cic_integrator_dsp_count [expr {$total_dsp_count - 2}]
 if {$cic_integrator_dsp_count < 0 || $cic_integrator_dsp_count > 2} {
     error "Unexpected DSP mapping: total DSP count is $total_dsp_count"
 }
-if {$cic_integrator_dsp_count == 2} {
+set two24_dsp_cells [get_cells -hierarchical -filter \
+    {REF_NAME =~ DSP48* && USE_SIMD == TWO24}]
+set two24_cic_enabled [expr {[llength $two24_dsp_cells] == 1}]
+if {[llength $two24_dsp_cells] > 1} {
+    error "Unexpected DSP mapping: more than one TWO24 DSP48E1"
+}
+if {$two24_cic_enabled} {
+    set cic_mapping_description \
+        "one DSP48E1 in TWO24 SIMD mode implements both 24-bit low limbs; signed high limbs and exact B=Q+A reconstruction use LUT carry chains"
+} elseif {$cic_integrator_dsp_count == 2} {
     set cic_mapping_description \
         "both high-rate integrators use DSP48E1"
 } elseif {$cic_integrator_dsp_count == 1} {
@@ -224,6 +233,7 @@ puts $manifest_handle "Architecture: 1-DSP Stage1 + 1-DSP shared Stage2/3 + shif
 puts $manifest_handle "N3 Hold optimization: C^3 -> up16 -> I^3 is rewritten exactly as C^2 -> Hold16 -> I^2; proven 26-bit first and 29-bit final integrator widths replace the former conservative 33-bit states"
 puts $manifest_handle "Equalizer optimization: combinational hand-off plus lossless 21-bit headroom removes the intermediate 20-bit saturation mux; the CIC final quantizer remains 20-bit"
 puts $manifest_handle "CIC mapping: two low-rate comb stages use LUT CARRY4; $cic_mapping_description"
+puts $manifest_handle "CIC TWO24 P1-S enabled: $two24_cic_enabled"
 puts $manifest_handle "Stage1 optimization: DSP48E1 A+D preadder plus multiplier/PREG MAC state, 41-bit proven bound, and exact DSP-resident Q15 rounding"
 puts $manifest_handle "Stage2/3 optimization: shared DSP48E1 PREG MAC state, constant 16383 plus CARRYIN exact rounding, and board-only elimination of the unreachable aligned-CE pending-history queue"
 puts $manifest_handle "Stage3 correctness: true Q15 coefficients, complete 38-bit MAC view, and explicit signed 20-bit saturation"

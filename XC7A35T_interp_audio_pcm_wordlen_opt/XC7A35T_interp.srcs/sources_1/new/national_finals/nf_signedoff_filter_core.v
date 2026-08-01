@@ -51,6 +51,11 @@ module nf_signedoff_filter_core (
         .USE_NATIONAL_FINALS_NARROW_STAGE23(1),
         .ASSUME_ALIGNED_POW2_CE(1),
         .CIC_INTEGRATOR_DSP_MODE(2),
+`ifdef NATIONAL_FINALS_USE_TWO24_CIC_P1S
+        .USE_TWO24_CIC_P1S(1),
+`else
+        .USE_TWO24_CIC_P1S(0),
+`endif
         .USE_UNIFIED_FIR_COEFF_BRAM(1)
     ) u_signedoff_core (
         .clk(clk),

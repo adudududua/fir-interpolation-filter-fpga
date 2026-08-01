@@ -4,7 +4,8 @@ param(
     [ValidateSet('Smoke', 'Release')]
     [string]$RegressionScale = 'Smoke',
     [string]$VectorDir = '',
-    [switch]$PublishImpulseOutputs
+    [switch]$PublishImpulseOutputs,
+    [switch]$Two24P1S
 )
 
 $ErrorActionPreference = 'Stop'
@@ -115,8 +116,15 @@ $signedOffFullChainXvlogOptions = @(
     '-d', 'NATIONAL_FINALS_SINGLE_BRAM_STAGE1',
     '-d', 'PHASE7_USE_BRAM_STAGE23_COEFF'
 )
+if ($Two24P1S) {
+    $signedOffFullChainXvlogOptions += @(
+        '-d', 'NATIONAL_FINALS_USE_TWO24_CIC_P1S'
+    )
+}
 $v7Source = Join-Path $sourceRoot 'all2x_v7'
 $v7Sim = Join-Path $simRoot 'all2x_v7\verification'
+$p1Two24Source = Join-Path $nfSource 'p1_two24'
+$p1Two24Sim = Join-Path $nfSim 'p1_two24'
 $coeffHeader = Join-Path $sourceRoot 'all2x_v2\all2x_v2_coeff_pkg.vh'
 
 if ([string]::IsNullOrWhiteSpace($VectorDir)) {
@@ -274,6 +282,33 @@ $cicHoldDir = Invoke-RtlCase -Name 'cic_n3_hold_equivalence' `
     -Snapshot 'tb_nf_cic_n3_hold_equiv_sim' `
     -ExpectedPassText 'N3 HOLD CIC EQUIVALENCE PASS'
 
+if ($Two24P1S) {
+    $null = Invoke-RtlCase -Name 'cic_two24_integrator_pair' `
+        -VerilogFiles @(
+            (Join-Path $p1Two24Source 'nf_cic_two24_integrator_pair_p1s.v'),
+            (Join-Path $p1Two24Sim 'tb_nf_cic_two24_integrator_pair_p1s.v'),
+            $glbl
+        ) `
+        -Top 'tb_nf_cic_two24_integrator_pair_p1s' `
+        -Snapshot 'tb_nf_cic_two24_integrator_pair_p1s_sim' `
+        -ExpectedPassText 'P1B TWO24 UNISIM PASS:' `
+        -XelabOptions @('glbl', '-L', 'unisims_ver')
+
+    $null = Invoke-RtlCase -Name 'cic_two24_full_equivalence' `
+        -VerilogFiles @(
+            (Join-Path $sourceRoot 'all2x_v6\round_sat_shift_compact.v'),
+            (Join-Path $nfSource 'cic_interp16_n3_hold2_dsp_ce.v'),
+            (Join-Path $p1Two24Source 'nf_cic_two24_integrator_pair_p1s.v'),
+            (Join-Path $p1Two24Source 'cic_interp16_n3_hold2_two24_p1s_ce.v'),
+            (Join-Path $p1Two24Sim 'tb_cic_interp16_n3_hold2_two24_p1s_equiv.v'),
+            $glbl
+        ) `
+        -Top 'tb_cic_interp16_n3_hold2_two24_p1s_equiv' `
+        -Snapshot 'tb_nf_cic_two24_full_equivalence_sim' `
+        -ExpectedPassText 'P1C TWO24 CIC EQUIVALENCE PASS:' `
+        -XelabOptions @('glbl', '-L', 'unisims_ver')
+}
+
 $clockDir = Invoke-RtlCase -Name 'clock' `
     -VerilogFiles @(
         (Join-Path $nfSource 'dual_family_audio_clock.v'),
@@ -331,6 +366,8 @@ $fullDir = Invoke-RtlCase -Name 'full_chain_bittrue' `
         (Join-Path $v7Source 'cic_interp16_core_dsp_ce.v'),
         (Join-Path $nfSource 'cic_interp16_serial_comb_dsp_ce.v'),
         (Join-Path $nfSource 'cic_interp16_n3_hold2_dsp_ce.v'),
+        (Join-Path $p1Two24Source 'nf_cic_two24_integrator_pair_p1s.v'),
+        (Join-Path $p1Two24Source 'cic_interp16_n3_hold2_two24_p1s_ce.v'),
         (Join-Path $v7Source 'interp128_all2x_v7_folded_fir_cic_top_ce.v'),
         (Join-Path $nfSource 'nf_signedoff_filter_core.v'),
         (Join-Path $v7Sim 'tb_phase7_full_chain_bittrue.v'),
@@ -359,6 +396,8 @@ $resetDir = Invoke-RtlCase -Name 'full_chain_reset_recovery' `
         (Join-Path $v7Source 'cic_interp16_core_dsp_ce.v'),
         (Join-Path $nfSource 'cic_interp16_serial_comb_dsp_ce.v'),
         (Join-Path $nfSource 'cic_interp16_n3_hold2_dsp_ce.v'),
+        (Join-Path $p1Two24Source 'nf_cic_two24_integrator_pair_p1s.v'),
+        (Join-Path $p1Two24Source 'cic_interp16_n3_hold2_two24_p1s_ce.v'),
         (Join-Path $v7Source 'interp128_all2x_v7_folded_fir_cic_top_ce.v'),
         (Join-Path $v7Sim 'tb_phase7_full_chain_reset_recovery.v'),
         $glbl
@@ -386,6 +425,8 @@ $dynamicDir = Invoke-RtlCase -Name 'dynamic_mode_switch' `
         (Join-Path $v7Source 'cic_interp16_core_dsp_ce.v'),
         (Join-Path $nfSource 'cic_interp16_serial_comb_dsp_ce.v'),
         (Join-Path $nfSource 'cic_interp16_n3_hold2_dsp_ce.v'),
+        (Join-Path $p1Two24Source 'nf_cic_two24_integrator_pair_p1s.v'),
+        (Join-Path $p1Two24Source 'cic_interp16_n3_hold2_two24_p1s_ce.v'),
         (Join-Path $v7Source 'interp128_all2x_v7_folded_fir_cic_top_ce.v'),
         (Join-Path $nfSource 'dual_rate_test_tone_rom_source.v'),
         (Join-Path $sourceRoot 'demo_interp_dac8_audio_pcm_common.v'),
@@ -398,6 +439,9 @@ $dynamicDir = Invoke-RtlCase -Name 'dynamic_mode_switch' `
     -XvlogOptions @(
         '-d', 'PHASE7_USE_BRAM_STAGE23_HISTORY',
         '-d', 'PHASE7_USE_BRAM_STAGE23_COEFF'
+        $(if ($Two24P1S) {
+            @('-d', 'NATIONAL_FINALS_USE_TWO24_CIC_P1S')
+        })
     ) `
     -XelabOptions @('glbl', '-L', 'unisims_ver') `
     -Assets @(
@@ -415,5 +459,6 @@ if ($PublishImpulseOutputs) {
 }
 
 Write-Host ''
-Write-Host 'NATIONAL FINALS RTL REGRESSION PASS (15/15)'
+$caseCount = if ($Two24P1S) { 17 } else { 15 }
+Write-Host "NATIONAL FINALS RTL REGRESSION PASS ($caseCount/$caseCount)"
 Write-Host "Run directory: $runRoot"

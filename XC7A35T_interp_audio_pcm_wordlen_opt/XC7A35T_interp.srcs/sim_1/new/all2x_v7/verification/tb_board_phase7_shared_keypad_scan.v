@@ -210,7 +210,8 @@ module demo_interp_dac8_audio_pcm_common #(
     parameter integer USE_NATIONAL_FINALS_CIC_COMB_DSP = 0,
     parameter integer USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER = 0,
     parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 0,
-    parameter integer USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE = 2
+    parameter integer USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE = 2,
+    parameter integer USE_NATIONAL_FINALS_TWO24_CIC_P1S = 0
 )(
     input  wire       clk_audio_128x,
     input  wire       rst_n,

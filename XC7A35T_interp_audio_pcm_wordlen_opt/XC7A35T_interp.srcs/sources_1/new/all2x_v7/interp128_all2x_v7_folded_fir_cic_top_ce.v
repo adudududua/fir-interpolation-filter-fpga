@@ -56,6 +56,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 0,
     parameter integer ASSUME_ALIGNED_POW2_CE = 0,
     parameter integer CIC_INTEGRATOR_DSP_MODE = 2,
+    parameter integer USE_TWO24_CIC_P1S = 0,
     parameter integer USE_UNIFIED_FIR_COEFF_BRAM =
         USE_BRAM_STAGE23_COEFF
 )(
@@ -266,24 +267,45 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
 
     generate
         if (USE_N3_HOLD_EQUIV != 0) begin : gen_serial_cic_comb
-            cic_interp16_n3_hold2_dsp_ce #(
-                .DATA_W          (21),
-                .OUTPUT_W        (20),
-                .FINAL_PRUNE_LSB (FINAL_PRUNE_LSB),
-                .BURST_COUNTER_USE_DSP(CIC_BURST_COUNTER_USE_DSP),
-                .INTEGRATOR_DSP_MODE(CIC_INTEGRATOR_DSP_MODE)
-            ) u_cic_interp16_serial_comb_dsp_ce (
-                .clk                  (clk),
-                .rst_n                (rst_n),
-                .ce_out               (ce128_out),
-                .x_in                 (cic_x_w),
-                .x_in_valid           (cic_x_valid_w),
-                .y_out                (y128_w),
-                .y_out_valid          (y128_valid_w),
-                .burst_remaining_dbg  (),
-                .pending_dbg          (),
-                .comb_busy_dbg        ()
-            );
+            if (USE_TWO24_CIC_P1S != 0) begin : gen_two24_p1s
+                cic_interp16_n3_hold2_two24_p1s_ce #(
+                    .DATA_W          (21),
+                    .OUTPUT_W        (20),
+                    .FINAL_PRUNE_LSB (FINAL_PRUNE_LSB),
+                    .BURST_COUNTER_USE_DSP(CIC_BURST_COUNTER_USE_DSP)
+                ) u_cic_interp16_serial_comb_dsp_ce (
+                    .clk                  (clk),
+                    .rst_n                (rst_n),
+                    .ce_out               (ce128_out),
+                    .x_in                 (cic_x_w),
+                    .x_in_valid           (cic_x_valid_w),
+                    .y_out                (y128_w),
+                    .y_out_valid          (y128_valid_w),
+                    .burst_remaining_dbg  (),
+                    .pending_dbg          (),
+                    .comb_busy_dbg        ()
+                );
+            end
+            else begin : gen_two_dsp
+                cic_interp16_n3_hold2_dsp_ce #(
+                    .DATA_W          (21),
+                    .OUTPUT_W        (20),
+                    .FINAL_PRUNE_LSB (FINAL_PRUNE_LSB),
+                    .BURST_COUNTER_USE_DSP(CIC_BURST_COUNTER_USE_DSP),
+                    .INTEGRATOR_DSP_MODE(CIC_INTEGRATOR_DSP_MODE)
+                ) u_cic_interp16_serial_comb_dsp_ce (
+                    .clk                  (clk),
+                    .rst_n                (rst_n),
+                    .ce_out               (ce128_out),
+                    .x_in                 (cic_x_w),
+                    .x_in_valid           (cic_x_valid_w),
+                    .y_out                (y128_w),
+                    .y_out_valid          (y128_valid_w),
+                    .burst_remaining_dbg  (),
+                    .pending_dbg          (),
+                    .comb_busy_dbg        ()
+                );
+            end
         end
         else if (USE_SERIAL_CIC_COMB != 0) begin : gen_serial_cic_comb_legacy
             cic_interp16_serial_comb_dsp_ce #(

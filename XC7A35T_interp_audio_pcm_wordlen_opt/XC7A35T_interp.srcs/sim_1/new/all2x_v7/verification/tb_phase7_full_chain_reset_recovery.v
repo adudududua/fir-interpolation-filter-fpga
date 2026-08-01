@@ -37,7 +37,11 @@ module tb_phase7_full_chain_reset_recovery;
 `define DUT_STAGE1 u_dut.gen_dual_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce
 `endif
 `ifdef NATIONAL_FINALS_USE_N3_HOLD
-`define DUT_CIC u_dut.gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce
+`ifdef NATIONAL_FINALS_USE_TWO24_CIC_P1S
+`define DUT_CIC u_dut.gen_serial_cic_comb.gen_two24_p1s.u_cic_interp16_serial_comb_dsp_ce
+`else
+`define DUT_CIC u_dut.gen_serial_cic_comb.gen_two_dsp.u_cic_interp16_serial_comb_dsp_ce
+`endif
 `elsif NATIONAL_FINALS_USE_SERIAL_CIC_COMB
 `define DUT_CIC u_dut.gen_serial_cic_comb_legacy.u_cic_interp16_serial_comb_dsp_ce
 `else
@@ -139,6 +143,11 @@ module tb_phase7_full_chain_reset_recovery;
 `else
         .USE_STAGE1_DSP48_PREADDER(0),
 `endif
+`ifdef NATIONAL_FINALS_USE_TWO24_CIC_P1S
+        .USE_TWO24_CIC_P1S(1),
+`else
+        .USE_TWO24_CIC_P1S(0),
+`endif
 `ifdef NATIONAL_FINALS_UNIFIED_STAGE23_HISTORY
         .ASSUME_ALIGNED_POW2_CE(1)
 `else
@@ -215,6 +224,11 @@ module tb_phase7_full_chain_reset_recovery;
         .USE_STAGE1_DSP48_PREADDER(1),
 `else
         .USE_STAGE1_DSP48_PREADDER(0),
+`endif
+`ifdef NATIONAL_FINALS_USE_TWO24_CIC_P1S
+        .USE_TWO24_CIC_P1S(1),
+`else
+        .USE_TWO24_CIC_P1S(0),
 `endif
 `ifdef NATIONAL_FINALS_UNIFIED_STAGE23_HISTORY
         .ASSUME_ALIGNED_POW2_CE(1)
