@@ -266,24 +266,47 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
 
     generate
         if (USE_N3_HOLD_EQUIV != 0) begin : gen_serial_cic_comb
-            cic_interp16_n3_hold2_dsp_ce #(
-                .DATA_W          (21),
-                .OUTPUT_W        (20),
-                .FINAL_PRUNE_LSB (FINAL_PRUNE_LSB),
-                .BURST_COUNTER_USE_DSP(CIC_BURST_COUNTER_USE_DSP),
-                .INTEGRATOR_DSP_MODE(CIC_INTEGRATOR_DSP_MODE)
-            ) u_cic_interp16_serial_comb_dsp_ce (
-                .clk                  (clk),
-                .rst_n                (rst_n),
-                .ce_out               (ce128_out),
-                .x_in                 (cic_x_w),
-                .x_in_valid           (cic_x_valid_w),
-                .y_out                (y128_w),
-                .y_out_valid          (y128_valid_w),
-                .burst_remaining_dbg  (),
-                .pending_dbg          (),
-                .comb_busy_dbg        ()
-            );
+            if (USE_CIC3_SHIFTADD_COMPENSATOR != 0) begin :
+                    gen_shared_equalizer_comb_alu
+                cic_interp16_n3_comp_hold2_shared_alu_ce #(
+                    .INPUT_W          (20),
+                    .OUTPUT_W         (20),
+                    .FINAL_PRUNE_LSB  (FINAL_PRUNE_LSB),
+                    .BURST_COUNTER_USE_DSP(CIC_BURST_COUNTER_USE_DSP),
+                    .INTEGRATOR_DSP_MODE(CIC_INTEGRATOR_DSP_MODE)
+                ) u_cic_interp16_shared_front_alu_ce (
+                    .clk                  (clk),
+                    .rst_n                (rst_n),
+                    .ce_out               (ce128_out),
+                    .x_in                 (y8_w),
+                    .x_in_valid           (y8_valid_w),
+                    .y_out                (y128_w),
+                    .y_out_valid          (y128_valid_w),
+                    .burst_remaining_dbg  (),
+                    .pending_dbg          (),
+                    .front_busy_dbg       ()
+                );
+            end
+            else begin : gen_separate_equalizer_comb
+                cic_interp16_n3_hold2_dsp_ce #(
+                    .DATA_W          (21),
+                    .OUTPUT_W        (20),
+                    .FINAL_PRUNE_LSB (FINAL_PRUNE_LSB),
+                    .BURST_COUNTER_USE_DSP(CIC_BURST_COUNTER_USE_DSP),
+                    .INTEGRATOR_DSP_MODE(CIC_INTEGRATOR_DSP_MODE)
+                ) u_cic_interp16_serial_comb_dsp_ce (
+                    .clk                  (clk),
+                    .rst_n                (rst_n),
+                    .ce_out               (ce128_out),
+                    .x_in                 (cic_x_w),
+                    .x_in_valid           (cic_x_valid_w),
+                    .y_out                (y128_w),
+                    .y_out_valid          (y128_valid_w),
+                    .burst_remaining_dbg  (),
+                    .pending_dbg          (),
+                    .comb_busy_dbg        ()
+                );
+            end
         end
         else if (USE_SERIAL_CIC_COMB != 0) begin : gen_serial_cic_comb_legacy
             cic_interp16_serial_comb_dsp_ce #(

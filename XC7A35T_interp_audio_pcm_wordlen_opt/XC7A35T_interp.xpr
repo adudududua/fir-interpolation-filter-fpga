@@ -108,6 +108,13 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PSRCDIR/sources_1/new/national_finals/cic_interp16_n3_comp_hold2_shared_alu_ce.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PSRCDIR/sources_1/new/national_finals/cic_interp16_n3_hold2_dsp_ce.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>

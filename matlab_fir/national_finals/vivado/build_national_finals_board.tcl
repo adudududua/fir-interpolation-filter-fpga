@@ -71,6 +71,7 @@ set nf_sources [list \
     [file join $nf_src_dir cic3_compensator_shiftadd_ce.v] \
     [file join $nf_src_dir cic_interp16_serial_comb_dsp_ce.v] \
     [file join $nf_src_dir cic_interp16_n3_hold2_dsp_ce.v] \
+    [file join $nf_src_dir cic_interp16_n3_comp_hold2_shared_alu_ce.v] \
     [file join $nf_src_dir dual_family_audio_clock.v] \
     [file join $nf_src_dir nf_mode_cdc_handshake.v] \
     [file join $nf_src_dir dual_rate_test_tone_rom_source.v] \

@@ -37,7 +37,11 @@ module tb_phase7_full_chain_reset_recovery;
 `define DUT_STAGE1 u_dut.gen_dual_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce
 `endif
 `ifdef NATIONAL_FINALS_USE_N3_HOLD
+`ifdef NATIONAL_FINALS_EXPECT_SHARED_FRONT_ALU
+`define DUT_CIC u_dut.gen_serial_cic_comb.gen_shared_equalizer_comb_alu.u_cic_interp16_shared_front_alu_ce
+`else
 `define DUT_CIC u_dut.gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce
+`endif
 `elsif NATIONAL_FINALS_USE_SERIAL_CIC_COMB
 `define DUT_CIC u_dut.gen_serial_cic_comb_legacy.u_cic_interp16_serial_comb_dsp_ce
 `else
