@@ -1,0 +1,15 @@
+CASE_NAME,MAX_ABS_STAGE3,SIGNED_OUTPUT_SATURATION_COUNT,SIGNED_OUTPUT_SAFE
+impulse,263835,0,1
+random_seed01,120001,0,1
+random_seed02,108196,0,1
+random_seed03,119731,0,1
+random_seed04,117400,0,1
+random_seed05,115938,0,1
+random_seed06,107517,0,1
+random_seed07,115319,0,1
+random_seed08,113305,0,1
+random_seed09,116619,0,1
+random_seed10,102183,0,1
+fullscale_positive,527670,0,1
+fullscale_negative,527670,0,1
+strong_44k1_minus1dbfs,526002,0,1
