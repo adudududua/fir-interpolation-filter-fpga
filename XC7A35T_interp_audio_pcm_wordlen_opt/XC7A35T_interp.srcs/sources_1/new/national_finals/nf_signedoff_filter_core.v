@@ -1,7 +1,8 @@
 `timescale 1ns / 1ps
 
-// Fixed-configuration wrapper for the P4-C/P4-D national-finals filter core.
-// Regression scale belongs to the testbench and cannot alter this topology.
+// P3 verification-only pair.  One flat-bank instance supplies the official
+// 4x/8x nodes while one compensated-bank instance supplies 128x.  The board
+// build does not synthesize this wrapper; it uses one mode-selected core.
 module nf_signedoff_filter_core (
     input  wire               clk,
     input  wire               rst_n,
@@ -30,6 +31,13 @@ module nf_signedoff_filter_core (
     output wire               dbg_y64_valid
 );
 
+    wire signed [23:0] unused_comp_y2;
+    wire unused_comp_y2_valid;
+    wire signed [23:0] unused_comp_y4;
+    wire unused_comp_y4_valid;
+    wire signed [23:0] unused_comp_y8;
+    wire unused_comp_y8_valid;
+
     interp128_all2x_v7_folded_fir_cic_top_ce #(
         .STAGE1_ACC_W(41),
         .STAGE23_ACC_W(38),
@@ -37,7 +45,7 @@ module nf_signedoff_filter_core (
         .FINAL_PRUNE_LSB(0),
         .USE_LUTRAM_STAGE23(1),
         .STAGE3_FLAT(1),
-        .USE_CIC3_SHIFTADD_COMPENSATOR(1),
+        .USE_CIC3_SHIFTADD_COMPENSATOR(0),
         .USE_BRAM_STAGE23_HISTORY(1),
         .USE_UNIFIED_BRAM_STAGE23_HISTORY(1),
         .USE_SINGLE_BRAM_STAGE1(1),
@@ -49,10 +57,11 @@ module nf_signedoff_filter_core (
         .USE_N3_HOLD_EQUIV(1),
         .USE_STAGE1_DSP48_PREADDER(1),
         .USE_NATIONAL_FINALS_NARROW_STAGE23(1),
+        .USE_P3_JOINT_STAGE3(1),
         .ASSUME_ALIGNED_POW2_CE(1),
         .CIC_INTEGRATOR_DSP_MODE(2),
         .USE_UNIFIED_FIR_COEFF_BRAM(1)
-    ) u_signedoff_core (
+    ) u_p3_compensated_core (
         .clk(clk),
         .rst_n(rst_n),
         .ce2_out(ce2_out),
@@ -64,20 +73,73 @@ module nf_signedoff_filter_core (
         .ce128_out(ce128_out),
         .x_in(x_in),
         .x_in_valid(x_in_valid),
+        .stage3_compensated_mode(1'b1),
         .y_out(y_out),
         .y_out_valid(y_out_valid),
-        .dbg_y2(dbg_y2),
-        .dbg_y2_valid(dbg_y2_valid),
-        .dbg_y4(dbg_y4),
-        .dbg_y4_valid(dbg_y4_valid),
-        .dbg_y8(dbg_y8),
-        .dbg_y8_valid(dbg_y8_valid),
+        .dbg_y2(unused_comp_y2),
+        .dbg_y2_valid(unused_comp_y2_valid),
+        .dbg_y4(unused_comp_y4),
+        .dbg_y4_valid(unused_comp_y4_valid),
+        .dbg_y8(unused_comp_y8),
+        .dbg_y8_valid(unused_comp_y8_valid),
         .dbg_y16(dbg_y16),
         .dbg_y16_valid(dbg_y16_valid),
         .dbg_y32(dbg_y32),
         .dbg_y32_valid(dbg_y32_valid),
         .dbg_y64(dbg_y64),
         .dbg_y64_valid(dbg_y64_valid)
+    );
+
+    interp128_all2x_v7_folded_fir_cic_top_ce #(
+        .STAGE1_ACC_W(41),
+        .STAGE23_ACC_W(38),
+        .CIC_ORDER(3),
+        .FINAL_PRUNE_LSB(0),
+        .USE_LUTRAM_STAGE23(1),
+        .STAGE3_FLAT(1),
+        .USE_CIC3_SHIFTADD_COMPENSATOR(0),
+        .USE_BRAM_STAGE23_HISTORY(1),
+        .USE_UNIFIED_BRAM_STAGE23_HISTORY(1),
+        .USE_SINGLE_BRAM_STAGE1(1),
+        .USE_BRAM_STAGE23_COEFF(1),
+        .USE_PACKED_BRAM_STAGE23(0),
+        .CIC_BURST_COUNTER_USE_DSP(0),
+        .CIC_COMB_USE_DSP(0),
+        .USE_SERIAL_CIC_COMB(1),
+        .USE_N3_HOLD_EQUIV(1),
+        .USE_STAGE1_DSP48_PREADDER(1),
+        .USE_NATIONAL_FINALS_NARROW_STAGE23(1),
+        .USE_P3_JOINT_STAGE3(1),
+        .ASSUME_ALIGNED_POW2_CE(1),
+        .CIC_INTEGRATOR_DSP_MODE(2),
+        .USE_UNIFIED_FIR_COEFF_BRAM(1)
+    ) u_p3_flat_core (
+        .clk(clk),
+        .rst_n(rst_n),
+        .ce2_out(ce2_out),
+        .ce4_out(ce4_out),
+        .ce8_out(ce8_out),
+        .ce16_out(ce16_out),
+        .ce32_out(ce32_out),
+        .ce64_out(ce64_out),
+        .ce128_out(ce128_out),
+        .x_in(x_in),
+        .x_in_valid(x_in_valid),
+        .stage3_compensated_mode(1'b0),
+        .y_out(),
+        .y_out_valid(),
+        .dbg_y2(dbg_y2),
+        .dbg_y2_valid(dbg_y2_valid),
+        .dbg_y4(dbg_y4),
+        .dbg_y4_valid(dbg_y4_valid),
+        .dbg_y8(dbg_y8),
+        .dbg_y8_valid(dbg_y8_valid),
+        .dbg_y16(),
+        .dbg_y16_valid(),
+        .dbg_y32(),
+        .dbg_y32_valid(),
+        .dbg_y64(),
+        .dbg_y64_valid()
     );
 
 endmodule

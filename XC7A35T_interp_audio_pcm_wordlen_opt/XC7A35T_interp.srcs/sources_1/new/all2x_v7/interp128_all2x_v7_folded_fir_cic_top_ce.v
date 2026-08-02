@@ -54,6 +54,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     parameter integer USE_N3_HOLD_EQUIV = 0,
     parameter integer USE_STAGE1_DSP48_PREADDER = 0,
     parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 0,
+    parameter integer USE_P3_JOINT_STAGE3 = 0,
     parameter integer ASSUME_ALIGNED_POW2_CE = 0,
     parameter integer CIC_INTEGRATOR_DSP_MODE = 2,
     parameter integer USE_UNIFIED_FIR_COEFF_BRAM =
@@ -70,6 +71,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     input  wire                         ce128_out,
     input  wire signed [23:0]           x_in,
     input  wire                         x_in_valid,
+    input  wire                         stage3_compensated_mode,
     output wire signed [23:0]           y_out,
     output wire                         y_out_valid,
     output wire signed [23:0]           dbg_y2,
@@ -94,7 +96,9 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     wire y4_valid_w;
     wire signed [19:0] y4_to_8_data;
     wire y4_to_8_valid;
-    wire signed [19:0] y8_w;
+    localparam integer STAGE3_RESULT_W =
+        (USE_P3_JOINT_STAGE3 != 0) ? 21 : 20;
+    wire signed [STAGE3_RESULT_W-1:0] y8_w;
     wire y8_valid_w;
     wire signed [20:0] cic_x_w;
     wire cic_x_valid_w;
@@ -102,8 +106,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     wire y128_valid_w;
     wire [4:0] stage1_coeff_addr_w;
     wire signed [15:0] stage1_coeff_data_w;
-    wire [5:0] stage23_coeff_addr_w;
-    wire signed [15:0] stage23_coeff_data_w;
+    wire [6:0] stage23_coeff_addr_w;
+    wire signed [17:0] stage23_coeff_data_w;
 
     wire unused_ce;
     assign unused_ce = ce16_out ^ ce32_out ^ ce64_out;
@@ -121,7 +125,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
         end
         else begin : gen_no_unified_fir_coeff_bram
             assign stage1_coeff_data_w = 16'sd0;
-            assign stage23_coeff_data_w = 16'sd0;
+            assign stage23_coeff_data_w = 18'sd0;
         end
     endgenerate
 
@@ -182,8 +186,10 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
                 .DATA_W(24),
                 .STAGE2_DATA_W(22),
                 .STAGE3_DATA_W(20),
-                .COEFF_W((USE_NATIONAL_FINALS_NARROW_STAGE23 != 0) ?
-                         16 : 18),
+                .STAGE3_OUTPUT_W(STAGE3_RESULT_W),
+                .COEFF_W((USE_P3_JOINT_STAGE3 != 0) ? 18 :
+                         ((USE_NATIONAL_FINALS_NARROW_STAGE23 != 0) ?
+                          16 : 18)),
                 .ACC_W(STAGE23_ACC_W),
                 .CIC_ORDER(CIC_ORDER),
                 .STAGE3_FLAT(STAGE3_FLAT),
@@ -193,6 +199,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
                 .USE_BRAM_COEFF(USE_BRAM_STAGE23_COEFF),
                 .USE_PACKED_BRAM(USE_PACKED_BRAM_STAGE23),
                 .USE_EXTERNAL_COEFF_BRAM(USE_UNIFIED_FIR_COEFF_BRAM),
+                .USE_P3_JOINT_STAGE3(USE_P3_JOINT_STAGE3),
                 .ASSUME_ALIGNED_POW2_CE(ASSUME_ALIGNED_POW2_CE)
             ) u_interp2_stage23_lutram_cic_dsp_ce (
                 .clk(clk), .rst_n(rst_n),
@@ -204,6 +211,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
                 .stage3_ce_out(ce8_out),
                 .stage3_x_in(y4_to_8_data),
                 .stage3_x_in_valid(y4_to_8_valid),
+                .stage3_compensated_mode(stage3_compensated_mode),
                 .stage3_y_out(y8_w),
                 .stage3_y_out_valid(y8_valid_w),
                 .stage2_phase_dbg(), .stage3_phase_dbg(),
@@ -242,7 +250,13 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     endgenerate
 
     generate
-        if (USE_CIC3_SHIFTADD_COMPENSATOR != 0) begin :
+        if (USE_P3_JOINT_STAGE3 != 0) begin :
+                gen_p3_joint_stage3_compensator
+            assign cic_x_w =
+                {{(21-STAGE3_RESULT_W){y8_w[STAGE3_RESULT_W-1]}}, y8_w};
+            assign cic_x_valid_w = y8_valid_w;
+        end
+        else if (USE_CIC3_SHIFTADD_COMPENSATOR != 0) begin :
                 gen_cic3_shiftadd_compensator
             cic3_compensator_shiftadd_ce #(
                 .DATA_W(20),
@@ -252,7 +266,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
             ) u_cic3_compensator_shiftadd_ce (
                 .clk(clk),
                 .rst_n(rst_n),
-                .x_in(y8_w),
+                .x_in(y8_w[19:0]),
                 .x_in_valid(y8_valid_w),
                 .y_out(cic_x_w),
                 .y_out_valid(cic_x_valid_w)
@@ -332,7 +346,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     assign dbg_y2_valid = y2_valid_w;
     assign dbg_y4 = {y4_w, 2'b0};
     assign dbg_y4_valid = y4_valid_w;
-    assign dbg_y8 = {y8_w, 4'b0};
+    assign dbg_y8 = {y8_w[19:0], 4'b0};
     assign dbg_y8_valid = y8_valid_w;
     assign dbg_y16 = 24'sd0;
     assign dbg_y16_valid = 1'b0;
@@ -347,6 +361,10 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
             $fatal(1, "STAGE3_FLAT currently requires LUTRAM/BRAM Stage23");
         if (USE_CIC3_SHIFTADD_COMPENSATOR != 0 && STAGE3_FLAT == 0)
             $fatal(1, "CIC3 shift-add compensator requires flat Stage3");
+        if (USE_P3_JOINT_STAGE3 != 0 &&
+            (STAGE3_FLAT == 0 || USE_CIC3_SHIFTADD_COMPENSATOR != 0 ||
+             USE_UNIFIED_FIR_COEFF_BRAM == 0))
+            $fatal(1, "P3 requires flat/compensated external bank and no separate equalizer");
         if (USE_SERIAL_CIC_COMB != 0 && CIC_ORDER != 3)
             $fatal(1, "Serial CIC comb candidate requires CIC_ORDER=3");
         if (USE_N3_HOLD_EQUIV != 0 && CIC_ORDER != 3)
@@ -360,6 +378,16 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
         if (rst_n && unused_ce === 1'bx)
             $fatal(1, "Unused intermediate CE input contains X");
     end
+
+    generate
+        if (USE_P3_JOINT_STAGE3 != 0) begin : g_p3_debug_range_assert
+            always @(posedge clk) begin
+                if (rst_n && !stage3_compensated_mode && y8_valid_w &&
+                    y8_w[20] != y8_w[19])
+                    $fatal(1, "Flat Stage3 exceeded signed-20 debug output range");
+            end
+        end
+    endgenerate
 `endif
 
 endmodule

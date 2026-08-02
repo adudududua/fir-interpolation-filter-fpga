@@ -193,7 +193,7 @@ $coeffPrimitiveDir = Invoke-RtlCase -Name 'unified_coeff_ramb18_primitive' `
     ) `
     -Top 'tb_nf_unified_fir_coeff_bram_primitive' `
     -Snapshot 'tb_nf_unified_coeff_primitive_sim' `
-    -ExpectedPassText 'UNIFIED COEFFICIENT RAMB18 PRIMITIVE PASS: 32 Stage1 + 64 Stage23 addresses' `
+    -ExpectedPassText 'UNIFIED COEFFICIENT RAMB18 PRIMITIVE PASS: 32 Stage1 + 128 Stage23 addresses with signed18 parity' `
     -XvlogOptions @('-d', 'SYNTHESIS') `
     -XelabOptions @('glbl', '-L', 'unisims_ver')
 

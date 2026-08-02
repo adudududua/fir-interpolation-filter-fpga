@@ -55,6 +55,7 @@ module demo_interp_dac8_audio_pcm_common #(
     parameter integer USE_NATIONAL_FINALS_CIC_COMB_DSP = 0,
     parameter integer USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER = 0,
     parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 0,
+    parameter integer USE_NATIONAL_FINALS_P3_JOINT_STAGE3 = 0,
     parameter integer USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE = 2
 )(
     input  wire        force_mute,
@@ -279,6 +280,8 @@ module demo_interp_dac8_audio_pcm_common #(
                     USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER),
                 .USE_NATIONAL_FINALS_NARROW_STAGE23(
                     USE_NATIONAL_FINALS_NARROW_STAGE23),
+                .USE_P3_JOINT_STAGE3(
+                    USE_NATIONAL_FINALS_P3_JOINT_STAGE3),
                 .ASSUME_ALIGNED_POW2_CE(
                     USE_NATIONAL_FINALS_DATAPATH &&
                     USE_PHASE7_UNIFIED_BRAM_STAGE23_HISTORY),
@@ -293,6 +296,7 @@ module demo_interp_dac8_audio_pcm_common #(
                 .ce32_out(ce32_out), .ce64_out(ce64_out),
                 .ce128_out(ce128_out),
                 .x_in(x_in), .x_in_valid(x_in_valid),
+                .stage3_compensated_mode(mode_state == MODE_128X),
                 .y_out(y_out_w), .y_out_valid(y_out_valid_w),
                 .dbg_y2(), .dbg_y2_valid(),
                 .dbg_y4(dbg_y4_w), .dbg_y4_valid(dbg_y4_valid_w),

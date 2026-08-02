@@ -44,6 +44,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     parameter integer DATA_W = 24,
     parameter integer STAGE2_DATA_W = 22,
     parameter integer STAGE3_DATA_W = 20,
+    parameter integer STAGE3_OUTPUT_W = STAGE3_DATA_W,
     parameter integer COEFF_W = 18,
     parameter integer ACC_W = 38,
     parameter integer CIC_ORDER = 3,
@@ -53,6 +54,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     parameter integer USE_BRAM_COEFF = 0,
     parameter integer USE_PACKED_BRAM = 0,
     parameter integer USE_EXTERNAL_COEFF_BRAM = 0,
+    parameter integer USE_P3_JOINT_STAGE3 = 0,
     parameter integer ASSUME_ALIGNED_POW2_CE = 0
 )(
     input  wire                              clk,
@@ -67,7 +69,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     input  wire                              stage3_ce_out,
     input  wire signed [STAGE3_DATA_W-1:0]   stage3_x_in,
     input  wire                              stage3_x_in_valid,
-    output reg  signed [STAGE3_DATA_W-1:0]   stage3_y_out,
+    input  wire                              stage3_compensated_mode,
+    output reg  signed [STAGE3_OUTPUT_W-1:0] stage3_y_out,
     output reg                               stage3_y_out_valid,
 
     output wire                              stage2_phase_dbg,
@@ -76,8 +79,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     output wire [1:0]                        scheduler_stage_dbg,
     output wire [3:0]                        scheduler_mac_index_dbg,
 
-    output wire [5:0]                        external_coeff_addr,
-    input  wire signed [15:0]                external_coeff_data
+    output wire [6:0]                        external_coeff_addr,
+    input  wire signed [17:0]                external_coeff_data
 );
 
     localparam integer MEM_ADDR_W = 4;
@@ -85,15 +88,15 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     localparam integer FRAC_W = 15;
     localparam integer SHIFT_W = ACC_W - FRAC_W;
     localparam integer STAGE2_UPPER_W = SHIFT_W - STAGE2_DATA_W;
-    localparam integer STAGE3_UPPER_W = SHIFT_W - STAGE3_DATA_W;
+    localparam integer STAGE3_UPPER_W = SHIFT_W - STAGE3_OUTPUT_W;
     localparam signed [STAGE2_DATA_W-1:0] STAGE2_OUT_MAX =
         {1'b0, {(STAGE2_DATA_W-1){1'b1}}};
     localparam signed [STAGE2_DATA_W-1:0] STAGE2_OUT_MIN =
         {1'b1, {(STAGE2_DATA_W-1){1'b0}}};
-    localparam signed [STAGE3_DATA_W-1:0] STAGE3_OUT_MAX =
-        {1'b0, {(STAGE3_DATA_W-1){1'b1}}};
-    localparam signed [STAGE3_DATA_W-1:0] STAGE3_OUT_MIN =
-        {1'b1, {(STAGE3_DATA_W-1){1'b0}}};
+    localparam signed [STAGE3_OUTPUT_W-1:0] STAGE3_OUT_MAX =
+        {1'b0, {(STAGE3_OUTPUT_W-1){1'b1}}};
+    localparam signed [STAGE3_OUTPUT_W-1:0] STAGE3_OUT_MIN =
+        {1'b1, {(STAGE3_OUTPUT_W-1){1'b0}}};
 
     (* ram_style = "distributed" *)
     reg signed [STAGE2_DATA_W-1:0] stage2_hist_mem [0:MEM_DEPTH-1];
@@ -115,10 +118,12 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     reg stage3_pending;
     reg stage2_pending_phase;
     reg stage3_pending_phase;
+    reg stage3_pending_compensated;
 
     reg job_active;
     reg job_stage3;
     reg job_phase;
+    reg job_stage3_compensated;
     reg [3:0] job_mac_index;
     reg [MEM_ADDR_W-1:0] job_history_head;
     reg [MEM_ADDR_W-1:0] job_fill_count;
@@ -184,12 +189,13 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     wire signed [47:0] dsp_round_bias;
     wire dsp_round_carryin;
     wire signed [STAGE2_DATA_W-1:0] stage2_q15_rounded;
-    wire signed [STAGE3_DATA_W-1:0] stage3_q15_rounded;
+    wire signed [STAGE3_OUTPUT_W-1:0] stage3_q15_rounded;
     wire signed [SHIFT_W-1:0] truncated_value;
     wire stage2_upper_is_sign_extension;
     wire stage3_upper_is_sign_extension;
     wire coeff_bram_stage3;
     wire coeff_bram_phase;
+    wire coeff_bram_stage3_compensated;
     wire [3:0] coeff_bram_next_index;
     wire [5:0] coeff_bram_read_addr;
     wire [5:0] packed_coeff_read_addr;
@@ -240,12 +246,18 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         (!stage2_pending && stage3_pending);
     assign coeff_bram_phase = job_active ? job_phase :
         (stage2_pending ? stage2_pending_phase : stage3_pending_phase);
+    assign coeff_bram_stage3_compensated =
+        (USE_P3_JOINT_STAGE3 != 0) && coeff_bram_stage3 &&
+        (job_active ? job_stage3_compensated :
+                      stage3_pending_compensated);
     assign coeff_bram_next_index = job_active ?
         job_mac_index + 4'd1 : 4'd0;
     assign coeff_bram_read_addr = {coeff_bram_stage3,
                                    coeff_bram_phase,
                                    coeff_bram_next_index};
-    assign external_coeff_addr = coeff_bram_read_addr;
+    assign external_coeff_addr = coeff_bram_stage3_compensated ?
+        {2'b11, coeff_bram_phase, coeff_bram_next_index} :
+        {1'b0, coeff_bram_read_addr};
     // 地址 0～15 保存历史；16～31 和 32～47 分别保存两相系数。
     assign packed_coeff_read_addr = {coeff_bram_phase,
                                      ~coeff_bram_phase,
@@ -316,7 +328,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         stage2_packed_raw[COEFF_W-1:0] :
         stage3_packed_raw[COEFF_W-1:0];
     assign dsp_coeff_b = (USE_EXTERNAL_COEFF_BRAM != 0) ?
-        {{2{external_coeff_data[15]}}, external_coeff_data} :
+        external_coeff_data :
         ((USE_PACKED_BRAM != 0) ? packed_coeff_raw :
          ((USE_BRAM_COEFF != 0) ? coeff_bram_raw : coeff_comb));
     // PREG is synchronously cleared as a new job is accepted, then feeds the
@@ -424,11 +436,11 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     // direct slice safe, so retain the complete 38-bit view and explicit
     // signed saturation for every Stage3 configuration.
     assign stage3_upper_is_sign_extension =
-        truncated_value[SHIFT_W-1:STAGE3_DATA_W] ==
-        {STAGE3_UPPER_W{truncated_value[STAGE3_DATA_W-1]}};
+        truncated_value[SHIFT_W-1:STAGE3_OUTPUT_W] ==
+        {STAGE3_UPPER_W{truncated_value[STAGE3_OUTPUT_W-1]}};
     assign stage3_q15_rounded =
         stage3_upper_is_sign_extension ?
-        truncated_value[STAGE3_DATA_W-1:0] :
+        truncated_value[STAGE3_OUTPUT_W-1:0] :
         (truncated_value[SHIFT_W-1] ?
          STAGE3_OUT_MIN : STAGE3_OUT_MAX);
 
@@ -683,16 +695,18 @@ module interp2_stage23_lutram_cic_dsp_ce #(
             stage3_pending <= 1'b0;
             stage2_pending_phase <= 1'b0;
             stage3_pending_phase <= 1'b0;
+            stage3_pending_compensated <= 1'b0;
             job_active <= 1'b0;
             job_stage3 <= 1'b0;
             job_phase <= 1'b0;
+            job_stage3_compensated <= 1'b0;
             job_mac_index <= 4'd0;
             job_history_head <= {MEM_ADDR_W{1'b0}};
             job_fill_count <= {MEM_ADDR_W{1'b0}};
             job_result_pending <= 1'b0;
             job_output_pending <= 1'b0;
             stage2_y_out <= {STAGE2_DATA_W{1'b0}};
-            stage3_y_out <= {STAGE3_DATA_W{1'b0}};
+            stage3_y_out <= {STAGE3_OUTPUT_W{1'b0}};
             stage2_y_out_valid <= 1'b0;
             stage3_y_out_valid <= 1'b0;
         end
@@ -714,6 +728,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
             if (stage3_ce_out) begin
                 stage3_pending <= 1'b1;
                 stage3_pending_phase <= stage3_phase;
+                stage3_pending_compensated <=
+                    stage3_compensated_mode;
                 if (stage3_phase == 1'b0) begin
                     stage3_head <= stage3_write_addr;
                     if (stage3_fill_count < 4'd6)
@@ -760,6 +776,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
                 job_active <= 1'b1;
                 job_stage3 <= 1'b1;
                 job_phase <= stage3_pending_phase;
+                job_stage3_compensated <=
+                    stage3_pending_compensated;
                 job_mac_index <= 4'd0;
                 job_history_head <= stage3_head;
                 job_fill_count <= stage3_fill_count;
@@ -772,6 +790,13 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     initial begin
         if (STAGE2_DATA_W > 24 || STAGE2_DATA_W < STAGE3_DATA_W)
             $fatal(1, "Invalid Stage 2/3 data widths");
+        if (STAGE3_OUTPUT_W < STAGE3_DATA_W ||
+            STAGE3_OUTPUT_W > STAGE3_DATA_W+1)
+            $fatal(1, "Stage3 output must retain input width or one headroom bit");
+        if (USE_P3_JOINT_STAGE3 != 0 &&
+            (STAGE3_OUTPUT_W != 21 || COEFF_W != 18 ||
+             USE_EXTERNAL_COEFF_BRAM == 0))
+            $fatal(1, "P3 Stage3 requires 21bit output and external signed18 coefficients");
         if (COEFF_W != 18 && !(STAGE3_FLAT != 0 && COEFF_W == 16))
             $fatal(1, "Stage 2/3 coefficients require 18bit, or 16bit in flat Stage3 mode");
         if (USE_PACKED_BRAM != 0 &&

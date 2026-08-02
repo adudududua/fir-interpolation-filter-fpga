@@ -6,9 +6,9 @@
 module tb_nf_unified_fir_coeff_bram_primitive;
     reg clk = 1'b0;
     reg [4:0] stage1_addr = 5'd0;
-    reg [5:0] stage23_addr = 6'd0;
+    reg [6:0] stage23_addr = 7'd0;
     wire signed [15:0] stage1_coeff;
-    wire signed [15:0] stage23_coeff;
+    wire signed [17:0] stage23_coeff;
 
     integer addr;
     integer errors = 0;
@@ -58,8 +58,8 @@ module tb_nf_unified_fir_coeff_bram_primitive;
         end
     endfunction
 
-    function signed [15:0] expected_stage23;
-        input [5:0] index;
+    function signed [17:0] expected_stage23;
+        input [6:0] index;
         begin
             case (index)
                 6'd0:  expected_stage23 = -16'sd115;
@@ -90,7 +90,44 @@ module tb_nf_unified_fir_coeff_bram_primitive;
                 6'd50: expected_stage23 =  16'sd32016;
                 6'd51: expected_stage23 =  16'sd522;
                 6'd52: expected_stage23 = -16'sd148;
-                default: expected_stage23 = 16'sd0;
+                7'd64: expected_stage23 = -18'sd5;
+                7'd65: expected_stage23 =  18'sd7;
+                7'd66: expected_stage23 = -18'sd12;
+                7'd67: expected_stage23 =  18'sd19;
+                7'd68: expected_stage23 = -18'sd29;
+                7'd69: expected_stage23 =  18'sd42;
+                7'd70: expected_stage23 = -18'sd59;
+                7'd71: expected_stage23 =  18'sd80;
+                7'd72: expected_stage23 = -18'sd107;
+                7'd73: expected_stage23 =  18'sd141;
+                7'd74: expected_stage23 = -18'sd182;
+                7'd75: expected_stage23 =  18'sd233;
+                7'd76: expected_stage23 = -18'sd293;
+                7'd77: expected_stage23 =  18'sd367;
+                7'd78: expected_stage23 = -18'sd455;
+                7'd79: expected_stage23 =  18'sd562;
+                7'd80: expected_stage23 = -18'sd691;
+                7'd81: expected_stage23 =  18'sd849;
+                7'd82: expected_stage23 = -18'sd1045;
+                7'd83: expected_stage23 =  18'sd1296;
+                7'd84: expected_stage23 = -18'sd1629;
+                7'd85: expected_stage23 =  18'sd2094;
+                7'd86: expected_stage23 = -18'sd2803;
+                7'd87: expected_stage23 =  18'sd4044;
+                7'd88: expected_stage23 = -18'sd6876;
+                7'd89: expected_stage23 =  18'sd20836;
+                7'd96:  expected_stage23 =  18'sd561;
+                7'd97:  expected_stage23 = -18'sd4232;
+                7'd98:  expected_stage23 =  18'sd20046;
+                7'd99:  expected_stage23 =  18'sd20046;
+                7'd100: expected_stage23 = -18'sd4232;
+                7'd101: expected_stage23 =  18'sd561;
+                7'd112: expected_stage23 =  18'sd137;
+                7'd113: expected_stage23 = -18'sd1554;
+                7'd114: expected_stage23 =  18'sd35584;
+                7'd115: expected_stage23 = -18'sd1554;
+                7'd116: expected_stage23 =  18'sd137;
+                default: expected_stage23 = 18'sd0;
             endcase
         end
     endfunction
@@ -100,10 +137,10 @@ module tb_nf_unified_fir_coeff_bram_primitive;
         #120;
 
         // Check every address, including all intentionally zero-filled holes.
-        for (addr = 0; addr < 64; addr = addr + 1) begin
+        for (addr = 0; addr < 128; addr = addr + 1) begin
             @(negedge clk);
             stage1_addr = addr[4:0];
-            stage23_addr = addr[5:0];
+            stage23_addr = addr[6:0];
             @(posedge clk);
             #1;
 
@@ -115,10 +152,10 @@ module tb_nf_unified_fir_coeff_bram_primitive;
                 errors = errors + 1;
             end
 
-            if (stage23_coeff !== expected_stage23(addr[5:0])) begin
+            if (stage23_coeff !== expected_stage23(addr[6:0])) begin
                 $display("Stage23 primitive mismatch addr=%0d actual=%0d expected=%0d",
                          stage23_addr, stage23_coeff,
-                         expected_stage23(addr[5:0]));
+                         expected_stage23(addr[6:0]));
                 errors = errors + 1;
             end
         end
@@ -127,7 +164,7 @@ module tb_nf_unified_fir_coeff_bram_primitive;
             $fatal(1, "Unified coefficient RAMB18 primitive FAIL errors=%0d",
                    errors);
 
-        $display("UNIFIED COEFFICIENT RAMB18 PRIMITIVE PASS: 32 Stage1 + 64 Stage23 addresses");
+        $display("UNIFIED COEFFICIENT RAMB18 PRIMITIVE PASS: 32 Stage1 + 128 Stage23 addresses with signed18 parity");
         $finish;
     end
 endmodule
