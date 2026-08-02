@@ -18,6 +18,8 @@ p3_joint_stage3=1
 
 板级 post-route 结果为 **432 LUT / 431 FF / 174 Slice / 4 DSP48E1 / 4 RAMB18E1（2 BRAM Tile）/ 2 MMCM**。相对 P4-D R2 的 479 LUT / 468 FF / 198 Slice，减少 **47 LUT（9.81%）/ 37 FF（7.91%）/ 24 Slice（12.12%）**，DSP、BRAM 和 MMCM 不增加。WNS/WHS 为 **+45.624/+0.105 ns**，TNS/THS 为 0，vectorless 功耗为 **0.271 W（0.199 W dynamic + 0.072 W static）**。
 
+最终 clean-source 构建起点为提交 `d441c49958439e1624ff08a73a1c4263de5686ea`，`source_worktree_dirty=false`。正式结果目录为 `matlab_fir/national_finals/vivado_results/p3_joint_stage3_432lut_431ff_174slice_4dsp_2bram_signedoff`；bitstream SHA-256 为 `8E2C2DB3329BBE519CB8F87249961A35E120A79EE49A2CC706C62D9D037FA85C`，routed DCP SHA-256 为 `6DB2FA7BDD26FAE35E603577D4F708E7CB75BF7B4684F1DAB54E8AEBFDE3F004`。
+
 这不是仅看综合结果的估算，而是完整板级布局布线结果。物理板下载、六档 DA_CLK 和频谱仪测试仍需现场完成，因此本文件只声明工具侧签核通过。
 
 ## 2. 创新结构与优化原理
@@ -108,10 +110,10 @@ Smoke 工作目录为 `_work/rtl_regression/20260802_154458`，Release 为 `_wor
 - `check_timing`：无时钟端点 0，未约束内部 max-delay 端点 0；
 - CDC：CDC-3 Info 10；CDC-13 Critical 2 为 BUFGMUX 专用 S0/S1；CDC-15 Warning 4 为已采用 request/ack 和 50 ns bus-skew/absolute-delay 约束的 bundled mode bus；
 - DRC：error=0；保留 8 个 DPIP-1、2 个 DPOP-1 和 1 个 AVAL-4 非功能性提示，均未产生时序违例。
+- bundled mode bus：50 ns bus-skew 门槛下实际 1.801 ns；absolute data delay 最大 1.000 ns；
 
 ## 7. 回退路线
 
 - P4-D R2 稳定标签：`nf-p4d-r2-479lut-468ff-4dsp-2bram-2mmcm-clean`；
 - P3-J 阶段提交依次为 MATLAB 门禁、架构冻结、RTL 实现、复位/动态回归、可复现构建和策略扫描；
-- 最终 P3-J 签核标签在 clean-source bitstream 完成后写入本节及 README。
-
+- 最终 P3-J 签核标签：`nf-p3j-432lut-431ff-174slice-4dsp-2bram-2mmcm-signedoff`。

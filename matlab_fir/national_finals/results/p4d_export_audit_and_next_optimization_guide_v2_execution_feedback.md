@@ -198,7 +198,7 @@ P2-A 通过 17/17 Release，完整布线且 0 timing failing endpoint；bit SHA-
 | TWO24 3-DSP | `codex/national-finals-p1-two24-cic` | `nf-p1-two24-518lut-498ff-3dsp-2bram-2mmcm` |
 | distributed ROM 1-Tile | `codex/national-finals-p2-coeff-distributed-rom` | `nf-p2-513lut-496ff-4dsp-1bram-2mmcm` |
 | Stage3/均衡器 MATLAB 门禁 | `codex/national-finals-p3-joint-stage3-equalizer` | `nf-p3-matlab-gate-11tap-q15-18bit` |
-| Stage3/均衡器 RTL 签核 | `national-finals-p3-rtl-equalizer-fold` | 最终 clean build 后创建 |
+| Stage3/均衡器 RTL 签核 | `national-finals-p3-rtl-equalizer-fold` | `nf-p3j-432lut-431ff-174slice-4dsp-2bram-2mmcm-signedoff` |
 
 当前工作分支停留在 P3-J RTL 签核版；P4-D R2 标签不移动，仍可一条命令回退。
 

@@ -502,7 +502,7 @@ Route 1相对573-LUT基线减少149 LUT和150 FF，WNS减少 **0.983 ns**，WHS�
 
 ## 全国总决赛当前推荐候选（2026-08-02，P3-J 4-DSP 联合 Stage3）
 
-当前发布闭环分支为 `national-finals-p3-rtl-equalizer-fold`。默认推荐 **432 LUT / 431 FF / 174 Slice / 4 DSP / 2 BRAM Tile**；P4-D R2 标签 `nf-p4d-r2-479lut-468ff-4dsp-2bram-2mmcm-clean` 是同拓扑稳定回退。若评分更看重 BRAM，可切换 P4-E（1.5 BRAM）或 P4-F（1 BRAM）；若更看重 DSP，可回退 P4-C 的 **504 LUT / 494 FF / 3 DSP** 或 **523 LUT / 523 FF / 2 DSP**。P3-J 已完成六工况 MATLAB、Smoke/Release 15/15、综合、布局布线、setup/hold、DRC/CDC、功耗和 bitstream；详细签核见 [P3-J RTL 签核](matlab_fir/national_finals/results/p3_joint_stage3_rtl_signoff.md)。
+当前发布闭环分支为 `national-finals-p3-rtl-equalizer-fold`，最终标签为 `nf-p3j-432lut-431ff-174slice-4dsp-2bram-2mmcm-signedoff`。默认推荐 **432 LUT / 431 FF / 174 Slice / 4 DSP / 2 BRAM Tile**；P4-D R2 标签 `nf-p4d-r2-479lut-468ff-4dsp-2bram-2mmcm-clean` 是同拓扑稳定回退。若评分更看重 BRAM，可切换 P4-E（1.5 BRAM）或 P4-F（1 BRAM）；若更看重 DSP，可回退 P4-C 的 **504 LUT / 494 FF / 3 DSP** 或 **523 LUT / 523 FF / 2 DSP**。P3-J 已完成六工况 MATLAB、Smoke/Release 15/15、综合、布局布线、setup/hold、DRC/CDC、功耗和 bitstream；正式结果目录为 [`p3_joint_stage3_432lut_431ff_174slice_4dsp_2bram_signedoff`](matlab_fir/national_finals/vivado_results/p3_joint_stage3_432lut_431ff_174slice_4dsp_2bram_signedoff)，bitstream SHA-256 为 `8E2C2DB3329BBE519CB8F87249961A35E120A79EE49A2CC706C62D9D037FA85C`，详细签核见 [P3-J RTL 签核](matlab_fir/national_finals/results/p3_joint_stage3_rtl_signoff.md)。
 
 工具侧验证不能替代实物板：目前仍需下载 bitstream，实测六档 DA_CLK、44.1/48 kHz 家族切换、DAC 数据建立保持、15 kHz 主音和 128x 首镜像抑制，全部通过后才能声明“全国赛实板验证完成”。
 
@@ -606,7 +606,7 @@ Narrow Stage2/3      = on
 | MMCM（MMCME2_ADV） | **2** | 5 | **40.00%** |
 | BUFGCTRL | 2 | 32 | 6.25% |
 
-最终默认实现全部布线完成，WNS/TNS为`+45.624 ns / 0 ns`，WHS/THS为`+0.105 ns / 0 ns`，setup/hold失败端点均为0，route error为0。P3-J 原始报告、bitstream 和机器可读 SHA 清单保存在带资源名的最终签核结果目录；频响、RTL 和策略扫描见 [`p3_joint_stage3_rtl_signoff.md`](matlab_fir/national_finals/results/p3_joint_stage3_rtl_signoff.md)。若以 DSP 数为第一目标，可选择 P4-C 的 504-LUT/3-DSP 或 523-LUT/2-DSP 档；所有全国赛候选均未完成实物板测。
+最终默认实现全部布线完成，WNS/TNS为`+45.624 ns / 0 ns`，WHS/THS为`+0.105 ns / 0 ns`，setup/hold失败端点均为0，route error为0。P3-J 原始报告、bitstream 和机器可读 SHA 清单见 [`p3_joint_stage3_432lut_431ff_174slice_4dsp_2bram_signedoff`](matlab_fir/national_finals/vivado_results/p3_joint_stage3_432lut_431ff_174slice_4dsp_2bram_signedoff)，频响、RTL 和策略扫描见 [`p3_joint_stage3_rtl_signoff.md`](matlab_fir/national_finals/results/p3_joint_stage3_rtl_signoff.md)。若以 DSP 数为第一目标，可选择 P4-C 的 504-LUT/3-DSP 或 523-LUT/2-DSP 档；所有全国赛候选均未完成实物板测。
 
 软件、RTL 和 FPGA 实现签核已通过；物理开发板下载及示波器/频谱仪验收尚需现场执行。完整架构、指标、RTL 一键回归、bitstream、SW1～SW8 映射和板测清单见 [全国总决赛交付说明](matlab_fir/national_finals/README.md)。
 
@@ -635,7 +635,7 @@ Narrow Stage2/3      = on
 AUTO扫频；LCD同步显示当前倍率、输出采样率、`IN:xx kHz`及AUTO状态。
 四组定向XSim、完整综合实现和bitstream均已通过，详细接口、资源和
 首次上板步骤见
-[`LCD12864_DISPLAY_README.md`](XC7A35T_interp_audio_pcm_wordlen_opt_display_function/LCD12864_DISPLAY_README.md)。
+[`LCD12864_DISPLAY_README.md`](XC7A35T_interp_opt_df/LCD12864_DISPLAY_README.md)。
 
 ## 0. Phase 7 折叠补偿 FIR-CIC 候选
 
