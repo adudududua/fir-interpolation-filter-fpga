@@ -356,10 +356,13 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     assign y8_extended_w =
         {{(21-STAGE3_RESULT_W){y8_w[STAGE3_RESULT_W-1]}}, y8_w};
     assign y8_debug_overflow_w =
-        (USE_P3_JOINT_STAGE3 != 0) &&
-        (y8_extended_w[20] != y8_extended_w[19]);
-    assign y8_debug_20_w = !y8_debug_overflow_w ? y8_extended_w[19:0] :
-        (y8_extended_w[20] ? 20'sh80000 : 20'sh7ffff);
+        y8_extended_w[20] != y8_extended_w[19];
+    // The saturated sign bit is always the original signed-21 sign.  Only
+    // the lower 19 bits need a mux: all ones on positive overflow and all
+    // zeros on negative overflow.
+    assign y8_debug_20_w[19] = y8_extended_w[20];
+    assign y8_debug_20_w[18:0] = y8_debug_overflow_w ?
+        {19{~y8_extended_w[20]}} : y8_extended_w[18:0];
     assign dbg_y8 = {y8_debug_20_w, 4'b0};
     assign dbg_y8_valid = y8_valid_w;
     assign dbg_y16 = 24'sd0;
