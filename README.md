@@ -576,6 +576,7 @@ Narrow Stage2/3      = on
 21. **在当前 Stage1 单 BRAM 核重新启用 DSP48 预加器**：早期架构中预加器 A/B 曾变差，但当前串行双读核中 `D+A` 实测再减少7个综合 LUT；优化结论按具体结构而不是按器件直觉复用。
 22. **CIC 解析状态收窄与三档映射**：第一/第二积分器从保守33 bit收紧为可证明的26/29 bit；两个积分器可分别映射 DSP48E1 或 LUT CARRY4，形成479-LUT/4-DSP、504-LUT/3-DSP、523-LUT/2-DSP三档。
 23. **正确性与复现补强**：修复48 kHz首ROM地址和CDC settle计数宽度；GUI顶层/宏与CLI签核一致；历史RAMB18原语对行为模型独立对拍；最终15/15 RTL与六工况MATLAB重跑通过。
+24. **P3-J GUI 手动构建稳定性修复**：工程文件显式保存 `USE_NATIONAL_FINALS_P3_JOINT_STAGE3=1`，并把普通 GUI run 固定为 `AreaOptimized_high / flatten full / resource sharing on + opt_design Default`。校验脚本将综合和实现并行度限制为4，避免 Vivado GUI 按19 jobs启动后在 `opt_design` 发生内存耗尽，或因系统内存压力留下无进展的 route worker。修复后从干净综合结果重跑，综合约30秒、实现到 bitstream 约61秒，资源、Slice和时序与 P3-J 签核值完全一致。
 
 ### 4x / 8x / 128x 分级滤波指标
 
@@ -607,6 +608,8 @@ Narrow Stage2/3      = on
 | BUFGCTRL | 2 | 32 | 6.25% |
 
 最终默认实现全部布线完成，WNS/TNS为`+45.624 ns / 0 ns`，WHS/THS为`+0.105 ns / 0 ns`，setup/hold失败端点均为0，route error为0。P3-J 原始报告、bitstream 和机器可读 SHA 清单见 [`p3_joint_stage3_432lut_431ff_174slice_4dsp_2bram_signedoff`](matlab_fir/national_finals/vivado_results/p3_joint_stage3_432lut_431ff_174slice_4dsp_2bram_signedoff)，频响、RTL 和策略扫描见 [`p3_joint_stage3_rtl_signoff.md`](matlab_fir/national_finals/results/p3_joint_stage3_rtl_signoff.md)。若以 DSP 数为第一目标，可选择 P4-C 的 504-LUT/3-DSP 或 523-LUT/2-DSP 档；所有全国赛候选均未完成实物板测。
+
+GUI 工程已在相同源码上重新验证：综合后为461 LUT / 437 FF / 4 DSP / 4 RAMB18E1 / 2 MMCM，布局布线后为432 LUT / 431 FF / 174 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM，WNS/WHS=`+45.624/+0.105 ns`，vectorless 总/动态/静态功耗=`0.271/0.199/0.072 W`，bitstream 生成成功。推荐先运行 `configure_national_finals_gui_project.tcl` 固化配置；手动点击 Vivado 的 Generate Bitstream 时将 Number of jobs 设为4。也可运行 `verify_national_finals_gui_project.tcl rebuild` 完成等价的全量重建和资源门禁。
 
 软件、RTL 和 FPGA 实现签核已通过；物理开发板下载及示波器/频谱仪验收尚需现场执行。完整架构、指标、RTL 一键回归、bitstream、SW1～SW8 映射和板测清单见 [全国总决赛交付说明](matlab_fir/national_finals/README.md)。
 

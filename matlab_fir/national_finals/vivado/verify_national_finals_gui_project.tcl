@@ -38,6 +38,7 @@ require_generic $project_generics USE_NATIONAL_FINALS_SINGLE_BRAM_STAGE1 1
 require_generic $project_generics USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER 1
 require_generic $project_generics USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE 2
 require_generic $project_generics USE_NATIONAL_FINALS_NARROW_STAGE23 1
+require_generic $project_generics USE_NATIONAL_FINALS_P3_JOINT_STAGE3 1
 
 set sim_set [get_filesets sim_1]
 set project_sim_defines [get_property verilog_define $sim_set]
@@ -90,11 +91,19 @@ require_condition [expr {[llength $stage1_serial_file] == 1}] \
 
 set gui_resource_sharing [string tolower [get_property \
     STEPS.SYNTH_DESIGN.ARGS.RESOURCE_SHARING [get_runs synth_1]]]
+set gui_synth_directive [get_property \
+    STEPS.SYNTH_DESIGN.ARGS.DIRECTIVE [get_runs synth_1]]
+set gui_flatten_hierarchy [string tolower [get_property \
+    STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY [get_runs synth_1]]]
 set gui_opt_directive [get_property \
     STEPS.OPT_DESIGN.ARGS.DIRECTIVE [get_runs impl_1]]
 require_condition \
     [expr {$gui_resource_sharing in {"on" "1" "true"}}] \
     "GUI synthesis ResourceSharing must be enabled."
+require_condition [expr {$gui_synth_directive eq "AreaOptimized_high"}] \
+    "GUI synthesis directive must be AreaOptimized_high."
+require_condition [expr {$gui_flatten_hierarchy eq "full"}] \
+    "GUI synthesis flatten_hierarchy must be full."
 require_condition [expr {$gui_opt_directive eq "Default"}] \
     "GUI implementation opt_design directive must be Default."
 
@@ -102,6 +111,8 @@ puts "NATIONAL_FINALS_GUI_CONFIG_PASS"
 puts "GUI_GENERICS=$project_generics"
 puts "GUI_SIM_DEFINES=$project_sim_defines"
 puts "GUI_RESOURCE_SHARING=$gui_resource_sharing"
+puts "GUI_SYNTH_DIRECTIVE=$gui_synth_directive"
+puts "GUI_FLATTEN_HIERARCHY=$gui_flatten_hierarchy"
 puts "GUI_OPT_DIRECTIVE=$gui_opt_directive"
 
 if {$requested_action eq "rebuild"} {
@@ -148,15 +159,15 @@ if {[get_property PROGRESS [get_runs impl_1]] eq "100%"} {
     puts "GUI_MMCM=$mmcm_count"
 
     require_condition [expr {$dsp_count == 4}] \
-        "GUI implementation is not the P4-D 4-DSP architecture."
+        "GUI implementation is not the P3-J 4-DSP architecture."
     require_condition [expr {$bram18_count == 4}] \
         "GUI implementation does not use the expected two BRAM tiles."
     require_condition [expr {$mmcm_count == 2}] \
         "GUI implementation does not use the expected two MMCMs."
-    require_condition [expr {$lut_count <= 500}] \
-        "GUI implementation exceeds the signed-off 500-LUT P4-D guard."
-    require_condition [expr {$ff_count <= 490}] \
-        "GUI implementation exceeds the signed-off 490-FF P4-D guard."
+    require_condition [expr {$lut_count <= 440}] \
+        "GUI implementation exceeds the signed-off 440-LUT P3-J guard."
+    require_condition [expr {$ff_count <= 440}] \
+        "GUI implementation exceeds the signed-off 440-FF P3-J guard."
 
     puts "NATIONAL_FINALS_GUI_IMPLEMENTATION_PASS"
     close_design

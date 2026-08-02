@@ -44,6 +44,17 @@ require_generic $project_generics USE_NATIONAL_FINALS_SINGLE_BRAM_STAGE1 1
 require_generic $project_generics USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER 1
 require_generic $project_generics USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE 2
 require_generic $project_generics USE_NATIONAL_FINALS_NARROW_STAGE23 1
+require_generic $project_generics USE_NATIONAL_FINALS_P3_JOINT_STAGE3 1
+
+# Keep ordinary GUI runs bit-for-bit aligned with the selected P3-J strategy.
+set_property STEPS.SYNTH_DESIGN.ARGS.DIRECTIVE AreaOptimized_high \
+    [get_runs synth_1]
+set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY full \
+    [get_runs synth_1]
+set_property STEPS.SYNTH_DESIGN.ARGS.RESOURCE_SHARING on \
+    [get_runs synth_1]
+set_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE Default \
+    [get_runs impl_1]
 
 set sim_set [get_filesets sim_1]
 set daily_vector_names [list \
@@ -74,5 +85,9 @@ puts "NATIONAL_FINALS_GUI_SIM_CONFIGURED"
 puts "GUI_SIM_TOP=[get_property top $sim_set]"
 puts "GUI_SIM_DEFINES=[get_property verilog_define $sim_set]"
 puts "GUI_SIM_ASSET_COUNT=[llength $daily_vector_names]"
+puts "GUI_SYNTH_DIRECTIVE=[get_property STEPS.SYNTH_DESIGN.ARGS.DIRECTIVE [get_runs synth_1]]"
+puts "GUI_FLATTEN_HIERARCHY=[get_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY [get_runs synth_1]]"
+puts "GUI_RESOURCE_SHARING=[get_property STEPS.SYNTH_DESIGN.ARGS.RESOURCE_SHARING [get_runs synth_1]]"
+puts "GUI_OPT_DIRECTIVE=[get_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE [get_runs impl_1]]"
 
 close_project

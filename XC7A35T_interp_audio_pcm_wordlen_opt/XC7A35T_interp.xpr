@@ -486,6 +486,7 @@
         <Generic Name="USE_NATIONAL_FINALS_CIC_COMB_DSP" Val="0"/>
         <Generic Name="USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER" Val="1"/>
         <Generic Name="USE_NATIONAL_FINALS_NARROW_STAGE23" Val="1"/>
+        <Generic Name="USE_NATIONAL_FINALS_P3_JOINT_STAGE3" Val="1"/>
         <Generic Name="USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE" Val="2"/>
       </Config>
     </FileSet>
@@ -698,6 +699,7 @@
         <Step Id="synth_design">
           <Option Id="Directive">1</Option>
           <Option Id="ResourceSharing">1</Option>
+          <Option Id="FlattenHierarchy">0</Option>
         </Step>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
