@@ -15,6 +15,11 @@ set board_xdc [file join $project_dir XC7A35T_interp.srcs constrs_1 new \
 set result_tag board_dual_rate_cic6_round7_headroom_opt
 set implementation_opt_directive Default
 set p3_joint_stage3 1
+set expected_synth_directive AreaOptimized_high
+set expected_flatten_hierarchy full
+set expected_resource_sharing on
+set expected_stage1_dsp48_preadder 1
+set expected_cic_integrator_dsp_mode 2
 if {$argc > 0} {
     set result_tag [lindex $argv 0]
 }
@@ -23,6 +28,21 @@ if {$argc > 1} {
 }
 if {$argc > 2} {
     set p3_joint_stage3 [lindex $argv 2]
+}
+if {$argc > 3} {
+    set expected_synth_directive [lindex $argv 3]
+}
+if {$argc > 4} {
+    set expected_flatten_hierarchy [lindex $argv 4]
+}
+if {$argc > 5} {
+    set expected_resource_sharing [lindex $argv 5]
+}
+if {$argc > 6} {
+    set expected_stage1_dsp48_preadder [lindex $argv 6]
+}
+if {$argc > 7} {
+    set expected_cic_integrator_dsp_mode [lindex $argv 7]
 }
 if {![regexp {^[A-Za-z0-9_-]+$} $result_tag]} {
     error "result_tag may contain only letters, digits, underscore, and dash"
@@ -61,6 +81,22 @@ proc write_primitive_report {report_file pattern title} {
 
 require_file $synth_dcp
 require_file $board_xdc
+set synth_provenance_file [file join $project_dir XC7A35T_interp.runs synth_1 \
+    national_finals_synth_provenance.txt]
+require_file $synth_provenance_file
+set expected_synth_provenance [join [list \
+    "synth_directive=$expected_synth_directive" \
+    "flatten_hierarchy=$expected_flatten_hierarchy" \
+    "resource_sharing=$expected_resource_sharing" \
+    "stage1_dsp48_preadder=$expected_stage1_dsp48_preadder" \
+    "cic_integrator_dsp_mode=$expected_cic_integrator_dsp_mode" \
+    "p3_joint_stage3=$p3_joint_stage3"] "\n"]
+set synth_provenance_handle [open $synth_provenance_file r]
+set actual_synth_provenance [string trim [read $synth_provenance_handle]]
+close $synth_provenance_handle
+if {$actual_synth_provenance ne $expected_synth_provenance} {
+    error "Synthesis checkpoint provenance mismatch. Re-run synthesis with the requested profile before implementation. Expected:\n$expected_synth_provenance\nActual:\n$actual_synth_provenance"
+}
 file mkdir $result_dir
 
 open_checkpoint $synth_dcp
@@ -240,8 +276,11 @@ puts $manifest_handle "Stage1 optimization: DSP48E1 A+D preadder plus multiplier
 puts $manifest_handle "Stage2/3 optimization: shared DSP48E1 PREG MAC state, constant 16383 plus CARRYIN exact rounding, and board-only elimination of the unreachable aligned-CE pending-history queue"
 puts $manifest_handle "Stage3 correctness: true Q15 coefficients, complete 38-bit MAC view, and explicit signed 20/21-bit saturation selected by architecture"
 puts $manifest_handle "Stage2/3 correctness: job head/fill snapshots protect an active MAC from the next ring-buffer write"
-puts $manifest_handle "Synthesis directive: AreaOptimized_high"
-puts $manifest_handle "Synthesis resource sharing: on"
+puts $manifest_handle "Synthesis directive: $expected_synth_directive"
+puts $manifest_handle "Synthesis flatten hierarchy: $expected_flatten_hierarchy"
+puts $manifest_handle "Synthesis resource sharing: $expected_resource_sharing"
+puts $manifest_handle "Stage1 DSP48 preadder: $expected_stage1_dsp48_preadder"
+puts $manifest_handle "Requested CIC integrator DSP mode: $expected_cic_integrator_dsp_mode"
 puts $manifest_handle "Implementation opt directive: $implementation_opt_directive"
 puts $manifest_handle "P3 joint Stage3 mode: $p3_joint_stage3"
 close $manifest_handle

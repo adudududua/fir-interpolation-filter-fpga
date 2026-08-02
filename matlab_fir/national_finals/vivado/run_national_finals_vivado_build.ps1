@@ -6,7 +6,7 @@ param(
     [ValidateSet('Default', 'AreaOptimized_high', 'AreaOptimized_medium')]
     [string]$SynthesisDirective = 'AreaOptimized_high',
     [ValidateSet('rebuilt', 'full', 'none')]
-    [string]$FlattenHierarchy = 'rebuilt',
+    [string]$FlattenHierarchy = 'full',
     [ValidateSet('auto', 'on', 'off')]
     [string]$ResourceSharing = 'on',
     [ValidateSet('Default', 'Explore', 'ExploreWithRemap', 'ExploreArea', 'AddRemap')]
@@ -138,7 +138,12 @@ try {
             -TclArguments @(
                 $ResultTag,
                 $ImplementationOptDirective,
-                $P3JointStage3
+                $P3JointStage3,
+                $SynthesisDirective,
+                $FlattenHierarchy,
+                $ResourceSharing,
+                $Stage1Dsp48Preadder,
+                $CicIntegratorDspMode
             )
     }
 }

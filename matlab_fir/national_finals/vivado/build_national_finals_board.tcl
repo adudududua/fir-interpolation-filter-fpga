@@ -16,7 +16,7 @@ set nf_sim_dir [file join $sim_dir national_finals]
 set reuse_current_synthesis 0
 set synthesis_only 0
 set synth_directive AreaOptimized_high
-set flatten_hierarchy rebuilt
+set flatten_hierarchy full
 set resource_sharing on
 set result_tag board_dual_rate_cic6_round7_headroom_opt
 set stage1_dsp48_preadder 1
@@ -182,6 +182,19 @@ if {$reuse_current_synthesis == 0} {
     error "Requested synthesis reuse, but synth_1 is not complete."
 }
 
+# Record the exact profile which produced synth_1.  The low-memory
+# implementation flow refuses to reuse a checkpoint with a different profile.
+set synth_provenance_file [file join $project_dir XC7A35T_interp.runs synth_1 \
+    national_finals_synth_provenance.txt]
+set synth_provenance_handle [open $synth_provenance_file w]
+puts $synth_provenance_handle "synth_directive=$synth_directive"
+puts $synth_provenance_handle "flatten_hierarchy=$flatten_hierarchy"
+puts $synth_provenance_handle "resource_sharing=$resource_sharing"
+puts $synth_provenance_handle "stage1_dsp48_preadder=$stage1_dsp48_preadder"
+puts $synth_provenance_handle "cic_integrator_dsp_mode=$cic_integrator_dsp_mode"
+puts $synth_provenance_handle "p3_joint_stage3=$p3_joint_stage3"
+close $synth_provenance_handle
+
 if {$synthesis_only != 0} {
     open_run synth_1
     set source_manifest_handle [open \
@@ -272,7 +285,9 @@ if {$p3_joint_stage3 != 0} {
     puts $manifest_handle "Equalizer headroom optimization: lossless 21-bit equalizer output feeds a 21-bit CIC input; clipping is deferred to the final 20-bit CIC quantizer"
 }
 puts $manifest_handle "CIC DSP mapping: two low-rate combs use LUT CARRY4; exact Hold16 feeds two high-rate DSP48E1 integrators"
-puts $manifest_handle "Synthesis directive: AreaOptimized_high"
+puts $manifest_handle "Synthesis directive: $synth_directive"
+puts $manifest_handle "Synthesis flatten hierarchy: $flatten_hierarchy"
+puts $manifest_handle "Synthesis resource sharing: $resource_sharing"
 puts $manifest_handle "Stage1 DSP48 preadder: $stage1_dsp48_preadder"
 puts $manifest_handle "CIC integrator DSP mode: $cic_integrator_dsp_mode"
 puts $manifest_handle "P3 joint Stage3 mode: $p3_joint_stage3"
