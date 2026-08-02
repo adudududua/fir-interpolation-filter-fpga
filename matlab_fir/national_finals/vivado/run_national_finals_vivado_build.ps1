@@ -15,6 +15,8 @@ param(
     [int]$Stage1Dsp48Preadder = 1,
     [ValidateSet(0, 1, 2)]
     [int]$CicIntegratorDspMode = 2,
+    [ValidateSet(0, 1)]
+    [int]$P3JointStage3 = 1,
     [ValidatePattern('^[A-Za-z0-9_-]+$')]
     [string]$ResultTag = 'board_dual_rate_cic6_round7_headroom_opt'
 )
@@ -126,7 +128,8 @@ try {
                 $ResourceSharing,
                 $ResultTag,
                 $Stage1Dsp48Preadder,
-                $CicIntegratorDspMode
+                $CicIntegratorDspMode,
+                $P3JointStage3
             )
     }
 
@@ -134,7 +137,8 @@ try {
         Invoke-VivadoStep -Name 'implementation' -TclPath $implementTcl `
             -TclArguments @(
                 $ResultTag,
-                $ImplementationOptDirective
+                $ImplementationOptDirective,
+                $P3JointStage3
             )
     }
 }

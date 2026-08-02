@@ -14,11 +14,15 @@ set board_xdc [file join $project_dir XC7A35T_interp.srcs constrs_1 new \
     board_demo_competition_dac8_top.xdc]
 set result_tag board_dual_rate_cic6_round7_headroom_opt
 set implementation_opt_directive Default
+set p3_joint_stage3 1
 if {$argc > 0} {
     set result_tag [lindex $argv 0]
 }
 if {$argc > 1} {
     set implementation_opt_directive [lindex $argv 1]
+}
+if {$argc > 2} {
+    set p3_joint_stage3 [lindex $argv 2]
 }
 if {![regexp {^[A-Za-z0-9_-]+$} $result_tag]} {
     error "result_tag may contain only letters, digits, underscore, and dash"
@@ -26,6 +30,9 @@ if {![regexp {^[A-Za-z0-9_-]+$} $result_tag]} {
 if {$implementation_opt_directive ni \
     {Default Explore ExploreWithRemap ExploreArea AddRemap}} {
     error "Unsupported implementation opt directive: $implementation_opt_directive"
+}
+if {$p3_joint_stage3 != 0 && $p3_joint_stage3 != 1} {
+    error "p3_joint_stage3 must be 0 or 1"
 }
 set result_dir [file normalize [file join $script_dir .. vivado_results \
     $result_tag]]
@@ -220,17 +227,23 @@ puts $manifest_handle [format "AD9708 output hold slack: %.3f ns" \
 puts $manifest_handle "44.1-kHz family 128x clock: 5.644796 MHz (-0.64 ppm nominal)"
 puts $manifest_handle "48-kHz family 128x clock: 6.144068 MHz (+11.03 ppm nominal)"
 puts $manifest_handle "Bundled-data CDC: mode_shadow\[1:0\] has 50.000 ns relative bus-skew and absolute datapath-delay requirements; verify routed evidence in bus_skew_routed.rpt, mode_absolute_delay_routed.rpt, and exceptions_ignored_routed.rpt"
-puts $manifest_handle "Architecture: 1-DSP Stage1 + 1-DSP shared Stage2/3 + shift-add equalizer + exact N3 Hold CIC16 with $cic_integrator_dsp_count DSP integrator(s)"
+if {$p3_joint_stage3 != 0} {
+    puts $manifest_handle "Architecture: 1-DSP Stage1 + 1-DSP shared Stage2/3 with mode-specific coefficient banks + exact N3 Hold CIC16 with $cic_integrator_dsp_count DSP integrator(s)"
+    puts $manifest_handle "P3 equalizer fold: the 128x compensation response is folded into Stage3; 4x/8x retain the flat Stage3 bank and the separate shift-add equalizer is not elaborated"
+} else {
+    puts $manifest_handle "Architecture: 1-DSP Stage1 + 1-DSP shared Stage2/3 + shift-add equalizer + exact N3 Hold CIC16 with $cic_integrator_dsp_count DSP integrator(s)"
+    puts $manifest_handle "Equalizer optimization: combinational hand-off plus lossless 21-bit headroom removes the intermediate 20-bit saturation mux; the CIC final quantizer remains 20-bit"
+}
 puts $manifest_handle "N3 Hold optimization: C^3 -> up16 -> I^3 is rewritten exactly as C^2 -> Hold16 -> I^2; proven 26-bit first and 29-bit final integrator widths replace the former conservative 33-bit states"
-puts $manifest_handle "Equalizer optimization: combinational hand-off plus lossless 21-bit headroom removes the intermediate 20-bit saturation mux; the CIC final quantizer remains 20-bit"
 puts $manifest_handle "CIC mapping: two low-rate comb stages use LUT CARRY4; $cic_mapping_description"
 puts $manifest_handle "Stage1 optimization: DSP48E1 A+D preadder plus multiplier/PREG MAC state, 41-bit proven bound, and exact DSP-resident Q15 rounding"
 puts $manifest_handle "Stage2/3 optimization: shared DSP48E1 PREG MAC state, constant 16383 plus CARRYIN exact rounding, and board-only elimination of the unreachable aligned-CE pending-history queue"
-puts $manifest_handle "Stage3 correctness: true Q15 coefficients, complete 38-bit MAC view, and explicit signed 20-bit saturation"
+puts $manifest_handle "Stage3 correctness: true Q15 coefficients, complete 38-bit MAC view, and explicit signed 20/21-bit saturation selected by architecture"
 puts $manifest_handle "Stage2/3 correctness: job head/fill snapshots protect an active MAC from the next ring-buffer write"
 puts $manifest_handle "Synthesis directive: AreaOptimized_high"
 puts $manifest_handle "Synthesis resource sharing: on"
 puts $manifest_handle "Implementation opt directive: $implementation_opt_directive"
+puts $manifest_handle "P3 joint Stage3 mode: $p3_joint_stage3"
 close $manifest_handle
 
 puts "NATIONAL_FINALS_SINGLE_PROCESS_BUILD_PASS"

@@ -21,6 +21,7 @@ set resource_sharing on
 set result_tag board_dual_rate_cic6_round7_headroom_opt
 set stage1_dsp48_preadder 1
 set cic_integrator_dsp_mode 2
+set p3_joint_stage3 1
 if {$argc > 0} {
     set reuse_current_synthesis [lindex $argv 0]
 }
@@ -45,6 +46,9 @@ if {$argc > 6} {
 if {$argc > 7} {
     set cic_integrator_dsp_mode [lindex $argv 7]
 }
+if {$argc > 8} {
+    set p3_joint_stage3 [lindex $argv 8]
+}
 if {$reuse_current_synthesis != 0 && $reuse_current_synthesis != 1} {
     error "reuse_current_synthesis must be 0 or 1"
 }
@@ -56,6 +60,9 @@ if {$stage1_dsp48_preadder != 0 && $stage1_dsp48_preadder != 1} {
 }
 if {$cic_integrator_dsp_mode < 0 || $cic_integrator_dsp_mode > 2} {
     error "cic_integrator_dsp_mode must be 0, 1, or 2"
+}
+if {$p3_joint_stage3 != 0 && $p3_joint_stage3 != 1} {
+    error "p3_joint_stage3 must be 0 or 1"
 }
 if {![regexp {^[A-Za-z0-9_-]+$} $result_tag]} {
     error "result_tag may contain only letters, digits, underscore, and dash"
@@ -142,6 +149,7 @@ set_property generic [list \
     USE_NATIONAL_FINALS_CIC_COMB_DSP=0 \
     USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER=$stage1_dsp48_preadder \
     USE_NATIONAL_FINALS_NARROW_STAGE23=1 \
+    USE_NATIONAL_FINALS_P3_JOINT_STAGE3=$p3_joint_stage3 \
     USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE=$cic_integrator_dsp_mode] \
     [get_filesets sources_1]
 
@@ -256,15 +264,21 @@ puts $manifest_handle "Top: board_demo_competition_dac8_top"
 puts $manifest_handle "Bitstream: $bitstream_dst"
 puts $manifest_handle "44.1-kHz family 128x clock: 5.644796 MHz (-0.64 ppm nominal)"
 puts $manifest_handle "48-kHz family 128x clock: 6.144068 MHz (+11.03 ppm nominal)"
-puts $manifest_handle "Architecture: shared 2x/2x/2x FIR + shift-add CIC equalizer + exact N3 Hold CIC16 with two DSP integrators"
+if {$p3_joint_stage3 != 0} {
+    puts $manifest_handle "Architecture: shared 2x/2x/2x FIR with mode-specific flat/compensated Stage3 coefficient banks + exact N3 Hold CIC16 with two DSP integrators"
+    puts $manifest_handle "P3 equalizer fold: the 128x compensation response is folded into Stage3; 4x/8x retain the flat Stage3 bank and the separate shift-add equalizer is not elaborated"
+} else {
+    puts $manifest_handle "Architecture: shared 2x/2x/2x FIR + shift-add CIC equalizer + exact N3 Hold CIC16 with two DSP integrators"
+    puts $manifest_handle "Equalizer headroom optimization: lossless 21-bit equalizer output feeds a 21-bit CIC input; clipping is deferred to the final 20-bit CIC quantizer"
+}
 puts $manifest_handle "CIC DSP mapping: two low-rate combs use LUT CARRY4; exact Hold16 feeds two high-rate DSP48E1 integrators"
-puts $manifest_handle "Equalizer headroom optimization: lossless 21-bit equalizer output feeds a 21-bit CIC input; clipping is deferred to the final 20-bit CIC quantizer"
 puts $manifest_handle "Synthesis directive: AreaOptimized_high"
 puts $manifest_handle "Stage1 DSP48 preadder: $stage1_dsp48_preadder"
 puts $manifest_handle "CIC integrator DSP mode: $cic_integrator_dsp_mode"
+puts $manifest_handle "P3 joint Stage3 mode: $p3_joint_stage3"
 puts $manifest_handle "Stage1 history: one RAMB18, current-sample bypass plus serialized symmetric reads"
 puts $manifest_handle "Rounding: constant 16383 plus DSP48 CARRYIN for non-negative MAC sums"
-puts $manifest_handle "Stage3: proven 35-bit MAC bound removes unreachable 20-bit saturation logic"
+puts $manifest_handle "Stage3: complete 38-bit MAC view with explicit signed output saturation"
 puts $manifest_handle "Implementation opt directive: Default"
 close $manifest_handle
 
