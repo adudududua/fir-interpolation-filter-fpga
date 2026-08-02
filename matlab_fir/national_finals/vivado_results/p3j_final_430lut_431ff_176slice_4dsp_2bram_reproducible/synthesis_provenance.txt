@@ -1,0 +1,6 @@
+synth_directive=AreaOptimized_high
+flatten_hierarchy=full
+resource_sharing=on
+stage1_dsp48_preadder=1
+cic_integrator_dsp_mode=2
+p3_joint_stage3=1

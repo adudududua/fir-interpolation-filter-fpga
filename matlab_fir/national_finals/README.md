@@ -1,20 +1,38 @@
 # 全国总决赛：双采样率可配置插值滤波器
 
-当前 P4-D 发布候选已完成 MATLAB 建模、24 bit 定点模型、Smoke 与 10-seed×4096 Release 两级 15 项 XSim 回归、GUI 行为仿真、Vivado 综合/布局布线/时序/DRC/CDC/功耗评估和两条路径的 bitstream 生成。默认最低 LUT/FF 档为 **479 LUT / 468 FF / 198 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM**；同源 P4-C 3-DSP、2-DSP 档也均完成实现与 bitstream。所有可在当前环境执行的软件与 FPGA 工具验收均已通过；由于当前环境无法接触实物开发板，物理板下载和仪器测量仍需按本文最后一节执行，不能把 bitstream 成功等同于实板通过。
+当前默认已更新为 P3-J Stage3/均衡器联合版，并从干净提交完成 MATLAB、Release 15/15、Vivado 综合/布局布线/时序/DRC/CDC/功耗评估和 bitstream 闭环。可复现结果为 **430 LUT / 431 FF / 176 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM**，WNS/WHS **+45.636/+0.119 ns**，vectorless 总/动态/静态功耗 **0.271/0.199/0.072 W**。最终 bitstream SHA-256 为 `C4DBB066030B92D387D799688D4010AB98F22B13BDA1623367EBCC8BE8BC0490`。由于当前环境无法接触实物开发板，物理板下载和仪器测量仍需按本文最后一节执行，不能把 bitstream 成功等同于实板通过。
 
-当前可发布 Pareto 点为 P3 `462 LUT / 447 FF / 5 DSP / 3 BRAM Tile`、P4-A `491 LUT / 444 FF / 4 DSP / 3 BRAM Tile`、P4-D `479 LUT / 4 DSP / 2 BRAM Tile`、P4-E `491 LUT / 4 DSP / 1.5 BRAM Tile`、P4-F `531 LUT / 4 DSP / 1 BRAM Tile`，以及 P4-C 的 `504 LUT / 3 DSP`、`523 LUT / 2 DSP` 两个低 DSP 档。这些版本均继承 P1 真 Q15 修复和 P3 的原子 CDC、同步复位、AD9708 输出时序闭环。P4-D 仍是默认最低 LUT/FF 交付版，P4-E/F 仅在 BRAM 更宝贵时使用。复核发现旧 Route 1 `424 LUT / 6 DSP` 与低 DSP `436 LUT / 5 DSP` 的 Stage 3 系数实际为 Q14 幅度、MAC 却按 Q15 右移，导致 8x/128x 绝对增益约为 -6.02 dB；这些旧版本只保留为资源演进历史，不再作为发布候选。P4-D 签核见 [发布闭环总结](results/p4d_release_closure_summary.md)。
+当前 P3-J Pareto 为默认 `430 LUT / 431 FF / 4 DSP / 2 BRAM`、低 DSP `466/457/3-DSP` 与 `488/486/2-DSP`、低 BRAM `456/450/4-DSP/1.5-BRAM`，以及交叉点 `478/476/3-DSP/1.5-BRAM`。这些版本均继承 P1 真 Q15 修复和 P3 的原子 CDC、同步复位、AD9708 输出时序闭环。P4-D `479/468/4-DSP/2-BRAM` 保留为联合 Stage3 之前的稳定回退；旧 Route 1 `424 LUT / 6 DSP` 与低 DSP `436 LUT / 5 DSP` 存在 8x/128x 约 −6.02 dB 标度缺陷，只保留为资源演进历史。
 
-## P4-D Release V2 与指导执行结果
+## P3-J 后续优化指导执行结果（2026-08-03）
+
+指导中的强信号、DSP、BRAM、交叉 Pareto 和有限字长路线已按停止线执行；MMCM/SAIF/实物板部分因没有硬件和仪器未虚构结论。完整逐项反馈见 [P3-J 后续优化指导执行反馈](results/p3j_next_optimization_execution_guide_execution_feedback.md)。
+
+| 候选 | LUT | FF | Slice | DSP | RAMB18 / Tile | WNS/WHS | 结论 |
+|---|---:|---:|---:|---:|---:|---:|---|
+| **P3-J 最终默认** | **430** | **431** | **176** | **4** | **4 / 2.0** | **+45.636/+0.119 ns** | 推荐最低 LUT/FF |
+| P3-J 3-DSP | 466 | 457 | 188 | 3 | 4 / 2.0 | +45.785/+0.121 ns | 低 DSP Pareto |
+| P3-J 2-DSP | 488 | 486 | 191 | 2 | 4 / 2.0 | +45.736/+0.060 ns | 最低 DSP Pareto |
+| P3-J 1.5-BRAM | 456 | 450 | 181 | 4 | 3 / 1.5 | +46.033/+0.116 ns | 低 BRAM Pareto |
+| P3-J 3-DSP+1.5-BRAM | 478 | 476 | 191 | 3 | 3 / 1.5 | +45.610/+0.115 ns | 交叉 Pareto |
+| P3-J 1-BRAM | 495 | 480 | 186 | 4 | 2 / 1.0 | +45.807/+0.108 ns | 超过 490 LUT，No-Go |
+| P3-J 9-tap | 441 | 431 | 177 | 4 | 4 / 2.0 | +46.190/+0.121 ns | 比默认多 11 LUT，No-Go |
+
+最终默认 Release 为 **15/15 PASS**。全链包括冲激、10 个固定 seed×4096、正/负满量程和 997 Hz/−1 dBFS 强信号共 14 组，4x/8x/128x 全部 0 LSB；复位恢复 8/8、动态切换 10/10。六工况最差绝对通带偏差 0.007730 dB、最差峰峰纹波 0.006192 dB、最差阻带 72.371 dB，严格线性相位。
+
+本轮还解决了“历史报告 430 LUT，手动重跑却是 436 LUT”的原因：430 实际使用 `AreaOptimized_high/full/on`，批处理旧默认却是 `rebuilt`，并且只实现步骤可能静默复用旧 DCP。现在批处理和 GUI 都固定 `full`，综合生成配置指纹，实现前校验，`-jobs` 固定为 4。正式证据目录为 [`p3j_final_430lut_431ff_176slice_4dsp_2bram_reproducible`](vivado_results/p3j_final_430lut_431ff_176slice_4dsp_2bram_reproducible)。
+
+## 历史 P4-D Release V2 与指导执行结果
 
 P4-D Release V2 已从 clean source 完成 21-bit golden、15/15 Release、频响、CDC、综合、布局布线和 bitstream 闭环。正式资源为 **479 LUT / 468 FF / 198 Slice / 4 DSP / 4 RAMB18E1（2 Tile）/ 2 MMCM**，WNS/WHS `+45.734/+0.121 ns`，DAC setup/hold `+76.116/+78.117 ns`，vectorless 功耗 `0.271 W`。bit SHA-256 为 `8630210663629357237AAA3F076348FBE65610EAAB61ADA4706E81F75AAF02A6`；标签为 `nf-p4d-r2-479lut-468ff-4dsp-2bram-2mmcm-clean`。
 
-后续指导的三个候选均采用独立分支：
+当时后续指导的三个候选均采用独立分支，以下为 P3-J RTL 完成前的历史记录：
 
 | 候选 | LUT | FF | DSP | RAMB18 / Tile | 验证与结论 |
 |---|---:|---:|---:|---:|---|
 | P1 TWO24 | 518 | 498 | 3 | 4 / 2.0 | Release 17/17；成功少 1 DSP，但被既有 504/494 3-DSP 点压制 |
 | P2-A distributed ROM | 513 | 496 | 4 | 2 / 1.0 | Release 17/17；当前推荐的 1-Tile Pareto |
-| P3 Stage3/均衡器联合设计 | 约450* | 约437* | 4* | 4 / 2.0* | MATLAB Go；*仅预测，尚无 RTL/post-route/bitstream |
+| P3 Stage3/均衡器联合设计 | 约450* | 约437* | 4* | 4 / 2.0* | 当时仅 MATLAB 预测；现已由上文 P3-J 实测替代 |
 
 P1 TWO24 的核心创新是用 `DSP48E1/TWO24/PREG=1` 保存两级积分器低 24 位，以小型 CARRY4 补齐 2/5-bit 高位；完整板级以 `+39 LUT/+30 FF` 换 `-1 DSP`。P2-A 把 P4-E 的只读系数 RAMB18 拆成两组地址寄存 distributed ROM，相对 P4-D 以 `+34 LUT/+28 FF` 换 `-1 BRAM Tile`。P3 用 128x 专用 11-tap Q15/18-bit Stage3 bank 吸收原三抽头均衡器，预计净省约 29 LUT/31 FF，但必须经 RTL 和布局布线复核。
 
@@ -163,7 +181,7 @@ y[n] = x[n-1] + (2*x[n-1] - x[n] - x[n-2]) / 8
 
 它仅用加减和算术右移，不增加乘法器；4x/8x 输出保持平坦 FIR 响应。双采样率板级测试正弦也打包在同一个 256×24 bit ROM 中。
 
-第七轮434-LUT基线布局布线后为 **434 LUT / 469 FF / 190 Slice / 6 DSP / 3 BRAM / 2 MMCM**。相对最初指定的573 LUT / 621 FF / 255 Slice / 6 DSP CIC基线，减少139 LUT、152 FF和65 Slice；Route 1和第八轮是后续历史资源点。完成 P1 标度修复和 P3 工程闭环后，P4-A 以 N3 Hold 降至4 DSP，P4-B 再把历史存储从3降至2 BRAM Tile；P4-C 删除板级不可达队列、启用当前结构有效的 DSP48 预加器并收紧 CIC 状态，当前默认 post-route 为 **479 LUT / 468 FF / 198 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM**。
+第七轮434-LUT基线布局布线后为 **434 LUT / 469 FF / 190 Slice / 6 DSP / 3 BRAM / 2 MMCM**。相对最初指定的573 LUT / 621 FF / 255 Slice / 6 DSP CIC基线，减少139 LUT、152 FF和65 Slice；Route 1和第八轮是后续历史资源点。完成 P1 标度修复和 P3 工程闭环后，P4-A 以 N3 Hold 降至4 DSP，P4-B 再把历史存储从3降至2 BRAM Tile；P4-C 删除板级不可达队列、启用当前结构有效的 DSP48 预加器并收紧 CIC 状态，当时默认 post-route 为 **479 LUT / 468 FF / 198 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM**，现已由上文 P3-J 430-LUT 版替代。
 
 ### 2.1 第七轮434-LUT基线优化方法
 
@@ -399,11 +417,14 @@ SHA-256：`49DF03B71C6D73A73EE282A5D1EEE0D9F5EB91ADDB96879ACBA381F0D999D47C`
 - `USE_NATIONAL_FINALS_NARROW_STAGE23=1`
 - `USE_NATIONAL_FINALS_SINGLE_BRAM_STAGE1=1`
 - `USE_PHASE7_UNIFIED_BRAM_STAGE23_HISTORY=1`
-- `USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER=0`
+- `USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER=1`
+- `USE_NATIONAL_FINALS_P3_JOINT_STAGE3=1`
+- `CIC_INTEGRATOR_DSP_MODE=2`
+- `SYNTH_DESIGN.FLATTEN_HIERARCHY=full`
 - `ResourceSharing=on`
 - `opt_design Directive=Default`
 
-第五轮用普通工程 `synth_1/impl_1` 从头重建得到 440 LUT / 464 FF；第七轮在同一工程配置和更新后的 RTL 上从头重建为 **434 LUT / 469 FF / 6 DSP / 3 BRAM Tile / 2 MMCM**。随后 comb-LUT 历史版为 **436 LUT / 471 FF / 5 DSP / 3 BRAM Tile / 2 MMCM**。当前 XPR 已进一步固定 N3 Hold、Stage 1 单 RAM、Stage 2/3 统一历史、Stage1 DSP48 预加器和 CIC 4-DSP 默认映射，正式签核为 **479 LUT / 468 FF / 4 DSP / 2 BRAM Tile / 2 MMCM**。可用以下命令检查配置并重建：
+第五轮用普通工程 `synth_1/impl_1` 从头重建得到 440 LUT / 464 FF；第七轮在同一工程配置和更新后的 RTL 上从头重建为 **434 LUT / 469 FF / 6 DSP / 3 BRAM Tile / 2 MMCM**。随后 comb-LUT 历史版为 **436 LUT / 471 FF / 5 DSP / 3 BRAM Tile / 2 MMCM**。当前 XPR 已进一步固定 N3 Hold、Stage 1 单 RAM、Stage 2/3 统一历史、Stage1 DSP48 预加器、P3-J 联合 Stage3 和 CIC 4-DSP 默认映射，正式签核为 **430 LUT / 431 FF / 4 DSP / 2 BRAM Tile / 2 MMCM**。可用以下命令检查配置并重建：
 
 ```powershell
 vivado.bat -mode batch -source `
@@ -432,7 +453,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
   -Step all
 ```
 
-包装脚本先执行面积优化综合，再以低内存单进程完成布局布线、报告和 bitstream。默认实现指令是本轮复核后的 `Default`；P4-C 三个正式目录为 `vivado_results/p4c_signed_479lut_468ff_4dsp_2bram`、`p4c_signed_3dsp_2bram` 和 `p4c_signed_2dsp_2bram`，P4-B、P4-A、P3、Route 1及此前回退结果仍保留。日志与 `.Xil` 均写入 `matlab_fir/national_finals/_work/<tool>/<时间戳>`，不会污染项目根目录。
+包装脚本先执行 `AreaOptimized_high/full/on` 综合，再以低内存单进程完成布局布线、报告和 bitstream，默认实现指令为 `Default`。综合 DCP 旁保存配置指纹，实施阶段拒绝复用参数不一致的旧 DCP。最终目录为 `vivado_results/p3j_final_430lut_431ff_176slice_4dsp_2bram_reproducible`，P4-D、P4-C、P4-B、P4-A、P3、Route 1及此前回退结果仍保留。日志与 `.Xil` 均写入 `matlab_fir/national_finals/_work/<tool>/<时间戳>`，不会污染项目根目录。
 
 需要使用 Vivado GUI 时，不要从仓库根目录直接运行 `vivado.bat`，也不要依赖双击 `.xpr` 的当前工作目录。使用以下入口可把 GUI 的 `.Xil`、journal 和 log 隔离到 `national_finals/_work/vivado_gui/<时间戳>`：
 

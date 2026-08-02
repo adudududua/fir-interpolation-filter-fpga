@@ -1,0 +1,600 @@
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date         : Mon Aug  3 01:01:04 2026
+| Host         : LAPTOP-476JT8H0 running 64-bit major release  (build 9200)
+| Command      : report_timing -to [get_ports {dac_data[*]}] -delay_type min -max_paths 8 -file D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/vivado_results/p3j_final_430lut_431ff_176slice_4dsp_2bram_reproducible/dac_output_hold_routed.rpt
+| Design       : board_demo_competition_dac8_top
+| Device       : 7a35t-fgg484
+| Speed File   : -2  PRODUCTION 1.23 2018-06-13
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Timing Report
+
+Slack (MET) :             78.117ns  (arrival time - required time)
+  Source:                 u_demo_interp_dac8_audio_pcm_common/dac_data_r_reg[6]/C
+                            (falling edge-triggered cell FDRE clocked by u_dual_family_audio_clock/clk_48k_raw  {rise@0.000ns fall@81.379ns period=162.759ns})
+  Destination:            dac_data[6]
+                            (output port clocked by dac_clk_48k_128x  {rise@0.000ns fall@81.379ns period=162.759ns})
+  Path Group:             dac_clk_48k_128x
+  Path Type:              Min at Fast Process Corner
+  Requirement:            -81.379ns  (dac_clk_48k_128x rise@0.000ns - u_dual_family_audio_clock/clk_48k_raw fall@81.379ns)
+  Data Path Delay:        2.135ns  (logic 2.134ns (99.953%)  route 0.001ns (0.047%))
+  Logic Levels:           1  (OBUF=1)
+  Output Delay:           -2.000ns
+  Clock Path Skew:        1.967ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    5.236ns
+    Source Clock Delay      (SCD):    2.701ns = ( 84.081 - 81.379 ) 
+    Clock Pessimism Removal (CPR):    0.568ns
+  Clock Uncertainty:      1.431ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.972ns
+    Phase Error              (PE):    0.944ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock u_dual_family_audio_clock/clk_48k_raw fall edge)
+                                                     81.379    81.379 f  
+    Y18                                               0.000    81.379 f  clk (IN)
+                         net (fo=0)                   0.000    81.379    clk
+    Y18                  IBUF (Prop_ibuf_I_O)         0.264    81.643 f  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           0.634    82.277    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.026    82.303 f  u_bufg_sys_clk/O
+                         net (fo=68, routed)          0.547    82.850    clk_sys_bufg
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.050    82.900 f  u_dual_family_audio_clock/u_mmcm_48k/CLKOUT0
+                         net (fo=1, routed)           0.489    83.389    u_dual_family_audio_clock/clk_48k_raw
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I1_O)
+                                                      0.026    83.415 f  u_dual_family_audio_clock/u_bufgmux_audio_family/O
+                         net (fo=387, routed)         0.666    84.081    clk_audio_128x
+    OLOGIC_X0Y145        FDRE                                         r  u_demo_interp_dac8_audio_pcm_common/dac_data_r_reg[6]/C  (IS_INVERTED)
+  -------------------------------------------------------------------    -------------------
+    OLOGIC_X0Y145        FDRE (Prop_fdre_C_Q)         0.177    84.258 r  u_demo_interp_dac8_audio_pcm_common/dac_data_r_reg[6]/Q
+                         net (fo=1, routed)           0.001    84.259    dac_data_OBUF[6]
+    E17                  OBUF (Prop_obuf_I_O)         1.957    86.216 r  dac_data_OBUF[6]_inst/O
+                         net (fo=0)                   0.000    86.216    dac_data[6]
+    E17                                                               r  dac_data[6] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock dac_clk_48k_128x rise edge)
+                                                      0.000     0.000 r  
+    Y18                                               0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    Y18                  IBUF (Prop_ibuf_I_O)         0.452     0.452 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           0.689     1.140    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.029     1.169 r  u_bufg_sys_clk/O
+                         net (fo=68, routed)          0.813     1.983    clk_sys_bufg
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.053     2.036 r  u_dual_family_audio_clock/u_mmcm_48k/CLKOUT0
+                         net (fo=1, routed)           0.534     2.569    u_dual_family_audio_clock/clk_48k_raw
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I1_O)
+                                                      0.029     2.598 r  u_dual_family_audio_clock/u_bufgmux_audio_family/O
+                         net (fo=387, routed)         0.855     3.454    clk_audio_128x
+    OLOGIC_X0Y95         ODDR (Prop_oddr_C_Q)         0.204     3.658 r  u_demo_interp_dac8_audio_pcm_common/gen_dac_clock_oddr.u_dac_clock_oddr/Q
+                         net (fo=1, routed)           0.001     3.659    dac_clk_OBUF
+    G16                  OBUF (Prop_obuf_I_O)         1.577     5.236 r  dac_clk_OBUF_inst/O
+                         net (fo=0)                   0.000     5.236    dac_clk
+    G16                                                               r  dac_clk (OUT)
+                         clock pessimism             -0.568     4.668    
+                         clock uncertainty            1.431     6.099    
+                         output delay                 2.000     8.099    
+  -------------------------------------------------------------------
+                         required time                         -8.099    
+                         arrival time                          86.216    
+  -------------------------------------------------------------------
+                         slack                                 78.117    
+
+Slack (MET) :             78.142ns  (arrival time - required time)
+  Source:                 u_demo_interp_dac8_audio_pcm_common/dac_data_r_reg[1]/C
+                            (falling edge-triggered cell FDRE clocked by u_dual_family_audio_clock/clk_48k_raw  {rise@0.000ns fall@81.379ns period=162.759ns})
+  Destination:            dac_data[1]
+                            (output port clocked by dac_clk_48k_128x  {rise@0.000ns fall@81.379ns period=162.759ns})
+  Path Group:             dac_clk_48k_128x
+  Path Type:              Min at Fast Process Corner
+  Requirement:            -81.379ns  (dac_clk_48k_128x rise@0.000ns - u_dual_family_audio_clock/clk_48k_raw fall@81.379ns)
+  Data Path Delay:        2.168ns  (logic 2.167ns (99.954%)  route 0.001ns (0.046%))
+  Logic Levels:           1  (OBUF=1)
+  Output Delay:           -2.000ns
+  Clock Path Skew:        1.974ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    5.236ns
+    Source Clock Delay      (SCD):    2.694ns = ( 84.074 - 81.379 ) 
+    Clock Pessimism Removal (CPR):    0.568ns
+  Clock Uncertainty:      1.431ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.972ns
+    Phase Error              (PE):    0.944ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock u_dual_family_audio_clock/clk_48k_raw fall edge)
+                                                     81.379    81.379 f  
+    Y18                                               0.000    81.379 f  clk (IN)
+                         net (fo=0)                   0.000    81.379    clk
+    Y18                  IBUF (Prop_ibuf_I_O)         0.264    81.643 f  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           0.634    82.277    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.026    82.303 f  u_bufg_sys_clk/O
+                         net (fo=68, routed)          0.547    82.850    clk_sys_bufg
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.050    82.900 f  u_dual_family_audio_clock/u_mmcm_48k/CLKOUT0
+                         net (fo=1, routed)           0.489    83.389    u_dual_family_audio_clock/clk_48k_raw
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I1_O)
+                                                      0.026    83.415 f  u_dual_family_audio_clock/u_bufgmux_audio_family/O
+                         net (fo=387, routed)         0.659    84.074    clk_audio_128x
+    OLOGIC_X0Y122        FDRE                                         r  u_demo_interp_dac8_audio_pcm_common/dac_data_r_reg[1]/C  (IS_INVERTED)
+  -------------------------------------------------------------------    -------------------
+    OLOGIC_X0Y122        FDRE (Prop_fdre_C_Q)         0.177    84.251 r  u_demo_interp_dac8_audio_pcm_common/dac_data_r_reg[1]/Q
+                         net (fo=1, routed)           0.001    84.252    dac_data_OBUF[1]
+    E19                  OBUF (Prop_obuf_I_O)         1.990    86.242 r  dac_data_OBUF[1]_inst/O
+                         net (fo=0)                   0.000    86.242    dac_data[1]
+    E19                                                               r  dac_data[1] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock dac_clk_48k_128x rise edge)
+                                                      0.000     0.000 r  
+    Y18                                               0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    Y18                  IBUF (Prop_ibuf_I_O)         0.452     0.452 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           0.689     1.140    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.029     1.169 r  u_bufg_sys_clk/O
+                         net (fo=68, routed)          0.813     1.983    clk_sys_bufg
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.053     2.036 r  u_dual_family_audio_clock/u_mmcm_48k/CLKOUT0
+                         net (fo=1, routed)           0.534     2.569    u_dual_family_audio_clock/clk_48k_raw
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I1_O)
+                                                      0.029     2.598 r  u_dual_family_audio_clock/u_bufgmux_audio_family/O
+                         net (fo=387, routed)         0.855     3.454    clk_audio_128x
+    OLOGIC_X0Y95         ODDR (Prop_oddr_C_Q)         0.204     3.658 r  u_demo_interp_dac8_audio_pcm_common/gen_dac_clock_oddr.u_dac_clock_oddr/Q
+                         net (fo=1, routed)           0.001     3.659    dac_clk_OBUF
+    G16                  OBUF (Prop_obuf_I_O)         1.577     5.236 r  dac_clk_OBUF_inst/O
+                         net (fo=0)                   0.000     5.236    dac_clk
+    G16                                                               r  dac_clk (OUT)
+                         clock pessimism             -0.568     4.668    
+                         clock uncertainty            1.431     6.099    
+                         output delay                 2.000     8.099    
+  -------------------------------------------------------------------
+                         required time                         -8.099    
+                         arrival time                          86.242    
+  -------------------------------------------------------------------
+                         slack                                 78.142    
+
+Slack (MET) :             78.143ns  (arrival time - required time)
+  Source:                 u_demo_interp_dac8_audio_pcm_common/dac_data_r_reg[7]/C
+                            (falling edge-triggered cell FDSE clocked by u_dual_family_audio_clock/clk_48k_raw  {rise@0.000ns fall@81.379ns period=162.759ns})
+  Destination:            dac_data[7]
+                            (output port clocked by dac_clk_48k_128x  {rise@0.000ns fall@81.379ns period=162.759ns})
+  Path Group:             dac_clk_48k_128x
+  Path Type:              Min at Fast Process Corner
+  Requirement:            -81.379ns  (dac_clk_48k_128x rise@0.000ns - u_dual_family_audio_clock/clk_48k_raw fall@81.379ns)
+  Data Path Delay:        2.169ns  (logic 2.168ns (99.954%)  route 0.001ns (0.046%))
+  Logic Levels:           1  (OBUF=1)
+  Output Delay:           -2.000ns
+  Clock Path Skew:        1.975ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    5.236ns
+    Source Clock Delay      (SCD):    2.693ns = ( 84.073 - 81.379 ) 
+    Clock Pessimism Removal (CPR):    0.568ns
+  Clock Uncertainty:      1.431ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.972ns
+    Phase Error              (PE):    0.944ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock u_dual_family_audio_clock/clk_48k_raw fall edge)
+                                                     81.379    81.379 f  
+    Y18                                               0.000    81.379 f  clk (IN)
+                         net (fo=0)                   0.000    81.379    clk
+    Y18                  IBUF (Prop_ibuf_I_O)         0.264    81.643 f  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           0.634    82.277    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.026    82.303 f  u_bufg_sys_clk/O
+                         net (fo=68, routed)          0.547    82.850    clk_sys_bufg
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.050    82.900 f  u_dual_family_audio_clock/u_mmcm_48k/CLKOUT0
+                         net (fo=1, routed)           0.489    83.389    u_dual_family_audio_clock/clk_48k_raw
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I1_O)
+                                                      0.026    83.415 f  u_dual_family_audio_clock/u_bufgmux_audio_family/O
+                         net (fo=387, routed)         0.658    84.073    clk_audio_128x
+    OLOGIC_X0Y125        FDSE                                         r  u_demo_interp_dac8_audio_pcm_common/dac_data_r_reg[7]/C  (IS_INVERTED)
+  -------------------------------------------------------------------    -------------------
+    OLOGIC_X0Y125        FDSE (Prop_fdse_C_Q)         0.177    84.250 r  u_demo_interp_dac8_audio_pcm_common/dac_data_r_reg[7]/Q
+                         net (fo=1, routed)           0.001    84.251    dac_data_OBUF[7]
+    C17                  OBUF (Prop_obuf_I_O)         1.991    86.242 r  dac_data_OBUF[7]_inst/O
+                         net (fo=0)                   0.000    86.242    dac_data[7]
+    C17                                                               r  dac_data[7] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock dac_clk_48k_128x rise edge)
+                                                      0.000     0.000 r  
+    Y18                                               0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    Y18                  IBUF (Prop_ibuf_I_O)         0.452     0.452 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           0.689     1.140    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.029     1.169 r  u_bufg_sys_clk/O
+                         net (fo=68, routed)          0.813     1.983    clk_sys_bufg
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.053     2.036 r  u_dual_family_audio_clock/u_mmcm_48k/CLKOUT0
+                         net (fo=1, routed)           0.534     2.569    u_dual_family_audio_clock/clk_48k_raw
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I1_O)
+                                                      0.029     2.598 r  u_dual_family_audio_clock/u_bufgmux_audio_family/O
+                         net (fo=387, routed)         0.855     3.454    clk_audio_128x
+    OLOGIC_X0Y95         ODDR (Prop_oddr_C_Q)         0.204     3.658 r  u_demo_interp_dac8_audio_pcm_common/gen_dac_clock_oddr.u_dac_clock_oddr/Q
+                         net (fo=1, routed)           0.001     3.659    dac_clk_OBUF
+    G16                  OBUF (Prop_obuf_I_O)         1.577     5.236 r  dac_clk_OBUF_inst/O
+                         net (fo=0)                   0.000     5.236    dac_clk
+    G16                                                               r  dac_clk (OUT)
+                         clock pessimism             -0.568     4.668    
+                         clock uncertainty            1.431     6.099    
+                         output delay                 2.000     8.099    
+  -------------------------------------------------------------------
+                         required time                         -8.099    
+                         arrival time                          86.242    
+  -------------------------------------------------------------------
+                         slack                                 78.143    
+
+Slack (MET) :             78.146ns  (arrival time - required time)
+  Source:                 u_demo_interp_dac8_audio_pcm_common/dac_data_r_reg[4]/C
+                            (falling edge-triggered cell FDRE clocked by u_dual_family_audio_clock/clk_48k_raw  {rise@0.000ns fall@81.379ns period=162.759ns})
+  Destination:            dac_data[4]
+                            (output port clocked by dac_clk_48k_128x  {rise@0.000ns fall@81.379ns period=162.759ns})
+  Path Group:             dac_clk_48k_128x
+  Path Type:              Min at Fast Process Corner
+  Requirement:            -81.379ns  (dac_clk_48k_128x rise@0.000ns - u_dual_family_audio_clock/clk_48k_raw fall@81.379ns)
+  Data Path Delay:        2.170ns  (logic 2.169ns (99.954%)  route 0.001ns (0.046%))
+  Logic Levels:           1  (OBUF=1)
+  Output Delay:           -2.000ns
+  Clock Path Skew:        1.973ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    5.236ns
+    Source Clock Delay      (SCD):    2.695ns = ( 84.075 - 81.379 ) 
+    Clock Pessimism Removal (CPR):    0.568ns
+  Clock Uncertainty:      1.431ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.972ns
+    Phase Error              (PE):    0.944ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock u_dual_family_audio_clock/clk_48k_raw fall edge)
+                                                     81.379    81.379 f  
+    Y18                                               0.000    81.379 f  clk (IN)
+                         net (fo=0)                   0.000    81.379    clk
+    Y18                  IBUF (Prop_ibuf_I_O)         0.264    81.643 f  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           0.634    82.277    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.026    82.303 f  u_bufg_sys_clk/O
+                         net (fo=68, routed)          0.547    82.850    clk_sys_bufg
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.050    82.900 f  u_dual_family_audio_clock/u_mmcm_48k/CLKOUT0
+                         net (fo=1, routed)           0.489    83.389    u_dual_family_audio_clock/clk_48k_raw
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I1_O)
+                                                      0.026    83.415 f  u_dual_family_audio_clock/u_bufgmux_audio_family/O
+                         net (fo=387, routed)         0.660    84.075    clk_audio_128x
+    OLOGIC_X0Y120        FDRE                                         r  u_demo_interp_dac8_audio_pcm_common/dac_data_r_reg[4]/C  (IS_INVERTED)
+  -------------------------------------------------------------------    -------------------
+    OLOGIC_X0Y120        FDRE (Prop_fdre_C_Q)         0.177    84.252 r  u_demo_interp_dac8_audio_pcm_common/dac_data_r_reg[4]/Q
+                         net (fo=1, routed)           0.001    84.253    dac_data_OBUF[4]
+    F18                  OBUF (Prop_obuf_I_O)         1.992    86.245 r  dac_data_OBUF[4]_inst/O
+                         net (fo=0)                   0.000    86.245    dac_data[4]
+    F18                                                               r  dac_data[4] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock dac_clk_48k_128x rise edge)
+                                                      0.000     0.000 r  
+    Y18                                               0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    Y18                  IBUF (Prop_ibuf_I_O)         0.452     0.452 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           0.689     1.140    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.029     1.169 r  u_bufg_sys_clk/O
+                         net (fo=68, routed)          0.813     1.983    clk_sys_bufg
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.053     2.036 r  u_dual_family_audio_clock/u_mmcm_48k/CLKOUT0
+                         net (fo=1, routed)           0.534     2.569    u_dual_family_audio_clock/clk_48k_raw
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I1_O)
+                                                      0.029     2.598 r  u_dual_family_audio_clock/u_bufgmux_audio_family/O
+                         net (fo=387, routed)         0.855     3.454    clk_audio_128x
+    OLOGIC_X0Y95         ODDR (Prop_oddr_C_Q)         0.204     3.658 r  u_demo_interp_dac8_audio_pcm_common/gen_dac_clock_oddr.u_dac_clock_oddr/Q
+                         net (fo=1, routed)           0.001     3.659    dac_clk_OBUF
+    G16                  OBUF (Prop_obuf_I_O)         1.577     5.236 r  dac_clk_OBUF_inst/O
+                         net (fo=0)                   0.000     5.236    dac_clk
+    G16                                                               r  dac_clk (OUT)
+                         clock pessimism             -0.568     4.668    
+                         clock uncertainty            1.431     6.099    
+                         output delay                 2.000     8.099    
+  -------------------------------------------------------------------
+                         required time                         -8.099    
+                         arrival time                          86.245    
+  -------------------------------------------------------------------
+                         slack                                 78.146    
+
+Slack (MET) :             78.303ns  (arrival time - required time)
+  Source:                 u_demo_interp_dac8_audio_pcm_common/dac_data_r_reg[2]/C
+                            (falling edge-triggered cell FDRE clocked by u_dual_family_audio_clock/clk_48k_raw  {rise@0.000ns fall@81.379ns period=162.759ns})
+  Destination:            dac_data[2]
+                            (output port clocked by dac_clk_48k_128x  {rise@0.000ns fall@81.379ns period=162.759ns})
+  Path Group:             dac_clk_48k_128x
+  Path Type:              Min at Fast Process Corner
+  Requirement:            -81.379ns  (dac_clk_48k_128x rise@0.000ns - u_dual_family_audio_clock/clk_48k_raw fall@81.379ns)
+  Data Path Delay:        2.152ns  (logic 2.151ns (99.953%)  route 0.001ns (0.046%))
+  Logic Levels:           1  (OBUF=1)
+  Output Delay:           -2.000ns
+  Clock Path Skew:        1.797ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    5.236ns
+    Source Clock Delay      (SCD):    2.618ns = ( 83.997 - 81.379 ) 
+    Clock Pessimism Removal (CPR):    0.821ns
+  Clock Uncertainty:      1.431ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.972ns
+    Phase Error              (PE):    0.944ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock u_dual_family_audio_clock/clk_48k_raw fall edge)
+                                                     81.379    81.379 f  
+    Y18                                               0.000    81.379 f  clk (IN)
+                         net (fo=0)                   0.000    81.379    clk
+    Y18                  IBUF (Prop_ibuf_I_O)         0.264    81.643 f  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           0.634    82.277    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.026    82.303 f  u_bufg_sys_clk/O
+                         net (fo=68, routed)          0.547    82.850    clk_sys_bufg
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.050    82.900 f  u_dual_family_audio_clock/u_mmcm_48k/CLKOUT0
+                         net (fo=1, routed)           0.489    83.389    u_dual_family_audio_clock/clk_48k_raw
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I1_O)
+                                                      0.026    83.415 f  u_dual_family_audio_clock/u_bufgmux_audio_family/O
+                         net (fo=387, routed)         0.583    83.997    clk_audio_128x
+    OLOGIC_X0Y87         FDRE                                         r  u_demo_interp_dac8_audio_pcm_common/dac_data_r_reg[2]/C  (IS_INVERTED)
+  -------------------------------------------------------------------    -------------------
+    OLOGIC_X0Y87         FDRE (Prop_fdre_C_Q)         0.177    84.174 r  u_demo_interp_dac8_audio_pcm_common/dac_data_r_reg[2]/Q
+                         net (fo=1, routed)           0.001    84.175    dac_data_OBUF[2]
+    H18                  OBUF (Prop_obuf_I_O)         1.974    86.149 r  dac_data_OBUF[2]_inst/O
+                         net (fo=0)                   0.000    86.149    dac_data[2]
+    H18                                                               r  dac_data[2] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock dac_clk_48k_128x rise edge)
+                                                      0.000     0.000 r  
+    Y18                                               0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    Y18                  IBUF (Prop_ibuf_I_O)         0.452     0.452 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           0.689     1.140    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.029     1.169 r  u_bufg_sys_clk/O
+                         net (fo=68, routed)          0.813     1.983    clk_sys_bufg
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.053     2.036 r  u_dual_family_audio_clock/u_mmcm_48k/CLKOUT0
+                         net (fo=1, routed)           0.534     2.569    u_dual_family_audio_clock/clk_48k_raw
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I1_O)
+                                                      0.029     2.598 r  u_dual_family_audio_clock/u_bufgmux_audio_family/O
+                         net (fo=387, routed)         0.855     3.454    clk_audio_128x
+    OLOGIC_X0Y95         ODDR (Prop_oddr_C_Q)         0.204     3.658 r  u_demo_interp_dac8_audio_pcm_common/gen_dac_clock_oddr.u_dac_clock_oddr/Q
+                         net (fo=1, routed)           0.001     3.659    dac_clk_OBUF
+    G16                  OBUF (Prop_obuf_I_O)         1.577     5.236 r  dac_clk_OBUF_inst/O
+                         net (fo=0)                   0.000     5.236    dac_clk
+    G16                                                               r  dac_clk (OUT)
+                         clock pessimism             -0.821     4.415    
+                         clock uncertainty            1.431     5.846    
+                         output delay                 2.000     7.846    
+  -------------------------------------------------------------------
+                         required time                         -7.846    
+                         arrival time                          86.149    
+  -------------------------------------------------------------------
+                         slack                                 78.303    
+
+Slack (MET) :             78.315ns  (arrival time - required time)
+  Source:                 u_demo_interp_dac8_audio_pcm_common/dac_data_r_reg[0]/C
+                            (falling edge-triggered cell FDRE clocked by u_dual_family_audio_clock/clk_48k_raw  {rise@0.000ns fall@81.379ns period=162.759ns})
+  Destination:            dac_data[0]
+                            (output port clocked by dac_clk_48k_128x  {rise@0.000ns fall@81.379ns period=162.759ns})
+  Path Group:             dac_clk_48k_128x
+  Path Type:              Min at Fast Process Corner
+  Requirement:            -81.379ns  (dac_clk_48k_128x rise@0.000ns - u_dual_family_audio_clock/clk_48k_raw fall@81.379ns)
+  Data Path Delay:        2.171ns  (logic 2.170ns (99.954%)  route 0.001ns (0.046%))
+  Logic Levels:           1  (OBUF=1)
+  Output Delay:           -2.000ns
+  Clock Path Skew:        1.804ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    5.236ns
+    Source Clock Delay      (SCD):    2.611ns = ( 83.990 - 81.379 ) 
+    Clock Pessimism Removal (CPR):    0.821ns
+  Clock Uncertainty:      1.431ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.972ns
+    Phase Error              (PE):    0.944ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock u_dual_family_audio_clock/clk_48k_raw fall edge)
+                                                     81.379    81.379 f  
+    Y18                                               0.000    81.379 f  clk (IN)
+                         net (fo=0)                   0.000    81.379    clk
+    Y18                  IBUF (Prop_ibuf_I_O)         0.264    81.643 f  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           0.634    82.277    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.026    82.303 f  u_bufg_sys_clk/O
+                         net (fo=68, routed)          0.547    82.850    clk_sys_bufg
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.050    82.900 f  u_dual_family_audio_clock/u_mmcm_48k/CLKOUT0
+                         net (fo=1, routed)           0.489    83.389    u_dual_family_audio_clock/clk_48k_raw
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I1_O)
+                                                      0.026    83.415 f  u_dual_family_audio_clock/u_bufgmux_audio_family/O
+                         net (fo=387, routed)         0.576    83.990    clk_audio_128x
+    OLOGIC_X0Y75         FDRE                                         r  u_demo_interp_dac8_audio_pcm_common/dac_data_r_reg[0]/C  (IS_INVERTED)
+  -------------------------------------------------------------------    -------------------
+    OLOGIC_X0Y75         FDRE (Prop_fdre_C_Q)         0.177    84.167 r  u_demo_interp_dac8_audio_pcm_common/dac_data_r_reg[0]/Q
+                         net (fo=1, routed)           0.001    84.168    dac_data_OBUF[0]
+    H19                  OBUF (Prop_obuf_I_O)         1.993    86.161 r  dac_data_OBUF[0]_inst/O
+                         net (fo=0)                   0.000    86.161    dac_data[0]
+    H19                                                               r  dac_data[0] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock dac_clk_48k_128x rise edge)
+                                                      0.000     0.000 r  
+    Y18                                               0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    Y18                  IBUF (Prop_ibuf_I_O)         0.452     0.452 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           0.689     1.140    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.029     1.169 r  u_bufg_sys_clk/O
+                         net (fo=68, routed)          0.813     1.983    clk_sys_bufg
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.053     2.036 r  u_dual_family_audio_clock/u_mmcm_48k/CLKOUT0
+                         net (fo=1, routed)           0.534     2.569    u_dual_family_audio_clock/clk_48k_raw
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I1_O)
+                                                      0.029     2.598 r  u_dual_family_audio_clock/u_bufgmux_audio_family/O
+                         net (fo=387, routed)         0.855     3.454    clk_audio_128x
+    OLOGIC_X0Y95         ODDR (Prop_oddr_C_Q)         0.204     3.658 r  u_demo_interp_dac8_audio_pcm_common/gen_dac_clock_oddr.u_dac_clock_oddr/Q
+                         net (fo=1, routed)           0.001     3.659    dac_clk_OBUF
+    G16                  OBUF (Prop_obuf_I_O)         1.577     5.236 r  dac_clk_OBUF_inst/O
+                         net (fo=0)                   0.000     5.236    dac_clk
+    G16                                                               r  dac_clk (OUT)
+                         clock pessimism             -0.821     4.415    
+                         clock uncertainty            1.431     5.846    
+                         output delay                 2.000     7.846    
+  -------------------------------------------------------------------
+                         required time                         -7.846    
+                         arrival time                          86.161    
+  -------------------------------------------------------------------
+                         slack                                 78.315    
+
+Slack (MET) :             78.323ns  (arrival time - required time)
+  Source:                 u_demo_interp_dac8_audio_pcm_common/dac_data_r_reg[5]/C
+                            (falling edge-triggered cell FDRE clocked by u_dual_family_audio_clock/clk_48k_raw  {rise@0.000ns fall@81.379ns period=162.759ns})
+  Destination:            dac_data[5]
+                            (output port clocked by dac_clk_48k_128x  {rise@0.000ns fall@81.379ns period=162.759ns})
+  Path Group:             dac_clk_48k_128x
+  Path Type:              Min at Fast Process Corner
+  Requirement:            -81.379ns  (dac_clk_48k_128x rise@0.000ns - u_dual_family_audio_clock/clk_48k_raw fall@81.379ns)
+  Data Path Delay:        2.172ns  (logic 2.171ns (99.954%)  route 0.001ns (0.046%))
+  Logic Levels:           1  (OBUF=1)
+  Output Delay:           -2.000ns
+  Clock Path Skew:        1.797ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    5.236ns
+    Source Clock Delay      (SCD):    2.618ns = ( 83.997 - 81.379 ) 
+    Clock Pessimism Removal (CPR):    0.821ns
+  Clock Uncertainty:      1.431ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.972ns
+    Phase Error              (PE):    0.944ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock u_dual_family_audio_clock/clk_48k_raw fall edge)
+                                                     81.379    81.379 f  
+    Y18                                               0.000    81.379 f  clk (IN)
+                         net (fo=0)                   0.000    81.379    clk
+    Y18                  IBUF (Prop_ibuf_I_O)         0.264    81.643 f  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           0.634    82.277    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.026    82.303 f  u_bufg_sys_clk/O
+                         net (fo=68, routed)          0.547    82.850    clk_sys_bufg
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.050    82.900 f  u_dual_family_audio_clock/u_mmcm_48k/CLKOUT0
+                         net (fo=1, routed)           0.489    83.389    u_dual_family_audio_clock/clk_48k_raw
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I1_O)
+                                                      0.026    83.415 f  u_dual_family_audio_clock/u_bufgmux_audio_family/O
+                         net (fo=387, routed)         0.583    83.997    clk_audio_128x
+    OLOGIC_X0Y92         FDRE                                         r  u_demo_interp_dac8_audio_pcm_common/dac_data_r_reg[5]/C  (IS_INVERTED)
+  -------------------------------------------------------------------    -------------------
+    OLOGIC_X0Y92         FDRE (Prop_fdre_C_Q)         0.177    84.174 r  u_demo_interp_dac8_audio_pcm_common/dac_data_r_reg[5]/Q
+                         net (fo=1, routed)           0.001    84.175    dac_data_OBUF[5]
+    G17                  OBUF (Prop_obuf_I_O)         1.994    86.169 r  dac_data_OBUF[5]_inst/O
+                         net (fo=0)                   0.000    86.169    dac_data[5]
+    G17                                                               r  dac_data[5] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock dac_clk_48k_128x rise edge)
+                                                      0.000     0.000 r  
+    Y18                                               0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    Y18                  IBUF (Prop_ibuf_I_O)         0.452     0.452 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           0.689     1.140    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.029     1.169 r  u_bufg_sys_clk/O
+                         net (fo=68, routed)          0.813     1.983    clk_sys_bufg
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.053     2.036 r  u_dual_family_audio_clock/u_mmcm_48k/CLKOUT0
+                         net (fo=1, routed)           0.534     2.569    u_dual_family_audio_clock/clk_48k_raw
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I1_O)
+                                                      0.029     2.598 r  u_dual_family_audio_clock/u_bufgmux_audio_family/O
+                         net (fo=387, routed)         0.855     3.454    clk_audio_128x
+    OLOGIC_X0Y95         ODDR (Prop_oddr_C_Q)         0.204     3.658 r  u_demo_interp_dac8_audio_pcm_common/gen_dac_clock_oddr.u_dac_clock_oddr/Q
+                         net (fo=1, routed)           0.001     3.659    dac_clk_OBUF
+    G16                  OBUF (Prop_obuf_I_O)         1.577     5.236 r  dac_clk_OBUF_inst/O
+                         net (fo=0)                   0.000     5.236    dac_clk
+    G16                                                               r  dac_clk (OUT)
+                         clock pessimism             -0.821     4.415    
+                         clock uncertainty            1.431     5.846    
+                         output delay                 2.000     7.846    
+  -------------------------------------------------------------------
+                         required time                         -7.846    
+                         arrival time                          86.169    
+  -------------------------------------------------------------------
+                         slack                                 78.323    
+
+Slack (MET) :             78.326ns  (arrival time - required time)
+  Source:                 u_demo_interp_dac8_audio_pcm_common/dac_data_r_reg[3]/C
+                            (falling edge-triggered cell FDRE clocked by u_dual_family_audio_clock/clk_48k_raw  {rise@0.000ns fall@81.379ns period=162.759ns})
+  Destination:            dac_data[3]
+                            (output port clocked by dac_clk_48k_128x  {rise@0.000ns fall@81.379ns period=162.759ns})
+  Path Group:             dac_clk_48k_128x
+  Path Type:              Min at Fast Process Corner
+  Requirement:            -81.379ns  (dac_clk_48k_128x rise@0.000ns - u_dual_family_audio_clock/clk_48k_raw fall@81.379ns)
+  Data Path Delay:        2.175ns  (logic 2.174ns (99.954%)  route 0.001ns (0.046%))
+  Logic Levels:           1  (OBUF=1)
+  Output Delay:           -2.000ns
+  Clock Path Skew:        1.797ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    5.236ns
+    Source Clock Delay      (SCD):    2.618ns = ( 83.997 - 81.379 ) 
+    Clock Pessimism Removal (CPR):    0.821ns
+  Clock Uncertainty:      1.431ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.972ns
+    Phase Error              (PE):    0.944ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock u_dual_family_audio_clock/clk_48k_raw fall edge)
+                                                     81.379    81.379 f  
+    Y18                                               0.000    81.379 f  clk (IN)
+                         net (fo=0)                   0.000    81.379    clk
+    Y18                  IBUF (Prop_ibuf_I_O)         0.264    81.643 f  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           0.634    82.277    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.026    82.303 f  u_bufg_sys_clk/O
+                         net (fo=68, routed)          0.547    82.850    clk_sys_bufg
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.050    82.900 f  u_dual_family_audio_clock/u_mmcm_48k/CLKOUT0
+                         net (fo=1, routed)           0.489    83.389    u_dual_family_audio_clock/clk_48k_raw
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I1_O)
+                                                      0.026    83.415 f  u_dual_family_audio_clock/u_bufgmux_audio_family/O
+                         net (fo=387, routed)         0.583    83.997    clk_audio_128x
+    OLOGIC_X0Y91         FDRE                                         r  u_demo_interp_dac8_audio_pcm_common/dac_data_r_reg[3]/C  (IS_INVERTED)
+  -------------------------------------------------------------------    -------------------
+    OLOGIC_X0Y91         FDRE (Prop_fdre_C_Q)         0.177    84.174 r  u_demo_interp_dac8_audio_pcm_common/dac_data_r_reg[3]/Q
+                         net (fo=1, routed)           0.001    84.175    dac_data_OBUF[3]
+    G18                  OBUF (Prop_obuf_I_O)         1.997    86.172 r  dac_data_OBUF[3]_inst/O
+                         net (fo=0)                   0.000    86.172    dac_data[3]
+    G18                                                               r  dac_data[3] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock dac_clk_48k_128x rise edge)
+                                                      0.000     0.000 r  
+    Y18                                               0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    Y18                  IBUF (Prop_ibuf_I_O)         0.452     0.452 r  u_ibuf_sys_clk/O
+                         net (fo=1, routed)           0.689     1.140    clk_ibuf
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.029     1.169 r  u_bufg_sys_clk/O
+                         net (fo=68, routed)          0.813     1.983    clk_sys_bufg
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                      0.053     2.036 r  u_dual_family_audio_clock/u_mmcm_48k/CLKOUT0
+                         net (fo=1, routed)           0.534     2.569    u_dual_family_audio_clock/clk_48k_raw
+    BUFGCTRL_X0Y16       BUFGCTRL (Prop_bufgctrl_I1_O)
+                                                      0.029     2.598 r  u_dual_family_audio_clock/u_bufgmux_audio_family/O
+                         net (fo=387, routed)         0.855     3.454    clk_audio_128x
+    OLOGIC_X0Y95         ODDR (Prop_oddr_C_Q)         0.204     3.658 r  u_demo_interp_dac8_audio_pcm_common/gen_dac_clock_oddr.u_dac_clock_oddr/Q
+                         net (fo=1, routed)           0.001     3.659    dac_clk_OBUF
+    G16                  OBUF (Prop_obuf_I_O)         1.577     5.236 r  dac_clk_OBUF_inst/O
+                         net (fo=0)                   0.000     5.236    dac_clk
+    G16                                                               r  dac_clk (OUT)
+                         clock pessimism             -0.821     4.415    
+                         clock uncertainty            1.431     5.846    
+                         output delay                 2.000     7.846    
+  -------------------------------------------------------------------
+                         required time                         -7.846    
+                         arrival time                          86.172    
+  -------------------------------------------------------------------
+                         slack                                 78.326    
+
+
+
+

@@ -1,0 +1,43 @@
+{
+  "configuration_id": "NF-P3J-FINAL-430LUT-REPRODUCIBLE-R1",
+  "role": "recommended_low_lut_ff_default",
+  "source_branch": "national-finals-p3j-cic-dsp-pareto",
+  "source_commit": "008a03122101833a596397013172a4d65b208a14",
+  "source_worktree_dirty": false,
+  "synthesis": {
+    "directive": "AreaOptimized_high",
+    "flatten_hierarchy": "full",
+    "resource_sharing": "on",
+    "jobs": 4,
+    "stage1_dsp48_preadder": 1,
+    "cic_integrator_dsp_mode": 2,
+    "p3_joint_stage3": 1
+  },
+  "post_route": {
+    "lut": 430,
+    "ff": 431,
+    "slice": 176,
+    "dsp48e1": 4,
+    "ramb18e1": 4,
+    "bram_tile_equivalent": 2.0,
+    "mmcm": 2,
+    "wns_ns": 45.636,
+    "whs_ns": 0.119,
+    "dac_setup_slack_ns": 76.116,
+    "dac_hold_slack_ns": 78.117,
+    "vectorless_total_power_w": 0.271,
+    "vectorless_dynamic_power_w": 0.199,
+    "vectorless_static_power_w": 0.072
+  },
+  "verification": {
+    "matlab_gate": "PASS",
+    "rtl_release": "15/15 PASS",
+    "full_chain_cases": "impulse + 10 random seeds + positive/negative fullscale + 997 Hz -1 dBFS strong signal",
+    "full_chain_max_error_lsb": 0,
+    "reset_recovery": "8/8 PASS",
+    "dynamic_mode_switch": "10/10 PASS",
+    "ordinary_gui_project_rebuild": "PASS: 430 LUT / 431 FF / 4 DSP / 4 RAMB18E1 / 2 MMCM",
+    "bitstream_generated": true,
+    "physical_board": "NOT_EXECUTED"
+  }
+}

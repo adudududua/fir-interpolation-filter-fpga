@@ -13,3 +13,7 @@
 # Release-v2 hashes must survive a fresh Windows checkout byte-for-byte.
 matlab_fir/national_finals/release_v2/*.json text eol=lf
 matlab_fir/national_finals/release_v2/*.csv text eol=crlf
+
+# Preserve signed-off P3-J evidence byte-for-byte so SHA256SUMS remains valid
+# after a fresh Windows checkout.
+matlab_fir/national_finals/vivado_results/p3j_final_430lut_431ff_176slice_4dsp_2bram_reproducible/* -text
