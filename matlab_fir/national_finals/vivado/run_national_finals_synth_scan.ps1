@@ -1,6 +1,10 @@
 [CmdletBinding()]
 param(
-    [string]$VivadoExe = 'E:\app\Xilinx2018.3\Vivado\2018.3\bin\vivado.bat'
+    [string]$VivadoExe = 'E:\app\Xilinx2018.3\Vivado\2018.3\bin\vivado.bat',
+    [ValidatePattern('^[A-Za-z0-9_-]+$')]
+    [string]$TagPrefix = 'p3_joint_stage3',
+    [ValidateSet(0, 1)]
+    [int]$P3JointStage3 = 1
 )
 
 $ErrorActionPreference = 'Stop'
@@ -8,38 +12,39 @@ Set-StrictMode -Version Latest
 
 $wrapper = Join-Path $PSScriptRoot 'run_national_finals_vivado_build.ps1'
 $resultRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\vivado_results')).Path
-$summaryPath = Join-Path $resultRoot 'synthesis_strategy_scan.csv'
+$summaryPath = Join-Path $resultRoot `
+    "${TagPrefix}_synthesis_strategy_scan.csv"
 
 $candidates = @(
     [pscustomobject]@{
-        Tag = 'scan_area_rebuilt_auto'
+        Tag = "${TagPrefix}_scan_area_high_rebuilt_auto"
         Directive = 'AreaOptimized_high'
         Flatten = 'rebuilt'
         Sharing = 'auto'
     },
     [pscustomobject]@{
-        Tag = 'scan_area_full_auto'
+        Tag = "${TagPrefix}_scan_area_high_full_on"
         Directive = 'AreaOptimized_high'
         Flatten = 'full'
-        Sharing = 'auto'
+        Sharing = 'on'
     },
     [pscustomobject]@{
-        Tag = 'scan_area_none_auto'
+        Tag = "${TagPrefix}_scan_area_high_none_on"
         Directive = 'AreaOptimized_high'
         Flatten = 'none'
-        Sharing = 'auto'
+        Sharing = 'on'
     },
     [pscustomobject]@{
-        Tag = 'scan_area_rebuilt_on'
-        Directive = 'AreaOptimized_high'
+        Tag = "${TagPrefix}_scan_area_medium_rebuilt_on"
+        Directive = 'AreaOptimized_medium'
         Flatten = 'rebuilt'
         Sharing = 'on'
     },
     [pscustomobject]@{
-        Tag = 'scan_default_rebuilt_auto'
+        Tag = "${TagPrefix}_scan_default_rebuilt_on"
         Directive = 'Default'
         Flatten = 'rebuilt'
-        Sharing = 'auto'
+        Sharing = 'on'
     }
 )
 
@@ -63,6 +68,7 @@ $rows = foreach ($candidate in $candidates) {
         -SynthesisDirective $candidate.Directive `
         -FlattenHierarchy $candidate.Flatten `
         -ResourceSharing $candidate.Sharing `
+        -P3JointStage3 $P3JointStage3 `
         -ResultTag $candidate.Tag
 
     $reportPath = Join-Path $resultRoot `
