@@ -1,0 +1,51 @@
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date         : Sun Aug  2 23:21:54 2026
+| Host         : LAPTOP-476JT8H0 running 64-bit major release  (build 9200)
+| Command      : report_utilization -hierarchical -file D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/vivado_results/p3j_shared_pcm_stage1_1p5bram_3dsp_clean/utilization_hierarchical.rpt
+| Design       : board_demo_competition_dac8_top
+| Device       : 7a35tfgg484-2
+| Design State : Routed
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++---------------------------------------------------------------------------+------------------------------------------------------+------------+------------+---------+------+-----+--------+--------+--------------+
+|                                  Instance                                 |                        Module                        | Total LUTs | Logic LUTs | LUTRAMs | SRLs | FFs | RAMB36 | RAMB18 | DSP48 Blocks |
++---------------------------------------------------------------------------+------------------------------------------------------+------------+------------+---------+------+-----+--------+--------+--------------+
+| board_demo_competition_dac8_top                                           |                                                (top) |        478 |        477 |       0 |    1 | 476 |      0 |      3 |            3 |
+|   (board_demo_competition_dac8_top)                                       |                                                (top) |         18 |         17 |       0 |    1 |  40 |      0 |      0 |            0 |
+|   gen_compact_keypad.u_matrix_keypad_mode_ctrl_compact                    |                      matrix_keypad_mode_ctrl_compact |         40 |         40 |       0 |    0 |  26 |      0 |      0 |            0 |
+|   u_demo_interp_dac8_audio_pcm_common                                     |                    demo_interp_dac8_audio_pcm_common |        410 |        410 |       0 |    0 | 396 |      0 |      3 |            3 |
+|     (u_demo_interp_dac8_audio_pcm_common)                                 |                    demo_interp_dac8_audio_pcm_common |          6 |          6 |       0 |    0 |  10 |      0 |      0 |            0 |
+|     gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce          |             interp128_all2x_v7_folded_fir_cic_top_ce |        404 |        404 |       0 |    0 | 386 |      0 |      3 |            3 |
+|       gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce              |                    interp2_stage23_lutram_cic_dsp_ce |        129 |        129 |       0 |    0 |  85 |      0 |      1 |            1 |
+|         (gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce)          |                    interp2_stage23_lutram_cic_dsp_ce |         79 |         79 |       0 |    0 |  85 |      0 |      0 |            1 |
+|         gen_unified_bram_history.u_nf_stage23_history_ramb18_sdp          |                        nf_stage23_history_ramb18_sdp |         50 |         50 |       0 |    0 |   0 |      0 |      1 |            0 |
+|       gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce               |                         cic_interp16_n3_hold2_dsp_ce |         93 |         93 |       0 |    0 | 133 |      0 |      0 |            1 |
+|         (gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce)           |                         cic_interp16_n3_hold2_dsp_ce |         86 |         86 |       0 |    0 | 133 |      0 |      0 |            1 |
+|         u_round_cic_normalized_output                                     |                              round_sat_shift_compact |          7 |          7 |       0 |    0 |   0 |      0 |      0 |            0 |
+|       gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce     |                 interp2_stage1_single_bram_serial_ce |        177 |        177 |       0 |    0 | 162 |      0 |      1 |            1 |
+|         (gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce) |                 interp2_stage1_single_bram_serial_ce |         98 |         98 |       0 |    0 | 126 |      0 |      0 |            1 |
+|         gen_shared_pcm_bram.u_nf_pcm_stage1_shared_ramb18_sdp             |                      nf_pcm_stage1_shared_ramb18_sdp |         80 |         80 |       0 |    0 |  36 |      0 |      1 |            0 |
+|       gen_unified_fir_coeff_bram.u_nf_unified_fir_coeff_bram              |                            nf_unified_fir_coeff_bram |          1 |          1 |       0 |    0 |   2 |      0 |      1 |            0 |
+|       u_bridge_2_to_4_quantized                                           |                 bridge_valid_quantized_to_interp2_ce |          2 |          2 |       0 |    0 |   2 |      0 |      0 |            0 |
+|         (u_bridge_2_to_4_quantized)                                       |                 bridge_valid_quantized_to_interp2_ce |          2 |          2 |       0 |    0 |   2 |      0 |      0 |            0 |
+|         u_round_sat_shift_compact                                         |              round_sat_shift_compact__parameterized0 |          0 |          0 |       0 |    0 |   0 |      0 |      0 |            0 |
+|       u_bridge_4_to_8_quantized                                           | bridge_valid_quantized_to_interp2_ce__parameterized0 |          2 |          2 |       0 |    0 |   2 |      0 |      0 |            0 |
+|         (u_bridge_4_to_8_quantized)                                       | bridge_valid_quantized_to_interp2_ce__parameterized0 |          2 |          2 |       0 |    0 |   2 |      0 |      0 |            0 |
+|         u_round_sat_shift_compact                                         |              round_sat_shift_compact__parameterized1 |          0 |          0 |       0 |    0 |   0 |      0 |      0 |            0 |
+|   u_dual_family_audio_clock                                               |                              dual_family_audio_clock |          0 |          0 |       0 |    0 |   0 |      0 |      0 |            0 |
+|   u_nf_mode_cdc_handshake                                                 |                                nf_mode_cdc_handshake |         10 |         10 |       0 |    0 |  14 |      0 |      0 |            0 |
++---------------------------------------------------------------------------+------------------------------------------------------+------------+------------+---------+------+-----+--------+--------+--------------+
+* Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
+
+
