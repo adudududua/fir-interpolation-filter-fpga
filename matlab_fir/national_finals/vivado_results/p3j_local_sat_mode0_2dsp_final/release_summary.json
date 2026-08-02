@@ -1,0 +1,26 @@
+{
+  "configuration_id": "NF-P3-RTL-JOINT-STAGE3-EQ-R1",
+  "role": "minimum_dsp_pareto",
+  "cic_integrator_dsp_mode": 0,
+  "rtl_source_commit": "9a216f4e1b85906fadb2050c64ab987c71948abe",
+  "post_route": {
+    "lut": 488,
+    "ff": 486,
+    "slice": 191,
+    "dsp48e1": 2,
+    "ramb18e1": 4,
+    "bram_tile_equivalent": 2.0,
+    "mmcm": 2,
+    "wns_ns": 45.736,
+    "whs_ns": 0.060,
+    "vectorless_total_power_w": 0.270,
+    "vectorless_dynamic_power_w": 0.198,
+    "vectorless_static_power_w": 0.072
+  },
+  "verification": {
+    "rtl_release": "15/15 PASS",
+    "full_chain_cases": "impulse + 10 random seeds + positive/negative fullscale + 997 Hz -1 dBFS strong signal",
+    "full_chain_max_error_lsb": 0,
+    "bitstream_generated": true
+  }
+}
