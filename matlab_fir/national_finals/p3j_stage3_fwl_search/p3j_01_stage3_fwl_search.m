@@ -72,7 +72,7 @@ candidate11 = unique(candidate11, 'rows', 'stable');
 candidate11 = candidate11(max(abs(double(candidate11)), [], 2) < 2^(COEFF_W-1), :);
 
 [pass11, stop11] = coarse_screen(candidate11, bank11, 250);
-frequency_keep11 = pass11 <= PASS_GATE_DB+0.002 && ...
+frequency_keep11 = pass11 <= PASS_GATE_DB+0.002 & ...
     stop11 >= STOP_GATE_DB-0.2;
 candidate11_gate = candidate11(frequency_keep11, :);
 pass11_gate = pass11(frequency_keep11);
@@ -107,7 +107,7 @@ for refinement = 1:2
     local = unique(local, 'rows', 'stable');
     local = local(max(abs(double(local)), [], 2) < 2^(COEFF_W-1), :);
     [local_pass, local_stop] = coarse_screen(local, bank11, 250);
-    local_keep = local_pass <= PASS_GATE_DB+0.002 && ...
+    local_keep = local_pass <= PASS_GATE_DB+0.002 & ...
         local_stop >= STOP_GATE_DB-0.2;
     local = local(local_keep, :);
     local_pass = local_pass(local_keep);
