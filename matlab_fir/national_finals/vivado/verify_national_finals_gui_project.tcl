@@ -66,6 +66,10 @@ foreach asset_name $daily_asset_patterns {
     set asset_file [get_files -quiet -of_objects $sim_set "*$asset_name"]
     require_condition [expr {[llength $asset_file] == 1}] \
         "GUI simulation asset is not registered exactly once: $asset_name"
+    require_condition \
+        [expr {[string first "/vectors/p3j_daily/" \
+            [string map {\\ /} [file normalize $asset_file]]] >= 0}] \
+        "GUI simulation asset is not from the signed-off P3-J vector set: $asset_file"
 }
 
 set serial_cic_file [get_files -quiet \

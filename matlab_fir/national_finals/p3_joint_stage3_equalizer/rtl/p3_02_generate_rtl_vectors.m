@@ -22,6 +22,10 @@ switch vector_profile
         error('Unknown NF_P3_VECTOR_PROFILE=%s (use SMOKE or RELEASE).', ...
             vector_profile);
 end
+vector_dir_override = strtrim(getenv('NF_P3_VECTOR_DIR'));
+if ~isempty(vector_dir_override)
+    vector_dir = vector_dir_override;
+end
 if ~exist(vector_dir, 'dir'); mkdir(vector_dir); end
 addpath(script_dir);
 

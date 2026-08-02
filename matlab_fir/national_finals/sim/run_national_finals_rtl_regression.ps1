@@ -3,6 +3,8 @@ param(
     [string]$VivadoBin = 'E:\app\Xilinx2018.3\Vivado\2018.3\bin',
     [ValidateSet('Smoke', 'Release')]
     [string]$RegressionScale = 'Smoke',
+    [ValidateSet(0, 1, 2)]
+    [int]$CicIntegratorDspMode = 2,
     [string]$VectorDir = '',
     [switch]$PublishImpulseOutputs
 )
@@ -15,6 +17,7 @@ $projectRoot = Join-Path $repoRoot 'XC7A35T_interp_audio_pcm_wordlen_opt\XC7A35T
 $sourceRoot = Join-Path $projectRoot 'sources_1\new'
 $simRoot = Join-Path $projectRoot 'sim_1\new'
 $nfRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$p3Root = Join-Path $nfRoot 'p3_joint_stage3_equalizer'
 $timestamp = Get-Date -Format 'yyyyMMdd_HHmmss'
 $runRoot = Join-Path $nfRoot "_work\rtl_regression\$timestamp"
 
@@ -116,22 +119,37 @@ $signedOffFullChainXvlogOptions = @(
     '-d', 'NATIONAL_FINALS_SINGLE_BRAM_STAGE1',
     '-d', 'PHASE7_USE_BRAM_STAGE23_COEFF'
 )
+if ($CicIntegratorDspMode -lt 2) {
+    $signedOffFullChainXvlogOptions += @(
+        '-d', "NF_CIC_INTEGRATOR_DSP_MODE_$CicIntegratorDspMode")
+}
 $v7Source = Join-Path $sourceRoot 'all2x_v7'
 $v7Sim = Join-Path $simRoot 'all2x_v7\verification'
 $coeffHeader = Join-Path $sourceRoot 'all2x_v2\all2x_v2_coeff_pkg.vh'
 
 if ([string]::IsNullOrWhiteSpace($VectorDir)) {
     if ($RegressionScale -eq 'Release') {
-        $VectorDir = Join-Path $nfRoot '_work\release_vectors'
+        $VectorDir = Join-Path $p3Root '_work\rtl_vectors'
     }
     else {
-        $VectorDir = Join-Path $nfRoot 'vectors\daily'
+        $VectorDir = Join-Path $nfRoot 'vectors\p3j_daily'
     }
 }
 if (-not (Test-Path -LiteralPath $VectorDir)) {
     throw "Vector directory not found for $RegressionScale regression: $VectorDir"
 }
 $VectorDir = (Resolve-Path -LiteralPath $VectorDir).Path
+$vectorManifestPath = Join-Path $VectorDir 'p3_rtl_vector_manifest.csv'
+if (-not (Test-Path -LiteralPath $vectorManifestPath)) {
+    throw "P3-J vector manifest is missing: $vectorManifestPath"
+}
+$vectorManifestRows = @(Import-Csv -LiteralPath $vectorManifestPath)
+if ($vectorManifestRows.Count -eq 0 -or
+    @($vectorManifestRows | Where-Object {
+        $_.CONFIG_ID -ne 'NF-P3-RTL-JOINT-STAGE3-EQ-R1'
+    }).Count -ne 0) {
+    throw "Vector directory is not the signed-off P3-J configuration: $VectorDir"
+}
 $expectedSeedCount = if ($RegressionScale -eq 'Release') { 10 } else { 1 }
 $requiredVectorNames = @(
     'impulse_input_24bit.mem',
@@ -174,6 +192,51 @@ $fullChainPassText = if ($RegressionScale -eq 'Release') {
 }
 else {
     'PHASE7 FULL CHAIN BITTRUE PASS: impulse + 1 seeds, reset-zero prefixes and all nodes 0 LSB.'
+}
+
+$signedOffWrapperPath = Join-Path $nfSource 'nf_signedoff_filter_core.v'
+$fullChainTbPath = Join-Path $v7Sim 'tb_phase7_full_chain_bittrue.v'
+if ($CicIntegratorDspMode -lt 2) {
+    $generatedCandidateDir = Join-Path $runRoot 'generated_candidate'
+    New-Item -ItemType Directory -Path $generatedCandidateDir -Force | Out-Null
+    $candidateModuleName = "nf_p3j_cic_mode${CicIntegratorDspMode}_filter_core"
+
+    $wrapperText = [System.IO.File]::ReadAllText($signedOffWrapperPath)
+    $moduleNeedle = 'module nf_signedoff_filter_core ('
+    if (([regex]::Matches($wrapperText,
+            [regex]::Escape($moduleNeedle))).Count -ne 1) {
+        throw 'Could not uniquely rewrite the P3-J signed-off wrapper module name.'
+    }
+    $dspNeedle = '.CIC_INTEGRATOR_DSP_MODE(2),'
+    if (([regex]::Matches($wrapperText,
+            [regex]::Escape($dspNeedle))).Count -ne 2) {
+        throw 'Could not find both signed-off CIC DSP mode literals.'
+    }
+    $wrapperText = $wrapperText.Replace(
+        $moduleNeedle, "module $candidateModuleName (")
+    $wrapperText = $wrapperText.Replace(
+        $dspNeedle, ".CIC_INTEGRATOR_DSP_MODE($CicIntegratorDspMode),")
+    $candidateWrapperPath = Join-Path $generatedCandidateDir "${candidateModuleName}.v"
+    [System.IO.File]::WriteAllText(
+        $candidateWrapperPath, $wrapperText,
+        [System.Text.UTF8Encoding]::new($false))
+
+    $tbText = [System.IO.File]::ReadAllText($fullChainTbPath)
+    $tbNeedle = 'nf_signedoff_filter_core u_dut ('
+    if (([regex]::Matches($tbText,
+            [regex]::Escape($tbNeedle))).Count -ne 1) {
+        throw 'Could not uniquely bind the generated P3-J candidate wrapper.'
+    }
+    $tbText = $tbText.Replace(
+        $tbNeedle, "$candidateModuleName u_dut (")
+    $candidateFullChainTbPath = Join-Path $generatedCandidateDir 'tb_phase7_full_chain_bittrue.v'
+    [System.IO.File]::WriteAllText(
+        $candidateFullChainTbPath, $tbText,
+        [System.Text.UTF8Encoding]::new($false))
+}
+else {
+    $candidateWrapperPath = $signedOffWrapperPath
+    $candidateFullChainTbPath = $fullChainTbPath
 }
 
 $romDir = Invoke-RtlCase -Name 'rom' `
@@ -333,8 +396,8 @@ $fullDir = Invoke-RtlCase -Name 'full_chain_bittrue' `
         (Join-Path $nfSource 'cic_interp16_serial_comb_dsp_ce.v'),
         (Join-Path $nfSource 'cic_interp16_n3_hold2_dsp_ce.v'),
         (Join-Path $v7Source 'interp128_all2x_v7_folded_fir_cic_top_ce.v'),
-        (Join-Path $nfSource 'nf_signedoff_filter_core.v'),
-        (Join-Path $v7Sim 'tb_phase7_full_chain_bittrue.v'),
+        $candidateWrapperPath,
+        $candidateFullChainTbPath,
         $glbl
     ) `
     -Top 'tb_phase7_full_chain_bittrue' `
@@ -371,6 +434,15 @@ $resetDir = Invoke-RtlCase -Name 'full_chain_reset_recovery' `
     -XelabOptions @('glbl', '-L', 'unisims_ver') `
     -Assets @($coeffHeader)
 
+$dynamicXvlogOptions = @(
+    '-d', 'PHASE7_USE_BRAM_STAGE23_HISTORY',
+    '-d', 'PHASE7_USE_BRAM_STAGE23_COEFF'
+)
+if ($CicIntegratorDspMode -lt 2) {
+    $dynamicXvlogOptions += @(
+        '-d', "NF_CIC_INTEGRATOR_DSP_MODE_$CicIntegratorDspMode")
+}
+
 $dynamicDir = Invoke-RtlCase -Name 'dynamic_mode_switch' `
     -VerilogFiles @(
         (Join-Path $sourceRoot 'all2x_v6\round_sat_shift_compact.v'),
@@ -396,10 +468,7 @@ $dynamicDir = Invoke-RtlCase -Name 'dynamic_mode_switch' `
     -Top 'tb_phase7_mode_switch_dynamic' `
     -Snapshot 'tb_nf_dynamic_mode_sim' `
     -ExpectedPassText 'PHASE7 DYNAMIC MODE PASS: 10 switches, no reset, no runt pulse or X.' `
-    -XvlogOptions @(
-        '-d', 'PHASE7_USE_BRAM_STAGE23_HISTORY',
-        '-d', 'PHASE7_USE_BRAM_STAGE23_COEFF'
-    ) `
+    -XvlogOptions $dynamicXvlogOptions `
     -XelabOptions @('glbl', '-L', 'unisims_ver') `
     -Assets @(
         $coeffHeader,
@@ -417,4 +486,5 @@ if ($PublishImpulseOutputs) {
 
 Write-Host ''
 Write-Host 'NATIONAL FINALS RTL REGRESSION PASS (15/15)'
+Write-Host "CIC integrator DSP mode: $CicIntegratorDspMode"
 Write-Host "Run directory: $runRoot"

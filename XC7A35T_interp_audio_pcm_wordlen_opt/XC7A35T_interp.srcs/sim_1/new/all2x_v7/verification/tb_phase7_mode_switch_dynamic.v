@@ -1,5 +1,13 @@
 `timescale 1ns / 1ps
 
+`ifdef NF_CIC_INTEGRATOR_DSP_MODE_0
+`define NF_CIC_INTEGRATOR_DSP_MODE 0
+`elsif NF_CIC_INTEGRATOR_DSP_MODE_1
+`define NF_CIC_INTEGRATOR_DSP_MODE 1
+`else
+`define NF_CIC_INTEGRATOR_DSP_MODE 2
+`endif
+
 //=============================================================
 // 文件名       : tb_phase7_mode_switch_dynamic.v
 // 模块名       : tb_phase7_mode_switch_dynamic
@@ -77,7 +85,9 @@ module tb_phase7_mode_switch_dynamic;
         .USE_NATIONAL_FINALS_N3_HOLD_EQUIV(1),
         .USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER(1),
         .USE_NATIONAL_FINALS_NARROW_STAGE23(1),
-        .USE_NATIONAL_FINALS_P3_JOINT_STAGE3(1)
+        .USE_NATIONAL_FINALS_P3_JOINT_STAGE3(1),
+        .USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE(
+            `NF_CIC_INTEGRATOR_DSP_MODE)
     ) u_dut (
         .clk_audio_128x(clk),
         .rst_n(rst_n),

@@ -1,5 +1,13 @@
 `timescale 1ns / 1ps
 
+`ifdef NF_CIC_INTEGRATOR_DSP_MODE_0
+`define NF_CIC_INTEGRATOR_DSP_MODE 0
+`elsif NF_CIC_INTEGRATOR_DSP_MODE_1
+`define NF_CIC_INTEGRATOR_DSP_MODE 1
+`else
+`define NF_CIC_INTEGRATOR_DSP_MODE 2
+`endif
+
 //=============================================================
 // 文件名       : tb_phase7_full_chain_reset_recovery.v
 // 模块名       : tb_phase7_full_chain_reset_recovery
@@ -144,6 +152,7 @@ module tb_phase7_full_chain_reset_recovery;
 `else
         .USE_STAGE1_DSP48_PREADDER(0),
 `endif
+        .CIC_INTEGRATOR_DSP_MODE(`NF_CIC_INTEGRATOR_DSP_MODE),
 `ifdef NATIONAL_FINALS_UNIFIED_STAGE23_HISTORY
         .ASSUME_ALIGNED_POW2_CE(1)
 `else
@@ -227,6 +236,7 @@ module tb_phase7_full_chain_reset_recovery;
 `else
         .USE_STAGE1_DSP48_PREADDER(0),
 `endif
+        .CIC_INTEGRATOR_DSP_MODE(`NF_CIC_INTEGRATOR_DSP_MODE),
 `ifdef NATIONAL_FINALS_UNIFIED_STAGE23_HISTORY
         .ASSUME_ALIGNED_POW2_CE(1)
 `else

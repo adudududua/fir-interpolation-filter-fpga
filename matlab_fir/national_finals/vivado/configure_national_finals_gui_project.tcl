@@ -12,7 +12,7 @@ set project_src_dir [file join $repo_dir XC7A35T_interp_audio_pcm_wordlen_opt \
 set signedoff_wrapper [file join $project_src_dir national_finals \
     nf_signedoff_filter_core.v]
 set daily_vector_dir [file join $repo_dir matlab_fir national_finals \
-    vectors daily]
+    vectors p3j_daily]
 
 proc require_condition {condition message} {
     if {!$condition} {
@@ -70,6 +70,12 @@ foreach vector_name $daily_vector_names {
     set vector_path [file join $daily_vector_dir $vector_name]
     require_condition [file exists $vector_path] \
         "GUI simulation asset is missing: $vector_path"
+    foreach existing_vector [get_files -quiet -of_objects $sim_set \
+            "*$vector_name"] {
+        if {[file normalize $existing_vector] ne [file normalize $vector_path]} {
+            remove_files -fileset sim_1 $existing_vector
+        }
+    }
     if {[llength [get_files -quiet -of_objects $sim_set $vector_path]] == 0} {
         add_files -fileset sim_1 -norecurse $vector_path
     }
