@@ -43,9 +43,12 @@ search_names = {'impulse', 'fullscale_positive', ...
     'fullscale_negative', 'strong_44k1_minus1dbfs'};
 search_case_index = find(ismember(case_names, search_names));
 peak_basis_search = [];
+peak_basis_search9 = [];
 for index = search_case_index(:).'
     peak_basis_search = [peak_basis_search, ... %#ok<AGROW>
         build_stage3_acc_basis(stage2_cases{index}, 11)];
+    peak_basis_search9 = [peak_basis_search9, ... %#ok<AGROW>
+        build_stage3_acc_basis(stage2_cases{index}, 9)];
 end
 
 fprintf('Building dual-family coarse frequency banks...\n');
@@ -164,11 +167,11 @@ if any(signed20_pass)
         -precise_stop11(passing_rows), peak11_gate(passing_rows)], [1 2 3]);
     selected_row = passing_rows(best_order(1));
     selected11 = candidate11_gate(selected_row, :);
-    coverage_table = full_coverage(selected11, case_names, stage2_cases, ...
-        SIGNED20_MIN, SIGNED20_MAX);
+    coverage_table = full_coverage(selected11, 11, case_names, ...
+        stage2_cases, SIGNED20_MIN, SIGNED20_MAX);
     writetable(coverage_table, fullfile(result_dir, ...
         'p3j_p5_signed20_fixed_vector_coverage.csv'));
-    if ~all(coverage_table.SIGNED20_SAFE)
+    if ~all(coverage_table.SIGNED_OUTPUT_SAFE)
         selected11 = int64([]);
     end
 end
@@ -209,11 +212,35 @@ if ~isempty(coarse_gate9)
     end
 end
 pass_gate9 = precise_pass9 <= PASS_GATE_DB & precise_stop9 >= STOP_GATE_DB;
+peak9 = nan(size(pass9));
+peak9(pass_gate9) = bittrue_peak(candidate9(pass_gate9, :), ...
+    peak_basis_search9, 100);
+signed21_search_safe9 = peak9 <= 2^20-1;
+passing9 = find(pass_gate9 & signed21_search_safe9);
+selected9 = int64([]);
+coverage9 = table();
+if ~isempty(passing9)
+    [~, passing_order9] = sortrows([precise_pass9(passing9), ...
+        -precise_stop9(passing9), peak9(passing9)], [1 2 3]);
+    for candidate_index = passing9(passing_order9(:)).'
+        trial_coverage = full_coverage(candidate9(candidate_index, :), ...
+            9, case_names, stage2_cases, -2^20, 2^20-1);
+        if all(trial_coverage.SIGNED_OUTPUT_SAFE)
+            selected9 = candidate9(candidate_index, :);
+            coverage9 = trial_coverage;
+            break;
+        end
+    end
+end
+if ~isempty(selected9)
+    writetable(coverage9, fullfile(result_dir, ...
+        'p3j_p5_9tap_fixed_vector_coverage.csv'));
+end
 rank_score9 = pass9/PASS_GATE_DB + max(0, STOP_GATE_DB-stop9);
 [~, rank9] = sort(rank_score9, 'ascend');
 keep9 = unique([find(pass_gate9); rank9(1:min(1000, numel(rank9)))], 'stable');
 table9 = build_candidate_table(candidate9(keep9, :), pass9(keep9), ...
-    stop9(keep9), nan(numel(keep9), 1), precise_pass9(keep9), ...
+    stop9(keep9), peak9(keep9), precise_pass9(keep9), ...
     precise_stop9(keep9), pass_gate9(keep9), 9);
 writetable(table9, fullfile(result_dir, 'p3j_p5_9tap_candidates.csv'));
 
@@ -237,13 +264,19 @@ if ~isempty(selected11)
 end
 fprintf(fid, 'NINE_TAP_CANDIDATES=%d\n', size(candidate9, 1));
 fprintf(fid, 'NINE_TAP_PRECISE_PASS=%d\n', nnz(pass_gate9));
+fprintf(fid, 'NINE_TAP_FULL_COVERAGE_PASS=%d\n', ~isempty(selected9));
+if ~isempty(selected9)
+    fprintf(fid, 'NINE_TAP_SELECTED_INDEPENDENT='); fprintf(fid, '%d ', selected9); fprintf(fid, '\n');
+    fprintf(fid, 'NINE_TAP_SELECTED_FULL='); fprintf(fid, '%d ', expand_symmetric(selected9)); fprintf(fid, '\n');
+    fprintf(fid, 'NINE_TAP_PHASE_TASKS=5,4 (baseline 6,5)\n');
+end
 fprintf(fid, 'SIGNED20_MATLAB_GO=%d\n', ~isempty(selected11));
-fprintf(fid, 'NINE_TAP_MATLAB_GO=%d\n', any(pass_gate9));
+fprintf(fid, 'NINE_TAP_MATLAB_GO=%d\n', ~isempty(selected9));
 fprintf(fid, 'RTL_STATUS=NOT_CHANGED_BY_THIS_SCRIPT\n');
 clear cleanup_summary;
 
 fprintf(['P3J_P5_SEARCH_DONE: signed20_go=%d, 9tap_go=%d, ' ...
-    'baseline_peak=%d\n'], ~isempty(selected11), any(pass_gate9), baseline_peak);
+    'baseline_peak=%d\n'], ~isempty(selected11), ~isempty(selected9), baseline_peak);
 
 
 function h_up = upsample_ir(h, rate)
@@ -500,12 +533,13 @@ function data = build_candidate_table(candidate, coarse_pass, coarse_stop, ...
 end
 
 
-function data = full_coverage(candidate, names, stage2_cases, out_min, out_max)
+function data = full_coverage(candidate, taps, names, stage2_cases, ...
+        out_min, out_max)
     max_abs = zeros(numel(names), 1);
     sat_count = zeros(numel(names), 1);
     safe = false(numel(names), 1);
     for index = 1:numel(names)
-        basis = build_stage3_acc_basis(stage2_cases{index}, 11);
+        basis = build_stage3_acc_basis(stage2_cases{index}, taps);
         acc = double(candidate)*basis;
         rounded = floor((acc+16383+(acc >= 0))/2^15);
         max_abs(index) = max(abs(rounded));
@@ -514,5 +548,5 @@ function data = full_coverage(candidate, names, stage2_cases, out_min, out_max)
     end
     data = table(names(:), max_abs, sat_count, safe, ...
         'VariableNames', {'CASE_NAME', 'MAX_ABS_STAGE3', ...
-        'SIGNED20_SATURATION_COUNT', 'SIGNED20_SAFE'});
+        'SIGNED_OUTPUT_SATURATION_COUNT', 'SIGNED_OUTPUT_SAFE'});
 end
