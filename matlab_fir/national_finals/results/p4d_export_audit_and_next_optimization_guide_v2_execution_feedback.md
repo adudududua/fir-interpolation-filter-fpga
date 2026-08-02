@@ -4,14 +4,14 @@
 
 本轮没有盲目合并所有建议，而是按指导规定的 P0→P1/P2→P3 Stop/Go 顺序逐项验证。最终结论如下：
 
-1. **P0 已完成并签核。** 21-bit golden、频响绝对门禁、CDC 绝对延迟、无 BOM 哈希和 clean-source-to-bitstream 闭环均已修复；默认发布版仍为 P4-D：**479 LUT / 468 FF / 198 Slice / 4 DSP / 4 RAMB18E1（2 Tile）/ 2 MMCM**。
+1. **P0 已完成并签核。** 21-bit golden、频响绝对门禁、CDC 绝对延迟、无 BOM 哈希和 clean-source-to-bitstream 闭环均已修复；当时形成的 P4-D 稳定回退为 **479 LUT / 468 FF / 198 Slice / 4 DSP / 4 RAMB18E1（2 Tile）/ 2 MMCM**，当前默认已由后续 P3-J 替代。
 2. **P1 TWO24 在结构和功能上成功，但没有达到首选资源门槛。** 单颗 DSP48E1 精确承担两级 CIC 积分器，完整工程降到 3 DSP，17/17 Release 通过；代价为 **518 LUT / 498 FF**。它是可回退的 3-DSP 研究 Pareto，但 LUT/FF 还劣于既有 P4-C 3-DSP 的 504/494，因此不替代默认版，也不作为最佳 3-DSP 交付版。
 3. **P2 分布式系数 ROM 成功形成 1 BRAM Tile Pareto。** P2-A 为 **513 LUT / 496 FF / 4 DSP / 2 RAMB18E1（1 Tile）**，17/17 Release 通过；它明显优于旧 P4-F 的 531 LUT / 487 FF / 1 Tile（少 18 LUT、多 9 FF），适合 BRAM 比 LUT/FF 更紧张的场景，但不替代 P4-D。
-4. **P3 通过 MATLAB RTL 入口门禁。** 11-tap Q15/18-bit 联合 Stage3/均衡器候选满足六工况、线性相位、定点强弱信号和调度余量要求。预计可通过删除独立均衡器净省约 29 LUT / 31 FF，但这只是保守模型，尚无 RTL、post-route 或 bitstream，不能写成实测资源。
+4. **P3 已继续完成 P3-J RTL 签核。** 11-tap Q15/18-bit 联合 Stage3/均衡器候选先通过六工况、线性相位、定点强弱信号和调度余量门禁，随后完成 RTL、Smoke/Release、动态切换、复位、post-route 和 bitstream；实测为 **432 LUT / 431 FF / 174 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM**。
 5. **PREG 面积路线明确撤销。** routed DCP 已证明现有两颗 CIC DSP 使用 CREG 保存状态，Slice 中不存在可直接删除的 40～55 个状态 FF；单纯 CREG→PREG 不具有指导所要求的面积依据。
 6. **P4 MMCM 功耗路线本轮未执行。** 它是独立的低功耗目标，需要 SAIF 或实板电流测量，并会引入时钟启停、LOCK 超时和切换 CDC 验证；不应与本轮面积单变量实验混合。
 
-默认交付仍是 P4-D clean release-v2。P1、P2、P3 均保存在独立 Git 分支和标签中，便于继续研究或回退。
+工具侧默认交付已更新为 P3-J；P4-D clean release-v2 继续作为稳定回退。P1、P2、P3 均保存在独立 Git 分支和标签中，便于继续研究或回退。
 
 ## 2. 指导条目执行矩阵
 
@@ -27,7 +27,7 @@
 | P1-C：CIC OOC | 已完成 | 95107 输出 0 LSB；2 DSP→1 DSP，+36 LUT/+18 FF | 独立分支 |
 | P1-D：完整板级 | 已完成 | 518 LUT / 498 FF / 3 DSP，17/17 Release，bitstream 生成 | 保留，不替代默认版 |
 | P2：双 distributed coefficient ROM | 已完成 | A/B 均实现；选中 P2-A 513/496/4DSP/1Tile | 低 BRAM 分支 |
-| P3：Stage3/均衡器联合设计 | MATLAB 门禁完成 | 11-tap Q15/18-bit 候选通过；尚未进入 RTL | 研究分支 |
+| P3：Stage3/均衡器联合设计 | RTL/Release/post-route/bitstream 完成 | 432 LUT / 431 FF / 174 Slice / 4 DSP / 2 BRAM Tile | 当前默认候选 |
 | PREG 面积 A/B | 不执行 | 前提被 routed DSP 属性否定，没有可删除的 Slice 状态 FF | 否 |
 | P4：MMCM PWRDWN/单家族 bit | 延后 | 需要独立 SAIF/实测和完整时钟切换安全验证 | 否 |
 | 实物板卡六档验收 | 环境受限 | bitstream 已生成；下载、DA_CLK、DAC 波形/频谱和电流仍需现场完成 | 待现场 |
@@ -186,7 +186,7 @@ P2-A 通过 17/17 Release，完整布线且 0 timing failing endpoint；bit SHA-
 | **P2-A** | clean build + RTL + route + bit | **513** | **496** | **4** | **2 / 1.0** | 2 | +45.949/+0.117 ns | 0.270 W | 推荐 1-Tile Pareto |
 | P2-B | clean build + RTL + route + bit | 516 | 516 | 4 | 2 / 1.0 | 2 | +45.764/+0.103 ns | 0.270 W | A/B 反例 |
 | P4-F | 完整实现 | 531 | 487 | 4 | 2 / 1.0 | 2 | +45.898/+0.105 ns | 0.271 W | 被 P2-A 在 LUT 上明显改进 |
-| P3 联合设计 | MATLAB 门禁 | 约450* | 约437* | 4* | 4 / 2.0* | 2* | 未实现 | 未实现 | *均为预测，不是实测 |
+| **P3-J 联合设计** | **clean build + RTL + route + bit** | **432** | **431** | **4** | **4 / 2.0** | **2** | **+45.624/+0.105 ns** | **0.271 W** | **当前默认候选** |
 
 功耗均为 Vivado vectorless、Medium confidence；不能据 0.001 W 差异宣称实际省电。
 
@@ -198,5 +198,43 @@ P2-A 通过 17/17 Release，完整布线且 0 timing failing endpoint；bit SHA-
 | TWO24 3-DSP | `codex/national-finals-p1-two24-cic` | `nf-p1-two24-518lut-498ff-3dsp-2bram-2mmcm` |
 | distributed ROM 1-Tile | `codex/national-finals-p2-coeff-distributed-rom` | `nf-p2-513lut-496ff-4dsp-1bram-2mmcm` |
 | Stage3/均衡器 MATLAB 门禁 | `codex/national-finals-p3-joint-stage3-equalizer` | `nf-p3-matlab-gate-11tap-q15-18bit` |
+| Stage3/均衡器 RTL 签核 | `national-finals-p3-rtl-equalizer-fold` | 最终 clean build 后创建 |
 
-本轮最终工作分支停留在 P4-D R2；实验分支不合并进默认 RTL，避免破坏 clean release 边界。
+当前工作分支停留在 P3-J RTL 签核版；P4-D R2 标签不移动，仍可一条命令回退。
+
+## 10. P3-J RTL 后续执行反馈（2026-08-02）
+
+### 10.1 已执行内容
+
+MATLAB 门禁通过后，没有直接把预测资源写成结论，而是按独立分支继续完成以下工作：
+
+1. 冻结模式化 Stage3 架构：4x/8x 使用 flat bank，128x 使用 compensated bank；
+2. 将 compensated bank 放入统一 RAMB18 的空闲地址，以 parity 保存 signed-18 高两位；
+3. Stage3 输出扩展为可配置 signed-20/21，128x 保留 fullscale 证明所需的 21 bit；
+4. 在 pending/job 边界快照模式，防止动态切档混用系数；
+5. 从板级网表删除独立 `cic3_compensator_shiftadd_ce`；
+6. 增加 P3 MATLAB bittrue/golden 入口、RAMB18 parity 原语测试、P3 reset 和动态切换覆盖；
+7. 运行 Smoke/Release 15/15、综合参数扫描、五种实现策略、完整 post-route、DRC/CDC、功耗和 bitstream。
+
+### 10.2 遇到的问题及解决
+
+- **验证 wrapper 最初未显式传递 P3 参数。** 所有签核 wrapper 与构建 Tcl 改为显式 `P3JointStage3=1`，禁止依赖默认值。
+- **Smoke 一度读取 Release 的 4096 点资产。** 生成器增加 `NF_P3_VECTOR_PROFILE=SMOKE|RELEASE`，资产分别放入 `_work/rtl_vectors_smoke` 和 `_work/rtl_vectors`，避免同名文件漂移。
+- **动态切档测试暴露 demo 顶层仍打开旧 shift-add equalizer。** 顶层条件改为 `national_datapath && !P3`，P3 模式下独立均衡器不会 elaboration。
+- **所有模式共用 compensated bank 不可行。** MATLAB 反例的 44.1/48 kHz 8x 通带误差为 0.129854/0.112188 dB，故保留模式化 bank。
+- **20-bit P3 Stage3 边界不可证明。** 满量程最大绝对值 527320 大于 524287，保留 signed-21，拒绝用潜在削顶换面积。
+- **综合警告提示 P3 禁用时索引越界。** 改为 generate 隔离断言，最终 Smoke/Release 无 mismatch、fatal 或越界。
+
+### 10.3 实测结果
+
+Release 使用冲激、10 个固定 seed×4096 和正/负满量程共 13 组全链输入，4x/8x/128x 全部 0 LSB；8 个内部状态复位场景和 10 次无复位动态切换通过。六工况最差绝对通带误差 0.007730 dB、最差峰峰纹波 0.006192 dB、最差阻带 72.371 dB。
+
+选定实现为 `AreaOptimized_high/full/on + Default`：
+
+| 版本 | LUT | FF | Slice | DSP | RAMB18 / Tile | MMCM | WNS/WHS | 功耗 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| P4-D R2 | 479 | 468 | 198 | 4 | 4 / 2.0 | 2 | +45.734/+0.121 ns | 0.271 W |
+| **P3-J** | **432** | **431** | **174** | **4** | **4 / 2.0** | **2** | **+45.624/+0.105 ns** | **0.271 W** |
+| 差值 | **-47** | **-37** | **-24** | 0 | 0 | 0 | -0.110/-0.016 ns | 0 W |
+
+`AddRemap` 和 `Explore` 与 Default 完全同分；`ExploreWithRemap` 为 442 LUT，`ExploreArea` 为 486 LUT，均 No-Go。详细数据、六工况与警告审计见 [P3-J RTL 签核](p3_joint_stage3_rtl_signoff.md)。物理板测试仍未执行，不能把工具侧 bitstream PASS 写成实板 PASS。

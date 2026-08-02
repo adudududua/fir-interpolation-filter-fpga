@@ -2,7 +2,7 @@
 
 ## 优化演进总览（建议先读）
 
-本节按时间顺序统一整理“最初 4x+2x 结构、区域赛全 2x 优化、FIR-CIC 优化、全国赛全 2x 回退对照、全国赛 6-DSP CIC、440/442/434-LUT 演进、Route 1、comb-LUT 低 DSP 版、P1 真 Q15 正确性修复、P3 工程闭环，以及 P4-A～P4-F 演进”。重要纠错：旧 424-LUT/6-DSP 与 436-LUT/5-DSP 版本的归一化频响虽通过，但 8x/128x 绝对增益约低 6.02 dB，现仅作为资源演进历史。当前默认发布候选仍为 P4-D `479 LUT / 468 FF / 4 DSP / 2 BRAM Tile`；P4-E `491 LUT / 487 FF / 1.5 BRAM Tile` 和 P4-F `531 LUT / 487 FF / 1 BRAM Tile` 是已完整验证的低 BRAM 备选，不替代 LUT/FF 更低的默认版。
+本节按时间顺序统一整理“最初 4x+2x 结构、区域赛全 2x 优化、FIR-CIC 优化、全国赛全 2x 回退对照、全国赛 6-DSP CIC、440/442/434-LUT 演进、Route 1、comb-LUT 低 DSP 版、P1 真 Q15 正确性修复、P3 工程闭环、P4-A～P4-F，以及 P3-J Stage3/均衡器联合设计”。重要纠错：旧 424-LUT/6-DSP 与 436-LUT/5-DSP 版本的归一化频响虽通过，但 8x/128x 绝对增益约低 6.02 dB，现仅作为资源演进历史。当前工具侧默认发布候选已更新为 P3-J `432 LUT / 431 FF / 174 Slice / 4 DSP / 2 BRAM Tile`；P4-D R2 `479 LUT / 468 FF / 198 Slice` 继续作为同资源拓扑的稳定回退，P4-E/P4-F 则保留为低 BRAM Pareto。
 
 ### 统计与比较口径
 
@@ -16,6 +16,12 @@
 | **MATLAB 候选** | 只完成数学或定点搜索，未进入完整 RTL/实现 | 只能比较频响，不能填写 FPGA 资源 |
 
 下文的 LUT、FF、DSP、BRAM 和 MMCM 均取 Vivado 布局布线后结果；明确标为“独立链”的早期数据除外。BRAM 按 BRAM Tile 计数，两个 RAMB18E1 等于一个 BRAM Tile。功耗均为 Vivado vectorless 估计，不是实测值；`0.168/0.169 W` 来自早期单采样率顶层且为 Low confidence，`0.271 W` 来自全国赛双采样率顶层且为 Medium confidence，因此两组数值不能用于推导滤波器本身的功耗增量。
+
+### P3-J 当前推荐版：Stage3 吸收 128x CIC 均衡器
+
+P3-J 把 P4-D 独立的 11-tap shift-add CIC 均衡器折叠进第三级 FIR：4x/8x 使用原 flat Stage3 系数，128x 使用联合设计的 compensated Stage3 系数，然后直接进入 N3 Hold CIC16。两组系数占用统一 RAMB18E1 的空闲地址，signed-18 高两位存入 parity；模式在 Stage3 job 边界快照，补偿输出保留经满量程证明所需的 signed-21。独立均衡器不再进入板级网表，DSP、BRAM、MMCM不增加。
+
+Release 从零回归 **15/15 PASS**：冲激、10 个固定 seed×4096、正/负满量程共 13 组全链输入，4x/8x/128x 逐样本 **0 LSB**；另通过 8 个内部状态复位场景、10 次不停机倍率切换、1200 次原子 CDC 切换和 RAMB18 parity 原语测试。选定策略的板级 post-route 为 **432 LUT / 431 FF / 174 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM**，相对 P4-D R2 减少 **47 LUT / 37 FF / 24 Slice**；WNS/WHS **+45.624/+0.105 ns**，AD9708 setup/hold **+76.116/+78.117 ns**，功耗 **0.271 W**。详细结构、六工况、策略扫描和验证证据见 [P3-J RTL 签核](matlab_fir/national_finals/results/p3_joint_stage3_rtl_signoff.md)。
 
 ### P1 正确性修复：Stage 3 真 Q15 与绝对增益门禁
 
@@ -119,6 +125,7 @@ X3 两个时钟域 WNS/WHS 分别为 20 MHz `+34.839/+0.072 ns`、6.144 MHz `+14
   -> P4-E：PCM/Stage1 共享 RAMB18，形成 491 LUT / 4 DSP / 1.5 BRAM Tile Pareto
   -> P4-F：Stage2/3 历史改 RAM32M，形成 531 LUT / 4 DSP / 1 BRAM Tile Pareto
   -> X3：20 MHz 三级 FIR 共用 1 DSP，Release 0 LSB，但核心为 910 LUT / 692 FF / 3 DSP / 2.5 BRAM，资源 No-Go
+  -> P3-J：按模式将128x均衡响应折叠进Stage3，删除独立均衡器，形成432 LUT / 431 FF / 4 DSP新默认版
 ```
 
 ### Route 1：历史 424-LUT 资源点做了什么
@@ -356,6 +363,12 @@ FIR-CIC 正式 128x RTL 冲激的通带最大绝对偏差为 **0.00303062 dB**�
 | **P1 / P3 / P4-A / P4-B / P4-C / P4-D 正确标度版** | **48 kHz** | **4x** | **0.004610 dB** | **0.005703 dB** | **78.669 dB** | **各版逐点位真一致；绝对增益 -0.001599 dB** |
 | **P1 / P3 / P4-A / P4-B / P4-C / P4-D 正确标度版** | **48 kHz** | **8x** | **0.005395 dB** | **0.005719 dB** | **78.562 dB** | **各版逐点位真一致；绝对增益 -0.002709 dB** |
 | **P1 / P3 / P4-A / P4-B / P4-C / P4-D 正确标度版** | **48 kHz** | **128x** | **0.006116 dB** | **0.006116 dB** | **72.331 dB** | **各版逐点位真一致；绝对增益 -0.003480 dB** |
+| **P3-J Stage3/均衡器联合版** | **44.1 kHz** | **4x** | **0.003022 dB** | **0.005709 dB** | **78.568 dB** | **flat Stage3；Release 0 LSB** |
+| **P3-J Stage3/均衡器联合版** | **44.1 kHz** | **8x** | **0.003521 dB** | **0.006192 dB** | **78.609 dB** | **flat Stage3；Release 0 LSB** |
+| **P3-J Stage3/均衡器联合版** | **44.1 kHz** | **128x** | **0.007730 dB** | **0.005848 dB** | **72.371 dB** | **compensated Stage3；Release 0 LSB** |
+| **P3-J Stage3/均衡器联合版** | **48 kHz** | **4x** | **0.003022 dB** | **0.005709 dB** | **78.568 dB** | **flat Stage3；Release 0 LSB** |
+| **P3-J Stage3/均衡器联合版** | **48 kHz** | **8x** | **0.003007 dB** | **0.005678 dB** | **78.609 dB** | **flat Stage3；Release 0 LSB** |
+| **P3-J Stage3/均衡器联合版** | **48 kHz** | **128x** | **0.007606 dB** | **0.005724 dB** | **72.371 dB** | **compensated Stage3；Release 0 LSB** |
 
 ### 时序 Timing 统一结算
 
@@ -423,6 +436,7 @@ Timing 以 Vivado 完成布局布线后的 timing summary 为准，不使用综�
 | **P4-A：4 DSP / 3 BRAM Tile** | **+45.738 ns** | **-0.601 ns** | **+0.052 ns** | **-0.020 ns** | **0/0 ns** | **PASS** |
 | **P4-B：4 DSP / 2 BRAM Tile** | **+45.637 ns** | **-0.702 ns** | **+0.119 ns** | **+0.047 ns** | **0/0 ns** | **PASS** |
 | **P4-D 默认：479 LUT / 4 DSP** | **+45.734 ns** | **-0.605 ns** | **+0.121 ns** | **+0.049 ns** | **0/0 ns** | **PASS；另有50 ns bus-skew，实际1.816 ns** |
+| **P3-J 当前推荐：432 LUT / 4 DSP** | **+45.624 ns** | **-0.715 ns** | **+0.105 ns** | **+0.033 ns** | **0/0 ns** | **PASS；AD9708 setup/hold +76.116/+78.117 ns** |
 | **P4-E：491 LUT / 4 DSP / 1.5 BRAM** | **+46.132 ns** | **-0.207 ns** | **+0.105 ns** | **+0.033 ns** | **0/0 ns** | **PASS；50 ns bus-skew实际2.023 ns** |
 | **P4-F：531 LUT / 4 DSP / 1 BRAM** | **+45.898 ns** | **-0.441 ns** | **+0.105 ns** | **+0.033 ns** | **0/0 ns** | **PASS；50 ns bus-skew实际1.859 ns** |
 | **P4-C 低 DSP-A：504 LUT / 3 DSP** | **+45.853 ns** | **-0.486 ns** | **+0.121 ns** | **+0.049 ns** | **0/0 ns** | **PASS** |
@@ -467,6 +481,7 @@ Route 1相对573-LUT基线减少149 LUT和150 FF，WNS减少 **0.983 ns**，WHS�
 | **P4-A 4-DSP Pareto 版** | **全国赛板级** | **491** | **444** | **4** | **3** | **2** | **+45.738/+0.052 ns** | **0.271 W** | **N3 Hold 严格等价，较 P3 少1 DSP、多29 LUT** | **12/12 RTL、实现、DRC/CDC、bitstream；待物理板测** |
 | **P4-B 2-BRAM-Tile Pareto 版** | **全国赛板级** | **504** | **493** | **4** | **2** | **2** | **+45.637/+0.119 ns** | **0.271 W** | **较 P4-A 多13 LUT/49 FF，少1 BRAM Tile** | **14/14 RTL、实现、DRC/CDC、bitstream；待物理板测** |
 | **P4-D 默认发布闭环版** | **全国赛板级** | **479** | **468** | **4** | **2** | **2** | **+45.734/+0.121 ns** | **0.271 W** | **继承P4-C资源结构；固定签核wrapper、Release长回归、CDC bus-skew** | **Smoke/Release 15/15、GUI行为/实现、双路径bitstream；待物理板测** |
+| **P3-J Stage3/均衡器联合版** | **全国赛板级** | **432** | **431** | **4** | **2** | **2** | **+45.624/+0.105 ns** | **0.271 W** | **128x均衡响应折叠进Stage3；较P4-D少47 LUT/37 FF/24 Slice** | **Smoke/Release 15/15、实现、DRC/CDC、bitstream；待物理板测** |
 | **P4-E 1.5-BRAM Pareto** | **全国赛板级** | **491** | **487** | **4** | **1.5** | **2** | **+46.132/+0.105 ns** | **0.271 W** | **PCM ROM与Stage1历史共享RAMB18；较P4-D少0.5 BRAM、多12 LUT/19 FF** | **Smoke/Release 16/16、GUI行为/实现、bitstream；待物理板测** |
 | **P4-F 1-BRAM Pareto** | **全国赛板级** | **531** | **487** | **4** | **1** | **2** | **+45.898/+0.105 ns** | **0.270 W** | **Stage2/3历史改8个RAM32M；较P4-D少1 BRAM、多52 LUT/19 FF** | **Smoke/Release 16/16、GUI行为/实现、bitstream；待物理板测** |
 | **P4-C 3-DSP Pareto 版** | **全国赛板级** | **504** | **494** | **3** | **2** | **2** | **+45.853/+0.121 ns** | **0.271 W** | **较默认版多25 LUT/26 FF，少1 DSP** | **CIC三映射0 LSB、实现、bitstream；待物理板测** |
@@ -475,18 +490,19 @@ Route 1相对573-LUT基线减少149 LUT和150 FF，WNS减少 **0.983 ns**，WHS�
 综合结论：
 
 - 旧 Route 1 `424 LUT / 6 DSP` 和第八轮 `436 LUT / 5 DSP` 是重要资源演进点，但存在 Stage 3 Q14/Q15 标度缺陷，不再作为发布候选；
-- **正确标度并完成发布闭环后的默认最低 LUT/FF 是 P4-D：479 LUT / 468 FF / 4 DSP / 2 BRAM Tile**；
+- **正确标度并完成工具侧发布闭环后的默认最低 LUT/FF 已更新为 P3-J：432 LUT / 431 FF / 4 DSP / 2 BRAM Tile**；
+- **P4-D R2：479 LUT / 468 FF / 4 DSP / 2 BRAM Tile 保留为联合 Stage3 之前的稳定回退点**；
 - **P4-E 与 P4-F 分别以增加 12/52 LUT 换取 0.5/1 BRAM Tile，是低 BRAM Pareto，不支配 P4-D**；
 - **P4-A：491 LUT / 444 FF / 4 DSP / 3 BRAM Tile 仍是最低 FF 的 4-DSP 回退点**；
 - **P4-B 已被同为 4 DSP/2 BRAM Tile、但少25 LUT/25 FF的 P4-C 默认档支配，只保留为回退**；
 - **当前最低 FF 的全国赛 6-DSP CIC 是 442 LUT / 432 FF 版本；它与 434 LUT / 469 FF 版本互为 Pareto 点**；
 - **当前最低 DSP 的全国赛方案是 P4-C 523 LUT / 2 DSP / 2 BRAM Tile；另有 504 LUT / 3 DSP 中间档**；
 - 全 2x 最低 DSP 版仍具有更高最终阻带，但在相同2 DSP下比P4-C多205 LUT、139 FF和1 BRAM Tile；FIR-CIC 以仍高于70 dB的阻带余量换取明显更低资源；
-- P3、P4-A、P4-B、P4-C 和 P4-D 均已完成 MATLAB、RTL、XSim、综合、布局布线、时序、DRC/CDC 和 bitstream 工具侧签核；P4-D 另完成 GUI 资产与 10-seed×4096 发布门槛；仍需实物板下载复测，不能把区域赛472-LUT版本的实板结论直接代替。
+- P3、P4-A、P4-B、P4-C、P4-D 和 P3-J 均已完成 MATLAB、RTL、XSim、综合、布局布线、时序、DRC/CDC 和 bitstream 工具侧签核；P3-J 与 P4-D 均完成 10-seed×4096 加正负满量程的发布门槛；仍需实物板下载复测，不能把区域赛472-LUT版本的实板结论直接代替。
 
-## 全国总决赛当前推荐候选（2026-08-01，P4-D 4-DSP 发布闭环）
+## 全国总决赛当前推荐候选（2026-08-02，P3-J 4-DSP 联合 Stage3）
 
-当前发布闭环分支为 `codex/national-finals-p4d-release-closure`。默认推荐 **479 LUT / 468 FF / 4 DSP / 2 BRAM Tile**；若评分更看重 BRAM，可切换 `codex/national-finals-p4e-bram15`（1.5 BRAM）或 `codex/national-finals-p4f-bram1`（1 BRAM）；若更看重 DSP，可回退 P4-C 的 **504 LUT / 494 FF / 3 DSP** 或 **523 LUT / 523 FF / 2 DSP**。P4-D 已完成六工况 MATLAB、Smoke/Release 15/15、GUI 行为仿真、综合、布局布线、setup/hold、DRC/CDC、50 ns bus-skew、功耗和两条 bitstream 路径；正式结果目录为 `matlab_fir/national_finals/vivado_results/p4d_release_closure_4dsp`，详细签核见 [P4-D 发布闭环总结](matlab_fir/national_finals/results/p4d_release_closure_summary.md)。
+当前发布闭环分支为 `national-finals-p3-rtl-equalizer-fold`。默认推荐 **432 LUT / 431 FF / 174 Slice / 4 DSP / 2 BRAM Tile**；P4-D R2 标签 `nf-p4d-r2-479lut-468ff-4dsp-2bram-2mmcm-clean` 是同拓扑稳定回退。若评分更看重 BRAM，可切换 P4-E（1.5 BRAM）或 P4-F（1 BRAM）；若更看重 DSP，可回退 P4-C 的 **504 LUT / 494 FF / 3 DSP** 或 **523 LUT / 523 FF / 2 DSP**。P3-J 已完成六工况 MATLAB、Smoke/Release 15/15、综合、布局布线、setup/hold、DRC/CDC、功耗和 bitstream；详细签核见 [P3-J RTL 签核](matlab_fir/national_finals/results/p3_joint_stage3_rtl_signoff.md)。
 
 工具侧验证不能替代实物板：目前仍需下载 bitstream，实测六档 DA_CLK、44.1/48 kHz 家族切换、DAC 数据建立保持、15 kHz 主音和 128x 首镜像抑制，全部通过后才能声明“全国赛实板验证完成”。
 
@@ -567,12 +583,12 @@ Narrow Stage2/3      = on
 
 | 输入采样率 | 正式输出节点 | 输出采样率 | 通带最大绝对偏差 | 通带峰峰纹波 | 阻带衰减 | 线性相位/对称性 | 结果 |
 |---:|---:|---:|---:|---:|---:|---:|---|
-| 44.1 kHz | 4x | 176.4 kHz | 0.004610 dB | 0.005703 dB | 78.669 dB | 0 LSB | PASS |
-| 44.1 kHz | 8x | 352.8 kHz | 0.005395 dB | 0.006174 dB | 78.562 dB | 0 LSB | PASS |
-| 44.1 kHz | 128x | 5.6448 MHz | 0.006116 dB | 0.008056 dB | 72.331 dB | 0 LSB | PASS |
-| 48 kHz | 4x | 192 kHz | 0.004610 dB | 0.005703 dB | 78.669 dB | 0 LSB | PASS |
-| 48 kHz | 8x | 384 kHz | 0.005395 dB | 0.005719 dB | 78.562 dB | 0 LSB | PASS |
-| 48 kHz | 128x | 6.144 MHz | 0.006116 dB | 0.006116 dB | 72.331 dB | 0 LSB | PASS |
+| 44.1 kHz | 4x | 176.4 kHz | 0.003022 dB | 0.005709 dB | 78.568 dB | 0 LSB | PASS |
+| 44.1 kHz | 8x | 352.8 kHz | 0.003521 dB | 0.006192 dB | 78.609 dB | 0 LSB | PASS |
+| 44.1 kHz | 128x | 5.6448 MHz | 0.007730 dB | 0.005848 dB | 72.371 dB | 0 LSB | PASS |
+| 48 kHz | 4x | 192 kHz | 0.003022 dB | 0.005709 dB | 78.568 dB | 0 LSB | PASS |
+| 48 kHz | 8x | 384 kHz | 0.003007 dB | 0.005678 dB | 78.609 dB | 0 LSB | PASS |
+| 48 kHz | 128x | 6.144 MHz | 0.007606 dB | 0.005724 dB | 72.371 dB | 0 LSB | PASS |
 
 六个工况均满足 10 Hz～20 kHz 通带、最大绝对偏差不超过 0.05 dB、阻带衰减不低于 70 dB 和严格线性相位要求。原始精度数据见 [`nf_rtl_impulse_summary.txt`](matlab_fir/national_finals/results/nf_rtl_impulse_summary.txt)，完整频响图见 [`nf_rtl_impulse_response.png`](matlab_fir/national_finals/figures/nf_rtl_impulse_response.png)。
 
@@ -582,19 +598,19 @@ Narrow Stage2/3      = on
 
 | 资源 | 使用量 | 器件总量 | 利用率 |
 |---|---:|---:|---:|
-| Slice | **198** | 8,150 | **2.43%** |
-| LUT（Slice LUT） | **479** | 20,800 | **2.30%** |
-| FF（Slice Register） | **468** | 41,600 | **1.13%** |
+| Slice | **174** | 8,150 | **2.13%** |
+| LUT（Slice LUT） | **432** | 20,800 | **2.08%** |
+| FF（Slice Register） | **431** | 41,600 | **1.04%** |
 | DSP（DSP48E1） | **4** | 90 | **4.44%** |
 | BRAM（BRAM Tile） | **2** | 50 | **4.00%** |
 | MMCM（MMCME2_ADV） | **2** | 5 | **40.00%** |
 | BUFGCTRL | 2 | 32 | 6.25% |
 
-最终默认实现为1159/1159个可布线网络全部完成，WNS/TNS为`+45.734 ns / 0 ns`，WHS/THS为`+0.121 ns / 0 ns`，setup/hold失败端点均为0，route error为0。原始报告、bitstream 和机器可读 SHA 清单见 [`p4d_release_closure_4dsp`](matlab_fir/national_finals/vivado_results/p4d_release_closure_4dsp)，频响原始精度见 [`nf_rtl_impulse_summary.txt`](matlab_fir/national_finals/results/nf_rtl_impulse_summary.txt)。若以 DSP 数为第一目标，可选择 P4-C 的 504-LUT/3-DSP 或 523-LUT/2-DSP 档；所有全国赛候选均未完成实物板测。
+最终默认实现全部布线完成，WNS/TNS为`+45.624 ns / 0 ns`，WHS/THS为`+0.105 ns / 0 ns`，setup/hold失败端点均为0，route error为0。P3-J 原始报告、bitstream 和机器可读 SHA 清单保存在带资源名的最终签核结果目录；频响、RTL 和策略扫描见 [`p3_joint_stage3_rtl_signoff.md`](matlab_fir/national_finals/results/p3_joint_stage3_rtl_signoff.md)。若以 DSP 数为第一目标，可选择 P4-C 的 504-LUT/3-DSP 或 523-LUT/2-DSP 档；所有全国赛候选均未完成实物板测。
 
 软件、RTL 和 FPGA 实现签核已通过；物理开发板下载及示波器/频谱仪验收尚需现场执行。完整架构、指标、RTL 一键回归、bitstream、SW1～SW8 映射和板测清单见 [全国总决赛交付说明](matlab_fir/national_finals/README.md)。
 
-> **版本口径说明**：以上479 LUT / 468 FF / 4 DSP / 2 BRAM / 2 MMCM及六工况指标是当前 P4-D 全国总决赛默认版本；504 LUT / 3 DSP 与 523 LUT / 2 DSP 是 P4-C 同源低 DSP Pareto。旧 424/436-LUT 版本存在Stage3约-6.02 dB标度错误，只作历史；下面的472-LUT单采样率版及Phase 6/7/8内容是区域赛优化过程、Pareto候选和回退版本，不能替代全国赛最终资源数据。
+> **版本口径说明**：以上432 LUT / 431 FF / 4 DSP / 2 BRAM / 2 MMCM及六工况指标是当前 P3-J 全国总决赛默认版本；P4-D R2 479/468 是稳定回退，504 LUT / 3 DSP 与 523 LUT / 2 DSP 是 P4-C 低 DSP Pareto。旧 424/436-LUT 版本存在Stage3约-6.02 dB标度错误，只作历史；下面的472-LUT单采样率版及Phase 6/7/8内容是区域赛优化过程、Pareto候选和回退版本，不能替代全国赛最终资源数据。
 
 > 当前最低 LUT 实板通过版：44.1 kHz 专用、Phase 7 折叠补偿 FIR-CIC、Stage 2/3 BRAM 历史/系数、共享按键扫描、472 LUT / 8 DSP，自动化验证、完整实现与四档板测通过<br>
 > 上一面积策略候选：相同滤波算法与板级功能、478 LUT / 565 FF / 9 DSP / 3 BRAM Tile<br>
@@ -2128,7 +2144,7 @@ Phase 8 进一步验证了两个边界方向。Stage2/3 交叉打包候选以 48
 
 ## 15. 全国赛 P4-D 导出审计 V2 与后续优化
 
-指导文件 `matlab_fir/p4d_export_audit_and_next_optimization_guide_v2.md` 已按 Stop/Go 顺序执行。P0 clean release-v2 修复了旧导出中的 20/21-bit golden 边界、绝对频响门禁、CDC absolute delay 和源码到 bitstream 哈希闭环；P1 用 DSP48E1 `TWO24` 尝试一颗 DSP 承担两级 CIC 积分器；P2 从 P4-E 把只读系数迁移为两组 distributed ROM；P3 只完成 Stage3/均衡器联合设计的 MATLAB 门禁。单纯 CREG→PREG 省 40～55 FF 的假设已被 routed DCP 否定，MMCM 动态关断留作独立 SAIF/实板功耗课题。
+指导文件 `matlab_fir/p4d_export_audit_and_next_optimization_guide_v2.md` 已按 Stop/Go 顺序执行。P0 clean release-v2 修复了旧导出中的 20/21-bit golden 边界、绝对频响门禁、CDC absolute delay 和源码到 bitstream 哈希闭环；P1 用 DSP48E1 `TWO24` 尝试一颗 DSP 承担两级 CIC 积分器；P2 从 P4-E 把只读系数迁移为两组 distributed ROM；P3 先通过 Stage3/均衡器联合设计 MATLAB 门禁，随后又完成 P3-J RTL、Release、post-route 和 bitstream。单纯 CREG→PREG 省 40～55 FF 的假设已被 routed DCP 否定，MMCM 动态关断留作独立 SAIF/实板功耗课题。
 
 | 版本 | LUT | FF | DSP | RAMB18 / Tile | WNS/WHS | 功耗估计 | 定位 |
 |---|---:|---:|---:|---:|---:|---:|---|
@@ -2138,10 +2154,10 @@ Phase 8 进一步验证了两个边界方向。Stage2/3 交叉打包候选以 48
 | P4-E | 491 | 487 | 4 | 3 / 1.5 | +46.132/+0.105 ns | 0.271 W | 1.5-Tile Pareto |
 | **P2-A distributed ROM** | **513** | **496** | **4** | **2 / 1.0** | +45.949/+0.117 ns | 0.270 W | 推荐 1-Tile Pareto |
 | P4-F | 531 | 487 | 4 | 2 / 1.0 | +45.898/+0.105 ns | 0.271 W | 旧 1-Tile 对照 |
-| P3 联合设计 | 约450* | 约437* | 4* | 4 / 2.0* | 未实现 | 未实现 | *MATLAB 后的保守预测，非 Vivado 实测 |
+| **P3-J 联合设计** | **432** | **431** | **4** | **4 / 2.0** | **+45.624/+0.105 ns** | **0.271 W** | **RTL/Release/post-route/bitstream实测，当前默认** |
 
-P4-D/P1/P2 都通过完整 RTL Release、post-route 与 bitstream。P1 相对 P4-D 以 `+39 LUT/+30 FF` 换 `-1 DSP`；P2-A 以 `+34 LUT/+28 FF` 换 `-1 BRAM Tile`。P3 候选预计通过删除 46 LUT/40 FF 的独立均衡器并增加约 17 LUT/9 FF 的 bank/模式逻辑，净省约 29 LUT/31 FF，但在完成独立 RTL、golden、动态切换和布局布线前不得作为正式资源数字。
+P4-D/P1/P2/P3-J 都通过完整 RTL Release、post-route 与 bitstream。P1 相对 P4-D 以 `+39 LUT/+30 FF` 换 `-1 DSP`；P2-A 以 `+34 LUT/+28 FF` 换 `-1 BRAM Tile`。P3-J 删除独立均衡器并增加双系数 bank、模式快照、18-bit 系数 parity 和 21-bit 边界逻辑，实际相对 P4-D 净省 `47 LUT/37 FF/24 Slice`，优于 MATLAB 阶段保守预测的 `29 LUT/31 FF`。
 
-P4-D/P1/P2 的滤波传递函数不变，六工况绝对通带误差/阻带衰减为：44.1 kHz 下 4x `0.003011/78.670 dB`、8x `0.003470/78.565 dB`、128x `0.005146/72.335 dB`；48 kHz 下分别为 `0.003011/78.670 dB`、`0.003033/78.565 dB`、`0.003477/72.335 dB`。P3 MATLAB 候选的六工况最差绝对通带误差为 0.007730 dB，最差阻带为 72.371 dB，对称误差 0、相位残差不超过 `1.42e-13 rad`。
+P4-D/P1/P2 的滤波传递函数不变，六工况绝对通带误差/阻带衰减为：44.1 kHz 下 4x `0.003011/78.670 dB`、8x `0.003470/78.565 dB`、128x `0.005146/72.335 dB`；48 kHz 下分别为 `0.003011/78.670 dB`、`0.003033/78.565 dB`、`0.003477/72.335 dB`。P3-J 的六工况最差绝对通带误差为 0.007730 dB，最差峰峰纹波 0.006192 dB，最差阻带为 72.371 dB，对称误差 0、相位残差不超过 `1.42e-13 rad`。
 
-默认分支/标签为 `codex/national-finals-p0-release-v2` / `nf-p4d-r2-479lut-468ff-4dsp-2bram-2mmcm-clean`；P1、P2、P3 均保留独立分支和标签，不把实验 RTL 混入默认发布版。逐项执行内容、失败原因、修复过程、验证证据和回退命令见 [P4-D 导出审计 V2 执行反馈](matlab_fir/national_finals/results/p4d_export_audit_and_next_optimization_guide_v2_execution_feedback.md)。
+当前分支为 `national-finals-p3-rtl-equalizer-fold`，不再使用 `codex/` 前缀；P4-D 稳定回退标签为 `nf-p4d-r2-479lut-468ff-4dsp-2bram-2mmcm-clean`。P1、P2、P3-J 都有独立提交/分支或标签，逐项执行内容、失败原因、修复过程、验证证据和回退命令见 [P4-D 导出审计 V2 执行反馈](matlab_fir/national_finals/results/p4d_export_audit_and_next_optimization_guide_v2_execution_feedback.md)及 [P3-J RTL 签核](matlab_fir/national_finals/results/p3_joint_stage3_rtl_signoff.md)。

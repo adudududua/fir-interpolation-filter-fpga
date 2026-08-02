@@ -2,7 +2,9 @@
 param(
     [ValidatePattern('^[A-Za-z0-9_-]+$')]
     [string]$ResultTag = 'p4d_release_closure_4dsp',
-    [string]$OutputName = 'release_manifest_p4d.json'
+    [ValidateSet('P4D', 'P3')]
+    [string]$Profile = 'P4D',
+    [string]$OutputName = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -13,6 +15,13 @@ $nfRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $resultDir = Join-Path $nfRoot "vivado_results\$ResultTag"
 if (-not (Test-Path -LiteralPath $resultDir)) {
     throw "Result directory not found: $resultDir"
+}
+if ([string]::IsNullOrWhiteSpace($OutputName)) {
+    $OutputName = if ($Profile -eq 'P3') {
+        'release_manifest_p3_joint_stage3.json'
+    } else {
+        'release_manifest_p4d.json'
+    }
 }
 
 function Get-Text([string]$Path) {
@@ -103,6 +112,18 @@ $canonicalPaths = @(
     'matlab_fir\national_finals\vivado\configure_national_finals_gui_project.tcl',
     'matlab_fir\national_finals\vivado\verify_national_finals_gui_project.tcl'
 )
+if ($Profile -eq 'P3') {
+    $canonicalPaths += @(
+        'matlab_fir\national_finals\p3_joint_stage3_equalizer\p3_01_search_joint_stage3_equalizer.m',
+        'matlab_fir\national_finals\p3_joint_stage3_equalizer\results\p3_joint_stage3_equalizer_config.json',
+        'matlab_fir\national_finals\p3_joint_stage3_equalizer\results\p3_joint_stage3_equalizer_summary.txt',
+        'matlab_fir\national_finals\p3_joint_stage3_equalizer\rtl\nf_p3_build_bittrue_case.m',
+        'matlab_fir\national_finals\p3_joint_stage3_equalizer\rtl\p3_02_generate_rtl_vectors.m',
+        'matlab_fir\national_finals\p3_joint_stage3_equalizer\rtl\p3_rtl_architecture.md',
+        'XC7A35T_interp_audio_pcm_wordlen_opt\XC7A35T_interp.srcs\sim_1\new\national_finals\tb_nf_unified_fir_coeff_bram_primitive.v',
+        'XC7A35T_interp_audio_pcm_wordlen_opt\XC7A35T_interp.srcs\sim_1\new\all2x_v7\verification\tb_phase7_full_chain_reset_recovery.v'
+    )
+}
 $sourceManifestPath = Join-Path $resultDir 'synthesis_sources.txt'
 if (-not (Test-Path -LiteralPath $sourceManifestPath)) {
     throw "Synthesis source manifest is missing: $sourceManifestPath"
@@ -148,9 +169,24 @@ if (Test-Path -LiteralPath (Join-Path $repoRoot '.gitmodules')) {
         throw 'Unable to capture Git submodule status.'
     }
 }
+$configId = if ($Profile -eq 'P3') {
+    'NF-P3-RTL-JOINT-STAGE3-EQ-R1'
+} else {
+    'NF-P4D-R2-479LUT-468FF-4DSP-2BRAM-2MMCM'
+}
+$guiBehavioral = if ($Profile -eq 'P3') {
+    'Not separately rerun: CLI XSim Smoke/Release use the same P3 RTL sources and pass 15/15.'
+} else {
+    'PASS: impulse + seed01, 0 LSB'
+}
+$guiImplementation = if ($Profile -eq 'P3') {
+    'Not separately rerun: isolated Tcl implementation and bitstream generation pass; use the manifest resource fields as the source of truth.'
+} else {
+    'PASS: bitstream and 479/468/4/4xRAMB18/2 resources'
+}
 $manifest = [ordered]@{
-    schema = 'national-finals-release-manifest-v2'
-    config_id = 'NF-P4D-R2-479LUT-468FF-4DSP-2BRAM-2MMCM'
+    schema = 'national-finals-release-manifest-v3'
+    config_id = $configId
     generated_utc = (Get-Date).ToUniversalTime().ToString('o')
     tool = [ordered]@{ name = 'Vivado'; version = '2018.3'; build = '2405991'; part = 'xc7a35tfgg484-2' }
     git = [ordered]@{
@@ -172,10 +208,13 @@ $manifest = [ordered]@{
         single_bram_stage1 = 1
         unified_fir_coefficient_bram = 1
         packed_stage23_bram = 0
+        p3_joint_stage3_equalizer = [int]($Profile -eq 'P3')
+        separate_shiftadd_equalizer = [int]($Profile -ne 'P3')
     }
     resources_post_route = [ordered]@{
         slice_lut = [int](Get-RegexNumber $utilizationText '^\| Slice LUTs\s*\|\s*([0-9]+)' 'LUT count')
         slice_ff = [int](Get-RegexNumber $utilizationText '^\| Slice Registers\s*\|\s*([0-9]+)' 'FF count')
+        slice = [int](Get-RegexNumber $utilizationText '^\| Slice\s*\|\s*([0-9]+)' 'Slice count')
         dsp48e1 = [int](Get-RegexNumber $utilizationText '^\| DSPs\s*\|\s*([0-9]+)' 'DSP count')
         bram_tile = [int](Get-RegexNumber $utilizationText '^\| Block RAM Tile\s*\|\s*([0-9]+)' 'BRAM count')
         mmcm = [int](Get-RegexNumber $utilizationText '^\| MMCME2_ADV\s*\|\s*([0-9]+)' 'MMCM count')
@@ -197,8 +236,8 @@ $manifest = [ordered]@{
     verification = [ordered]@{
         smoke = [ordered]@{ result = 'PASS'; cases = '15/15'; full_chain = 'impulse + 1 seed x 1024'; log = $smokeEvidencePath.Substring($repoRoot.Length + 1).Replace('\', '/') }
         release = [ordered]@{ result = 'PASS'; cases = '15/15'; full_chain = 'impulse + 10 seeds x 4096 + positive/negative fullscale; reset-zero prefixes and 4x/8x/128x all 0 LSB'; log = $releaseEvidencePath.Substring($repoRoot.Length + 1).Replace('\', '/') }
-        gui_behavioral = 'PASS: impulse + seed01, 0 LSB'
-        gui_implementation = 'PASS: bitstream and 479/468/4/4xRAMB18/2 resources'
+        gui_behavioral = $guiBehavioral
+        gui_implementation = $guiImplementation
     }
     cdc_post_route = [ordered]@{
         cdc3_info = [int](Get-RegexNumber $cdcText '^CDC-3\s+Info\s+([0-9]+)' 'CDC-3 count')
