@@ -89,7 +89,6 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     localparam integer SHIFT_W = ACC_W - FRAC_W;
     localparam integer STAGE2_UPPER_W = SHIFT_W - STAGE2_DATA_W;
     localparam integer STAGE3_UPPER_W = SHIFT_W - STAGE3_OUTPUT_W;
-    localparam integer STAGE3_FLAT_UPPER_W = SHIFT_W - STAGE3_DATA_W;
     localparam signed [STAGE2_DATA_W-1:0] STAGE2_OUT_MAX =
         {1'b0, {(STAGE2_DATA_W-1){1'b1}}};
     localparam signed [STAGE2_DATA_W-1:0] STAGE2_OUT_MIN =
@@ -98,10 +97,6 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         {1'b0, {(STAGE3_OUTPUT_W-1){1'b1}}};
     localparam signed [STAGE3_OUTPUT_W-1:0] STAGE3_OUT_MIN =
         {1'b1, {(STAGE3_OUTPUT_W-1){1'b0}}};
-    localparam signed [STAGE3_DATA_W-1:0] STAGE3_FLAT_OUT_MAX =
-        {1'b0, {(STAGE3_DATA_W-1){1'b1}}};
-    localparam signed [STAGE3_DATA_W-1:0] STAGE3_FLAT_OUT_MIN =
-        {1'b1, {(STAGE3_DATA_W-1){1'b0}}};
 
     (* ram_style = "distributed" *)
     reg signed [STAGE2_DATA_W-1:0] stage2_hist_mem [0:MEM_DEPTH-1];
@@ -195,9 +190,6 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     wire dsp_round_carryin;
     wire signed [STAGE2_DATA_W-1:0] stage2_q15_rounded;
     wire signed [STAGE3_OUTPUT_W-1:0] stage3_q15_rounded;
-    wire stage3_flat_upper_is_sign_extension;
-    wire signed [STAGE3_DATA_W-1:0] stage3_flat_q15_rounded;
-    wire signed [STAGE3_OUTPUT_W-1:0] stage3_selected_q15_rounded;
     wire signed [SHIFT_W-1:0] truncated_value;
     wire stage2_upper_is_sign_extension;
     wire stage3_upper_is_sign_extension;
@@ -452,25 +444,6 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         (truncated_value[SHIFT_W-1] ?
          STAGE3_OUT_MIN : STAGE3_OUT_MAX);
 
-    // P3-J shares one Stage3 MAC between the legacy flat bank used by the
-    // 4x/8x outputs and the compensated bank used only by the 128x path.
-    // The compensated bank needs signed-21 headroom, while the externally
-    // visible flat node remains the original saturating signed-20 format.
-    // Saturate before widening; truncating the 21-bit result would wrap a
-    // near-full-scale positive 8x sample into a negative 24-bit PCM value.
-    assign stage3_flat_upper_is_sign_extension =
-        truncated_value[SHIFT_W-1:STAGE3_DATA_W] ==
-        {STAGE3_FLAT_UPPER_W{truncated_value[STAGE3_DATA_W-1]}};
-    assign stage3_flat_q15_rounded =
-        stage3_flat_upper_is_sign_extension ?
-        truncated_value[STAGE3_DATA_W-1:0] :
-        (truncated_value[SHIFT_W-1] ?
-         STAGE3_FLAT_OUT_MIN : STAGE3_FLAT_OUT_MAX);
-    assign stage3_selected_q15_rounded =
-        (USE_P3_JOINT_STAGE3 != 0 && !job_stage3_compensated) ?
-        {{(STAGE3_OUTPUT_W-STAGE3_DATA_W){
-            stage3_flat_q15_rounded[STAGE3_DATA_W-1]}},
-         stage3_flat_q15_rounded} : stage3_q15_rounded;
 
     assign stage2_phase_dbg = stage2_phase;
     assign stage3_phase_dbg = stage3_phase;
@@ -772,7 +745,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
                     stage2_y_out_valid <= 1'b1;
                 end
                 else begin
-                    stage3_y_out <= stage3_selected_q15_rounded;
+                    stage3_y_out <= stage3_q15_rounded;
                     stage3_y_out_valid <= 1'b1;
                 end
                 job_output_pending <= 1'b0;

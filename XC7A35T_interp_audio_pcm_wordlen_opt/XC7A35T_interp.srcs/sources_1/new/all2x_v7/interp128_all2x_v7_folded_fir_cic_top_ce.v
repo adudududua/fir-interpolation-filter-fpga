@@ -100,6 +100,9 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
         (USE_P3_JOINT_STAGE3 != 0) ? 21 : 20;
     wire signed [STAGE3_RESULT_W-1:0] y8_w;
     wire y8_valid_w;
+    wire signed [20:0] y8_extended_w;
+    wire y8_debug_overflow_w;
+    wire signed [19:0] y8_debug_20_w;
     wire signed [20:0] cic_x_w;
     wire cic_x_valid_w;
     wire signed [19:0] y128_w;
@@ -346,7 +349,18 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     assign dbg_y2_valid = y2_valid_w;
     assign dbg_y4 = {y4_w, 2'b0};
     assign dbg_y4_valid = y4_valid_w;
-    assign dbg_y8 = {y8_w[19:0], 4'b0};
+    // P3-J keeps a signed-21 Stage3 result for the compensated 128x path,
+    // but the visible 8x node retains the original saturating signed-20 PCM
+    // format.  Saturate the one extra bit here; direct truncation would turn
+    // a positive near-full-scale sample into a negative output.
+    assign y8_extended_w =
+        {{(21-STAGE3_RESULT_W){y8_w[STAGE3_RESULT_W-1]}}, y8_w};
+    assign y8_debug_overflow_w =
+        (USE_P3_JOINT_STAGE3 != 0) &&
+        (y8_extended_w[20] != y8_extended_w[19]);
+    assign y8_debug_20_w = !y8_debug_overflow_w ? y8_extended_w[19:0] :
+        (y8_extended_w[20] ? 20'sh80000 : 20'sh7ffff);
+    assign dbg_y8 = {y8_debug_20_w, 4'b0};
     assign dbg_y8_valid = y8_valid_w;
     assign dbg_y16 = 24'sd0;
     assign dbg_y16_valid = 1'b0;
@@ -380,11 +394,13 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     end
 
     generate
-        if (USE_P3_JOINT_STAGE3 != 0) begin : g_p3_debug_range_assert
+        if (USE_P3_JOINT_STAGE3 != 0) begin : g_p3_debug_saturation_assert
             always @(posedge clk) begin
                 if (rst_n && !stage3_compensated_mode && y8_valid_w &&
-                    y8_w[20] != y8_w[19])
-                    $fatal(1, "Flat Stage3 exceeded signed-20 debug output range");
+                    y8_debug_overflow_w &&
+                    y8_debug_20_w !=
+                        (y8_extended_w[20] ? 20'sh80000 : 20'sh7ffff))
+                    $fatal(1, "Flat Stage3 signed-20 saturation failed");
             end
         end
     endgenerate
