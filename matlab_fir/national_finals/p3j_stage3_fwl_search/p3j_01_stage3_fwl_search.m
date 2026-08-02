@@ -220,8 +220,10 @@ passing9 = find(pass_gate9 & signed21_search_safe9);
 selected9 = int64([]);
 coverage9 = table();
 if ~isempty(passing9)
-    [~, passing_order9] = sortrows([precise_pass9(passing9), ...
-        -precise_stop9(passing9), peak9(passing9)], [1 2 3]);
+    % The 128x stopband has much less competition margin than passband.
+    % Rank the accepted set by stopband first, then pass error and peak.
+    [~, passing_order9] = sortrows([-precise_stop9(passing9), ...
+        precise_pass9(passing9), peak9(passing9)], [1 2 3]);
     for candidate_index = passing9(passing_order9(:)).'
         trial_coverage = full_coverage(candidate9(candidate_index, :), ...
             9, case_names, stage2_cases, -2^20, 2^20-1);
