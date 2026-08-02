@@ -124,7 +124,13 @@ module tb_phase7_full_chain_bittrue;
     wire signed [23:0] dbg_y8;
     wire dbg_y8_valid;
 
-    nf_signedoff_filter_core u_dut (
+    nf_signedoff_filter_core #(
+`ifdef NF_P3_NINE_TAP_STAGE3
+        .USE_P3_NINE_TAP_STAGE3(1)
+`else
+        .USE_P3_NINE_TAP_STAGE3(0)
+`endif
+    ) u_dut (
         .clk(clk), .rst_n(rst_n),
         .ce2_out(ce2_out), .ce4_out(ce4_out),
         .ce8_out(ce8_out), .ce16_out(ce16_out),

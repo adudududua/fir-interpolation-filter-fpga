@@ -3,7 +3,9 @@
 // P3 verification-only pair.  One flat-bank instance supplies the official
 // 4x/8x nodes while one compensated-bank instance supplies 128x.  The board
 // build does not synthesize this wrapper; it uses one mode-selected core.
-module nf_signedoff_filter_core (
+module nf_signedoff_filter_core #(
+    parameter integer USE_P3_NINE_TAP_STAGE3 = 0
+) (
     input  wire               clk,
     input  wire               rst_n,
     input  wire               ce2_out,
@@ -58,7 +60,7 @@ module nf_signedoff_filter_core (
         .USE_STAGE1_DSP48_PREADDER(1),
         .USE_NATIONAL_FINALS_NARROW_STAGE23(1),
         .USE_P3_JOINT_STAGE3(1),
-        .USE_P3_NINE_TAP_STAGE3(1),
+        .USE_P3_NINE_TAP_STAGE3(USE_P3_NINE_TAP_STAGE3),
         .ASSUME_ALIGNED_POW2_CE(1),
         .CIC_INTEGRATOR_DSP_MODE(2),
         .USE_SHARED_PCM_STAGE1_BRAM(1),
@@ -117,7 +119,7 @@ module nf_signedoff_filter_core (
         .USE_STAGE1_DSP48_PREADDER(1),
         .USE_NATIONAL_FINALS_NARROW_STAGE23(1),
         .USE_P3_JOINT_STAGE3(1),
-        .USE_P3_NINE_TAP_STAGE3(1),
+        .USE_P3_NINE_TAP_STAGE3(USE_P3_NINE_TAP_STAGE3),
         .ASSUME_ALIGNED_POW2_CE(1),
         .CIC_INTEGRATOR_DSP_MODE(2),
         .USE_SHARED_PCM_STAGE1_BRAM(1),

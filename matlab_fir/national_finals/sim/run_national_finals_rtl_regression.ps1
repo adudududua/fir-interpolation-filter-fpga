@@ -485,6 +485,9 @@ $dynamicXvlogOptions = @(
     '-d', 'PHASE7_USE_BRAM_STAGE23_HISTORY',
     '-d', 'PHASE7_USE_BRAM_STAGE23_COEFF'
 )
+if ($Stage3Variant -eq 'NineTap') {
+    $dynamicXvlogOptions += @('-d', 'NF_P3_NINE_TAP_STAGE3')
+}
 if ($CicIntegratorDspMode -lt 2) {
     $dynamicXvlogOptions += @(
         '-d', "NF_CIC_INTEGRATOR_DSP_MODE_$CicIntegratorDspMode")
