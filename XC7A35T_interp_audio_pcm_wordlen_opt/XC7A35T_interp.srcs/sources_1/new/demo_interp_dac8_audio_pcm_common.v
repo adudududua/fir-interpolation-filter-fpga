@@ -260,7 +260,8 @@ module demo_interp_dac8_audio_pcm_common #(
                 .USE_LUTRAM_STAGE23(USE_PHASE7_LUTRAM_STAGE23),
                 .STAGE3_FLAT(USE_NATIONAL_FINALS_DATAPATH),
                 .USE_CIC3_SHIFTADD_COMPENSATOR(
-                    USE_NATIONAL_FINALS_DATAPATH),
+                    USE_NATIONAL_FINALS_DATAPATH &&
+                    !USE_NATIONAL_FINALS_P3_JOINT_STAGE3),
                 .USE_BRAM_STAGE23_HISTORY(USE_PHASE7_BRAM_STAGE23_HISTORY),
                 .USE_UNIFIED_BRAM_STAGE23_HISTORY(
                     USE_PHASE7_UNIFIED_BRAM_STAGE23_HISTORY),

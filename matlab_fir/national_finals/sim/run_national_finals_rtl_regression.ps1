@@ -105,6 +105,7 @@ $nfSource = Join-Path $sourceRoot 'national_finals'
 $nfSim = Join-Path $simRoot 'national_finals'
 $signedOffFullChainXvlogOptions = @(
     '-d', 'NATIONAL_FINALS',
+    '-d', 'NATIONAL_FINALS_P3',
     '-d', 'NATIONAL_FINALS_USE_SERIAL_CIC_COMB',
     '-d', 'NATIONAL_FINALS_USE_N3_HOLD',
     '-d', 'NATIONAL_FINALS_USE_STAGE1_DSP48_PREADDER',

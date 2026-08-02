@@ -76,7 +76,8 @@ module tb_phase7_mode_switch_dynamic;
         .USE_NATIONAL_FINALS_SERIAL_CIC_COMB(1),
         .USE_NATIONAL_FINALS_N3_HOLD_EQUIV(1),
         .USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER(1),
-        .USE_NATIONAL_FINALS_NARROW_STAGE23(1)
+        .USE_NATIONAL_FINALS_NARROW_STAGE23(1),
+        .USE_NATIONAL_FINALS_P3_JOINT_STAGE3(1)
     ) u_dut (
         .clk_audio_128x(clk),
         .rst_n(rst_n),

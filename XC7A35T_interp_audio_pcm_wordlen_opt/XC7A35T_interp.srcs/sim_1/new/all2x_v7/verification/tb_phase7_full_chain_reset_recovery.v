@@ -115,7 +115,12 @@ module tb_phase7_full_chain_reset_recovery;
 `else
         .USE_PACKED_BRAM_STAGE23(0),
 `endif
-`ifdef NATIONAL_FINALS
+`ifdef NATIONAL_FINALS_P3
+        .STAGE3_FLAT(1),
+        .USE_CIC3_SHIFTADD_COMPENSATOR(0),
+        .USE_NATIONAL_FINALS_NARROW_STAGE23(1),
+        .USE_P3_JOINT_STAGE3(1),
+`elsif NATIONAL_FINALS
         .STAGE3_FLAT(1),
         .USE_CIC3_SHIFTADD_COMPENSATOR(1),
         .USE_NATIONAL_FINALS_NARROW_STAGE23(1),
@@ -150,6 +155,7 @@ module tb_phase7_full_chain_reset_recovery;
         .ce8_out(ce8_out), .ce16_out(ce16_out),
         .ce32_out(ce32_out), .ce64_out(ce64_out),
         .ce128_out(1'b1), .x_in(x_in), .x_in_valid(x_in_valid),
+        .stage3_compensated_mode(1'b1),
         .y_out(dut_y128), .y_out_valid(dut_y128_valid),
         .dbg_y2(), .dbg_y2_valid(),
         .dbg_y4(dut_y4), .dbg_y4_valid(dut_y4_valid),
@@ -192,7 +198,12 @@ module tb_phase7_full_chain_reset_recovery;
 `else
         .USE_PACKED_BRAM_STAGE23(0),
 `endif
-`ifdef NATIONAL_FINALS
+`ifdef NATIONAL_FINALS_P3
+        .STAGE3_FLAT(1),
+        .USE_CIC3_SHIFTADD_COMPENSATOR(0),
+        .USE_NATIONAL_FINALS_NARROW_STAGE23(1),
+        .USE_P3_JOINT_STAGE3(1),
+`elsif NATIONAL_FINALS
         .STAGE3_FLAT(1),
         .USE_CIC3_SHIFTADD_COMPENSATOR(1),
         .USE_NATIONAL_FINALS_NARROW_STAGE23(1),
@@ -227,6 +238,7 @@ module tb_phase7_full_chain_reset_recovery;
         .ce8_out(ce8_out), .ce16_out(ce16_out),
         .ce32_out(ce32_out), .ce64_out(ce64_out),
         .ce128_out(1'b1), .x_in(x_in), .x_in_valid(x_in_valid),
+        .stage3_compensated_mode(1'b1),
         .y_out(ref_y128), .y_out_valid(ref_y128_valid),
         .dbg_y2(), .dbg_y2_valid(),
         .dbg_y4(ref_y4), .dbg_y4_valid(ref_y4_valid),
