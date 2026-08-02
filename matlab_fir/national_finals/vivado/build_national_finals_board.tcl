@@ -22,6 +22,7 @@ set result_tag board_dual_rate_cic6_round7_headroom_opt
 set stage1_dsp48_preadder 1
 set cic_integrator_dsp_mode 2
 set p3_joint_stage3 1
+set shared_pcm_stage1_bram 0
 if {$argc > 0} {
     set reuse_current_synthesis [lindex $argv 0]
 }
@@ -49,6 +50,9 @@ if {$argc > 7} {
 if {$argc > 8} {
     set p3_joint_stage3 [lindex $argv 8]
 }
+if {$argc > 9} {
+    set shared_pcm_stage1_bram [lindex $argv 9]
+}
 if {$reuse_current_synthesis != 0 && $reuse_current_synthesis != 1} {
     error "reuse_current_synthesis must be 0 or 1"
 }
@@ -64,6 +68,9 @@ if {$cic_integrator_dsp_mode < 0 || $cic_integrator_dsp_mode > 2} {
 if {$p3_joint_stage3 != 0 && $p3_joint_stage3 != 1} {
     error "p3_joint_stage3 must be 0 or 1"
 }
+if {$shared_pcm_stage1_bram != 0 && $shared_pcm_stage1_bram != 1} {
+    error "shared_pcm_stage1_bram must be 0 or 1"
+}
 if {![regexp {^[A-Za-z0-9_-]+$} $result_tag]} {
     error "result_tag may contain only letters, digits, underscore, and dash"
 }
@@ -73,6 +80,7 @@ set nf_sources [list \
     [file join $nf_src_dir nf_signedoff_filter_core.v] \
     [file join $nf_src_dir nf_unified_fir_coeff_bram.v] \
     [file join $nf_src_dir nf_stage1_history_ramb18_sdp.v] \
+    [file join $nf_src_dir nf_pcm_stage1_shared_ramb18_sdp.v] \
     [file join $nf_src_dir interp2_stage1_single_bram_serial_ce.v] \
     [file join $nf_src_dir nf_stage23_history_ramb18_sdp.v] \
     [file join $nf_src_dir cic3_compensator_shiftadd_ce.v] \
@@ -150,6 +158,7 @@ set_property generic [list \
     USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER=$stage1_dsp48_preadder \
     USE_NATIONAL_FINALS_NARROW_STAGE23=1 \
     USE_NATIONAL_FINALS_P3_JOINT_STAGE3=$p3_joint_stage3 \
+    USE_NATIONAL_FINALS_SHARED_PCM_STAGE1_BRAM=$shared_pcm_stage1_bram \
     USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE=$cic_integrator_dsp_mode] \
     [get_filesets sources_1]
 
@@ -276,6 +285,7 @@ puts $manifest_handle "Synthesis directive: AreaOptimized_high"
 puts $manifest_handle "Stage1 DSP48 preadder: $stage1_dsp48_preadder"
 puts $manifest_handle "CIC integrator DSP mode: $cic_integrator_dsp_mode"
 puts $manifest_handle "P3 joint Stage3 mode: $p3_joint_stage3"
+puts $manifest_handle "PCM/Stage1 shared RAMB18 mode: $shared_pcm_stage1_bram"
 puts $manifest_handle "Stage1 history: one RAMB18, current-sample bypass plus serialized symmetric reads"
 puts $manifest_handle "Rounding: constant 16383 plus DSP48 CARRYIN for non-negative MAC sums"
 puts $manifest_handle "Stage3: complete 38-bit MAC view with explicit signed output saturation"

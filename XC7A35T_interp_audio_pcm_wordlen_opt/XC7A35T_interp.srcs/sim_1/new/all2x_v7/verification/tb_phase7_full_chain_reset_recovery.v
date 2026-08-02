@@ -113,6 +113,7 @@ module tb_phase7_full_chain_reset_recovery;
 `else
         .USE_SINGLE_BRAM_STAGE1(0),
 `endif
+        .USE_SHARED_PCM_STAGE1_BRAM(1),
 `ifdef PHASE7_USE_BRAM_STAGE23_COEFF
         .USE_BRAM_STAGE23_COEFF(1),
 `else
@@ -165,6 +166,9 @@ module tb_phase7_full_chain_reset_recovery;
         .ce32_out(ce32_out), .ce64_out(ce64_out),
         .ce128_out(1'b1), .x_in(x_in), .x_in_valid(x_in_valid),
         .stage3_compensated_mode(1'b1),
+        .pcm_sample_ce(1'b0), .pcm_family_48k(1'b0),
+        .pcm_sample_out(), .pcm_sample_update(),
+        .pcm_sample_addr_dbg(), .pcm_deadline_miss_dbg(),
         .y_out(dut_y128), .y_out_valid(dut_y128_valid),
         .dbg_y2(), .dbg_y2_valid(),
         .dbg_y4(dut_y4), .dbg_y4_valid(dut_y4_valid),
@@ -197,6 +201,7 @@ module tb_phase7_full_chain_reset_recovery;
 `else
         .USE_SINGLE_BRAM_STAGE1(0),
 `endif
+        .USE_SHARED_PCM_STAGE1_BRAM(1),
 `ifdef PHASE7_USE_BRAM_STAGE23_COEFF
         .USE_BRAM_STAGE23_COEFF(1),
 `else
@@ -249,6 +254,9 @@ module tb_phase7_full_chain_reset_recovery;
         .ce32_out(ce32_out), .ce64_out(ce64_out),
         .ce128_out(1'b1), .x_in(x_in), .x_in_valid(x_in_valid),
         .stage3_compensated_mode(1'b1),
+        .pcm_sample_ce(1'b0), .pcm_family_48k(1'b0),
+        .pcm_sample_out(), .pcm_sample_update(),
+        .pcm_sample_addr_dbg(), .pcm_deadline_miss_dbg(),
         .y_out(ref_y128), .y_out_valid(ref_y128_valid),
         .dbg_y2(), .dbg_y2_valid(),
         .dbg_y4(ref_y4), .dbg_y4_valid(ref_y4_valid),

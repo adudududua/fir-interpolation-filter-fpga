@@ -17,6 +17,8 @@ param(
     [int]$CicIntegratorDspMode = 2,
     [ValidateSet(0, 1)]
     [int]$P3JointStage3 = 1,
+    [ValidateSet(0, 1)]
+    [int]$SharedPcmStage1Bram = 0,
     [ValidatePattern('^[A-Za-z0-9_-]+$')]
     [string]$ResultTag = 'board_dual_rate_cic6_round7_headroom_opt'
 )
@@ -129,7 +131,8 @@ try {
                 $ResultTag,
                 $Stage1Dsp48Preadder,
                 $CicIntegratorDspMode,
-                $P3JointStage3
+                $P3JointStage3,
+                $SharedPcmStage1Bram
             )
     }
 
