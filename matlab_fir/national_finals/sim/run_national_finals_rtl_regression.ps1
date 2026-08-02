@@ -106,6 +106,8 @@ function Invoke-RtlCase {
 
 $nfSource = Join-Path $sourceRoot 'national_finals'
 $nfSim = Join-Path $simRoot 'national_finals'
+$p3jCoeffSource = Join-Path $nfSource 'p3j_coeff_rom'
+$p3jCoeffSim = Join-Path $nfSim 'p3j_coeff_rom'
 $signedOffFullChainXvlogOptions = @(
     '-d', 'NATIONAL_FINALS',
     '-d', 'NATIONAL_FINALS_P3',
@@ -264,6 +266,15 @@ $coeffPrimitiveDir = Invoke-RtlCase -Name 'unified_coeff_ramb18_primitive' `
     -XvlogOptions @('-d', 'SYNTHESIS') `
     -XelabOptions @('glbl', '-L', 'unisims_ver')
 
+$distributedCoeffDir = Invoke-RtlCase -Name 'p3j_dual_distributed_coeff_rom' `
+    -VerilogFiles @(
+        (Join-Path $p3jCoeffSource 'nf_p3j_dual_distributed_fir_coeff_rom.v'),
+        (Join-Path $p3jCoeffSim 'tb_nf_p3j_dual_distributed_fir_coeff_rom.v')
+    ) `
+    -Top 'tb_nf_p3j_dual_distributed_fir_coeff_rom' `
+    -Snapshot 'tb_nf_p3j_dual_distributed_coeff_rom_sim' `
+    -ExpectedPassText 'P3-J DUAL DISTRIBUTED COEFFICIENT ROM PASS: 32 Stage1 + 128 Stage23 addresses, two register modes equivalent'
+
 $historyPrimitiveDir = Invoke-RtlCase -Name 'history_ramb18_primitive' `
     -VerilogFiles @(
         (Join-Path $nfSource 'nf_stage1_history_ramb18_sdp.v'),
@@ -408,6 +419,7 @@ $fullDir = Invoke-RtlCase -Name 'full_chain_bittrue' `
         (Join-Path $v7Source 'interp2_stage23_folded_cic_dsp_ce.v'),
         (Join-Path $v7Source 'interp2_stage23_lutram_cic_dsp_ce.v'),
         (Join-Path $nfSource 'nf_unified_fir_coeff_bram.v'),
+        (Join-Path $p3jCoeffSource 'nf_p3j_dual_distributed_fir_coeff_rom.v'),
         (Join-Path $nfSource 'nf_stage23_history_ramb18_sdp.v'),
         (Join-Path $nfSource 'cic3_compensator_shiftadd_ce.v'),
         (Join-Path $v7Source 'cic_interp16_core_dsp_ce.v'),
@@ -439,6 +451,7 @@ $resetDir = Invoke-RtlCase -Name 'full_chain_reset_recovery' `
         (Join-Path $v7Source 'interp2_stage23_folded_cic_dsp_ce.v'),
         (Join-Path $v7Source 'interp2_stage23_lutram_cic_dsp_ce.v'),
         (Join-Path $nfSource 'nf_unified_fir_coeff_bram.v'),
+        (Join-Path $p3jCoeffSource 'nf_p3j_dual_distributed_fir_coeff_rom.v'),
         (Join-Path $nfSource 'nf_stage23_history_ramb18_sdp.v'),
         (Join-Path $nfSource 'cic3_compensator_shiftadd_ce.v'),
         (Join-Path $v7Source 'cic_interp16_core_dsp_ce.v'),
@@ -477,6 +490,7 @@ $dynamicDir = Invoke-RtlCase -Name 'dynamic_mode_switch' `
         (Join-Path $v7Source 'interp2_stage23_folded_cic_dsp_ce.v'),
         (Join-Path $v7Source 'interp2_stage23_lutram_cic_dsp_ce.v'),
         (Join-Path $nfSource 'nf_unified_fir_coeff_bram.v'),
+        (Join-Path $p3jCoeffSource 'nf_p3j_dual_distributed_fir_coeff_rom.v'),
         (Join-Path $nfSource 'nf_stage23_history_ramb18_sdp.v'),
         (Join-Path $nfSource 'cic3_compensator_shiftadd_ce.v'),
         (Join-Path $v7Source 'cic_interp16_core_dsp_ce.v'),
@@ -508,6 +522,6 @@ if ($PublishImpulseOutputs) {
 }
 
 Write-Host ''
-Write-Host 'NATIONAL FINALS RTL REGRESSION PASS (16/16)'
+Write-Host 'NATIONAL FINALS RTL REGRESSION PASS (17/17)'
 Write-Host "CIC integrator DSP mode: $CicIntegratorDspMode"
 Write-Host "Run directory: $runRoot"

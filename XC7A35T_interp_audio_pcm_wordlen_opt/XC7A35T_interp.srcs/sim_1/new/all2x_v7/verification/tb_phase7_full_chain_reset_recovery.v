@@ -114,6 +114,8 @@ module tb_phase7_full_chain_reset_recovery;
         .USE_SINGLE_BRAM_STAGE1(0),
 `endif
         .USE_SHARED_PCM_STAGE1_BRAM(1),
+        .USE_DISTRIBUTED_FIR_COEFF_ROM(1),
+        .DISTRIBUTED_COEFF_REGISTER_OUTPUT(0),
 `ifdef PHASE7_USE_BRAM_STAGE23_COEFF
         .USE_BRAM_STAGE23_COEFF(1),
 `else
@@ -202,6 +204,8 @@ module tb_phase7_full_chain_reset_recovery;
         .USE_SINGLE_BRAM_STAGE1(0),
 `endif
         .USE_SHARED_PCM_STAGE1_BRAM(1),
+        .USE_DISTRIBUTED_FIR_COEFF_ROM(1),
+        .DISTRIBUTED_COEFF_REGISTER_OUTPUT(0),
 `ifdef PHASE7_USE_BRAM_STAGE23_COEFF
         .USE_BRAM_STAGE23_COEFF(1),
 `else

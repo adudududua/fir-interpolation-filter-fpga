@@ -1,0 +1,93 @@
+`timescale 1ns / 1ps
+
+// Two independent distributed-ROM read planes replace the unified RAMB18
+// coefficient store while preserving its one-clock address-to-data contract.
+// Stage23 is signed-18 and includes both the flat and P3-J compensated banks.
+module nf_p3j_dual_distributed_fir_coeff_rom #(
+    parameter integer REGISTER_OUTPUT = 0
+)(
+    input  wire                         clk,
+    input  wire [4:0]                   stage1_addr,
+    output wire signed [15:0]           stage1_coeff,
+    input  wire [6:0]                   stage23_addr,
+    output wire signed [17:0]           stage23_coeff
+);
+
+    (* rom_style = "distributed" *) reg signed [15:0] stage1_rom [0:31];
+    (* rom_style = "distributed" *) reg signed [17:0] stage23_rom [0:127];
+    integer idx;
+
+    initial begin
+        for (idx = 0; idx < 32; idx = idx + 1)
+            stage1_rom[idx] = 16'sd0;
+        for (idx = 0; idx < 128; idx = idx + 1)
+            stage23_rom[idx] = 18'sd0;
+
+        stage1_rom[0]=-16'sd5;     stage1_rom[1]=16'sd7;
+        stage1_rom[2]=-16'sd12;    stage1_rom[3]=16'sd19;
+        stage1_rom[4]=-16'sd29;    stage1_rom[5]=16'sd42;
+        stage1_rom[6]=-16'sd59;    stage1_rom[7]=16'sd80;
+        stage1_rom[8]=-16'sd107;   stage1_rom[9]=16'sd141;
+        stage1_rom[10]=-16'sd182;  stage1_rom[11]=16'sd233;
+        stage1_rom[12]=-16'sd293;  stage1_rom[13]=16'sd367;
+        stage1_rom[14]=-16'sd455;  stage1_rom[15]=16'sd562;
+        stage1_rom[16]=-16'sd691;  stage1_rom[17]=16'sd849;
+        stage1_rom[18]=-16'sd1045; stage1_rom[19]=16'sd1296;
+        stage1_rom[20]=-16'sd1629; stage1_rom[21]=16'sd2094;
+        stage1_rom[22]=-16'sd2803; stage1_rom[23]=16'sd4044;
+        stage1_rom[24]=-16'sd6876; stage1_rom[25]=16'sd20836;
+
+        stage23_rom[0]=-18'sd115;   stage23_rom[1]=18'sd534;
+        stage23_rom[2]=-18'sd1302;  stage23_rom[3]=18'sd2116;
+        stage23_rom[4]=18'sd30298;  stage23_rom[5]=18'sd2116;
+        stage23_rom[6]=-18'sd1302;  stage23_rom[7]=18'sd534;
+        stage23_rom[8]=-18'sd115;
+        stage23_rom[16]=-18'sd203;  stage23_rom[17]=18'sd1233;
+        stage23_rom[18]=-18'sd4595; stage23_rom[19]=18'sd19945;
+        stage23_rom[20]=18'sd19945; stage23_rom[21]=-18'sd4595;
+        stage23_rom[22]=18'sd1233;  stage23_rom[23]=-18'sd203;
+        stage23_rom[32]=18'sd404;   stage23_rom[33]=-18'sd3272;
+        stage23_rom[34]=18'sd19250; stage23_rom[35]=18'sd19250;
+        stage23_rom[36]=-18'sd3272; stage23_rom[37]=18'sd404;
+        stage23_rom[48]=-18'sd148;  stage23_rom[49]=18'sd522;
+        stage23_rom[50]=18'sd32016; stage23_rom[51]=18'sd522;
+        stage23_rom[52]=-18'sd148;
+
+        stage23_rom[96]=18'sd561;    stage23_rom[97]=-18'sd4232;
+        stage23_rom[98]=18'sd20046;  stage23_rom[99]=18'sd20046;
+        stage23_rom[100]=-18'sd4232; stage23_rom[101]=18'sd561;
+        stage23_rom[112]=18'sd137;   stage23_rom[113]=-18'sd1554;
+        stage23_rom[114]=18'sd35584; stage23_rom[115]=-18'sd1554;
+        stage23_rom[116]=18'sd137;
+    end
+
+    generate
+        if (REGISTER_OUTPUT == 0) begin : gen_registered_address
+            reg [4:0] stage1_addr_q;
+            reg [6:0] stage23_addr_q;
+            always @(posedge clk) begin
+                stage1_addr_q <= stage1_addr;
+                stage23_addr_q <= stage23_addr;
+            end
+            assign stage1_coeff = stage1_rom[stage1_addr_q];
+            assign stage23_coeff = stage23_rom[stage23_addr_q];
+        end
+        else begin : gen_registered_output
+            reg signed [15:0] stage1_coeff_q;
+            reg signed [17:0] stage23_coeff_q;
+            always @(posedge clk) begin
+                stage1_coeff_q <= stage1_rom[stage1_addr];
+                stage23_coeff_q <= stage23_rom[stage23_addr];
+            end
+            assign stage1_coeff = stage1_coeff_q;
+            assign stage23_coeff = stage23_coeff_q;
+        end
+    endgenerate
+
+`ifndef SYNTHESIS
+    initial begin
+        if (REGISTER_OUTPUT != 0 && REGISTER_OUTPUT != 1)
+            $fatal(1, "REGISTER_OUTPUT must be 0 or 1");
+    end
+`endif
+endmodule
