@@ -1,5 +1,10 @@
-function result = nf_p3_build_bittrue_case(x)
+function result = nf_p3_build_bittrue_case(x, stage3_variant)
 % Bit-true model for flat 4x/8x and compensated-Stage3 128x P3 RTL.
+
+    if nargin < 2 || isempty(stage3_variant)
+        stage3_variant = 'BASELINE';
+    end
+    stage3_variant = upper(strtrim(stage3_variant));
 
     script_dir = fileparts(mfilename('fullpath'));
     p3_dir = fileparts(script_dir);
@@ -10,8 +15,18 @@ function result = nf_p3_build_bittrue_case(x)
     addpath(bittrue_dir);
 
     release = nf_release_v2_config();
-    p3_coeff = int64([561 137 -4232 -1554 20046 35584 ...
-        20046 -1554 -4232 137 561]);
+    switch stage3_variant
+        case 'BASELINE'
+            p3_coeff = int64([561 137 -4232 -1554 20046 35584 ...
+                20046 -1554 -4232 137 561]);
+            config_id = 'NF-P3-RTL-JOINT-STAGE3-EQ-R1';
+        case 'NINE_TAP'
+            p3_coeff = int64([-943 -2793 2406 19161 29851 ...
+                19161 2406 -2793 -943]);
+            config_id = 'NF-P3J-STAGE3-9TAP-R1';
+        otherwise
+            error('Unknown P3 Stage3 variant: %s', stage3_variant);
+    end
 
     x = int64(x(:).');
     [stage1, stat1] = interp2_polyphase_bittrue(x, ...
@@ -34,7 +49,7 @@ function result = nf_p3_build_bittrue_case(x)
     [cic_output, cic_stat, cic_trace] = ...
         nf_cic_n3_hold2_bittrue([stage3_comp int64([0 0])], 21, 20);
 
-    result.config_id = 'NF-P3-RTL-JOINT-STAGE3-EQ-R1';
+    result.config_id = config_id;
     result.input = x;
     result.y4_internal = stage2;
     result.y8_internal = stage3_flat;

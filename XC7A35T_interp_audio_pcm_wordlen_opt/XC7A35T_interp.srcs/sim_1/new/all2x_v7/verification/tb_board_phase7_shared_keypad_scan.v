@@ -211,6 +211,7 @@ module demo_interp_dac8_audio_pcm_common #(
     parameter integer USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER = 0,
     parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 0,
     parameter integer USE_NATIONAL_FINALS_P3_JOINT_STAGE3 = 0,
+    parameter integer USE_NATIONAL_FINALS_P3_NINE_TAP_STAGE3 = 0,
     parameter integer USE_NATIONAL_FINALS_SHARED_PCM_STAGE1_BRAM = 0,
     parameter integer USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE = 2,
     parameter integer USE_NATIONAL_FINALS_DISTRIBUTED_COEFF_ROM = 0,

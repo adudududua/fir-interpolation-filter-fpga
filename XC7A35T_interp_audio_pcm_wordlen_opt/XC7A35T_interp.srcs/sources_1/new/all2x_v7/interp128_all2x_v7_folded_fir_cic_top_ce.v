@@ -55,6 +55,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     parameter integer USE_STAGE1_DSP48_PREADDER = 0,
     parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 0,
     parameter integer USE_P3_JOINT_STAGE3 = 0,
+    parameter integer USE_P3_NINE_TAP_STAGE3 = 0,
     parameter integer ASSUME_ALIGNED_POW2_CE = 0,
     parameter integer CIC_INTEGRATOR_DSP_MODE = 2,
     parameter integer USE_SHARED_PCM_STAGE1_BRAM = 0,
@@ -135,7 +136,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
         if (USE_DISTRIBUTED_FIR_COEFF_ROM != 0) begin :
                 gen_distributed_fir_coeff_rom
             nf_p3j_dual_distributed_fir_coeff_rom #(
-                .REGISTER_OUTPUT(DISTRIBUTED_COEFF_REGISTER_OUTPUT)
+                .REGISTER_OUTPUT(DISTRIBUTED_COEFF_REGISTER_OUTPUT),
+                .USE_P3_NINE_TAP_STAGE3(USE_P3_NINE_TAP_STAGE3)
             ) u_nf_p3j_dual_distributed_fir_coeff_rom (
                 .clk(clk),
                 .stage1_addr(stage1_coeff_addr_w),
@@ -146,7 +148,9 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
         end
         else if (USE_UNIFIED_FIR_COEFF_BRAM != 0) begin :
                 gen_unified_fir_coeff_bram
-            nf_unified_fir_coeff_bram u_nf_unified_fir_coeff_bram (
+            nf_unified_fir_coeff_bram #(
+                .USE_P3_NINE_TAP_STAGE3(USE_P3_NINE_TAP_STAGE3)
+            ) u_nf_unified_fir_coeff_bram (
                 .clk(clk),
                 .stage1_addr(stage1_coeff_addr_w),
                 .stage1_coeff(stage1_coeff_data_w),
@@ -242,6 +246,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
                 .USE_PACKED_BRAM(USE_PACKED_BRAM_STAGE23),
                 .USE_EXTERNAL_COEFF_BRAM(USE_EXTERNAL_FIR_COEFF),
                 .USE_P3_JOINT_STAGE3(USE_P3_JOINT_STAGE3),
+                .USE_P3_NINE_TAP_STAGE3(USE_P3_NINE_TAP_STAGE3),
                 .ASSUME_ALIGNED_POW2_CE(ASSUME_ALIGNED_POW2_CE)
             ) u_interp2_stage23_lutram_cic_dsp_ce (
                 .clk(clk), .rst_n(rst_n),
@@ -422,6 +427,9 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
             (STAGE3_FLAT == 0 || USE_CIC3_SHIFTADD_COMPENSATOR != 0 ||
              USE_EXTERNAL_FIR_COEFF == 0))
             $fatal(1, "P3 requires flat/compensated external bank and no separate equalizer");
+        if (USE_P3_NINE_TAP_STAGE3 != 0 &&
+            USE_P3_JOINT_STAGE3 == 0)
+            $fatal(1, "P3 9-tap Stage3 requires P3 joint Stage3 mode");
         if (USE_SERIAL_CIC_COMB != 0 && CIC_ORDER != 3)
             $fatal(1, "Serial CIC comb candidate requires CIC_ORDER=3");
         if (USE_N3_HOLD_EQUIV != 0 && CIC_ORDER != 3)

@@ -22,6 +22,7 @@ set result_tag board_dual_rate_cic6_round7_headroom_opt
 set stage1_dsp48_preadder 1
 set cic_integrator_dsp_mode 2
 set p3_joint_stage3 1
+set p3_nine_tap_stage3 0
 set shared_pcm_stage1_bram 0
 set distributed_coeff_rom_mode 0
 if {$argc > 0} {
@@ -57,6 +58,9 @@ if {$argc > 9} {
 if {$argc > 10} {
     set distributed_coeff_rom_mode [lindex $argv 10]
 }
+if {$argc > 11} {
+    set p3_nine_tap_stage3 [lindex $argv 11]
+}
 if {$reuse_current_synthesis != 0 && $reuse_current_synthesis != 1} {
     error "reuse_current_synthesis must be 0 or 1"
 }
@@ -71,6 +75,9 @@ if {$cic_integrator_dsp_mode < 0 || $cic_integrator_dsp_mode > 2} {
 }
 if {$p3_joint_stage3 != 0 && $p3_joint_stage3 != 1} {
     error "p3_joint_stage3 must be 0 or 1"
+}
+if {$p3_nine_tap_stage3 != 0 && $p3_nine_tap_stage3 != 1} {
+    error "p3_nine_tap_stage3 must be 0 or 1"
 }
 if {$shared_pcm_stage1_bram != 0 && $shared_pcm_stage1_bram != 1} {
     error "shared_pcm_stage1_bram must be 0 or 1"
@@ -169,6 +176,7 @@ set_property generic [list \
     USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER=$stage1_dsp48_preadder \
     USE_NATIONAL_FINALS_NARROW_STAGE23=1 \
     USE_NATIONAL_FINALS_P3_JOINT_STAGE3=$p3_joint_stage3 \
+    USE_NATIONAL_FINALS_P3_NINE_TAP_STAGE3=$p3_nine_tap_stage3 \
     USE_NATIONAL_FINALS_SHARED_PCM_STAGE1_BRAM=$shared_pcm_stage1_bram \
     USE_NATIONAL_FINALS_DISTRIBUTED_COEFF_ROM=$use_distributed_coeff_rom \
     NATIONAL_FINALS_DISTRIBUTED_COEFF_REGISTER_OUTPUT=$distributed_coeff_register_output \
@@ -298,6 +306,7 @@ puts $manifest_handle "Synthesis directive: AreaOptimized_high"
 puts $manifest_handle "Stage1 DSP48 preadder: $stage1_dsp48_preadder"
 puts $manifest_handle "CIC integrator DSP mode: $cic_integrator_dsp_mode"
 puts $manifest_handle "P3 joint Stage3 mode: $p3_joint_stage3"
+puts $manifest_handle "P3 9-tap Stage3 candidate: $p3_nine_tap_stage3"
 puts $manifest_handle "PCM/Stage1 shared RAMB18 mode: $shared_pcm_stage1_bram"
 puts $manifest_handle "Distributed coefficient ROM mode: $distributed_coeff_rom_mode (0=RAMB18, 1=registered-address, 2=registered-output)"
 puts $manifest_handle "Stage1 history: one RAMB18, current-sample bypass plus serialized symmetric reads"

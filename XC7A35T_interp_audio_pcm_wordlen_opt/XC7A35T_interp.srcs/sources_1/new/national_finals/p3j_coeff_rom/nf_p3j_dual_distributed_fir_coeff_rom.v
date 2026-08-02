@@ -4,7 +4,8 @@
 // coefficient store while preserving its one-clock address-to-data contract.
 // Stage23 is signed-18 and includes both the flat and P3-J compensated banks.
 module nf_p3j_dual_distributed_fir_coeff_rom #(
-    parameter integer REGISTER_OUTPUT = 0
+    parameter integer REGISTER_OUTPUT = 0,
+    parameter integer USE_P3_NINE_TAP_STAGE3 = 0
 )(
     input  wire                         clk,
     input  wire [4:0]                   stage1_addr,
@@ -53,12 +54,21 @@ module nf_p3j_dual_distributed_fir_coeff_rom #(
         stage23_rom[50]=18'sd32016; stage23_rom[51]=18'sd522;
         stage23_rom[52]=-18'sd148;
 
-        stage23_rom[96]=18'sd561;    stage23_rom[97]=-18'sd4232;
-        stage23_rom[98]=18'sd20046;  stage23_rom[99]=18'sd20046;
-        stage23_rom[100]=-18'sd4232; stage23_rom[101]=18'sd561;
-        stage23_rom[112]=18'sd137;   stage23_rom[113]=-18'sd1554;
-        stage23_rom[114]=18'sd35584; stage23_rom[115]=-18'sd1554;
-        stage23_rom[116]=18'sd137;
+        if (USE_P3_NINE_TAP_STAGE3 != 0) begin
+            stage23_rom[96]=-18'sd943;   stage23_rom[97]=18'sd2406;
+            stage23_rom[98]=18'sd29851;  stage23_rom[99]=18'sd2406;
+            stage23_rom[100]=-18'sd943;
+            stage23_rom[112]=-18'sd2793; stage23_rom[113]=18'sd19161;
+            stage23_rom[114]=18'sd19161; stage23_rom[115]=-18'sd2793;
+        end
+        else begin
+            stage23_rom[96]=18'sd561;    stage23_rom[97]=-18'sd4232;
+            stage23_rom[98]=18'sd20046;  stage23_rom[99]=18'sd20046;
+            stage23_rom[100]=-18'sd4232; stage23_rom[101]=18'sd561;
+            stage23_rom[112]=18'sd137;   stage23_rom[113]=-18'sd1554;
+            stage23_rom[114]=18'sd35584; stage23_rom[115]=-18'sd1554;
+            stage23_rom[116]=18'sd137;
+        end
     end
 
     generate

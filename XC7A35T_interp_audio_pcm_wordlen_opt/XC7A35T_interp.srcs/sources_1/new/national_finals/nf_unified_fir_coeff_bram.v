@@ -10,7 +10,9 @@
 // Port B exposes the complete signed-18 RAMB18 word.  Bits 15:0 use the
 // normal data plane and bits 17:16 use the parity plane, allowing the P3
 // center coefficient 35584 without another BRAM or a LUT decoder.
-module nf_unified_fir_coeff_bram (
+module nf_unified_fir_coeff_bram #(
+    parameter integer USE_P3_NINE_TAP_STAGE3 = 0
+) (
     input  wire                         clk,
     input  wire [4:0]                   stage1_addr,
     output wire signed [15:0]           stage1_coeff,
@@ -19,6 +21,18 @@ module nf_unified_fir_coeff_bram (
 );
 
 `ifdef SYNTHESIS
+    localparam [255:0] P3_INIT_06 =
+        (USE_P3_NINE_TAP_STAGE3 != 0) ?
+        256'h00000000000000000000000000000000000000000000FC510966749B0966FC51 :
+        256'h00000000000000000000000000000000000000000231EF784E4E4E4EEF780231;
+    localparam [255:0] P3_INIT_07 =
+        (USE_P3_NINE_TAP_STAGE3 != 0) ?
+        256'h000000000000000000000000000000000000000000000000F5174AD94AD9F517 :
+        256'h000000000000000000000000000000000000000000000089F9EE8B00F9EE0089;
+    localparam [255:0] P3_INITP_00 =
+        (USE_P3_NINE_TAP_STAGE3 != 0) ?
+        256'h000000C3000003030003333333333333000003030000030C0000CC3300033033 :
+        256'h000000CC0000030C0003333333333333000003030000030C0000CC3300033033;
     wire [15:0] doa;
     wire [1:0] dopa;
     wire [15:0] dob;
@@ -40,9 +54,9 @@ module nf_unified_fir_coeff_bram (
         .INIT_03(256'h00000000000000000000000000000000000000000000FF6C020A7D10020AFF6C),
         .INIT_04(256'h0232FE39016FFEDB00E9FF4A008DFF950050FFC5002AFFE30013FFF40007FFFB),
         .INIT_05(256'h0000000000000000000000005164E5240FCCF50D082EF9A30510FBEB0351FD4D),
-        .INIT_06(256'h00000000000000000000000000000000000000000231EF784E4E4E4EEF780231),
-        .INIT_07(256'h000000000000000000000000000000000000000000000089F9EE8B00F9EE0089),
-        .INITP_00(256'h000000CC0000030C0003333333333333000003030000030C0000CC3300033033)
+        .INIT_06(P3_INIT_06),
+        .INIT_07(P3_INIT_07),
+        .INITP_00(P3_INITP_00)
     ) u_unified_coeff_ramb18e1 (
         .DOADO(doa),
         .DOPADOP(dopa),
@@ -145,18 +159,30 @@ module nf_unified_fir_coeff_bram (
         // P3 compensated Stage3, Q15/signed-18.  The two polyphase
         // sequences are expanded in MAC order, matching the existing
         // one-cycle coefficient prefetch contract.
-        coeff_mem[96]  = 18'sd561;
-        coeff_mem[97]  = -18'sd4232;
-        coeff_mem[98]  = 18'sd20046;
-        coeff_mem[99]  = 18'sd20046;
-        coeff_mem[100] = -18'sd4232;
-        coeff_mem[101] = 18'sd561;
-
-        coeff_mem[112] = 18'sd137;
-        coeff_mem[113] = -18'sd1554;
-        coeff_mem[114] = 18'sd35584;
-        coeff_mem[115] = -18'sd1554;
-        coeff_mem[116] = 18'sd137;
+        if (USE_P3_NINE_TAP_STAGE3 != 0) begin
+            coeff_mem[96]  = -18'sd943;
+            coeff_mem[97]  = 18'sd2406;
+            coeff_mem[98]  = 18'sd29851;
+            coeff_mem[99]  = 18'sd2406;
+            coeff_mem[100] = -18'sd943;
+            coeff_mem[112] = -18'sd2793;
+            coeff_mem[113] = 18'sd19161;
+            coeff_mem[114] = 18'sd19161;
+            coeff_mem[115] = -18'sd2793;
+        end
+        else begin
+            coeff_mem[96]  = 18'sd561;
+            coeff_mem[97]  = -18'sd4232;
+            coeff_mem[98]  = 18'sd20046;
+            coeff_mem[99]  = 18'sd20046;
+            coeff_mem[100] = -18'sd4232;
+            coeff_mem[101] = 18'sd561;
+            coeff_mem[112] = 18'sd137;
+            coeff_mem[113] = -18'sd1554;
+            coeff_mem[114] = 18'sd35584;
+            coeff_mem[115] = -18'sd1554;
+            coeff_mem[116] = 18'sd137;
+        end
     end
 
     always @(posedge clk) begin

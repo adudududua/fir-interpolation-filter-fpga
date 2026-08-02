@@ -8,6 +8,8 @@ module tb_nf_p3j_dual_distributed_fir_coeff_rom;
     wire signed [17:0] s23_addr_q;
     wire signed [15:0] s1_data_q;
     wire signed [17:0] s23_data_q;
+    wire signed [15:0] s1_9tap;
+    wire signed [17:0] s23_9tap;
     integer address_index;
     integer errors = 0;
 
@@ -20,6 +22,12 @@ module tb_nf_p3j_dual_distributed_fir_coeff_rom;
     nf_p3j_dual_distributed_fir_coeff_rom #(.REGISTER_OUTPUT(1)) dut_data_q (
         .clk(clk), .stage1_addr(stage1_addr), .stage1_coeff(s1_data_q),
         .stage23_addr(stage23_addr), .stage23_coeff(s23_data_q)
+    );
+    nf_p3j_dual_distributed_fir_coeff_rom #(
+        .REGISTER_OUTPUT(0), .USE_P3_NINE_TAP_STAGE3(1)
+    ) dut_9tap (
+        .clk(clk), .stage1_addr(stage1_addr), .stage1_coeff(s1_9tap),
+        .stage23_addr(stage23_addr), .stage23_coeff(s23_9tap)
     );
 
     function signed [15:0] expected_stage1;
@@ -40,6 +48,26 @@ module tb_nf_p3j_dual_distributed_fir_coeff_rom;
                 22:expected_stage1=-16'sd2803; 23:expected_stage1=16'sd4044;
                 24:expected_stage1=-16'sd6876; 25:expected_stage1=16'sd20836;
                 default:expected_stage1=16'sd0;
+            endcase
+        end
+    endfunction
+
+    function signed [17:0] expected_stage23_9tap;
+        input [6:0] a;
+        begin
+            case (a)
+                96:expected_stage23_9tap=-18'sd943;
+                97:expected_stage23_9tap=18'sd2406;
+                98:expected_stage23_9tap=18'sd29851;
+                99:expected_stage23_9tap=18'sd2406;
+                100:expected_stage23_9tap=-18'sd943;
+                101:expected_stage23_9tap=18'sd0;
+                112:expected_stage23_9tap=-18'sd2793;
+                113:expected_stage23_9tap=18'sd19161;
+                114:expected_stage23_9tap=18'sd19161;
+                115:expected_stage23_9tap=-18'sd2793;
+                116:expected_stage23_9tap=18'sd0;
+                default:expected_stage23_9tap=expected_stage23(a);
             endcase
         end
     endfunction
@@ -84,12 +112,14 @@ module tb_nf_p3j_dual_distributed_fir_coeff_rom;
             if (s1_addr_q !== expected_stage1(stage1_addr) ||
                 s1_data_q !== expected_stage1(stage1_addr) ||
                 s23_addr_q !== expected_stage23(stage23_addr) ||
-                s23_data_q !== expected_stage23(stage23_addr))
+                s23_data_q !== expected_stage23(stage23_addr) ||
+                s1_9tap !== expected_stage1(stage1_addr) ||
+                s23_9tap !== expected_stage23_9tap(stage23_addr))
                 errors = errors + 1;
         end
         if (errors != 0)
             $fatal(1, "P3-J dual distributed coefficient ROM FAIL errors=%0d", errors);
-        $display("P3-J DUAL DISTRIBUTED COEFFICIENT ROM PASS: 32 Stage1 + 128 Stage23 addresses, two register modes equivalent");
+        $display("P3-J DUAL DISTRIBUTED COEFFICIENT ROM PASS: baseline + 9tap, 32 Stage1 + 128 Stage23 addresses");
         $finish;
     end
 endmodule

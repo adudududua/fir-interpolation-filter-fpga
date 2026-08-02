@@ -7,6 +7,8 @@ script_dir = fileparts(mfilename('fullpath'));
 p3_dir = fileparts(script_dir);
 vector_profile = upper(strtrim(getenv('NF_P3_VECTOR_PROFILE')));
 if isempty(vector_profile); vector_profile = 'RELEASE'; end
+stage3_variant = upper(strtrim(getenv('NF_P3_STAGE3_VARIANT')));
+if isempty(stage3_variant); stage3_variant = 'BASELINE'; end
 switch vector_profile
     case 'SMOKE'
         vector_dir = fullfile(p3_dir, '_work', 'rtl_vectors_smoke');
@@ -69,7 +71,7 @@ p3_stage3_peak = zeros(numel(case_names), 1);
 cic_sat = zeros(numel(case_names), 1);
 
 for case_index = 1:numel(case_names)
-    result = nf_p3_build_bittrue_case(input_data{case_index});
+    result = nf_p3_build_bittrue_case(input_data{case_index}, stage3_variant);
     write_case(vector_dir, case_names{case_index}, result);
     config_id{case_index} = result.config_id;
     input_count(case_index) = numel(result.input);

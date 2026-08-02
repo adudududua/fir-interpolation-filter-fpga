@@ -35,7 +35,11 @@ module tb_phase7_full_chain_bittrue;
     localparam integer RANDOM_INPUT_COUNT = 4096;
     localparam integer RANDOM_Y4_COUNT = 16605;
     localparam integer RANDOM_Y8_COUNT = 33219;
+`ifdef NF_P3_NINE_TAP_STAGE3
+    localparam integer RANDOM_Y128_COUNT = 531552;
+`else
     localparam integer RANDOM_Y128_COUNT = 531584;
+`endif
     localparam integer CASE_COUNT = 14;
 `else
     localparam integer MAX_INPUT_COUNT = 1024;
@@ -45,17 +49,29 @@ module tb_phase7_full_chain_bittrue;
     localparam integer RANDOM_INPUT_COUNT = 1024;
     localparam integer RANDOM_Y4_COUNT = 4317;
     localparam integer RANDOM_Y8_COUNT = 8643;
+`ifdef NF_P3_NINE_TAP_STAGE3
+    localparam integer RANDOM_Y128_COUNT = 138336;
+`else
     localparam integer RANDOM_Y128_COUNT = 138368;
+`endif
     localparam integer CASE_COUNT = 2;
 `endif
     localparam integer IMPULSE_INPUT_COUNT = 256;
     localparam integer IMPULSE_Y4_COUNT = 1245;
     localparam integer IMPULSE_Y8_COUNT = 2499;
+`ifdef NF_P3_NINE_TAP_STAGE3
+    localparam integer IMPULSE_Y128_COUNT = 40032;
+`else
     localparam integer IMPULSE_Y128_COUNT = 40064;
+`endif
     localparam integer STRONG_INPUT_COUNT = 2048;
     localparam integer STRONG_Y4_COUNT = 8413;
     localparam integer STRONG_Y8_COUNT = 16835;
+`ifdef NF_P3_NINE_TAP_STAGE3
+    localparam integer STRONG_Y128_COUNT = 269408;
+`else
     localparam integer STRONG_Y128_COUNT = 269440;
+`endif
     localparam integer SHIFT_4X = 3;
     localparam integer SHIFT_8X = 7;
     localparam integer SHIFT_128X = 112;

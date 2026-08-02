@@ -131,6 +131,7 @@ module tb_phase7_full_chain_reset_recovery;
         .USE_CIC3_SHIFTADD_COMPENSATOR(0),
         .USE_NATIONAL_FINALS_NARROW_STAGE23(1),
         .USE_P3_JOINT_STAGE3(1),
+        .USE_P3_NINE_TAP_STAGE3(1),
 `elsif NATIONAL_FINALS
         .STAGE3_FLAT(1),
         .USE_CIC3_SHIFTADD_COMPENSATOR(1),
@@ -221,6 +222,7 @@ module tb_phase7_full_chain_reset_recovery;
         .USE_CIC3_SHIFTADD_COMPENSATOR(0),
         .USE_NATIONAL_FINALS_NARROW_STAGE23(1),
         .USE_P3_JOINT_STAGE3(1),
+        .USE_P3_NINE_TAP_STAGE3(1),
 `elsif NATIONAL_FINALS
         .STAGE3_FLAT(1),
         .USE_CIC3_SHIFTADD_COMPENSATOR(1),

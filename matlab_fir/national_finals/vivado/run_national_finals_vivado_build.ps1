@@ -18,6 +18,8 @@ param(
     [ValidateSet(0, 1)]
     [int]$P3JointStage3 = 1,
     [ValidateSet(0, 1)]
+    [int]$P3NineTapStage3 = 0,
+    [ValidateSet(0, 1)]
     [int]$SharedPcmStage1Bram = 0,
     [ValidateSet(0, 1, 2)]
     [int]$DistributedCoeffRom = 0,
@@ -135,7 +137,8 @@ try {
                 $CicIntegratorDspMode,
                 $P3JointStage3,
                 $SharedPcmStage1Bram,
-                $DistributedCoeffRom
+                $DistributedCoeffRom,
+                $P3NineTapStage3
             )
     }
 

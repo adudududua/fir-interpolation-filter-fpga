@@ -9,6 +9,8 @@ module tb_nf_unified_fir_coeff_bram_primitive;
     reg [6:0] stage23_addr = 7'd0;
     wire signed [15:0] stage1_coeff;
     wire signed [17:0] stage23_coeff;
+    wire signed [15:0] stage1_coeff_9tap;
+    wire signed [17:0] stage23_coeff_9tap;
 
     integer addr;
     integer errors = 0;
@@ -21,6 +23,15 @@ module tb_nf_unified_fir_coeff_bram_primitive;
         .stage1_coeff(stage1_coeff),
         .stage23_addr(stage23_addr),
         .stage23_coeff(stage23_coeff)
+    );
+    nf_unified_fir_coeff_bram #(
+        .USE_P3_NINE_TAP_STAGE3(1)
+    ) dut_9tap (
+        .clk(clk),
+        .stage1_addr(stage1_addr),
+        .stage1_coeff(stage1_coeff_9tap),
+        .stage23_addr(stage23_addr),
+        .stage23_coeff(stage23_coeff_9tap)
     );
 
     function signed [15:0] expected_stage1;
@@ -54,6 +65,26 @@ module tb_nf_unified_fir_coeff_bram_primitive;
                 5'd24: expected_stage1 = -16'sd6876;
                 5'd25: expected_stage1 =  16'sd20836;
                 default: expected_stage1 = 16'sd0;
+            endcase
+        end
+    endfunction
+
+    function signed [17:0] expected_stage23_9tap;
+        input [6:0] index;
+        begin
+            case (index)
+                7'd96:  expected_stage23_9tap = -18'sd943;
+                7'd97:  expected_stage23_9tap =  18'sd2406;
+                7'd98:  expected_stage23_9tap =  18'sd29851;
+                7'd99:  expected_stage23_9tap =  18'sd2406;
+                7'd100: expected_stage23_9tap = -18'sd943;
+                7'd101: expected_stage23_9tap =  18'sd0;
+                7'd112: expected_stage23_9tap = -18'sd2793;
+                7'd113: expected_stage23_9tap =  18'sd19161;
+                7'd114: expected_stage23_9tap =  18'sd19161;
+                7'd115: expected_stage23_9tap = -18'sd2793;
+                7'd116: expected_stage23_9tap =  18'sd0;
+                default: expected_stage23_9tap = expected_stage23(index);
             endcase
         end
     endfunction
@@ -151,11 +182,25 @@ module tb_nf_unified_fir_coeff_bram_primitive;
                          expected_stage1(addr[4:0]));
                 errors = errors + 1;
             end
+            if (addr < 32 &&
+                stage1_coeff_9tap !== expected_stage1(addr[4:0])) begin
+                $display("Stage1 9tap primitive mismatch addr=%0d actual=%0d expected=%0d",
+                         stage1_addr, stage1_coeff_9tap,
+                         expected_stage1(addr[4:0]));
+                errors = errors + 1;
+            end
 
             if (stage23_coeff !== expected_stage23(addr[6:0])) begin
                 $display("Stage23 primitive mismatch addr=%0d actual=%0d expected=%0d",
                          stage23_addr, stage23_coeff,
                          expected_stage23(addr[6:0]));
+                errors = errors + 1;
+            end
+            if (stage23_coeff_9tap !==
+                expected_stage23_9tap(addr[6:0])) begin
+                $display("Stage23 9tap primitive mismatch addr=%0d actual=%0d expected=%0d",
+                         stage23_addr, stage23_coeff_9tap,
+                         expected_stage23_9tap(addr[6:0]));
                 errors = errors + 1;
             end
         end
@@ -164,7 +209,7 @@ module tb_nf_unified_fir_coeff_bram_primitive;
             $fatal(1, "Unified coefficient RAMB18 primitive FAIL errors=%0d",
                    errors);
 
-        $display("UNIFIED COEFFICIENT RAMB18 PRIMITIVE PASS: 32 Stage1 + 128 Stage23 addresses with signed18 parity");
+        $display("UNIFIED COEFFICIENT RAMB18 PRIMITIVE PASS: baseline + 9tap, 32 Stage1 + 128 Stage23 addresses with signed18 parity");
         $finish;
     end
 endmodule

@@ -5,6 +5,8 @@ param(
     [string]$RegressionScale = 'Smoke',
     [ValidateSet(0, 1, 2)]
     [int]$CicIntegratorDspMode = 2,
+    [ValidateSet('Baseline', 'NineTap')]
+    [string]$Stage3Variant = 'Baseline',
     [string]$VectorDir = '',
     [switch]$PublishImpulseOutputs
 )
@@ -121,6 +123,10 @@ $signedOffFullChainXvlogOptions = @(
     '-d', 'NATIONAL_FINALS_SINGLE_BRAM_STAGE1',
     '-d', 'PHASE7_USE_BRAM_STAGE23_COEFF'
 )
+if ($Stage3Variant -eq 'NineTap') {
+    $signedOffFullChainXvlogOptions += @(
+        '-d', 'NF_P3_NINE_TAP_STAGE3')
+}
 if ($CicIntegratorDspMode -lt 2) {
     $signedOffFullChainXvlogOptions += @(
         '-d', "NF_CIC_INTEGRATOR_DSP_MODE_$CicIntegratorDspMode")
@@ -146,11 +152,17 @@ if (-not (Test-Path -LiteralPath $vectorManifestPath)) {
     throw "P3-J vector manifest is missing: $vectorManifestPath"
 }
 $vectorManifestRows = @(Import-Csv -LiteralPath $vectorManifestPath)
+$expectedConfigId = if ($Stage3Variant -eq 'NineTap') {
+    'NF-P3J-STAGE3-9TAP-R1'
+}
+else {
+    'NF-P3-RTL-JOINT-STAGE3-EQ-R1'
+}
 if ($vectorManifestRows.Count -eq 0 -or
     @($vectorManifestRows | Where-Object {
-        $_.CONFIG_ID -ne 'NF-P3-RTL-JOINT-STAGE3-EQ-R1'
+        $_.CONFIG_ID -ne $expectedConfigId
     }).Count -ne 0) {
-    throw "Vector directory is not the signed-off P3-J configuration: $VectorDir"
+    throw "Vector directory is not the requested P3-J configuration $expectedConfigId`: $VectorDir"
 }
 $expectedSeedCount = if ($RegressionScale -eq 'Release') { 10 } else { 1 }
 $requiredVectorNames = @(
@@ -262,7 +274,7 @@ $coeffPrimitiveDir = Invoke-RtlCase -Name 'unified_coeff_ramb18_primitive' `
     ) `
     -Top 'tb_nf_unified_fir_coeff_bram_primitive' `
     -Snapshot 'tb_nf_unified_coeff_primitive_sim' `
-    -ExpectedPassText 'UNIFIED COEFFICIENT RAMB18 PRIMITIVE PASS: 32 Stage1 + 128 Stage23 addresses with signed18 parity' `
+    -ExpectedPassText 'UNIFIED COEFFICIENT RAMB18 PRIMITIVE PASS: baseline + 9tap, 32 Stage1 + 128 Stage23 addresses with signed18 parity' `
     -XvlogOptions @('-d', 'SYNTHESIS') `
     -XelabOptions @('glbl', '-L', 'unisims_ver')
 
@@ -273,7 +285,7 @@ $distributedCoeffDir = Invoke-RtlCase -Name 'p3j_dual_distributed_coeff_rom' `
     ) `
     -Top 'tb_nf_p3j_dual_distributed_fir_coeff_rom' `
     -Snapshot 'tb_nf_p3j_dual_distributed_coeff_rom_sim' `
-    -ExpectedPassText 'P3-J DUAL DISTRIBUTED COEFFICIENT ROM PASS: 32 Stage1 + 128 Stage23 addresses, two register modes equivalent'
+    -ExpectedPassText 'P3-J DUAL DISTRIBUTED COEFFICIENT ROM PASS: baseline + 9tap, 32 Stage1 + 128 Stage23 addresses'
 
 $historyPrimitiveDir = Invoke-RtlCase -Name 'history_ramb18_primitive' `
     -VerilogFiles @(

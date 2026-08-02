@@ -55,6 +55,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     parameter integer USE_PACKED_BRAM = 0,
     parameter integer USE_EXTERNAL_COEFF_BRAM = 0,
     parameter integer USE_P3_JOINT_STAGE3 = 0,
+    parameter integer USE_P3_NINE_TAP_STAGE3 = 0,
     parameter integer ASSUME_ALIGNED_POW2_CE = 0
 )(
     input  wire                              clk,
@@ -231,7 +232,10 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     assign hist_index = job_mac_index[MEM_ADDR_W-1:0];
     assign hist_pair_limit = !job_stage3 ?
                              (job_phase ? 4'd7 : 4'd8) :
-                             (job_phase ? 4'd4 : 4'd5);
+        (((USE_P3_NINE_TAP_STAGE3 != 0) &&
+          job_stage3_compensated) ?
+             (job_phase ? 4'd3 : 4'd4) :
+             (job_phase ? 4'd4 : 4'd5));
     assign hist_mirror_index = hist_pair_limit - hist_index;
     assign coeff_index = (hist_index <= hist_mirror_index) ?
                          hist_index : hist_mirror_index;
@@ -240,7 +244,10 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     assign coeff_comb = coeff_rom[coeff_addr];
     assign job_mac_count = !job_stage3 ?
         (job_phase ? 4'd8 : 4'd9) :
-        (job_phase ? 4'd5 : 4'd6);
+        (((USE_P3_NINE_TAP_STAGE3 != 0) &&
+          job_stage3_compensated) ?
+             (job_phase ? 4'd4 : 4'd5) :
+             (job_phase ? 4'd5 : 4'd6));
 
     assign coeff_bram_stage3 = job_active ? job_stage3 :
         (!stage2_pending && stage3_pending);
@@ -798,6 +805,9 @@ module interp2_stage23_lutram_cic_dsp_ce #(
             (STAGE3_OUTPUT_W != 21 || COEFF_W != 18 ||
              USE_EXTERNAL_COEFF_BRAM == 0))
             $fatal(1, "P3 Stage3 requires 21bit output and external signed18 coefficients");
+        if (USE_P3_NINE_TAP_STAGE3 != 0 &&
+            USE_P3_JOINT_STAGE3 == 0)
+            $fatal(1, "P3 9-tap Stage3 requires P3 joint Stage3 mode");
         if (COEFF_W != 18 && !(STAGE3_FLAT != 0 && COEFF_W == 16))
             $fatal(1, "Stage 2/3 coefficients require 18bit, or 16bit in flat Stage3 mode");
         if (USE_PACKED_BRAM != 0 &&
