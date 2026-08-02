@@ -36,7 +36,7 @@ module tb_phase7_full_chain_bittrue;
     localparam integer RANDOM_Y4_COUNT = 16605;
     localparam integer RANDOM_Y8_COUNT = 33219;
     localparam integer RANDOM_Y128_COUNT = 531584;
-    localparam integer CASE_COUNT = 13;
+    localparam integer CASE_COUNT = 14;
 `else
     localparam integer MAX_INPUT_COUNT = 1024;
     localparam integer MAX_Y4_COUNT = 4317;
@@ -52,6 +52,10 @@ module tb_phase7_full_chain_bittrue;
     localparam integer IMPULSE_Y4_COUNT = 1245;
     localparam integer IMPULSE_Y8_COUNT = 2499;
     localparam integer IMPULSE_Y128_COUNT = 40064;
+    localparam integer STRONG_INPUT_COUNT = 2048;
+    localparam integer STRONG_Y4_COUNT = 8413;
+    localparam integer STRONG_Y8_COUNT = 16835;
+    localparam integer STRONG_Y128_COUNT = 269440;
     localparam integer SHIFT_4X = 3;
     localparam integer SHIFT_8X = 7;
     localparam integer SHIFT_128X = 112;
@@ -297,6 +301,10 @@ module tb_phase7_full_chain_bittrue;
             require_asset("fullscale_negative_y4_golden_24bit.mem");
             require_asset("fullscale_negative_y8_golden_24bit.mem");
             require_asset("fullscale_negative_y128_golden_24bit.mem");
+            require_asset("strong_44k1_minus1dbfs_input_24bit.mem");
+            require_asset("strong_44k1_minus1dbfs_y4_golden_24bit.mem");
+            require_asset("strong_44k1_minus1dbfs_y8_golden_24bit.mem");
+            require_asset("strong_44k1_minus1dbfs_y128_golden_24bit.mem");
 `endif
         end
     endtask
@@ -446,7 +454,7 @@ module tb_phase7_full_chain_bittrue;
                     expected_y8_count = IMPULSE_Y8_COUNT;
                     expected_y128_count = IMPULSE_Y128_COUNT;
                 end
-                default: begin
+                13: begin
                     $readmemh("fullscale_negative_input_24bit.mem", input_mem);
                     $readmemh("fullscale_negative_y4_golden_24bit.mem", y4_expected);
                     $readmemh("fullscale_negative_y8_golden_24bit.mem", y8_expected);
@@ -455,6 +463,19 @@ module tb_phase7_full_chain_bittrue;
                     expected_y4_count = IMPULSE_Y4_COUNT;
                     expected_y8_count = IMPULSE_Y8_COUNT;
                     expected_y128_count = IMPULSE_Y128_COUNT;
+                end
+                14: begin
+                    $readmemh("strong_44k1_minus1dbfs_input_24bit.mem", input_mem);
+                    $readmemh("strong_44k1_minus1dbfs_y4_golden_24bit.mem", y4_expected);
+                    $readmemh("strong_44k1_minus1dbfs_y8_golden_24bit.mem", y8_expected);
+                    $readmemh("strong_44k1_minus1dbfs_y128_golden_24bit.mem", y128_expected);
+                    active_input_count = STRONG_INPUT_COUNT;
+                    expected_y4_count = STRONG_Y4_COUNT;
+                    expected_y8_count = STRONG_Y8_COUNT;
+                    expected_y128_count = STRONG_Y128_COUNT;
+                end
+                default: begin
+                    $fatal(1, "Unsupported full-chain case=%0d", case_value);
                 end
             endcase
         end
@@ -531,7 +552,7 @@ module tb_phase7_full_chain_bittrue;
             run_case(case_index);
 
 `ifdef NF_RELEASE_REGRESSION
-        $display("PHASE7 FULL CHAIN BITTRUE PASS: impulse + 10 seeds + 2 fullscale, reset-zero prefixes and all nodes 0 LSB.");
+        $display("PHASE7 FULL CHAIN BITTRUE PASS: impulse + 10 seeds + 2 fullscale + strong -1 dBFS, reset-zero prefixes and all nodes 0 LSB.");
 `else
         $display("PHASE7 FULL CHAIN BITTRUE PASS: impulse + 1 seeds, reset-zero prefixes and all nodes 0 LSB.");
 `endif

@@ -34,7 +34,8 @@ seed_values = [294753618, 104729, 130363, 155921, 181081, ...
 case_names = [{'impulse'}, arrayfun(@(k) sprintf('random_seed%02d', k), ...
     1:seed_count, 'UniformOutput', false)];
 if include_fullscale
-    case_names = [case_names, {'fullscale_positive', 'fullscale_negative'}];
+    case_names = [case_names, {'fullscale_positive', 'fullscale_negative', ...
+        'strong_44k1_minus1dbfs'}];
 end
 input_data = cell(size(case_names));
 input_data{1} = zeros(1, 256, 'int64');
@@ -52,6 +53,10 @@ if include_fullscale
     input_data{seed_count+2}(1) = int64(2^23-1);
     input_data{seed_count+3} = zeros(1, 256, 'int64');
     input_data{seed_count+3}(1) = int64(-2^23);
+    strong_amplitude = (2^23-1)*10^(-1/20);
+    strong_n = 0:2047;
+    input_data{seed_count+4} = int64(round(strong_amplitude* ...
+        sin(2*pi*997*strong_n/44100)));
 end
 
 config_id = cell(numel(case_names), 1);
