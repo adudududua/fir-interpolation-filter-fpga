@@ -1,10 +1,12 @@
 # 全国总决赛：双采样率可配置插值滤波器
 
-## 当前修复候选：P3-K DAC-ROM 安全版（427 LUT / 4 DSP）
+## 当前实板通过发布：P3-K DAC-ROM 安全版（427 LUT / 4 DSP）
 
 实物板反馈显示，旧 412-LUT bitstream 的 DAC 时钟正常但数据固定为 128。对原 routed DCP 的完整板级功能仿真复现为 `edges=11290 / data_changes=0`，并定位到 Packed-ROM 二次 procedural 初始化没有被 Vivado 2018.3 可靠写入 RAMB18 INIT，导致测试音地址 0 自循环。当前分支 `national-finals-p3k-4dsp-dac-rom-fix` 已恢复显式地址计数，修复版 post-route 为 **427 LUT / 416 FF / 177 Slice / 4 DSP / 4 RAMB18E1（2 Tile）/ 2 MMCM**，WNS/WHS **+44.983/+0.105 ns**，AD9708 setup/hold **+76.116/+78.117 ns**，总/动态/静态功耗 **0.271/0.199/0.072 W**，bitstream SHA-256 为 `0FFEC2DC929AE3A16E2CB08B32F5B056F378902416E1E191B9D7D08CC6B0EA7D`。
 
-同一 post-route 板级测试在修复后得到 `edges=11290 / data_changes=7461 / sample_updates=88`，Stage1/Stage2/CIC 全部有活动。发布流程现已新增公开引脚级 routed-DCP DAC 活动门禁。旧 `nf-p3k-final-412lut-418ff-168slice-4dsp-2bram-pointerfill` 与 `nf-p3j-final-424lut-431ff-169slice-4dsp-2bram-packedrom` 标签保留用于审计，但均标记为**不允许上板使用**；安全历史回退应使用 Packed-ROM 之前的 430-LUT P3-J 版本。详细记录见 [DAC-ROM 修复执行反馈](results/p3k_dac_rom_hardware_fix_execution_feedback.md)，正式 bit、DCP、报告与日志见 [`p3k_final_427lut_416ff_177slice_4dsp_2bram_dacromfix`](vivado_results/p3k_final_427lut_416ff_177slice_4dsp_2bram_dacromfix)。物理板最终结果仍需用户下载修复 bit 后确认。
+同一 post-route 板级测试在修复后得到 `edges=11290 / data_changes=7461 / sample_updates=88`，Stage1/Stage2/CIC 全部有活动。发布流程现已新增公开引脚级 routed-DCP DAC 活动门禁。旧 `nf-p3k-final-412lut-418ff-168slice-4dsp-2bram-pointerfill` 与 `nf-p3j-final-424lut-431ff-169slice-4dsp-2bram-packedrom` 标签保留用于审计，但均标记为**不允许上板使用**；安全历史回退应使用 Packed-ROM 之前的 430-LUT P3-J 版本。详细记录见 [DAC-ROM 修复执行反馈](results/p3k_dac_rom_hardware_fix_execution_feedback.md)，正式 bit、DCP、报告与日志见 [`p3k_final_427lut_416ff_177slice_4dsp_2bram_dacromfix`](vivado_results/p3k_final_427lut_416ff_177slice_4dsp_2bram_dacromfix)。**2026-08-03 用户已完成修复 bitstream 实板复测，确认 DAC 输出正常、采样率正常。**
+
+427 LUT 相对失效的 412-LUT 版本增加 15 LUT，来源是恢复了真实的 8-bit 地址递增、44.1/48 kHz 范围比较、回绕和家族选择逻辑；旧版的 BRAM 高位在综合后成为常量 0，使这部分逻辑连同播放功能一起被常量传播/合并。综合结果只增加 7 LUT（449→456），post-route 因跨层合并与映射变化增加 15 LUT（412→427）；DSP、BRAM、MMCM、滤波器频响和功耗均未增加。因此 412 LUT 不是完整可用功能下的有效资源基准。
 
 ## 已撤销默认：P3-K 环形指针推导历史状态 412-LUT 版
 

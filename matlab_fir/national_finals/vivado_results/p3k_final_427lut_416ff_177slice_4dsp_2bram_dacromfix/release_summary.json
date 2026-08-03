@@ -1,6 +1,6 @@
 {
   "release": "P3-K DAC-ROM synthesis-semantics fix",
-  "status": "tool_signoff_pass_physical_retest_required",
+  "status": "tool_and_user_reported_board_signoff_pass",
   "branch": "national-finals-p3k-4dsp-dac-rom-fix",
   "tag": "nf-p3k-final-427lut-416ff-177slice-4dsp-2bram-dacromfix",
   "part": "xc7a35tfgg484-2",
@@ -51,5 +51,11 @@
     "nf-p3k-final-412lut-418ff-168slice-4dsp-2bram-pointerfill",
     "nf-p3j-final-424lut-431ff-169slice-4dsp-2bram-packedrom"
   ],
-  "physical_board": "User must download this fixed bitstream and confirm DAC waveform; post-route simulation is not a physical-board claim."
+  "physical_board": {
+    "status": "PASS (user reported)",
+    "date": "2026-08-03",
+    "dac_output": "normal",
+    "sample_rate": "normal",
+    "note": "No detailed per-mode measured frequency, oscilloscope capture, or spectrum values were supplied in this report."
+  }
 }
