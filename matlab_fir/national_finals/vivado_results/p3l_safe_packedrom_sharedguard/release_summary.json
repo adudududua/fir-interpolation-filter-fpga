@@ -1,0 +1,55 @@
+{
+  "status": "tool_verified_board_test_pending",
+  "branch": "national-finals-p3l-safe-packedrom-395target",
+  "rtl_commit": "49e7e5de1aba53403b0221fbbb6cdeccd8f2ed49",
+  "part": "xc7a35tfgg484-2",
+  "resources_postroute": {
+    "slice_lut": 397,
+    "slice_register": 409,
+    "slice": 161,
+    "dsp48e1": 4,
+    "ramb18e1": 4,
+    "bram_tile": 2,
+    "mmcm": 2
+  },
+  "timing_ns": {
+    "wns": 44.408,
+    "whs": 0.121,
+    "dac_setup_slack": 76.116,
+    "dac_hold_slack": 78.117,
+    "mode_bus_skew_actual": 1.875,
+    "mode_bus_skew_requirement": 50.0
+  },
+  "power_vectorless_w": 0.271,
+  "power_confidence": "Medium",
+  "rtl_smoke": {
+    "passed": 16,
+    "total": 16,
+    "run": "20260803_231835"
+  },
+  "rtl_release": {
+    "passed": 16,
+    "total": 16,
+    "run": "20260803_232831"
+  },
+  "postroute_default": {
+    "window_ms": 2,
+    "dac_edges": 11290,
+    "dac_data_changes": 7461,
+    "passed": true
+  },
+  "postroute_six_mode_edges_per_ms": {
+    "44k1_4x": 177,
+    "44k1_8x": 353,
+    "44k1_128x": 5645,
+    "48k_4x": 192,
+    "48k_8x": 384,
+    "48k_128x": 6144
+  },
+  "packed_tone_rom_init": {
+    "nonzero_init": 22,
+    "nonzero_initp": 2,
+    "passed": true
+  },
+  "bitstream_sha256": "AC8735BAD24450FA038C79B104072DA70CEFA6FEF7B599C52CE16ECA5F091440"
+}

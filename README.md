@@ -562,6 +562,7 @@ Route 1相对573-LUT基线减少149 LUT和150 FF，WNS减少 **0.983 ns**，WHS�
 | **P4-A 4-DSP Pareto 版** | **全国赛板级** | **491** | **444** | **4** | **3** | **2** | **+45.738/+0.052 ns** | **0.271 W** | **N3 Hold 严格等价，较 P3 少1 DSP、多29 LUT** | **12/12 RTL、实现、DRC/CDC、bitstream；待物理板测** |
 | **P4-B 2-BRAM-Tile Pareto 版** | **全国赛板级** | **504** | **493** | **4** | **2** | **2** | **+45.637/+0.119 ns** | **0.271 W** | **较 P4-A 多13 LUT/49 FF，少1 BRAM Tile** | **14/14 RTL、实现、DRC/CDC、bitstream；待物理板测** |
 | **P4-D 默认发布闭环版** | **全国赛板级** | **479** | **468** | **4** | **2** | **2** | **+45.734/+0.121 ns** | **0.271 W** | **继承P4-C资源结构；固定签核wrapper、Release长回归、CDC bus-skew** | **Smoke/Release 15/15、GUI行为/实现、双路径bitstream；待物理板测** |
+| **P3-L 共享保护时基候选** | **全国赛板级** | **397** | **409** | **4** | **2** | **2** | **+44.408/+0.121 ns** | **0.271 W** | **相对实板通过 P3-K 少30 LUT、7 FF、16 Slice；离线单镜像 Packed-ROM + 复用键盘计数器低10位** | **Smoke/Release 16/16、默认及六模式 post-route、DRC/CDC、bitstream；待物理板复测** |
 | **P3-K DAC-ROM 实板通过版** | **全国赛板级** | **427** | **416** | **4** | **2** | **2** | **+44.983/+0.105 ns** | **0.271 W** | **显式ROM地址计数；保留指针推导历史优化** | **Smoke/Release 15/15、post-route、DRC/CDC、bitstream、实板 DAC/采样率正常** |
 | P3-K 指针推导旧版 | 全国赛板级 | 412 | 418 | 4 | 2 | 2 | +45.083/+0.056 ns | 0.271 W | 环形指针推导填充深度 | **RAMB18下一地址为0，禁止上板** |
 | P3-J Packed-ROM 旧版 | 全国赛板级 | 424 | 431 | 4 | 2 | 2 | +45.042/+0.080 ns | 0.271 W | ROM高位保存下一地址 | **RAMB18下一地址为0，禁止上板** |
@@ -577,7 +578,8 @@ Route 1相对573-LUT基线减少149 LUT和150 FF，WNS减少 **0.983 ns**，WHS�
 综合结论：
 
 - 旧 Route 1 `424 LUT / 6 DSP` 和第八轮 `436 LUT / 5 DSP` 是重要资源演进点，但存在 Stage 3 Q14/Q15 标度缺陷，不再作为发布候选；
-- **当前实板通过发布为 DAC-ROM 修复版：427 LUT / 416 FF / 4 DSP / 2 BRAM Tile**；412-LUT 指针推导版和 424-LUT Packed-ROM 版均因 ROM 地址锁死撤销；
+- **当前工具侧最低 LUT 推荐候选为 P3-L：397 LUT / 409 FF / 4 DSP / 2 BRAM Tile**；已通过 Release 16/16 和六模式布局后 DAC 门禁，但在用户重新下载验证前不得标记为物理板通过；
+- **当前实板通过回退仍为 P3-K DAC-ROM 修复版：427 LUT / 416 FF / 4 DSP / 2 BRAM Tile**；旧 412-LUT 指针推导版和 424-LUT Packed-ROM 版均因 ROM 地址锁死撤销；
 - **P4-D R2：479 LUT / 468 FF / 4 DSP / 2 BRAM Tile 保留为联合 Stage3 之前的稳定回退点**；
 - **P4-E 与 P4-F 分别以增加 12/52 LUT 换取 0.5/1 BRAM Tile，是低 BRAM Pareto，不支配 P4-D**；
 - **P4-A：491 LUT / 444 FF / 4 DSP / 3 BRAM Tile 仍是最低 FF 的 4-DSP 回退点**；
@@ -587,7 +589,17 @@ Route 1相对573-LUT基线减少149 LUT和150 FF，WNS减少 **0.983 ns**，WHS�
 - 全 2x 最低 DSP 版仍具有更高最终阻带，但在相同2 DSP下比P4-C多205 LUT、139 FF和1 BRAM Tile；FIR-CIC 以仍高于70 dB的阻带余量换取明显更低资源；
 - P3、P4-A、P4-B、P4-C、P4-D 和 P3-J 均已完成 MATLAB、RTL、XSim、综合、布局布线、时序、DRC/CDC 和 bitstream 工具侧签核；P3-J 与 P4-D 均完成 10-seed×4096 加正负满量程的发布门槛；仍需实物板下载复测，不能把区域赛472-LUT版本的实板结论直接代替。
 
-## 全国总决赛当前实板通过发布（2026-08-03，P3-K 4-DSP DAC-ROM 安全版）
+## 全国总决赛当前工具侧推荐候选（2026-08-03，P3-L 397-LUT 共享保护时基版）
+
+当前候选分支为 `national-finals-p3l-safe-packedrom-395target`，布局布线后为 **397 LUT / 409 FF / 161 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM**。它在 P3-K 实板通过版之上完成两项可独立审计的优化：首先由 MATLAB 离线把 24-bit PCM 与下一播放地址打包成单个 32-bit `.mem` 镜像，RTL 只执行一次 `$readmemh`，避免旧 Packed-ROM 的第二段 procedural 初始化未进入 RAMB INIT；随后复用一直为紧凑键盘运行的 16-bit 上电计数器低 10 位作为 1024-cycle 家族切换时基，以 3-bit 状态机替代独立宽计数器。切换前立即静音，首次 tick 提交新家族，切换后仍保持 3072 个 20 MHz 周期复位。
+
+验证不是“综合、实现跑通”口径。Smoke 与 Release 均为 **16/16 PASS**，分别保存在 `_work/rtl_regression/20260803_231835` 和 `_work/rtl_regression/20260803_232831`；覆盖独立 24-bit ROM 对照、1029 点 DAC offset-binary 等价、RAMB18 原语、Stage1/Stage2/3、CIC 三种 DSP 映射、完整链 0-LSB、8 类复位恢复和 10 次不停机倍率切换。路由网表默认档在 2 ms 内得到 11290 个 DAC 上升沿和 7461 次数据变化；新增公开引脚六模式测试按真实矩阵键盘消抖依次测得 44.1 kHz 家族 `177 / 353 / 5645 edges/ms`，48 kHz 家族 `192 / 384 / 6144 edges/ms`，六档数据均持续变化、无 X，beep 保持关闭。该测试不 force 内部 mode/reset，实际覆盖 POR、按键、MMCM/BUFGMUX、家族保护窗、Packed-ROM、完整滤波链和 DAC ODDR。
+
+最终 WNS/WHS 为 **+44.408/+0.121 ns**，模式总线实际 skew 为 1.875 ns（约束 50 ns），1028/1028 个可布线网络完成且 route error 为 0。Vectorless 功耗仍为 **0.271 W（Medium confidence）**。路由 DCP 中测试音 RAMB18 的 INIT 审计得到 22 个非零 `INIT_xx` 和 2 个非零 `INITP_xx`；bitstream SHA-256 为 `AC8735BAD24450FA038C79B104072DA70CEFA6FEF7B599C52CE16ECA5F091440`。CDC 报告保留预期的 BUFGMUX 控制 `CDC-13 ×2` 和原子模式握手 `CDC-15 ×4`，构建脚本锁定其 ID/数量，六模式布局后切换测试提供对应功能证据。完整过程见 [P3-L 395-LUT 目标优化执行反馈](matlab_fir/national_finals/results/p3l_395lut_target_optimization_execution_feedback.md)。
+
+**物理板状态必须单独说明：P3-L 尚待用户下载复测，当前不能写成板级通过。** 下载后至少逐档确认 44.1/48 kHz × 4x/8x/128x 的 `DA_CLK`，并观察六档 DAC 均有稳定正弦输出；通过前，P3-K 427-LUT 版仍是实板安全回退。
+
+## 全国总决赛当前实板通过回退（2026-08-03，P3-K 4-DSP DAC-ROM 安全版）
 
 当前修复分支为 `national-finals-p3k-4dsp-dac-rom-fix`，候选为 **427 LUT / 416 FF / 177 Slice / 4 DSP / 2 BRAM Tile**。旧 412-LUT 标签 `nf-p3k-final-412lut-418ff-168slice-4dsp-2bram-pointerfill` 与 424-LUT 标签 `nf-p3j-final-424lut-431ff-169slice-4dsp-2bram-packedrom` 仅保留作审计，禁止上板；430-LUT P3-J 和 P4-D R2 是安全历史回退。修复 bitstream SHA-256 为 `0FFEC2DC929AE3A16E2CB08B32F5B056F378902416E1E191B9D7D08CC6B0EA7D`，完整反馈见 [P3-K DAC-ROM 修复执行反馈](matlab_fir/national_finals/results/p3k_dac_rom_hardware_fix_execution_feedback.md)。
 
@@ -664,6 +676,8 @@ Narrow Stage2/3      = on
 22. **CIC 解析状态收窄与三档映射**：第一/第二积分器从保守33 bit收紧为可证明的26/29 bit；两个积分器可分别映射 DSP48E1 或 LUT CARRY4，形成479-LUT/4-DSP、504-LUT/3-DSP、523-LUT/2-DSP三档。
 23. **正确性与复现补强**：修复48 kHz首ROM地址和CDC settle计数宽度；GUI顶层/宏与CLI签核一致；历史RAMB18原语对行为模型独立对拍；最终15/15 RTL与六工况MATLAB重跑通过。
 24. **P3-J GUI 手动构建稳定性修复**：工程文件显式保存 `USE_NATIONAL_FINALS_P3_JOINT_STAGE3=1`，并把普通 GUI run 固定为 `AreaOptimized_high / flatten full / resource sharing on + opt_design Default`。校验脚本将综合和实现并行度限制为4，避免 Vivado GUI 按19 jobs启动后在 `opt_design` 发生内存耗尽，或因系统内存压力留下无进展的 route worker。修复后从干净综合结果重跑，综合约30秒、实现到 bitstream 约61秒，资源、Slice和时序与 P3-J 签核值完全一致。
+25. **P3-L 单镜像安全 Packed-ROM**：MATLAB 在生成 ROM 时把每个 24-bit PCM 与下一播放地址离线打包成 32-bit word，RTL 只执行一次 `$readmemh`。这保留低 LUT 的地址查表结构，同时消除旧版“先读数据文件、再用第二个 initial 补高位”在 RAMB18 推断后高位 INIT 丢失的风险。独立 24-bit 参考逐地址对照、路由 RAMB INIT 审计和 48 kHz post-route 数据活动共同验证高位地址有效。
+26. **P3-L 家族保护计数器复用**：先把 12-bit guard counter 改为 10-bit cycle + 2-bit phase，得到408 LUT；实例热点仍显示约19个 family-switch LUT。最终复用持续运行的键盘/上电计数器低10位产生1024-cycle tick，只保留3-bit状态机，布局布线降至397 LUT/409 FF。非共享键盘参数分支继续保留独立计数器，避免破坏历史配置。Default/AddRemap在中间候选均为408 LUT，ExploreArea反增至473 LUT，因此正式策略保持Default。
 
 ### 4x / 8x / 128x 分级滤波指标
 
@@ -680,27 +694,27 @@ Narrow Stage2/3      = on
 
 六个工况均满足 10 Hz～20 kHz 通带、最大绝对偏差不超过 0.05 dB、阻带衰减不低于 70 dB 和严格线性相位要求。原始精度数据见 [`nf_rtl_impulse_summary.txt`](matlab_fir/national_finals/results/nf_rtl_impulse_summary.txt)，完整频响图见 [`nf_rtl_impulse_response.png`](matlab_fir/national_finals/figures/nf_rtl_impulse_response.png)。
 
-### 全国赛最终 FPGA 资源消耗
+### 全国赛当前 P3-L 候选 FPGA 资源消耗
 
 以下数据来自 `XC7A35T-FGG484-2` 最终布局布线后的资源报告，不是综合前估算值。
 
 | 资源 | 使用量 | 器件总量 | 利用率 |
 |---|---:|---:|---:|
-| Slice | **177** | 8,150 | **2.17%** |
-| LUT（Slice LUT） | **427** | 20,800 | **2.05%** |
-| FF（Slice Register） | **416** | 41,600 | **1.00%** |
+| Slice | **161** | 8,150 | **1.98%** |
+| LUT（Slice LUT） | **397** | 20,800 | **1.91%** |
+| FF（Slice Register） | **409** | 41,600 | **0.98%** |
 | DSP（DSP48E1） | **4** | 90 | **4.44%** |
 | BRAM（BRAM Tile） | **2** | 50 | **4.00%** |
 | MMCM（MMCME2_ADV） | **2** | 5 | **40.00%** |
 | BUFGCTRL | 2 | 32 | 6.25% |
 
-当前修复实现全部布线完成，WNS/TNS为`+44.983 ns / 0 ns`，WHS/THS为`+0.105 ns / 0 ns`，setup/hold失败端点均为0，route error为0。当前原始报告、bitstream 和验证反馈见 [`p3k_final_427lut_416ff_177slice_4dsp_2bram_dacromfix`](matlab_fir/national_finals/vivado_results/p3k_final_427lut_416ff_177slice_4dsp_2bram_dacromfix) 与 [`p3k_dac_rom_hardware_fix_execution_feedback.md`](matlab_fir/national_finals/results/p3k_dac_rom_hardware_fix_execution_feedback.md)。412/424-LUT bitstream 已撤销；430-LUT Packed-ROM 前基线继续作为安全历史回退。2026-08-03 用户已完成实板复测，DAC 输出和采样率正常。
+当前 P3-L 实现全部布线完成，WNS/TNS为`+44.408 ns / 0 ns`，WHS/THS为`+0.121 ns / 0 ns`，setup/hold失败端点均为0，route error为0。当前原始报告、bitstream 和验证反馈见 [`p3l_safe_packedrom_sharedguard`](matlab_fir/national_finals/vivado_results/p3l_safe_packedrom_sharedguard) 与 [`p3l_395lut_target_optimization_execution_feedback.md`](matlab_fir/national_finals/results/p3l_395lut_target_optimization_execution_feedback.md)。P3-L 完成物理板复测前，已由用户确认 DAC 输出和采样率正常的 P3-K 427-LUT 版继续作为实板安全回退。
 
-GUI 与批处理配置均固定为 `AreaOptimized_high/full/on + Default`。当前 clean build 综合后为456 LUT / 422 FF / 4 DSP / 4 RAMB18E1，布局布线后为427 LUT / 416 FF / 177 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM，WNS/WHS=`+44.983/+0.105 ns`，vectorless 总/动态/静态功耗=`0.271/0.199/0.072 W`，bitstream 生成成功。普通 GUI `impl_1` 已 reset 后重建并复现同一结果；每次新候选还必须运行 `run_postroute_board_dac_activity.ps1`，确认综合后 DAC 数据不是常量。手动点击 Vivado 的 Generate Bitstream 时将 Number of jobs 设为4。
+GUI 与批处理配置均固定为 `AreaOptimized_high/full/on + Default`。当前 P3-L build 综合后为425 LUT / 411 FF / 4 DSP / 4 RAMB18E1，布局布线后为397 LUT / 409 FF / 161 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM，WNS/WHS=`+44.408/+0.121 ns`，vectorless 总功耗=`0.271 W`，bitstream 生成成功。每次新候选必须同时运行 `run_postroute_board_dac_activity.ps1` 和 `run_postroute_six_mode_dac.ps1`，确认综合后 DAC 数据不是常量且六个正式采样率/倍率均正确。手动点击 Vivado 的 Generate Bitstream 时将 Number of jobs 设为4。
 
 软件、RTL 和 FPGA 实现签核已通过；物理开发板下载及示波器/频谱仪验收尚需现场执行。完整架构、指标、RTL 一键回归、bitstream、SW1～SW8 映射和板测清单见 [全国总决赛交付说明](matlab_fir/national_finals/README.md)。
 
-> **版本口径说明**：当前可上板工具候选是 427 LUT / 416 FF / 4 DSP / 2 BRAM / 2 MMCM 的 DAC-ROM 修复版。412-LUT P3-K 与 424-LUT P3-J 虽然真 Q15 和 RTL 0-LSB 均通过，但测试音 ROM 在综合后锁死，不能上板；430-LUT P3-J 与 P4-D R2 是安全历史回退。历史 424 LUT / 6 DSP Route 1 和 436 LUT / 5 DSP 版则另有 Stage3 约 −6.02 dB 标度错误。
+> **版本口径说明**：当前工具侧推荐候选是 P3-L 397 LUT / 409 FF / 4 DSP / 2 BRAM / 2 MMCM，尚待物理板复测；当前实板通过回退是 P3-K 427 LUT / 416 FF。旧 412-LUT P3-K 与 424-LUT P3-J 虽然真 Q15 和 RTL 0-LSB 均通过，但测试音 ROM 在综合后锁死，不能上板；430-LUT P3-J 与 P4-D R2 是安全历史回退。历史 424 LUT / 6 DSP Route 1 和 436 LUT / 5 DSP 版则另有 Stage3 约 −6.02 dB 标度错误。
 
 > 当前最低 LUT 实板通过版：44.1 kHz 专用、Phase 7 折叠补偿 FIR-CIC、Stage 2/3 BRAM 历史/系数、共享按键扫描、472 LUT / 8 DSP，自动化验证、完整实现与四档板测通过<br>
 > 上一面积策略候选：相同滤波算法与板级功能、478 LUT / 565 FF / 9 DSP / 3 BRAM Tile<br>
