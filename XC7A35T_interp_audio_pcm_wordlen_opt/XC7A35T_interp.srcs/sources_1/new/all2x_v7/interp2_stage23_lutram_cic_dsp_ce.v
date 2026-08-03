@@ -80,7 +80,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     output wire [3:0]                        scheduler_mac_index_dbg,
 
     output wire [6:0]                        external_coeff_addr,
-    input  wire signed [17:0]                external_coeff_data
+    input  wire signed [17:0]                external_coeff_data,
+    input  wire                              external_coeff_last
 );
 
     localparam integer MEM_ADDR_W = 4;
@@ -128,6 +129,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     reg [MEM_ADDR_W-1:0] job_history_head;
     reg [MEM_ADDR_W-1:0] job_fill_count;
     wire [3:0] job_mac_count;
+    wire job_last_mac;
 
     wire [MEM_ADDR_W-1:0] hist_index;
     wire [MEM_ADDR_W-1:0] hist_pair_limit;
@@ -241,6 +243,16 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     assign job_mac_count = !job_stage3 ?
         (job_phase ? 4'd8 : 4'd9) :
         (job_phase ? 4'd5 : 4'd6);
+
+    generate
+        if (USE_EXTERNAL_COEFF_BRAM != 0) begin : gen_external_last_flag
+            assign job_last_mac = external_coeff_last;
+        end
+        else begin : gen_internal_last_decode
+            assign job_last_mac =
+                (job_mac_index == job_mac_count - 4'd1);
+        end
+    endgenerate
 
     assign coeff_bram_stage3 = job_active ? job_stage3 :
         (!stage2_pending && stage3_pending);
@@ -755,7 +767,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
                 job_output_pending <= 1'b1;
             end
             else if (job_active) begin
-                if (job_mac_index == job_mac_count - 4'd1) begin
+                if (job_last_mac) begin
                     job_active <= 1'b0;
                     job_result_pending <= 1'b1;
                     job_mac_index <= 4'd0;

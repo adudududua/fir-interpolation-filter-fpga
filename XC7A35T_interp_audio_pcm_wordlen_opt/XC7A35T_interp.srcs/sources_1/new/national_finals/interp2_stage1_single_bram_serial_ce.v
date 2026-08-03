@@ -32,7 +32,8 @@ module interp2_stage1_single_bram_serial_ce #(
     output wire signed [DATA_W-1:0]     fir_in_dbg,
     output wire                         fir_in_valid_dbg,
     output wire [4:0]                   external_coeff_addr,
-    input  wire signed [15:0]           external_coeff_data
+    input  wire signed [15:0]           external_coeff_data,
+    input  wire                         external_coeff_last
 );
 
     localparam integer ADDR_W = 6;
@@ -52,7 +53,6 @@ module interp2_stage1_single_bram_serial_ce #(
     reg [ADDR_W-1:0] wr_ptr;
     reg [ADDR_W-1:0] base_ptr;
     reg [5:0] fill_count;
-    reg [5:0] active_fill_count;
 
     reg phase_cnt;
     reg mac_active;
@@ -93,11 +93,22 @@ module interp2_stage1_single_bram_serial_ce #(
     wire dsp_round_carryin;
     wire signed [QUOT_W-1:0] rounded_quotient;
     wire rounded_upper_is_sign_extension;
+    wire read_coeff_is_last;
 
     assign x_current = x_in_valid ? x_in : {DATA_W{1'b0}};
     assign fir_in_dbg = x_current;
     assign fir_in_valid_dbg = ce_out && (phase_cnt == 1'b0);
     assign external_coeff_addr = issue_index;
+
+    generate
+        if (USE_EXTERNAL_COEFF_BRAM != 0) begin : gen_external_last_flag
+            assign read_coeff_is_last = external_coeff_last;
+        end
+        else begin : gen_internal_last_decode
+            assign read_coeff_is_last =
+                (read_coeff_index == PAIR_COUNT-1);
+        end
+    endgenerate
 
     nf_stage1_history_ramb18_sdp #(
         .DATA_W(DATA_W),
@@ -239,7 +250,6 @@ module interp2_stage1_single_bram_serial_ce #(
             wr_ptr <= {ADDR_W{1'b0}};
             base_ptr <= {ADDR_W{1'b0}};
             fill_count <= 6'd0;
-            active_fill_count <= 6'd0;
             phase_cnt <= 1'b1;
             phase_dbg <= 1'b1;
             mac_active <= 1'b0;
@@ -278,7 +288,7 @@ module interp2_stage1_single_bram_serial_ce #(
                                     {DATA_W{1'b0}};
                     delay_ready <= 1'b1;
                 end
-                else if (read_coeff_index == PAIR_COUNT-1) begin
+                else if (read_coeff_is_last) begin
                     filter_commit_pending <= 1'b1;
                     mac_active <= 1'b0;
                 end
@@ -291,7 +301,7 @@ module interp2_stage1_single_bram_serial_ce #(
                 if (next_issue_is_left) begin
                     read_issue_kind <= READ_LEFT;
                     read_addr <= base_ptr - schedule_index;
-                    read_issue_mask <= schedule_index < active_fill_count;
+                    read_issue_mask <= schedule_index < fill_count;
                     next_issue_is_left <= 1'b0;
                 end
                 else begin
@@ -299,7 +309,7 @@ module interp2_stage1_single_bram_serial_ce #(
                     read_addr <= base_ptr -
                         (HISTORY_LEN-1-schedule_index);
                     read_issue_mask <=
-                        (HISTORY_LEN-1-schedule_index) < active_fill_count;
+                        (HISTORY_LEN-1-schedule_index) < fill_count;
 
                     if (schedule_index == PAIR_COUNT-1) begin
                         issue_active <= 1'b0;
@@ -324,10 +334,6 @@ module interp2_stage1_single_bram_serial_ce #(
                     wr_ptr <= wr_ptr + 6'd1;
                     if (fill_count < HISTORY_LEN)
                         fill_count <= fill_count + 6'd1;
-                    active_fill_count <=
-                        (fill_count < HISTORY_LEN) ?
-                        (fill_count + 6'd1) : fill_count;
-
                     mac_active <= 1'b1;
                     filter_ready <= 1'b0;
                     issue_active <= 1'b1;

@@ -109,8 +109,10 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     wire y128_valid_w;
     wire [4:0] stage1_coeff_addr_w;
     wire signed [15:0] stage1_coeff_data_w;
+    wire stage1_coeff_last_w;
     wire [6:0] stage23_coeff_addr_w;
     wire signed [17:0] stage23_coeff_data_w;
+    wire stage23_coeff_last_w;
 
     wire unused_ce;
     assign unused_ce = ce16_out ^ ce32_out ^ ce64_out;
@@ -122,13 +124,17 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
                 .clk(clk),
                 .stage1_addr(stage1_coeff_addr_w),
                 .stage1_coeff(stage1_coeff_data_w),
+                .stage1_last(stage1_coeff_last_w),
                 .stage23_addr(stage23_coeff_addr_w),
-                .stage23_coeff(stage23_coeff_data_w)
+                .stage23_coeff(stage23_coeff_data_w),
+                .stage23_last(stage23_coeff_last_w)
             );
         end
         else begin : gen_no_unified_fir_coeff_bram
             assign stage1_coeff_data_w = 16'sd0;
+            assign stage1_coeff_last_w = 1'b0;
             assign stage23_coeff_data_w = 18'sd0;
+            assign stage23_coeff_last_w = 1'b0;
         end
     endgenerate
 
@@ -145,7 +151,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
                 .y_out(y2_w), .y_out_valid(y2_valid_w),
                 .phase_dbg(), .fir_in_dbg(), .fir_in_valid_dbg(),
                 .external_coeff_addr(stage1_coeff_addr_w),
-                .external_coeff_data(stage1_coeff_data_w)
+                .external_coeff_data(stage1_coeff_data_w),
+                .external_coeff_last(stage1_coeff_last_w)
             );
         end
         else begin : gen_dual_bram_stage1
@@ -221,7 +228,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
                 .scheduler_busy_dbg(), .scheduler_stage_dbg(),
                 .scheduler_mac_index_dbg(),
                 .external_coeff_addr(stage23_coeff_addr_w),
-                .external_coeff_data(stage23_coeff_data_w)
+                .external_coeff_data(stage23_coeff_data_w),
+                .external_coeff_last(stage23_coeff_last_w)
             );
         end
         else begin : gen_register_stage23

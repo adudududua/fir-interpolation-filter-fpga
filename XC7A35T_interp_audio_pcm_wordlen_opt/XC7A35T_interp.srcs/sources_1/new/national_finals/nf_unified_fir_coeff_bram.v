@@ -7,15 +7,18 @@
 //   port B, addresses   0..63: Stage2 + flat Stage3 coefficients;
 //   port B, addresses 96..127: P3 compensated Stage3 coefficients.
 //
-// Port B exposes the complete signed-18 RAMB18 word.  Bits 15:0 use the
-// normal data plane and bits 17:16 use the parity plane, allowing the P3
-// center coefficient 35584 without another BRAM or a LUT decoder.
+// Every coefficient fits signed-17.  Parity bit 16 is therefore the true
+// coefficient sign bit while parity bit 17 carries an end-of-MAC flag.  Port A
+// uses the same flag for the final Stage1 pair.  The scheduler metadata costs
+// no extra BRAM and removes fabric terminal-count decode from both FIR lanes.
 module nf_unified_fir_coeff_bram (
     input  wire                         clk,
     input  wire [4:0]                   stage1_addr,
     output wire signed [15:0]           stage1_coeff,
+    output wire                         stage1_last,
     input  wire [6:0]                   stage23_addr,
-    output wire signed [17:0]           stage23_coeff
+    output wire signed [17:0]           stage23_coeff,
+    output wire                         stage23_last
 );
 
 `ifdef SYNTHESIS
@@ -42,7 +45,7 @@ module nf_unified_fir_coeff_bram (
         .INIT_05(256'h0000000000000000000000005164E5240FCCF50D082EF9A30510FBEB0351FD4D),
         .INIT_06(256'h00000000000000000000000000000000000000000231EF784E4E4E4EEF780231),
         .INIT_07(256'h000000000000000000000000000000000000000000000089F9EE8B00F9EE0089),
-        .INITP_00(256'h000000CC0000030C0003333333333333000003030000030C0000CC3300033033)
+        .INITP_00(256'h0000024400000904000911111111111100000301000009040000C41100031011)
     ) u_unified_coeff_ramb18e1 (
         .DOADO(doa),
         .DOPADOP(dopa),
@@ -69,16 +72,23 @@ module nf_unified_fir_coeff_bram (
     );
 
     assign stage1_coeff = doa;
-    assign stage23_coeff = {dopb, dob};
+    assign stage1_last = dopa[1];
+    assign stage23_coeff = {dopb[0], dopb[0], dob};
+    assign stage23_last = dopb[1];
 `else
     reg signed [17:0] coeff_mem [0:127];
+    reg coeff_last_mem [0:127];
     reg signed [15:0] stage1_coeff_q;
     reg signed [17:0] stage23_coeff_q;
+    reg stage1_last_q;
+    reg stage23_last_q;
     integer idx;
 
     initial begin
-        for (idx = 0; idx < 128; idx = idx + 1)
+        for (idx = 0; idx < 128; idx = idx + 1) begin
             coeff_mem[idx] = 18'sd0;
+            coeff_last_mem[idx] = 1'b0;
+        end
 
         coeff_mem[0] = -16'sd115;
         coeff_mem[1] = 16'sd534;
@@ -157,15 +167,27 @@ module nf_unified_fir_coeff_bram (
         coeff_mem[114] = 18'sd35584;
         coeff_mem[115] = -18'sd1554;
         coeff_mem[116] = 18'sd137;
+
+        coeff_last_mem[8] = 1'b1;
+        coeff_last_mem[23] = 1'b1;
+        coeff_last_mem[37] = 1'b1;
+        coeff_last_mem[52] = 1'b1;
+        coeff_last_mem[89] = 1'b1;
+        coeff_last_mem[101] = 1'b1;
+        coeff_last_mem[116] = 1'b1;
     end
 
     always @(posedge clk) begin
         stage1_coeff_q <= coeff_mem[{2'b10, stage1_addr}];
         stage23_coeff_q <= coeff_mem[stage23_addr];
+        stage1_last_q <= coeff_last_mem[{2'b10, stage1_addr}];
+        stage23_last_q <= coeff_last_mem[stage23_addr];
     end
 
     assign stage1_coeff = stage1_coeff_q;
     assign stage23_coeff = stage23_coeff_q;
+    assign stage1_last = stage1_last_q;
+    assign stage23_last = stage23_last_q;
 `endif
 
 endmodule

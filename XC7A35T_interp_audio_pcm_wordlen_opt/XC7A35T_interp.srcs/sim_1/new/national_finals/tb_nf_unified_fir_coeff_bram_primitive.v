@@ -8,7 +8,9 @@ module tb_nf_unified_fir_coeff_bram_primitive;
     reg [4:0] stage1_addr = 5'd0;
     reg [6:0] stage23_addr = 7'd0;
     wire signed [15:0] stage1_coeff;
+    wire stage1_last;
     wire signed [17:0] stage23_coeff;
+    wire stage23_last;
 
     integer addr;
     integer errors = 0;
@@ -19,8 +21,10 @@ module tb_nf_unified_fir_coeff_bram_primitive;
         .clk(clk),
         .stage1_addr(stage1_addr),
         .stage1_coeff(stage1_coeff),
+        .stage1_last(stage1_last),
         .stage23_addr(stage23_addr),
-        .stage23_coeff(stage23_coeff)
+        .stage23_coeff(stage23_coeff),
+        .stage23_last(stage23_last)
     );
 
     function signed [15:0] expected_stage1;
@@ -54,6 +58,19 @@ module tb_nf_unified_fir_coeff_bram_primitive;
                 5'd24: expected_stage1 = -16'sd6876;
                 5'd25: expected_stage1 =  16'sd20836;
                 default: expected_stage1 = 16'sd0;
+            endcase
+        end
+    endfunction
+
+    function expected_stage23_last;
+        input [6:0] index;
+        begin
+            case (index)
+                7'd8, 7'd23, 7'd37, 7'd52,
+                7'd89, 7'd101, 7'd116:
+                    expected_stage23_last = 1'b1;
+                default:
+                    expected_stage23_last = 1'b0;
             endcase
         end
     endfunction
@@ -152,10 +169,24 @@ module tb_nf_unified_fir_coeff_bram_primitive;
                 errors = errors + 1;
             end
 
+            if (addr < 32 && stage1_last !== (addr == 25)) begin
+                $display("Stage1 last-flag mismatch addr=%0d actual=%0b expected=%0b",
+                         stage1_addr, stage1_last, (addr == 25));
+                errors = errors + 1;
+            end
+
             if (stage23_coeff !== expected_stage23(addr[6:0])) begin
                 $display("Stage23 primitive mismatch addr=%0d actual=%0d expected=%0d",
                          stage23_addr, stage23_coeff,
                          expected_stage23(addr[6:0]));
+                errors = errors + 1;
+            end
+
+
+            if (stage23_last !== expected_stage23_last(addr[6:0])) begin
+                $display("Stage23 last-flag mismatch addr=%0d actual=%0b expected=%0b",
+                         stage23_addr, stage23_last,
+                         expected_stage23_last(addr[6:0]));
                 errors = errors + 1;
             end
         end
@@ -164,7 +195,7 @@ module tb_nf_unified_fir_coeff_bram_primitive;
             $fatal(1, "Unified coefficient RAMB18 primitive FAIL errors=%0d",
                    errors);
 
-        $display("UNIFIED COEFFICIENT RAMB18 PRIMITIVE PASS: 32 Stage1 + 128 Stage23 addresses with signed18 parity");
+        $display("UNIFIED COEFFICIENT RAMB18 PRIMITIVE PASS: coefficients plus Stage1/Stage23 last flags");
         $finish;
     end
 endmodule
