@@ -213,28 +213,45 @@ module board_demo_competition_dac8_top #(
     // 家族改变时先把音频数据通路保持复位，再切 BUFGMUX_CTRL，
     // 最后在新时钟域同步释放复位，防止跨采样率遗留滤波状态。
     //=========================================================
-    reg [11:0] family_switch_cnt = 12'd0;
-    reg        family_active = 1'b0;
-    wire       family_switch_busy;
+    // Four 1024-cycle protected phases replace one 12-bit down-counter with
+    // two wide terminal decoders. Phase 0 commits the new family while the
+    // datapath is muted/reset; phases 1..3 provide the post-switch settling
+    // window. The total guard interval remains 4096 system clocks.
+    reg [9:0] family_switch_cycle = 10'd0;
+    reg [1:0] family_switch_phase = 2'd0;
+    reg       family_switch_busy = 1'b0;
+    reg       family_active = 1'b0;
     wire       clk_audio_128x;
     wire       mmcm_locked_selected_unused;
     wire       mmcm_locked_44k1;
     wire       mmcm_locked_48k;
 
-    assign family_switch_busy = |family_switch_cnt;
-
     always @(posedge clk_sys_bufg) begin
         if (!rst_n_int) begin
-            family_switch_cnt <= 12'd0;
+            family_switch_cycle <= 10'd0;
+            family_switch_phase <= 2'd0;
+            family_switch_busy <= 1'b0;
             family_active <= 1'b0;
         end
-        else if (family_switch_cnt != 12'd0) begin
-            family_switch_cnt <= family_switch_cnt - 12'd1;
-            if (family_switch_cnt == 12'd3072)
-                family_active <= key_family_sel;
+        else if (family_switch_busy) begin
+            if (family_switch_cycle == 10'd1023) begin
+                family_switch_cycle <= 10'd0;
+                if (family_switch_phase == 2'd0)
+                    family_active <= key_family_sel;
+
+                if (family_switch_phase == 2'd3)
+                    family_switch_busy <= 1'b0;
+                else
+                    family_switch_phase <= family_switch_phase + 2'd1;
+            end
+            else begin
+                family_switch_cycle <= family_switch_cycle + 10'd1;
+            end
         end
         else if (key_family_sel != family_active) begin
-            family_switch_cnt <= 12'd4095;
+            family_switch_cycle <= 10'd0;
+            family_switch_phase <= 2'd0;
+            family_switch_busy <= 1'b1;
         end
     end
 
