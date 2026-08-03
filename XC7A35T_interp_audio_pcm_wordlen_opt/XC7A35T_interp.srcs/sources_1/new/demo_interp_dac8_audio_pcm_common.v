@@ -343,33 +343,28 @@ module demo_interp_dac8_audio_pcm_common #(
     // mode_state = MODE_128X:
     //   DAC 输出 y_out。
     //=========================================================
-    // The AD9708 only consumes bits [23:16]. Select those eight bits before
-    // the mode mux instead of building a 24-bit four-way mux and truncating
-    // it afterwards. Every source is already signed 24-bit, so the former
-    // 32-bit sign-extension/saturation stage could never clip. Likewise,
-    // signed8 + 128 is always in 0..255 and needs no second saturation.
-    reg signed [7:0] selected_sample_s8;
-    reg              selected_valid;
+    reg signed [23:0] selected_sample;
+    reg               selected_valid;
 
     always @(*) begin
         case (mode_state)
             MODE_1X: begin
-                selected_sample_s8 = audio_sample_w[23:16];
+                selected_sample = audio_sample_w;
                 selected_valid  = audio_sample_update_w;
             end
 
             MODE_4X: begin
-                selected_sample_s8 = dbg_y4_w[23:16];
+                selected_sample = dbg_y4_w;
                 selected_valid  = dbg_y4_valid_w;
             end
 
             MODE_8X: begin
-                selected_sample_s8 = dbg_y8_w[23:16];
+                selected_sample = dbg_y8_w;
                 selected_valid  = dbg_y8_valid_w;
             end
 
             default: begin
-                selected_sample_s8 = y_out_w[23:16];
+                selected_sample = y_out_w;
                 selected_valid  = y_out_valid_w;
             end
         endcase
@@ -381,10 +376,37 @@ module demo_interp_dac8_audio_pcm_common #(
     // 全 2x 各级系数已经包含 2 倍插值增益，1x、4x、8x、128x
     // 四个节点均保持输入幅度，因此不再做额外左移补偿。
     //=========================================================
-    // Two's-complement signed8 to offset-binary unsigned8 is exactly a sign
-    // bit inversion; no adder or comparator is required.
-    wire [7:0] sample_u8_w = {
-        ~selected_sample_s8[7], selected_sample_s8[6:0]};
+    reg  signed [31:0] display_sample_ext;
+    reg  signed [23:0] display_sample_sat;
+
+    wire signed [7:0] sample_s8_w;
+    wire signed [8:0] sample_bias_w;
+    reg        [7:0]  sample_u8_w;
+
+    always @(*) begin
+        display_sample_ext = {{8{selected_sample[23]}}, selected_sample};
+    end
+
+    always @(*) begin
+        if (display_sample_ext > 32'sd8388607)
+            display_sample_sat = 24'sd8388607;
+        else if (display_sample_ext < -32'sd8388608)
+            display_sample_sat = -24'sd8388608;
+        else
+            display_sample_sat = display_sample_ext[23:0];
+    end
+
+    assign sample_s8_w   = display_sample_sat[23:16];
+    assign sample_bias_w = $signed({sample_s8_w[7], sample_s8_w}) + 9'sd128;
+
+    always @(*) begin
+        if (sample_bias_w < 9'sd0)
+            sample_u8_w = 8'd0;
+        else if (sample_bias_w > 9'sd255)
+            sample_u8_w = 8'hFF;
+        else
+            sample_u8_w = sample_bias_w[7:0];
+    end
 
     //=========================================================
     // 8）输出到 8bit 并行 DAC
