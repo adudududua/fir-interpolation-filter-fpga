@@ -39,6 +39,7 @@
 module board_demo_competition_dac8_top #(
     parameter integer USE_PHASE7_LUTRAM_STAGE23 = 1,
     parameter integer USE_COMPACT_KEYPAD = 1,
+    parameter integer USE_ULTRACOMPACT_KEYPAD = 1,
     parameter integer COMPACT_KEYPAD_SCAN_DIV = 20000,
     parameter integer USE_SHARED_KEYPAD_SCAN_TICK = 1,
     parameter integer USE_PHASE7_BRAM_STAGE23_HISTORY = 1,
@@ -154,18 +155,34 @@ module board_demo_competition_dac8_top #(
 
     generate
         if (USE_COMPACT_KEYPAD != 0) begin : gen_compact_keypad
-            matrix_keypad_mode_ctrl_compact #(
-                .SCAN_DIV               (COMPACT_KEYPAD_SCAN_DIV),
-                .USE_EXTERNAL_SCAN_TICK (USE_SHARED_KEYPAD_SCAN_TICK)
-            ) u_matrix_keypad_mode_ctrl_compact (
-                .clk          (clk_sys_bufg),
-                .rst_n        (rst_n_int),
-                .scan_tick    (compact_keypad_scan_tick),
-                .kc           (key_kc),
-                .kr_drive_low (key_kr_drive_low),
-                .family_sel   (key_family_sel),
-                .mode_sel     (key_mode_sel)
-            );
+            if (USE_ULTRACOMPACT_KEYPAD != 0) begin : gen_ultracompact
+                matrix_keypad_mode_ctrl_ultracompact #(
+                    .SCAN_DIV               (COMPACT_KEYPAD_SCAN_DIV),
+                    .USE_EXTERNAL_SCAN_TICK (USE_SHARED_KEYPAD_SCAN_TICK)
+                ) u_matrix_keypad_mode_ctrl_ultracompact (
+                    .clk          (clk_sys_bufg),
+                    .rst_n        (rst_n_int),
+                    .scan_tick    (compact_keypad_scan_tick),
+                    .kc           (key_kc),
+                    .kr_drive_low (key_kr_drive_low),
+                    .family_sel   (key_family_sel),
+                    .mode_sel     (key_mode_sel)
+                );
+            end
+            else begin : gen_original_compact
+                matrix_keypad_mode_ctrl_compact #(
+                    .SCAN_DIV               (COMPACT_KEYPAD_SCAN_DIV),
+                    .USE_EXTERNAL_SCAN_TICK (USE_SHARED_KEYPAD_SCAN_TICK)
+                ) u_matrix_keypad_mode_ctrl_compact (
+                    .clk          (clk_sys_bufg),
+                    .rst_n        (rst_n_int),
+                    .scan_tick    (compact_keypad_scan_tick),
+                    .kc           (key_kc),
+                    .kr_drive_low (key_kr_drive_low),
+                    .family_sel   (key_family_sel),
+                    .mode_sel     (key_mode_sel)
+                );
+            end
 
             assign key_strobe_unused = 1'b0;
             assign key_code_unused = 4'd0;

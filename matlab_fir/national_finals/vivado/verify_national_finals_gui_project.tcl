@@ -30,6 +30,7 @@ open_project $project_file
 
 set source_set [get_filesets sources_1]
 set project_generics [get_property generic $source_set]
+require_generic $project_generics USE_ULTRACOMPACT_KEYPAD 1
 require_generic $project_generics USE_NATIONAL_FINALS_DATAPATH 1
 require_generic $project_generics USE_NATIONAL_FINALS_SERIAL_CIC_COMB 1
 require_generic $project_generics USE_NATIONAL_FINALS_N3_HOLD_EQUIV 1
@@ -82,6 +83,8 @@ set stage1_history_file [get_files -quiet \
     "*national_finals/nf_stage1_history_ramb18_sdp.v"]
 set stage1_serial_file [get_files -quiet \
     "*national_finals/interp2_stage1_single_bram_serial_ce.v"]
+set ultracompact_keypad_file [get_files -quiet \
+    "*national_finals/matrix_keypad_mode_ctrl_ultracompact.v"]
 require_condition [expr {[llength $serial_cic_file] == 1}] \
     "Serial-comb CIC source is not registered exactly once in sources_1."
 require_condition [expr {[llength $n3_hold_cic_file] == 1}] \
@@ -92,6 +95,8 @@ require_condition [expr {[llength $stage1_history_file] == 1}] \
     "Stage1 history RAMB18 source is not registered exactly once."
 require_condition [expr {[llength $stage1_serial_file] == 1}] \
     "Stage1 serialized-read source is not registered exactly once."
+require_condition [expr {[llength $ultracompact_keypad_file] == 1}] \
+    "Ultra-compact keypad source is not registered exactly once."
 
 set gui_resource_sharing [string tolower [get_property \
     STEPS.SYNTH_DESIGN.ARGS.RESOURCE_SHARING [get_runs synth_1]]]

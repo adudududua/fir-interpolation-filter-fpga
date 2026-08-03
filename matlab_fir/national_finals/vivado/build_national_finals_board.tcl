@@ -22,6 +22,8 @@ set result_tag board_dual_rate_cic6_round7_headroom_opt
 set stage1_dsp48_preadder 1
 set cic_integrator_dsp_mode 2
 set p3_joint_stage3 1
+set stage1_single_bram 1
+set stage23_unified_bram 1
 if {$argc > 0} {
     set reuse_current_synthesis [lindex $argv 0]
 }
@@ -49,6 +51,12 @@ if {$argc > 7} {
 if {$argc > 8} {
     set p3_joint_stage3 [lindex $argv 8]
 }
+if {$argc > 9} {
+    set stage1_single_bram [lindex $argv 9]
+}
+if {$argc > 10} {
+    set stage23_unified_bram [lindex $argv 10]
+}
 if {$reuse_current_synthesis != 0 && $reuse_current_synthesis != 1} {
     error "reuse_current_synthesis must be 0 or 1"
 }
@@ -63,6 +71,12 @@ if {$cic_integrator_dsp_mode < 0 || $cic_integrator_dsp_mode > 2} {
 }
 if {$p3_joint_stage3 != 0 && $p3_joint_stage3 != 1} {
     error "p3_joint_stage3 must be 0 or 1"
+}
+if {$stage1_single_bram != 0 && $stage1_single_bram != 1} {
+    error "stage1_single_bram must be 0 or 1"
+}
+if {$stage23_unified_bram != 0 && $stage23_unified_bram != 1} {
+    error "stage23_unified_bram must be 0 or 1"
 }
 if {![regexp {^[A-Za-z0-9_-]+$} $result_tag]} {
     error "result_tag may contain only letters, digits, underscore, and dash"
@@ -81,6 +95,7 @@ set nf_sources [list \
     [file join $nf_src_dir dual_family_audio_clock.v] \
     [file join $nf_src_dir nf_mode_cdc_handshake.v] \
     [file join $nf_src_dir dual_rate_test_tone_rom_source.v] \
+    [file join $nf_src_dir matrix_keypad_mode_ctrl_ultracompact.v] \
     [file join $nf_src_dir nf_sine_15k_dual_rate_24bit_256.mem]]
 
 set nf_sim_sources [list \
@@ -135,11 +150,12 @@ set_property top board_demo_competition_dac8_top [get_filesets sources_1]
 set_property generic [list \
     USE_PHASE7_LUTRAM_STAGE23=1 \
     USE_COMPACT_KEYPAD=1 \
+    USE_ULTRACOMPACT_KEYPAD=1 \
     COMPACT_KEYPAD_SCAN_DIV=20000 \
     USE_SHARED_KEYPAD_SCAN_TICK=1 \
     USE_PHASE7_BRAM_STAGE23_HISTORY=1 \
-    USE_PHASE7_UNIFIED_BRAM_STAGE23_HISTORY=1 \
-    USE_NATIONAL_FINALS_SINGLE_BRAM_STAGE1=1 \
+    USE_PHASE7_UNIFIED_BRAM_STAGE23_HISTORY=$stage23_unified_bram \
+    USE_NATIONAL_FINALS_SINGLE_BRAM_STAGE1=$stage1_single_bram \
     USE_PHASE7_BRAM_STAGE23_COEFF=1 \
     USE_PHASE8_PACKED_BRAM_STAGE23=0 \
     USE_PHASE7_CIC_BURST_COUNTER_DSP=0 \
@@ -193,6 +209,8 @@ puts $synth_provenance_handle "resource_sharing=$resource_sharing"
 puts $synth_provenance_handle "stage1_dsp48_preadder=$stage1_dsp48_preadder"
 puts $synth_provenance_handle "cic_integrator_dsp_mode=$cic_integrator_dsp_mode"
 puts $synth_provenance_handle "p3_joint_stage3=$p3_joint_stage3"
+puts $synth_provenance_handle "stage1_single_bram=$stage1_single_bram"
+puts $synth_provenance_handle "stage23_unified_bram=$stage23_unified_bram"
 close $synth_provenance_handle
 
 if {$synthesis_only != 0} {
@@ -291,7 +309,8 @@ puts $manifest_handle "Synthesis resource sharing: $resource_sharing"
 puts $manifest_handle "Stage1 DSP48 preadder: $stage1_dsp48_preadder"
 puts $manifest_handle "CIC integrator DSP mode: $cic_integrator_dsp_mode"
 puts $manifest_handle "P3 joint Stage3 mode: $p3_joint_stage3"
-puts $manifest_handle "Stage1 history: one RAMB18, current-sample bypass plus serialized symmetric reads"
+puts $manifest_handle "Stage1 single-BRAM history mode: $stage1_single_bram"
+puts $manifest_handle "Stage2/3 unified-BRAM history mode: $stage23_unified_bram"
 puts $manifest_handle "Rounding: constant 16383 plus DSP48 CARRYIN for non-negative MAC sums"
 puts $manifest_handle "Stage3: complete 38-bit MAC view with explicit signed output saturation"
 puts $manifest_handle "Implementation opt directive: Default"

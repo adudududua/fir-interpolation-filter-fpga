@@ -11,6 +11,8 @@ set project_src_dir [file join $repo_dir XC7A35T_interp_audio_pcm_wordlen_opt \
     XC7A35T_interp.srcs sources_1 new]
 set signedoff_wrapper [file join $project_src_dir national_finals \
     nf_signedoff_filter_core.v]
+set ultracompact_keypad [file join $project_src_dir national_finals \
+    matrix_keypad_mode_ctrl_ultracompact.v]
 set daily_vector_dir [file join $repo_dir matlab_fir national_finals \
     vectors p3j_daily]
 
@@ -35,7 +37,17 @@ require_condition [file exists $signedoff_wrapper] \
 if {[llength [get_files -quiet -of_objects $source_set $signedoff_wrapper]] == 0} {
     add_files -fileset sources_1 -norecurse $signedoff_wrapper
 }
+require_condition [file exists $ultracompact_keypad] \
+    "Ultra-compact keypad source is missing: $ultracompact_keypad"
+if {[llength [get_files -quiet -of_objects $source_set $ultracompact_keypad]] == 0} {
+    add_files -fileset sources_1 -norecurse $ultracompact_keypad
+}
 set project_generics [get_property generic $source_set]
+if {[lsearch -exact $project_generics "USE_ULTRACOMPACT_KEYPAD=1"] < 0} {
+    lappend project_generics "USE_ULTRACOMPACT_KEYPAD=1"
+    set_property generic $project_generics $source_set
+}
+require_generic $project_generics USE_ULTRACOMPACT_KEYPAD 1
 require_generic $project_generics USE_NATIONAL_FINALS_DATAPATH 1
 require_generic $project_generics USE_NATIONAL_FINALS_SERIAL_CIC_COMB 1
 require_generic $project_generics USE_NATIONAL_FINALS_N3_HOLD_EQUIV 1

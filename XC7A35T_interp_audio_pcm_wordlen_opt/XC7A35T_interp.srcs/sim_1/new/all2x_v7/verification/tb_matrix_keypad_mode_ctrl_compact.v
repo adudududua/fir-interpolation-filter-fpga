@@ -56,7 +56,7 @@ module tb_matrix_keypad_mode_ctrl_compact;
         .key_code     (code_unused)
     );
 
-    matrix_keypad_mode_ctrl_compact #(
+    matrix_keypad_mode_ctrl_ultracompact #(
         .SCAN_DIV(SCAN_DIV),
         .DEBOUNCE_SCANS(DEBOUNCE_SCANS),
         .USE_EXTERNAL_SCAN_TICK(1)

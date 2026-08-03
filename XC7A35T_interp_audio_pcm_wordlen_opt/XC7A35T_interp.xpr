@@ -241,6 +241,13 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PSRCDIR/sources_1/new/national_finals/matrix_keypad_mode_ctrl_ultracompact.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PSRCDIR/sources_1/new/national_finals/nf_mode_cdc_handshake.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -488,6 +495,7 @@
         <Generic Name="USE_NATIONAL_FINALS_NARROW_STAGE23" Val="1"/>
         <Generic Name="USE_NATIONAL_FINALS_P3_JOINT_STAGE3" Val="1"/>
         <Generic Name="USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE" Val="2"/>
+        <Generic Name="USE_ULTRACOMPACT_KEYPAD" Val="1"/>
       </Config>
     </FileSet>
     <FileSet Name="constrs_1" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1">
@@ -698,8 +706,8 @@
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018"/>
         <Step Id="synth_design">
           <Option Id="Directive">1</Option>
-          <Option Id="ResourceSharing">1</Option>
           <Option Id="FlattenHierarchy">0</Option>
+          <Option Id="ResourceSharing">1</Option>
         </Step>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>

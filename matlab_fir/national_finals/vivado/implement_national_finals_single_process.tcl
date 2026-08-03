@@ -20,6 +20,8 @@ set expected_flatten_hierarchy full
 set expected_resource_sharing on
 set expected_stage1_dsp48_preadder 1
 set expected_cic_integrator_dsp_mode 2
+set expected_stage1_single_bram 1
+set expected_stage23_unified_bram 1
 if {$argc > 0} {
     set result_tag [lindex $argv 0]
 }
@@ -43,6 +45,12 @@ if {$argc > 6} {
 }
 if {$argc > 7} {
     set expected_cic_integrator_dsp_mode [lindex $argv 7]
+}
+if {$argc > 8} {
+    set expected_stage1_single_bram [lindex $argv 8]
+}
+if {$argc > 9} {
+    set expected_stage23_unified_bram [lindex $argv 9]
 }
 if {![regexp {^[A-Za-z0-9_-]+$} $result_tag]} {
     error "result_tag may contain only letters, digits, underscore, and dash"
@@ -90,7 +98,9 @@ set expected_synth_provenance [join [list \
     "resource_sharing=$expected_resource_sharing" \
     "stage1_dsp48_preadder=$expected_stage1_dsp48_preadder" \
     "cic_integrator_dsp_mode=$expected_cic_integrator_dsp_mode" \
-    "p3_joint_stage3=$p3_joint_stage3"] "\n"]
+    "p3_joint_stage3=$p3_joint_stage3" \
+    "stage1_single_bram=$expected_stage1_single_bram" \
+    "stage23_unified_bram=$expected_stage23_unified_bram"] "\n"]
 set synth_provenance_handle [open $synth_provenance_file r]
 set actual_synth_provenance [string trim [read $synth_provenance_handle]]
 close $synth_provenance_handle
@@ -281,6 +291,8 @@ puts $manifest_handle "Synthesis flatten hierarchy: $expected_flatten_hierarchy"
 puts $manifest_handle "Synthesis resource sharing: $expected_resource_sharing"
 puts $manifest_handle "Stage1 DSP48 preadder: $expected_stage1_dsp48_preadder"
 puts $manifest_handle "Requested CIC integrator DSP mode: $expected_cic_integrator_dsp_mode"
+puts $manifest_handle "Stage1 single-BRAM history mode: $expected_stage1_single_bram"
+puts $manifest_handle "Stage2/3 unified-BRAM history mode: $expected_stage23_unified_bram"
 puts $manifest_handle "Implementation opt directive: $implementation_opt_directive"
 puts $manifest_handle "P3 joint Stage3 mode: $p3_joint_stage3"
 close $manifest_handle

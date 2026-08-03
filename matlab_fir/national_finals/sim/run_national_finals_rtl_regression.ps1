@@ -365,6 +365,7 @@ $keypadDir = Invoke-RtlCase -Name 'keypad' `
     -VerilogFiles @(
         (Join-Path $sourceRoot 'board_demo_competition_dac8_top.v'),
         (Join-Path $sourceRoot 'matrix_keypad_mode_ctrl_compact.v'),
+        (Join-Path $nfSource 'matrix_keypad_mode_ctrl_ultracompact.v'),
         (Join-Path $v7Sim 'tb_matrix_keypad_mode_ctrl_compact.v')
     ) `
     -Top 'tb_matrix_keypad_mode_ctrl_compact' `
@@ -375,6 +376,7 @@ $boardDir = Invoke-RtlCase -Name 'board' `
     -VerilogFiles @(
         (Join-Path $sourceRoot 'board_demo_competition_dac8_top.v'),
         (Join-Path $sourceRoot 'matrix_keypad_mode_ctrl_compact.v'),
+        (Join-Path $nfSource 'matrix_keypad_mode_ctrl_ultracompact.v'),
         (Join-Path $nfSource 'nf_mode_cdc_handshake.v'),
         (Join-Path $v7Sim 'tb_board_phase7_shared_keypad_scan.v')
     ) `
