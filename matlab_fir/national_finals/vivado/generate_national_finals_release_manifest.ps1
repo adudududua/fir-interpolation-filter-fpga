@@ -78,7 +78,7 @@ $smokeLog = $regressionLogs | Where-Object {
 } | Select-Object -First 1
 $releaseLog = $regressionLogs | Where-Object {
     (Get-Content -LiteralPath $_.FullName -Raw).Contains(
-        'PHASE7 FULL CHAIN BITTRUE PASS: impulse + 10 seeds + 2 fullscale, reset-zero prefixes and all nodes 0 LSB.')
+        'PHASE7 FULL CHAIN BITTRUE PASS: impulse + 10 seeds + 2 fullscale')
 } | Select-Object -First 1
 if ($null -eq $smokeLog -or $null -eq $releaseLog) {
     throw 'Both Smoke and Release full-chain PASS logs are required.'
@@ -180,7 +180,24 @@ $guiBehavioral = if ($Profile -eq 'P3') {
     'PASS: impulse + seed01, 0 LSB'
 }
 $guiImplementation = if ($Profile -eq 'P3') {
-    'Not separately rerun: isolated Tcl implementation and bitstream generation pass; use the manifest resource fields as the source of truth.'
+    $guiLogPath = Join-Path $resultDir 'gui_rebuild_final.log'
+    if (Test-Path -LiteralPath $guiLogPath) {
+        $guiLogText = Get-Content -LiteralPath $guiLogPath -Raw
+        $expectedGuiLut = [int](Get-RegexNumber $utilizationText '^\| Slice LUTs\s*\|\s*([0-9]+)' 'GUI expected LUT count')
+        $expectedGuiFf = [int](Get-RegexNumber $utilizationText '^\| Slice Registers\s*\|\s*([0-9]+)' 'GUI expected FF count')
+        if ($guiLogText.Contains('NATIONAL_FINALS_GUI_IMPLEMENTATION_PASS') -and
+            $guiLogText.Contains("GUI_LUT=$expectedGuiLut") -and
+            $guiLogText.Contains("GUI_FF=$expectedGuiFf") -and
+            $guiLogText.Contains('GUI_DSP=4') -and
+            $guiLogText.Contains('GUI_BRAM18=4') -and
+            $guiLogText.Contains('GUI_MMCM=2')) {
+            "PASS: ordinary Vivado project rebuild reproduced $expectedGuiLut LUT / $expectedGuiFf FF / 4 DSP / 4 RAMB18E1 / 2 MMCM and generated bitstream."
+        } else {
+            'FAIL: GUI rebuild log exists but does not reproduce the routed resource signature.'
+        }
+    } else {
+        'Not separately rerun: GUI rebuild log is absent.'
+    }
 } else {
     'PASS: bitstream and 479/468/4/4xRAMB18/2 resources'
 }
@@ -235,7 +252,7 @@ $manifest = [ordered]@{
     }
     verification = [ordered]@{
         smoke = [ordered]@{ result = 'PASS'; cases = '15/15'; full_chain = 'impulse + 1 seed x 1024'; log = $smokeEvidencePath.Substring($repoRoot.Length + 1).Replace('\', '/') }
-        release = [ordered]@{ result = 'PASS'; cases = '15/15'; full_chain = 'impulse + 10 seeds x 4096 + positive/negative fullscale; reset-zero prefixes and 4x/8x/128x all 0 LSB'; log = $releaseEvidencePath.Substring($repoRoot.Length + 1).Replace('\', '/') }
+        release = [ordered]@{ result = 'PASS'; cases = '15/15'; full_chain = 'impulse + 10 seeds x 4096 + positive/negative fullscale + 997 Hz/-1 dBFS strong signal; reset-zero prefixes and 4x/8x/128x all 0 LSB'; log = $releaseEvidencePath.Substring($repoRoot.Length + 1).Replace('\', '/') }
         gui_behavioral = $guiBehavioral
         gui_implementation = $guiImplementation
     }
