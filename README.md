@@ -8,6 +8,22 @@
 
 本轮同时实测了 5-RAMB18 的 Stage1/Stage2/3 拆分、两相共享 CIC、高/中/默认综合和 Default/AddRemap 实现。增加到 5 个 RAMB18E1 分别得到 478 或 477 LUT，没有出现 BRAM 换入 200 多 LUT 的收益；最终保留点仍只用 4 个 RAMB18E1。完整逐项数据、失败原因、超时处理和复现命令见 [P3-J 4-DSP BRAM/微引擎执行反馈](matlab_fir/national_finals/results/p3j_4dsp_bram_microengine_execution_feedback.md)，正式报告/bitstream/Release/GUI 日志见 [`p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom`](matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom)。bitstream SHA-256 为 `2BA97CCE337638D57268EE04CCE0D09D2FDF6637B1A4A25D35E57BCB49C3ED4B`。
 
+## 424-LUT 后续 LUT-only / FF 换 LUT 审计（2026-08-03）
+
+在 DSP=4、BRAM Tile=2、MMCM=2 不变且允许 FF 小幅增加（目标不超过440、上限448）的条件下，已继续实测系数 BRAM 终止标志、键盘移位去抖、CIC 15-bit 移位尾状态、共享启动/扫描计数以及五种 `opt_design` 策略。所有完成 RTL 的候选均通过对应 XSim；组合候选另通过完整 Smoke **15/15**。但最终布局布线均未低于当前 424-LUT 版本：
+
+| 后续候选 | Synth LUT/FF | Placed LUT/FF/Slice | DSP | BRAM Tile | WNS/WHS | 结论 |
+|---|---:|---:|---:|---:|---:|---|
+| 当前 Packed-ROM 基线 | 453/433 | **424/431/169** | 4 | 2 | **+45.042/+0.080 ns** | 保留 |
+| 系数 BRAM 终止标志 | 453/428 | 430/426/177 | 4 | 2 | +45.674/+0.096 ns | 少5 FF但多6 LUT，No-Go |
+| 系数标志+共享启动计数 | 451/428 | 429/426/182 | 4 | 2 | +45.156/+0.056 ns | 综合下降、实现反升，No-Go |
+| 仅共享启动计数 | 452/433 | 427/431/173 | 4 | 2 | +44.926/+0.096 ns | 多3 LUT，No-Go |
+| 原始 RTL 同环境重跑 | 453/433 | **424/431/169** | 4 | 2 | **+45.042/+0.080 ns** | 精确复现 |
+
+固定451-LUT综合 DCP 的实现策略结果为：Default/Explore/AddRemap/ExploreWithRemap 均为429 LUT，ExploreArea 为495 LUT。CIC 移位状态则在综合阶段已增至457 LUT/439 FF；键盘移位去抖在全局综合中净收益为0，二者均按停止线未进入实现。这说明当前424版的优势来自 Vivado 对原结构的跨层合并，局部 RTL 数量下降不能直接等价为 post-route LUT 下降。
+
+当前推荐版本、资源、Timing、功耗、bitstream 和频响指标均保持不变；本轮没有实物板，不能把工具侧验证写成新候选已通过板测。完整逐项方法、失败原因、验证证据、分支、提交和标签见 [P3-J LUT-only / FF 换 LUT 执行反馈](matlab_fir/national_finals/results/p3j_lut_only_ff_tradeoff_execution_feedback.md)。
+
 ## 优化演进总览（建议先读）
 
 本节按时间顺序统一整理“最初 4x+2x 结构、区域赛全 2x 优化、FIR-CIC 优化、全国赛全 2x 回退对照、全国赛 6-DSP CIC、440/442/434-LUT 演进、Route 1、comb-LUT 低 DSP 版、P1 真 Q15 正确性修复、P3 工程闭环、P4-A～P4-F、P3-J Stage3/均衡器联合设计，以及 Packed-ROM/Ultra-Keypad 收敛”。重要纠错：旧 424-LUT/6-DSP 与 436-LUT/5-DSP 版本的归一化频响虽通过，但 8x/128x 绝对增益约低 6.02 dB，现仅作为资源演进历史；当前 424-LUT/4-DSP 版继承真 Q15 和 Release 0-LSB 门禁，不存在该缺陷。当前工具侧默认发布候选为 `424 LUT / 431 FF / 169 Slice / 4 DSP / 2 BRAM Tile`；P3-J 430-LUT 与 P4-D R2 继续作为稳定回退，P3-J 3/2-DSP 与 1.5-BRAM 分支作为其他 Pareto。
