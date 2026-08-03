@@ -109,8 +109,11 @@ module interp2_stage23_lutram_cic_dsp_ce #(
 
     reg [MEM_ADDR_W-1:0] stage2_head;
     reg [MEM_ADDR_W-1:0] stage3_head;
-    reg [MEM_ADDR_W-1:0] stage2_fill_count;
-    reg [MEM_ADDR_W-1:0] stage3_fill_count;
+    // Head moves backwards from zero on every accepted history sample.  Its
+    // two's-complement magnitude is the fill depth until the short FIR
+    // history is full; only a sticky full flag is then required.
+    reg stage2_history_full;
+    reg stage3_history_full;
 
     reg stage2_phase;
     reg stage3_phase;
@@ -126,8 +129,9 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     reg job_stage3_compensated;
     reg [3:0] job_mac_index;
     reg [MEM_ADDR_W-1:0] job_history_head;
-    reg [MEM_ADDR_W-1:0] job_fill_count;
+    reg job_history_full;
     wire [3:0] job_mac_count;
+    wire [MEM_ADDR_W-1:0] job_fill_from_head;
 
     wire [MEM_ADDR_W-1:0] hist_index;
     wire [MEM_ADDR_W-1:0] hist_pair_limit;
@@ -241,6 +245,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     assign job_mac_count = !job_stage3 ?
         (job_phase ? 4'd8 : 4'd9) :
         (job_phase ? 4'd5 : 4'd6);
+    assign job_fill_from_head = (~job_history_head) + 4'd1;
 
     assign coeff_bram_stage3 = job_active ? job_stage3 :
         (!stage2_pending && stage3_pending);
@@ -312,9 +317,11 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     assign stage2_lutram_raw = stage2_hist_mem[stage2_read_addr];
     assign stage3_lutram_raw = stage3_hist_mem[stage3_read_addr];
 
-    assign stage2_mem = (hist_index < job_fill_count) ?
+    assign stage2_mem = (job_history_full ||
+                         hist_index < job_fill_from_head) ?
                         stage2_mem_raw : {STAGE2_DATA_W{1'b0}};
-    assign stage3_mem = (hist_index < job_fill_count) ?
+    assign stage3_mem = (job_history_full ||
+                         hist_index < job_fill_from_head) ?
                         stage3_mem_raw : {STAGE3_DATA_W{1'b0}};
 
     assign selected_sample = !job_stage3 ? stage2_mem :
@@ -688,8 +695,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         if (!rst_n) begin
             stage2_head <= {MEM_ADDR_W{1'b0}};
             stage3_head <= {MEM_ADDR_W{1'b0}};
-            stage2_fill_count <= {MEM_ADDR_W{1'b0}};
-            stage3_fill_count <= {MEM_ADDR_W{1'b0}};
+            stage2_history_full <= 1'b0;
+            stage3_history_full <= 1'b0;
             stage2_phase <= 1'b1;
             stage3_phase <= 1'b1;
             stage2_pending <= 1'b0;
@@ -703,7 +710,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
             job_stage3_compensated <= 1'b0;
             job_mac_index <= 4'd0;
             job_history_head <= {MEM_ADDR_W{1'b0}};
-            job_fill_count <= {MEM_ADDR_W{1'b0}};
+            job_history_full <= 1'b0;
             job_result_pending <= 1'b0;
             job_output_pending <= 1'b0;
             stage2_y_out <= {STAGE2_DATA_W{1'b0}};
@@ -720,8 +727,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
                 stage2_pending_phase <= stage2_phase;
                 if (stage2_phase == 1'b0) begin
                     stage2_head <= stage2_write_addr;
-                    if (stage2_fill_count < 4'd9)
-                        stage2_fill_count <= stage2_fill_count + 4'd1;
+                    if (stage2_head == 4'd8)
+                        stage2_history_full <= 1'b1;
                 end
                 stage2_phase <= ~stage2_phase;
             end
@@ -733,8 +740,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
                     stage3_compensated_mode;
                 if (stage3_phase == 1'b0) begin
                     stage3_head <= stage3_write_addr;
-                    if (stage3_fill_count < 4'd6)
-                        stage3_fill_count <= stage3_fill_count + 4'd1;
+                    if (stage3_head == 4'd11)
+                        stage3_history_full <= 1'b1;
                 end
                 stage3_phase <= ~stage3_phase;
             end
@@ -770,7 +777,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
                 job_phase <= stage2_pending_phase;
                 job_mac_index <= 4'd0;
                 job_history_head <= stage2_head;
-                job_fill_count <= stage2_fill_count;
+                job_history_full <= stage2_history_full;
                 stage2_pending <= 1'b0;
             end
             else if (stage3_pending) begin
@@ -781,7 +788,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
                     stage3_pending_compensated;
                 job_mac_index <= 4'd0;
                 job_history_head <= stage3_head;
-                job_fill_count <= stage3_fill_count;
+                job_history_full <= stage3_history_full;
                 stage3_pending <= 1'b0;
             end
         end

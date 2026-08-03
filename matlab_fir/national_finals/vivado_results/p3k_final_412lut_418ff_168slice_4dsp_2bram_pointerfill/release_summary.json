@@ -1,0 +1,44 @@
+{
+  "release": "P3-K pointer-derived history fill",
+  "date": "2026-08-03",
+  "branch": "national-finals-p3k-4dsp-pointer-fill",
+  "tag": "nf-p3k-final-412lut-418ff-168slice-4dsp-2bram-pointerfill",
+  "resources": {
+    "lut": 412,
+    "ff": 418,
+    "slice": 168,
+    "dsp": 4,
+    "bram_tile": 2,
+    "ramb18": 4,
+    "mmcm": 2
+  },
+  "timing": {
+    "wns_ns": 45.083,
+    "whs_ns": 0.056,
+    "tns_ns": 0.0,
+    "ths_ns": 0.0,
+    "dac_setup_ns": 76.116,
+    "dac_hold_ns": 78.117
+  },
+  "power_w": {
+    "total": 0.271,
+    "dynamic": 0.199,
+    "static": 0.072
+  },
+  "rtl": {
+    "smoke": "15/15 PASS",
+    "release": "15/15 PASS",
+    "full_chain_inputs": 14,
+    "max_lsb_error": 0,
+    "reset_scenarios": 8,
+    "dynamic_switches": 10
+  },
+  "filter": {
+    "worst_absolute_passband_db": 0.007730,
+    "worst_peak_to_peak_ripple_db": 0.006192,
+    "worst_stopband_attenuation_db": 72.371,
+    "phase": "strictly linear"
+  },
+  "bitstream_sha256": "E7512D603231276CDCED13C5FEA3A7284558B941CF4102FA1E3339CD5F5EF1CF",
+  "physical_board_validation": "not performed in this environment"
+}

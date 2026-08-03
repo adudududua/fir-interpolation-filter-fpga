@@ -51,8 +51,10 @@ module interp2_stage1_single_bram_serial_ce #(
     wire signed [DATA_W-1:0] read_data;
     reg [ADDR_W-1:0] wr_ptr;
     reg [ADDR_W-1:0] base_ptr;
-    reg [5:0] fill_count;
-    reg [5:0] active_fill_count;
+    // Before the circular pointer wraps, wr_ptr is also the exact number of
+    // initialized history words.  One sticky bit preserves that information
+    // after the 52-word history becomes full, replacing two 6-bit counters.
+    reg history_full;
 
     reg phase_cnt;
     reg mac_active;
@@ -238,8 +240,7 @@ module interp2_stage1_single_bram_serial_ce #(
         if (!rst_n) begin
             wr_ptr <= {ADDR_W{1'b0}};
             base_ptr <= {ADDR_W{1'b0}};
-            fill_count <= 6'd0;
-            active_fill_count <= 6'd0;
+            history_full <= 1'b0;
             phase_cnt <= 1'b1;
             phase_dbg <= 1'b1;
             mac_active <= 1'b0;
@@ -291,15 +292,16 @@ module interp2_stage1_single_bram_serial_ce #(
                 if (next_issue_is_left) begin
                     read_issue_kind <= READ_LEFT;
                     read_addr <= base_ptr - schedule_index;
-                    read_issue_mask <= schedule_index < active_fill_count;
+                    read_issue_mask <= history_full ||
+                                       schedule_index < wr_ptr;
                     next_issue_is_left <= 1'b0;
                 end
                 else begin
                     read_issue_kind <= READ_RIGHT;
                     read_addr <= base_ptr -
                         (HISTORY_LEN-1-schedule_index);
-                    read_issue_mask <=
-                        (HISTORY_LEN-1-schedule_index) < active_fill_count;
+                    read_issue_mask <= history_full ||
+                        (HISTORY_LEN-1-schedule_index) < wr_ptr;
 
                     if (schedule_index == PAIR_COUNT-1) begin
                         issue_active <= 1'b0;
@@ -322,11 +324,8 @@ module interp2_stage1_single_bram_serial_ce #(
 
                     base_ptr <= wr_ptr;
                     wr_ptr <= wr_ptr + 6'd1;
-                    if (fill_count < HISTORY_LEN)
-                        fill_count <= fill_count + 6'd1;
-                    active_fill_count <=
-                        (fill_count < HISTORY_LEN) ?
-                        (fill_count + 6'd1) : fill_count;
+                    if (wr_ptr == HISTORY_LEN-1)
+                        history_full <= 1'b1;
 
                     mac_active <= 1'b1;
                     filter_ready <= 1'b0;
@@ -335,9 +334,8 @@ module interp2_stage1_single_bram_serial_ce #(
                     schedule_index <= 5'd1;
                     read_issue_valid <= 1'b1;
                     read_issue_kind <= READ_RIGHT;
-                    read_issue_mask <= (HISTORY_LEN-1) <
-                        ((fill_count < HISTORY_LEN) ?
-                         (fill_count + 6'd1) : fill_count);
+                    read_issue_mask <= history_full ||
+                        (HISTORY_LEN-1) < (wr_ptr + 6'd1);
                     issue_index <= 5'd0;
                     read_addr <= wr_ptr - (HISTORY_LEN-1);
                     left_sample <= x_current;
@@ -349,7 +347,8 @@ module interp2_stage1_single_bram_serial_ce #(
 
                     read_issue_valid <= 1'b1;
                     read_issue_kind <= READ_DELAY;
-                    read_issue_mask <= fill_count > DELAY_INDEX;
+                    read_issue_mask <= history_full ||
+                                       wr_ptr > DELAY_INDEX;
                     issue_index <= 5'd0;
                     read_addr <= wr_ptr - (DELAY_INDEX + 1);
                 end

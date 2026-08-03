@@ -285,7 +285,7 @@ puts $manifest_handle "CIC mapping: two low-rate comb stages use LUT CARRY4; $ci
 puts $manifest_handle "Stage1 optimization: DSP48E1 A+D preadder plus multiplier/PREG MAC state, 41-bit proven bound, and exact DSP-resident Q15 rounding"
 puts $manifest_handle "Stage2/3 optimization: shared DSP48E1 PREG MAC state, constant 16383 plus CARRYIN exact rounding, and board-only elimination of the unreachable aligned-CE pending-history queue"
 puts $manifest_handle "Stage3 correctness: true Q15 coefficients, complete 38-bit MAC view, and explicit signed 20/21-bit saturation selected by architecture"
-puts $manifest_handle "Stage2/3 correctness: job head/fill snapshots protect an active MAC from the next ring-buffer write"
+puts $manifest_handle "History-state optimization: existing circular write heads derive startup fill depth; one sticky full flag per history plus one job snapshot replace the former wide fill counters while preserving reset masking and active-job isolation"
 puts $manifest_handle "Synthesis directive: $expected_synth_directive"
 puts $manifest_handle "Synthesis flatten hierarchy: $expected_flatten_hierarchy"
 puts $manifest_handle "Synthesis resource sharing: $expected_resource_sharing"
