@@ -109,19 +109,26 @@ module board_demo_competition_dac8_top #(
     // 作用：
     //   给两个 Clock Wizard 和后级逻辑一个稳定启动过程。
     //=========================================================
-    reg [15:0] pwr_rst_cnt = 16'd0;
-    reg        pwr_rst_done = 1'b0;
+    // Start at one so four 16384-cycle scan periods release reset on the
+    // same cycle (65535) as the signed-off 16-bit terminal-count version.
+    reg [15:0] pwr_rst_cnt = 16'd1;
+    // Four periods of the already-required 14-bit keypad scan counter retain
+    // the original ~3.28 ms startup delay.  In the shared configuration the
+    // unused upper counter bits disappear, while these three state bits keep
+    // the total FF count unchanged and avoid a second 16-bit terminal decode.
+    reg [2:0]  pwr_startup_scans = 3'd0;
     wire       rst_n_int;
     wire       compact_keypad_scan_tick;
 
     generate
         if (USE_SHARED_KEYPAD_SCAN_TICK != 0) begin : gen_shared_scan_counter
             always @(posedge clk_sys_bufg) begin
-                pwr_rst_cnt <= pwr_rst_cnt + 16'd1;
-                if (pwr_rst_cnt == 16'hFFFE)
-                    pwr_rst_done <= 1'b1;
+                pwr_rst_cnt[13:0] <= pwr_rst_cnt[13:0] + 14'd1;
+                pwr_rst_cnt[15:14] <= 2'd0;
+                if (compact_keypad_scan_tick && !pwr_startup_scans[2])
+                    pwr_startup_scans <= pwr_startup_scans + 3'd1;
             end
-            assign rst_n_int = pwr_rst_done;
+            assign rst_n_int = pwr_startup_scans[2];
         end
         else begin : gen_dedicated_power_reset
             always @(posedge clk_sys_bufg) begin
