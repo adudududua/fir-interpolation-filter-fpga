@@ -39,6 +39,36 @@ for idx = 1:ROM_DEPTH
     fprintf(fid, '%06X\n', value);
 end
 
+% Generate the resource-optimized 32-bit ROM in one offline pass. The high
+% byte is the next address and the low 24 bits are exactly the signed PCM
+% payload above. This avoids relying on a second Verilog procedural
+% initialization, which Vivado 2018.3 did not reliably merge into RAMB18
+% INIT values.
+next_addr = zeros(ROM_DEPTH, 1, 'uint64');
+next_addr(1:N_44K1-1) = uint64((1:N_44K1-1).');
+next_addr(N_44K1) = uint64(0);
+next_addr(N_44K1+(1:N_48K-1)) = ...
+    uint64((N_44K1+1:N_44K1+N_48K-1).');
+next_addr(N_44K1+N_48K) = uint64(N_44K1);
+
+pcm_unsigned = uint64(mod(double(rom_data), modulus));
+packed_data = bitshift(next_addr, DATA_W) + pcm_unsigned;
+packed_mem_path = fullfile(rtl_dir, ...
+    'nf_sine_15k_dual_rate_packed32_256.mem');
+packed_fid = fopen(packed_mem_path, 'w');
+if packed_fid < 0; error('无法创建 Packed ROM：%s', packed_mem_path); end
+packed_cleanup = onCleanup(@() fclose(packed_fid)); %#ok<NASGU>
+for idx = 1:ROM_DEPTH
+    fprintf(packed_fid, '%08X\n', packed_data(idx));
+end
+
+if any(bitand(packed_data, uint64(2^DATA_W-1)) ~= pcm_unsigned)
+    error('Packed ROM 低24 bit与PCM数据不一致。');
+end
+if any(bitshift(packed_data, -DATA_W) ~= next_addr)
+    error('Packed ROM 高8 bit与下一地址不一致。');
+end
+
 reference_path = fullfile(project_root, ...
     'XC7A35T_interp_audio_pcm_wordlen_opt', ...
     'XC7A35T_interp.srcs', 'sources_1', 'new', ...
@@ -50,6 +80,7 @@ if ~isequal(string(reference_text(:)), generated_text(:))
 end
 
 fprintf('双采样率测试 ROM 生成完成：%s\n', mem_path);
+fprintf('一次初始化 Packed ROM 生成完成：%s\n', packed_mem_path);
 fprintf('44.1 kHz: %d 点；48 kHz: %d 点；总深度: %d\n', ...
     N_44K1, N_48K, ROM_DEPTH);
 fprintf('44.1 kHz 已与板测 ROM 逐点一致：PASS\n');

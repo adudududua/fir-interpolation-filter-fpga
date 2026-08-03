@@ -96,7 +96,8 @@ set nf_sources [list \
     [file join $nf_src_dir nf_mode_cdc_handshake.v] \
     [file join $nf_src_dir dual_rate_test_tone_rom_source.v] \
     [file join $nf_src_dir matrix_keypad_mode_ctrl_ultracompact.v] \
-    [file join $nf_src_dir nf_sine_15k_dual_rate_24bit_256.mem]]
+    [file join $nf_src_dir nf_sine_15k_dual_rate_24bit_256.mem] \
+    [file join $nf_src_dir nf_sine_15k_dual_rate_packed32_256.mem]]
 
 set nf_sim_sources [list \
     [file join $nf_sim_dir tb_cic3_compensator_shiftadd_ce.v] \
@@ -139,6 +140,9 @@ foreach source_file $nf_sources {
 }
 set mem_file [file join $nf_src_dir nf_sine_15k_dual_rate_24bit_256.mem]
 set_property file_type {Memory Initialization Files} [get_files $mem_file]
+set packed_mem_file [file join $nf_src_dir \
+    nf_sine_15k_dual_rate_packed32_256.mem]
+set_property file_type {Memory Initialization Files} [get_files $packed_mem_file]
 
 foreach source_file $nf_sim_sources {
     if {[llength [get_files -quiet $source_file]] == 0} {

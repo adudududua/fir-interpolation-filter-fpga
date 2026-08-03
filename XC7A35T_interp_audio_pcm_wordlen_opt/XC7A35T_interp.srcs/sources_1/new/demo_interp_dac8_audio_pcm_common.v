@@ -170,7 +170,7 @@ module demo_interp_dac8_audio_pcm_common #(
         if (USE_NATIONAL_FINALS_DATAPATH != 0) begin :
                 gen_dual_rate_test_tone
             dual_rate_test_tone_rom_source #(
-                .MEM_FILE("nf_sine_15k_dual_rate_24bit_256.mem")
+                .MEM_FILE("nf_sine_15k_dual_rate_packed32_256.mem")
             ) u_dual_rate_test_tone_rom_source (
                 .clk(clk_audio_128x),
                 .rst_n(rst_n),

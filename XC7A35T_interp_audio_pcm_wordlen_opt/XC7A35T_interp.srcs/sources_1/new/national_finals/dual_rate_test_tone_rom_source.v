@@ -14,7 +14,7 @@
 //=============================================================
 
 module dual_rate_test_tone_rom_source #(
-    parameter MEM_FILE = "nf_sine_15k_dual_rate_24bit_256.mem"
+    parameter MEM_FILE = "nf_sine_15k_dual_rate_packed32_256.mem"
 )(
     input  wire                       clk,
     input  wire                       rst_n,
@@ -31,9 +31,13 @@ module dual_rate_test_tone_rom_source #(
     localparam [7:0] ADDR_48K_LAST   = 8'd162;
 
     (* rom_style = "block" *)
-    reg signed [23:0] pcm_rom [0:255];
+    // The upper byte is generated offline together with the PCM payload:
+    //   [31:24] = next address, [23:0] = signed PCM sample.
+    // A single $readmemh pass is essential. Vivado 2018.3 does not reliably
+    // merge a second procedural initialization pass into an inferred BRAM.
+    reg [31:0] pcm_rom [0:255];
     reg [7:0] rd_addr;
-    reg signed [23:0] rom_data_q;
+    reg [31:0] rom_word_q;
 
     initial begin
         $readmemh(MEM_FILE, pcm_rom);
@@ -41,7 +45,7 @@ module dual_rate_test_tone_rom_source #(
 
     // 保持纯同步读形式，便于 Vivado 2018.3 推断 RAMB18E1。
     always @(posedge clk) begin
-        rom_data_q <= pcm_rom[rd_addr];
+        rom_word_q <= pcm_rom[rd_addr];
     end
 
     // 地址寄存器直接驱动 BRAM 地址脚，使用同步复位可避免异步控制在
@@ -57,28 +61,10 @@ module dual_rate_test_tone_rom_source #(
         else begin
             sample_update <= 1'b0;
             if (sample_ce) begin
-                sample_out <= rom_data_q;
+                sample_out <= $signed(rom_word_q[23:0]);
                 sample_update <= 1'b1;
                 sample_addr_dbg <= rd_addr;
-
-                // Keep address generation in ordinary sequential logic.
-                // Vivado 2018.3 does not reliably merge a second procedural
-                // initialization pass into the unused upper bits of an
-                // inferred block ROM; doing so can leave the next-address
-                // byte at zero in hardware and lock playback at address 0.
-                if (family_48k) begin
-                    if (rd_addr < ADDR_48K_FIRST ||
-                        rd_addr >= ADDR_48K_LAST)
-                        rd_addr <= ADDR_48K_FIRST;
-                    else
-                        rd_addr <= rd_addr + 8'd1;
-                end
-                else begin
-                    if (rd_addr >= ADDR_44K1_LAST)
-                        rd_addr <= ADDR_44K1_FIRST;
-                    else
-                        rd_addr <= rd_addr + 8'd1;
-                end
+                rd_addr <= rom_word_q[31:24];
             end
         end
     end

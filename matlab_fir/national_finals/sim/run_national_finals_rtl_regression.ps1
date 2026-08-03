@@ -250,7 +250,10 @@ $romDir = Invoke-RtlCase -Name 'rom' `
     -Top 'tb_dual_rate_test_tone_rom_source' `
     -Snapshot 'tb_nf_rom_sim' `
     -ExpectedPassText 'PASS: dual-rate ROM data, wrap, and synchronous family reset' `
-    -Assets @((Join-Path $nfSource 'nf_sine_15k_dual_rate_24bit_256.mem'))
+    -Assets @(
+        (Join-Path $nfSource 'nf_sine_15k_dual_rate_24bit_256.mem'),
+        (Join-Path $nfSource 'nf_sine_15k_dual_rate_packed32_256.mem')
+    )
 
 $coeffPrimitiveDir = Invoke-RtlCase -Name 'unified_coeff_ramb18_primitive' `
     -VerilogFiles @(
@@ -477,7 +480,7 @@ $dynamicDir = Invoke-RtlCase -Name 'dynamic_mode_switch' `
     -XelabOptions @('glbl', '-L', 'unisims_ver') `
     -Assets @(
         $coeffHeader,
-        (Join-Path $nfSource 'nf_sine_15k_dual_rate_24bit_256.mem')
+        (Join-Path $nfSource 'nf_sine_15k_dual_rate_packed32_256.mem')
     )
 
 if ($PublishImpulseOutputs) {
