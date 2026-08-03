@@ -1,5 +1,7 @@
 # P3-J 4-DSP BRAM/微引擎下一轮优化执行反馈
 
+> **撤销 Packed-ROM 上板使用（2026-08-03）：** 后续实物板与 routed-DCP 仿真确认，本报告所述 Packed-ROM 的“高 8 bit 保存下一地址”依赖 `$readmemh` 后的 procedural 二次初始化，而 Vivado 2018.3 未可靠把这部分写入 RAMB18 INIT。对应 424-LUT bitstream 会停在地址 0、DAC 数据固定为 128。本报告的资源探索仍有效，但该 bitstream/tag 不能作为回退；应使用修复版或 Packed-ROM 之前的 430-LUT 版本。详见 [DAC-ROM 修复执行反馈](p3k_dac_rom_hardware_fix_execution_feedback.md)。
+
 ## 1. 结论
 
 本轮没有把完整全国赛板级设计降到 280～299 LUT，也没有发现“单纯增加 BRAM 就能进入 200 多 LUT”的可行证据。实际保留的改进是在原 P3-J 正确性签核版上压缩板级 ROM 地址控制和矩阵键盘扫描控制，最终从干净提交 `785eb61c67e3d1005b7f2e59f65f7097b026109a` 重建为：

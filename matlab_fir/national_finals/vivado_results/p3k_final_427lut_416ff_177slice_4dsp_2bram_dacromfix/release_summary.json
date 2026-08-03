@@ -1,0 +1,55 @@
+{
+  "release": "P3-K DAC-ROM synthesis-semantics fix",
+  "status": "tool_signoff_pass_physical_retest_required",
+  "branch": "national-finals-p3k-4dsp-dac-rom-fix",
+  "tag": "nf-p3k-final-427lut-416ff-177slice-4dsp-2bram-dacromfix",
+  "part": "xc7a35tfgg484-2",
+  "top": "board_demo_competition_dac8_top",
+  "resources": {
+    "lut": 427,
+    "ff": 416,
+    "slice": 177,
+    "dsp48e1": 4,
+    "ramb18e1": 4,
+    "bram_tile": 2.0,
+    "mmcm": 2
+  },
+  "timing_ns": {
+    "wns": 44.983,
+    "whs": 0.105,
+    "tns": 0.0,
+    "ths": 0.0,
+    "dac_setup_slack": 76.116,
+    "dac_hold_slack": 78.117
+  },
+  "power_w_vectorless": {
+    "total": 0.271,
+    "dynamic": 0.199,
+    "static": 0.072
+  },
+  "bitstream": {
+    "file": "national_finals_dual_rate_4x8x128x_areaopt.bit",
+    "sha256": "0FFEC2DC929AE3A16E2CB08B32F5B056F378902416E1E191B9D7D08CC6B0EA7D",
+    "gui_project_rebuild_sha256": "B5EB9D07A4807A2117D2792096659CA66634F94A8556E87D2CEE1FE27EF9D726",
+    "hash_note": "The GUI rebuild has identical routed resources/timing and passes the same post-route DAC gate; Vivado bit headers contain build metadata, so separately written bitstreams need not have identical hashes."
+  },
+  "verification": {
+    "rtl_smoke": "15/15 PASS",
+    "rtl_release": "15/15 PASS",
+    "postroute_board_dac_activity": {
+      "status": "PASS",
+      "measurement_window_ms": 2,
+      "dac_clock_edges": 11290,
+      "dac_data_changes": 7461,
+      "final_dac_data": 64,
+      "beep_inactive_high": true
+    },
+    "drc_errors": 0,
+    "route_errors": 0
+  },
+  "known_withdrawn_releases": [
+    "nf-p3k-final-412lut-418ff-168slice-4dsp-2bram-pointerfill",
+    "nf-p3j-final-424lut-431ff-169slice-4dsp-2bram-packedrom"
+  ],
+  "physical_board": "User must download this fixed bitstream and confirm DAC waveform; post-route simulation is not a physical-board claim."
+}

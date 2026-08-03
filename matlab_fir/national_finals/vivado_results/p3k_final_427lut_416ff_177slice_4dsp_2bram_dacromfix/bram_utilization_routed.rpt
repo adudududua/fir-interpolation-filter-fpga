@@ -1,0 +1,7 @@
+National-finals BRAM utilization
+================================
+Cell count: 4
+u_demo_interp_dac8_audio_pcm_common/gen_dual_rate_test_tone.u_dual_rate_test_tone_rom_source/rom_data_q_reg | RAMB18E1 | RAMB18_X0Y32
+u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/gen_unified_bram_history.u_nf_stage23_history_ramb18_sdp/gen_primitive.u_stage23_history_ramb18e1 | RAMB18E1 | RAMB18_X0Y36
+u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_nf_stage1_history_ramb18_sdp/gen_primitive.u_stage1_history_ramb18e1 | RAMB18E1 | RAMB18_X0Y33
+u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_unified_fir_coeff_bram.u_nf_unified_fir_coeff_bram/u_unified_coeff_ramb18e1 | RAMB18E1 | RAMB18_X0Y34

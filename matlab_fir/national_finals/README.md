@@ -1,12 +1,18 @@
 # 全国总决赛：双采样率可配置插值滤波器
 
-## 当前默认：P3-K 环形指针推导历史状态 412-LUT 版
+## 当前修复候选：P3-K DAC-ROM 安全版（427 LUT / 4 DSP）
+
+实物板反馈显示，旧 412-LUT bitstream 的 DAC 时钟正常但数据固定为 128。对原 routed DCP 的完整板级功能仿真复现为 `edges=11290 / data_changes=0`，并定位到 Packed-ROM 二次 procedural 初始化没有被 Vivado 2018.3 可靠写入 RAMB18 INIT，导致测试音地址 0 自循环。当前分支 `national-finals-p3k-4dsp-dac-rom-fix` 已恢复显式地址计数，修复版 post-route 为 **427 LUT / 416 FF / 177 Slice / 4 DSP / 4 RAMB18E1（2 Tile）/ 2 MMCM**，WNS/WHS **+44.983/+0.105 ns**，AD9708 setup/hold **+76.116/+78.117 ns**，总/动态/静态功耗 **0.271/0.199/0.072 W**，bitstream SHA-256 为 `0FFEC2DC929AE3A16E2CB08B32F5B056F378902416E1E191B9D7D08CC6B0EA7D`。
+
+同一 post-route 板级测试在修复后得到 `edges=11290 / data_changes=7461 / sample_updates=88`，Stage1/Stage2/CIC 全部有活动。发布流程现已新增公开引脚级 routed-DCP DAC 活动门禁。旧 `nf-p3k-final-412lut-418ff-168slice-4dsp-2bram-pointerfill` 与 `nf-p3j-final-424lut-431ff-169slice-4dsp-2bram-packedrom` 标签保留用于审计，但均标记为**不允许上板使用**；安全历史回退应使用 Packed-ROM 之前的 430-LUT P3-J 版本。详细记录见 [DAC-ROM 修复执行反馈](results/p3k_dac_rom_hardware_fix_execution_feedback.md)，正式 bit、DCP、报告与日志见 [`p3k_final_427lut_416ff_177slice_4dsp_2bram_dacromfix`](vivado_results/p3k_final_427lut_416ff_177slice_4dsp_2bram_dacromfix)。物理板最终结果仍需用户下载修复 bit 后确认。
+
+## 已撤销默认：P3-K 环形指针推导历史状态 412-LUT 版
 
 当前默认分支为 `national-finals-p3k-4dsp-pointer-fill`，完整板级结果为 **412 LUT / 418 FF / 168 Slice / 4 DSP / 4 RAMB18E1（2 Tile）/ 2 MMCM**，WNS/WHS **+45.083/+0.056 ns**，AD9708 setup/hold **+76.116/+78.117 ns**，总/动态/静态功耗 **0.271/0.199/0.072 W**。bitstream SHA-256 为 `E7512D603231276CDCED13C5FEA3A7284558B941CF4102FA1E3339CD5F5EF1CF`。
 
 本版不改变滤波数学路径，而是用现有 Stage1 `wr_ptr` 和 Stage2/3 `job_history_head` 推导启动填充深度，把原 24 bit fill 状态压缩为 4 bit 粘滞满状态。Release RTL 15/15、14 组全链 4x/8x/128x 逐样本 0 LSB、8 组短复位恢复、10 次动态切换、post-route、DRC/CDC、功耗和 bitstream 全部通过。相对 424-LUT 版减少 12 LUT、13 FF、1 Slice，DSP/BRAM/MMCM/功耗不变；当前仍需实物板下载和测量。
 
-完整执行反馈见 [P3-K 指针推导执行反馈](results/p3k_pointer_derived_fill_execution_feedback.md)，正式证据见 [`p3k_final_412lut_418ff_168slice_4dsp_2bram_pointerfill`](vivado_results/p3k_final_412lut_418ff_168slice_4dsp_2bram_pointerfill)。正式标签为 `nf-p3k-final-412lut-418ff-168slice-4dsp-2bram-pointerfill`，前一 424-LUT 标签继续作为稳定回退。
+历史执行反馈见 [P3-K 指针推导执行反馈](results/p3k_pointer_derived_fill_execution_feedback.md)，旧证据目录为 [`p3k_final_412lut_418ff_168slice_4dsp_2bram_pointerfill`](vivado_results/p3k_final_412lut_418ff_168slice_4dsp_2bram_pointerfill)。该目录和标签只保留用于审计，已撤销上板资格；424-LUT Packed-ROM 标签受相同缺陷影响，也不是稳定回退。
 
 ## 前一默认：P3-J Packed-ROM / Ultra-Keypad 424-LUT 版
 
@@ -16,9 +22,9 @@
 
 “增加 BRAM 进入 280～299 LUT”的假设未获实测支持：Stage2/3 历史拆分为 478 LUT/5 RAMB18，Stage1 双 BRAM 为 477 LUT/5 RAMB18；共享 CIC 又比原实现多 11 LUT。详细 Stop/Go 表、频响、时序和复现步骤见 [本轮执行反馈](results/p3j_4dsp_bram_microengine_execution_feedback.md)，正式证据见 [`p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom`](vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom)。
 
-前一 P3-J 430-LUT 基线已从干净提交完成 MATLAB、Release 15/15、Vivado 综合/布局布线/时序/DRC/CDC/功耗评估和 bitstream 闭环，继续作为当前 424-LUT 版的稳定回退。其资源为 **430 LUT / 431 FF / 176 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM**，WNS/WHS **+45.636/+0.119 ns**，bitstream SHA-256 为 `C4DBB066030B92D387D799688D4010AB98F22B13BDA1623367EBCC8BE8BC0490`。
+Packed-ROM 之前的 P3-J 430-LUT 基线已从干净提交完成 MATLAB、Release 15/15、Vivado 综合/布局布线/时序/DRC/CDC/功耗评估和 bitstream 闭环，是当前修复版之外的安全历史回退。其资源为 **430 LUT / 431 FF / 176 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM**，WNS/WHS **+45.636/+0.119 ns**，bitstream SHA-256 为 `C4DBB066030B92D387D799688D4010AB98F22B13BDA1623367EBCC8BE8BC0490`。
 
-当前 P3-J/P3-K Pareto 为默认 `412 LUT / 418 FF / 4 DSP / 2 BRAM`、低 DSP `466/457/3-DSP` 与 `488/486/2-DSP`、低 BRAM `456/450/4-DSP/1.5-BRAM`，以及交叉点 `478/476/3-DSP/1.5-BRAM`。这些版本均继承 P1 真 Q15 修复和 P3 的原子 CDC、同步复位、AD9708 输出时序闭环。424-LUT P3-J 和 P4-D `479/468/4-DSP/2-BRAM` 保留为稳定回退；旧 Route 1 `424 LUT / 6 DSP` 与低 DSP `436 LUT / 5 DSP` 存在 8x/128x 约 −6.02 dB 标度缺陷，只保留为资源演进历史。
+当前可上板候选为 DAC-ROM 修复版 `427 LUT / 416 FF / 4 DSP / 2 BRAM`。低 DSP和低 BRAM结构点若继承 Packed-ROM，也必须先合入同一 ROM 修复并重建 bitstream。Packed-ROM 之前的 430-LUT P3-J 和 P4-D `479/468/4-DSP/2-BRAM` 可作安全历史回退；旧 Route 1 `424 LUT / 6 DSP` 与低 DSP `436 LUT / 5 DSP` 另有 8x/128x 约 −6.02 dB 标度缺陷，只保留为资源演进历史。
 
 ## P3-J 后续优化指导执行结果（2026-08-03）
 
@@ -26,9 +32,10 @@
 
 | 候选 | LUT | FF | Slice | DSP | RAMB18 / Tile | WNS/WHS | 结论 |
 |---|---:|---:|---:|---:|---:|---:|---|
-| **P3-K 指针推导当前默认** | **412** | **418** | **168** | **4** | **4 / 2.0** | **+45.083/+0.056 ns** | 推荐最低 LUT |
-| P3-J Packed-ROM 前一默认 | 424 | 431 | 169 | 4 | 4 / 2.0 | +45.042/+0.080 ns | 稳定回退 |
-| P3-J 前一基线 | 430 | 431 | 176 | 4 | 4 / 2.0 | +45.636/+0.119 ns | 稳定回退 |
+| **P3-K DAC-ROM 修复候选** | **427** | **416** | **177** | **4** | **4 / 2.0** | **+44.983/+0.105 ns** | **当前可上板候选** |
+| P3-K 指针推导旧版 | 412 | 418 | 168 | 4 | 4 / 2.0 | +45.083/+0.056 ns | ROM 地址锁死，禁止上板 |
+| P3-J Packed-ROM 旧版 | 424 | 431 | 169 | 4 | 4 / 2.0 | +45.042/+0.080 ns | ROM 地址锁死，禁止上板 |
+| P3-J Packed-ROM 前基线 | 430 | 431 | 176 | 4 | 4 / 2.0 | +45.636/+0.119 ns | 安全历史回退 |
 | P3-J 3-DSP | 466 | 457 | 188 | 3 | 4 / 2.0 | +45.785/+0.121 ns | 低 DSP Pareto |
 | P3-J 2-DSP | 488 | 486 | 191 | 2 | 4 / 2.0 | +45.736/+0.060 ns | 最低 DSP Pareto |
 | P3-J 1.5-BRAM | 456 | 450 | 181 | 4 | 3 / 1.5 | +46.033/+0.116 ns | 低 BRAM Pareto |

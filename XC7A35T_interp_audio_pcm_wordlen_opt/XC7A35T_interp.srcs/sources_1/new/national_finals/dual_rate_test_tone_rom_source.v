@@ -30,35 +30,18 @@ module dual_rate_test_tone_rom_source #(
     localparam [7:0] ADDR_48K_FIRST  = 8'd147;
     localparam [7:0] ADDR_48K_LAST   = 8'd162;
 
-    // Pack the next ROM address into the otherwise unused upper byte of each
-    // 36-bit RAMB18 word.  This removes the external increment, two range
-    // comparators and family-dependent wrap mux without adding a BRAM.
     (* rom_style = "block" *)
-    reg [31:0] pcm_rom [0:255];
+    reg signed [23:0] pcm_rom [0:255];
     reg [7:0] rd_addr;
-    reg [31:0] rom_word_q;
-    integer init_addr;
+    reg signed [23:0] rom_data_q;
 
     initial begin
         $readmemh(MEM_FILE, pcm_rom);
-        for (init_addr = 0; init_addr < 256;
-             init_addr = init_addr + 1) begin
-            if (init_addr < ADDR_44K1_LAST)
-                pcm_rom[init_addr][31:24] = init_addr + 1;
-            else if (init_addr == ADDR_44K1_LAST)
-                pcm_rom[init_addr][31:24] = ADDR_44K1_FIRST;
-            else if (init_addr < ADDR_48K_FIRST)
-                pcm_rom[init_addr][31:24] = ADDR_44K1_FIRST;
-            else if (init_addr < ADDR_48K_LAST)
-                pcm_rom[init_addr][31:24] = init_addr + 1;
-            else
-                pcm_rom[init_addr][31:24] = ADDR_48K_FIRST;
-        end
     end
 
     // 保持纯同步读形式，便于 Vivado 2018.3 推断 RAMB18E1。
     always @(posedge clk) begin
-        rom_word_q <= pcm_rom[rd_addr];
+        rom_data_q <= pcm_rom[rd_addr];
     end
 
     // 地址寄存器直接驱动 BRAM 地址脚，使用同步复位可避免异步控制在
@@ -74,10 +57,28 @@ module dual_rate_test_tone_rom_source #(
         else begin
             sample_update <= 1'b0;
             if (sample_ce) begin
-                sample_out <= rom_word_q[23:0];
+                sample_out <= rom_data_q;
                 sample_update <= 1'b1;
                 sample_addr_dbg <= rd_addr;
-                rd_addr <= rom_word_q[31:24];
+
+                // Keep address generation in ordinary sequential logic.
+                // Vivado 2018.3 does not reliably merge a second procedural
+                // initialization pass into the unused upper bits of an
+                // inferred block ROM; doing so can leave the next-address
+                // byte at zero in hardware and lock playback at address 0.
+                if (family_48k) begin
+                    if (rd_addr < ADDR_48K_FIRST ||
+                        rd_addr >= ADDR_48K_LAST)
+                        rd_addr <= ADDR_48K_FIRST;
+                    else
+                        rd_addr <= rd_addr + 8'd1;
+                end
+                else begin
+                    if (rd_addr >= ADDR_44K1_LAST)
+                        rd_addr <= ADDR_44K1_FIRST;
+                    else
+                        rd_addr <= rd_addr + 8'd1;
+                end
             end
         end
     end

@@ -1,5 +1,7 @@
 # P3-K 环形指针推导历史填充状态优化执行反馈
 
+> **撤销上板使用（2026-08-03）：** 实物板和随后补充的 routed-DCP 完整板级仿真证明，本版继承的 Packed-ROM 地址高位没有被 Vivado 2018.3 正确固化进 RAMB18 INIT，测试音永久停在地址 0，`dac_data` 固定为 128。本文资源与滤波器位真结果仍可用于历史审计，但对应分支、标签和 bitstream 不再是发布候选。修复见 [P3-K DAC-ROM 修复执行反馈](p3k_dac_rom_hardware_fix_execution_feedback.md)。
+
 ## 1. 目标与验收条件
 
 本轮从已签核的 P3-J Packed-ROM 版本 `424 LUT / 431 FF / 169 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM` 出发，目标是在不改变滤波系数、字长、舍入、饱和、输出 valid 时序和板级接口的前提下继续降低 LUT。正式 Go 条件为：
