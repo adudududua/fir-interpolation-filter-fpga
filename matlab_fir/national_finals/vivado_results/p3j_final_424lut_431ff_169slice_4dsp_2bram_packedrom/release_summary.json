@@ -1,0 +1,627 @@
+{
+    "schema":  "national-finals-release-manifest-v3",
+    "config_id":  "NF-P3-RTL-JOINT-STAGE3-EQ-R1",
+    "generated_utc":  "2026-08-03T10:02:26.3083242Z",
+    "tool":  {
+                 "name":  "Vivado",
+                 "version":  "2018.3",
+                 "build":  "2405991",
+                 "part":  "xc7a35tfgg484-2"
+             },
+    "git":  {
+                "branch":  "national-finals-p3j-4dsp-bram-microengine",
+                "commit":  "785eb61c67e3d1005b7f2e59f65f7097b026109a",
+                "source_worktree_dirty_at_build_start":  false,
+                "source_status_at_build_start":  "",
+                "source_worktree_dirty_at_manifest":  false,
+                "source_status_at_manifest":  "",
+                "generated_status_at_manifest":  "?? matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/build_manifest.txt\n?? matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/national_finals_dual_rate_4x8x128x_areaopt.bit\n?? matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/source_state_at_build_start.json\n?? matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/synthesis_provenance.txt\n?? matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/synthesis_sources.txt",
+                "submodule_status":  ""
+            },
+    "topology":  {
+                     "stage1_dsp48_preadder":  1,
+                     "stage23_shared_dsp":  1,
+                     "cic_integrator_dsp_mode":  2,
+                     "serial_cic_comb":  1,
+                     "unified_stage23_history":  1,
+                     "single_bram_stage1":  1,
+                     "unified_fir_coefficient_bram":  1,
+                     "packed_stage23_bram":  0,
+                     "p3_joint_stage3_equalizer":  1,
+                     "separate_shiftadd_equalizer":  0
+                 },
+    "resources_post_route":  {
+                                 "slice_lut":  424,
+                                 "slice_ff":  431,
+                                 "slice":  169,
+                                 "dsp48e1":  4,
+                                 "bram_tile":  2,
+                                 "mmcm":  2
+                             },
+    "timing_post_route_ns":  {
+                                 "wns":  45.042,
+                                 "whs":  0.08,
+                                 "dac_setup":  76.116,
+                                 "dac_hold":  78.117,
+                                 "mode_bus_skew_requirement":  50,
+                                 "mode_bus_skew_actual":  2,
+                                 "mode_absolute_data_delay_max":  1.053
+                             },
+    "power_vectorless_w":  {
+                               "total":  0.271,
+                               "dynamic":  0.199,
+                               "static":  0.072
+                           },
+    "verification":  {
+                         "smoke":  {
+                                       "result":  "PASS",
+                                       "cases":  "15/15",
+                                       "full_chain":  "impulse + 1 seed x 1024",
+                                       "log":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/rtl_smoke_full_chain_xsim.log"
+                                   },
+                         "release":  {
+                                         "result":  "PASS",
+                                         "cases":  "15/15",
+                                         "full_chain":  "impulse + 10 seeds x 4096 + positive/negative fullscale + 997 Hz/-1 dBFS strong signal; reset-zero prefixes and 4x/8x/128x all 0 LSB",
+                                         "log":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/rtl_release_full_chain_xsim.log"
+                                     },
+                         "gui_behavioral":  "Not separately rerun: CLI XSim Smoke/Release use the same P3 RTL sources and pass 15/15.",
+                         "gui_implementation":  "PASS: ordinary Vivado project rebuild reproduced 424 LUT / 431 FF / 4 DSP / 4 RAMB18E1 / 2 MMCM and generated bitstream."
+                     },
+    "cdc_post_route":  {
+                           "cdc3_info":  10,
+                           "cdc13_reviewed":  2,
+                           "cdc15_reviewed":  4,
+                           "ignored_exception_report_empty":  true
+                       },
+    "primitive_counts":  {
+                             "ramb18e1":  4
+                         },
+    "reviewed_warnings":  [
+                              "TIMING-18: Vivado 2018.3 methodology warning retained; check_timing reports zero ports missing output delay and both generated-clock max/min delays are present.",
+                              "CDC-13: BUFGMUX_CTRL S0/S1 dedicated clock-select pins; functional family-switch stress test passes.",
+                              "CDC-15: request/ack bundled-data shadow bus; source holds stable through acknowledgement, destination waits three cycles, and 50 ns bus-skew constraint meets with margin."
+                          ],
+    "file_hashes":  [
+                        {
+                            "path":  "matlab_fir/national_finals/nf_04_generate_release_vectors.m",
+                            "bytes":  6278,
+                            "sha256":  "58572E97BD70D7CBA8133302EDC9D3AC23F1E7D7785D91583AF39E0299478B82"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/nf_05_validate_release_v2_model.m",
+                            "bytes":  4635,
+                            "sha256":  "5C438AF82628B6602F942194D3DDE182A262F7549AC0D8C75CF4C589BE6A7374"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/nf_06_generate_release_v2_metadata.m",
+                            "bytes":  2402,
+                            "sha256":  "A0D7DDE33C6152BD45E5B512561B1F79951DA74BFF3C637B23686FA2469B843D"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/nf_07_release_v2_frequency_check.m",
+                            "bytes":  11952,
+                            "sha256":  "F217AC873A307A670869CA4BD8FEDE39BC8D1A5E90B38F14DED70DF6AB043BD3"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/nf_cic_n3_hold2_bittrue.m",
+                            "bytes":  3244,
+                            "sha256":  "012F34A3D7212D64E0A29EADBA61B8D6755C7984DB0DEE357C712BF4A723841E"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/nf_cic3_shiftadd_bittrue.m",
+                            "bytes":  1922,
+                            "sha256":  "F94A15E9554E1E99418802498D93384ABA389B0BD7B75A92EFFCE93AC36C23ED"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/nf_release_v2_config.m",
+                            "bytes":  2193,
+                            "sha256":  "EC2FA2AA316612A9C92138895C339FBF48B221CBA8582AA7B11E76F58CBDF7C3"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/p3_joint_stage3_equalizer/p3_01_search_joint_stage3_equalizer.m",
+                            "bytes":  36036,
+                            "sha256":  "8F61070BAC1B803140DE3B94D74BC8C2DCD8FE83F633FCF96EE871FB8565CB4D"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/p3_joint_stage3_equalizer/results/p3_joint_stage3_equalizer_config.json",
+                            "bytes":  657,
+                            "sha256":  "960A20752DD6738BCDAEE4C10D1C2EF403BD0592C09A9D0ABB3D7B63C7670E9C"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/p3_joint_stage3_equalizer/results/p3_joint_stage3_equalizer_summary.txt",
+                            "bytes":  537,
+                            "sha256":  "150DE26776F25ACA0409AA802AD5B6B06D36CA74422E12017B2E68487D6A4068"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/p3_joint_stage3_equalizer/rtl/nf_p3_build_bittrue_case.m",
+                            "bytes":  2289,
+                            "sha256":  "8B68F9D8DBB9CDB295C8ABE076F9F1BABF86F03CFE787CA8071FA6E7EC24CFE8"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/p3_joint_stage3_equalizer/rtl/p3_02_generate_rtl_vectors.m",
+                            "bytes":  4843,
+                            "sha256":  "9C0FCC9CD94E5AC619D3BBF4AD4F143824857E80ED30A7647FEB0477358A5706"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/p3_joint_stage3_equalizer/rtl/p3_rtl_architecture.md",
+                            "bytes":  3411,
+                            "sha256":  "590D1B6AD173EDD1F0BBECA094CEE5F27A8C0DE03F6D4E95412D5008EBF0C3EE"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/release_v2/coefficients.csv",
+                            "bytes":  2376,
+                            "sha256":  "52DE3B7047D4B7F2013CA49816652C5802BEF1C06BE1963FC899BA37F652D15F"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/release_v2/p4d_release_v2_config.json",
+                            "bytes":  2613,
+                            "sha256":  "053276FA3FF0CE9ABEFB57A3CBB7EDD8BB7E4AE80853CEADB7E81E2FD984FD02"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/release_v2/q_format_and_scaling.json",
+                            "bytes":  1178,
+                            "sha256":  "42E628E818FA1A1270AD3ECAE7D0526D7AE3A4249A337EBC149083B28673CF9A"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/release_v2/SHA256SUMS",
+                            "bytes":  8696,
+                            "sha256":  "C037FA634814214277B216900A47D05A59CE6EC43CC3BC36E854B875214AF065"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/sim/run_national_finals_rtl_regression.ps1",
+                            "bytes":  21653,
+                            "sha256":  "69D4D3D19F8B7DA4EC63DB3BF8E385F8BA5B27D8014B1AA6711F4E35A074E103"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vectors/daily/impulse_input_24bit.mem",
+                            "bytes":  1792,
+                            "sha256":  "E551F4704D950FA6732F7BF24C4EAD8813CBDB22F714149EEFDA340C6B5DD8BB"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vectors/daily/impulse_y128_golden_24bit.mem",
+                            "bytes":  280448,
+                            "sha256":  "BC900FF2561EF9C9A208ED41BCDACD374644BABFADF2B16FDC7C074A543F5B06"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vectors/daily/impulse_y4_golden_24bit.mem",
+                            "bytes":  8715,
+                            "sha256":  "8B91F596EAD5E2C3C317502FED90F805E5BCF8B1340D4A886203B6BFA47E298B"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vectors/daily/impulse_y8_golden_24bit.mem",
+                            "bytes":  17493,
+                            "sha256":  "DA5C94EAE442B2372A4AE9E551AA73493CDE057E4FDCC5318504B077E926363E"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vectors/daily/random_seed01_input_24bit.mem",
+                            "bytes":  7168,
+                            "sha256":  "B7C921C10547E13B7DE0AD031F867B723EA41E23CC84977377AC68D2D2986C2F"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vectors/daily/random_seed01_y128_golden_24bit.mem",
+                            "bytes":  968576,
+                            "sha256":  "06660EF2D9F26804CE7B89180E7DEADAE954BABCAA37B14FCE5E191E6F914301"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vectors/daily/random_seed01_y4_golden_24bit.mem",
+                            "bytes":  30219,
+                            "sha256":  "6A9C709DEC329B6BB505A3FAD4A712D01556B93D9BB64FEE7CC266D98B1BE48B"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vectors/daily/random_seed01_y8_golden_24bit.mem",
+                            "bytes":  60501,
+                            "sha256":  "F2AF4AED94A670A8A027EBD765D38C668603F48C0A2DA12674494DD6DD60DEBE"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado/build_national_finals_board.tcl",
+                            "bytes":  13817,
+                            "sha256":  "B4E9866A30F3FC9152C8594B1DC22A70343F5EDD43DD51B1E6F05F009721102C"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado/configure_national_finals_gui_project.tcl",
+                            "bytes":  5194,
+                            "sha256":  "0159267553D1374B6566DC7FADD3A4F248EC11BCC5129BABE5D3E1E171131987"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado/implement_national_finals_single_process.tcl",
+                            "bytes":  14461,
+                            "sha256":  "84AF0E0C033D486CFC7CC1676255472BAE2F0D5BE27D06913D9601393D5A072F"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado/verify_national_finals_gui_project.tcl",
+                            "bytes":  8343,
+                            "sha256":  "9F38D52205FC19D206394F5430E6D45567E36203BBBBCA3EA8AF57AA47C58C85"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/bram_utilization_routed.rpt",
+                            "bytes":  958,
+                            "sha256":  "B131B2E354A205854A655BEC05A5D6BBB00EF3572406994CD10BAB0987C02CAE"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/bram_utilization_synthesized.rpt",
+                            "bytes":  934,
+                            "sha256":  "F034E6121E21554D4660C2CAA0A824D97A165AB9A8D6DE35497040E442C3BF9A"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/build_manifest.txt",
+                            "bytes":  2409,
+                            "sha256":  "9F5791C0F4034C743608230040D1887D28F8BD3C8675A68D7C9F35F40EA09DD0"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/bus_skew_routed.rpt",
+                            "bytes":  10658,
+                            "sha256":  "46DC313CD8D52DDD082D967193BB05FA1F6E300572BA1B9B920BCCB65E0A9E04"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/cdc_routed.rpt",
+                            "bytes":  6141,
+                            "sha256":  "7AD82AB08AE52529C1E6219A4B7B0B11B223BFEF13628DF404DE383DB9BC7986"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/check_timing_routed.rpt",
+                            "bytes":  3408,
+                            "sha256":  "733E5B8F35EF36F677ECA762BDC7E82C0BF148EFA9C5E096A1A4EBAC3E662397"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/clock_interaction_routed.rpt",
+                            "bytes":  5638,
+                            "sha256":  "FAF1D8EFFE24B111860D0942C38BE073D4C5E96C3FC0193A7D4D55813E7D419C"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/clock_report_routed.rpt",
+                            "bytes":  4167,
+                            "sha256":  "D31CB34E3AFCFA7883761AC62D2F3ECF3D6BFE0CF68BB85B1C1965031F7004A7"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/dac_output_hold_routed.rpt",
+                            "bytes":  48047,
+                            "sha256":  "8EF9868F75CBCD3C35DE0B47FDB8FBDDD2AACA8BF125BF808B2F0D472708321F"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/dac_output_setup_routed.rpt",
+                            "bytes":  48258,
+                            "sha256":  "4CC42F846044EB77B7A9FBEE7DB511C1755E059DB6CEA8D31A0AD8F02C4D0E6B"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/drc_routed.rpt",
+                            "bytes":  8442,
+                            "sha256":  "0E031BDF17FABA4DE17B7EB0D3C49A305C875BBEB150384B11A763A83DAD4DA0"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/dsp_utilization_routed.rpt",
+                            "bytes":  923,
+                            "sha256":  "B4D8A8241177C805CA9A5D2BF9720F74C96D39D40254DBE6EC72CA9583ADEBA2"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/dsp_utilization_synthesized.rpt",
+                            "bytes":  903,
+                            "sha256":  "2AA34B34D3ADF5FD907F3AF539D8E939EE1AF93621C1900D6410A40B10DFB3A7"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/exceptions_coverage_routed.rpt",
+                            "bytes":  2249,
+                            "sha256":  "9B745D2446BE7CCC41E164FE6A39599CBA76177F7D9DC38FB566AF027883A00E"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/exceptions_ignored_routed.rpt",
+                            "bytes":  1108,
+                            "sha256":  "6FE7E6612F8CD79266597FCB1D19FC19AAD44D2BE8A1815462FEC98F3686A15C"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/gui_config_final.log",
+                            "bytes":  7305,
+                            "sha256":  "4E203FEA39C52E01BE7CE1AAC855A10CBDBFBCBB93A4BAD247A560E7C69D07EE"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/gui_rebuild_final.log",
+                            "bytes":  199096,
+                            "sha256":  "6787A2A62ED4D82B70EC69EE4A53E854617A9156C0CDDF468D608C0CEF9DF796"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/methodology_routed.rpt",
+                            "bytes":  2849,
+                            "sha256":  "839F758A22A6EDD05587312CFA87D9E932B0731DE57BB1C1FF51194E7F4B9510"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/mmcm_utilization_routed.rpt",
+                            "bytes":  222,
+                            "sha256":  "9E3086A53927EE14D959308CD6D0BD450BCFDD00EC8995FFDED5F7772342899B"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/mode_absolute_delay_routed.rpt",
+                            "bytes":  10352,
+                            "sha256":  "C5AB7283BB15B2E3A995FF408FFFCFCE7432A3904AFDDFE9D8056C6B6B0A73BE"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/national_finals_board_routed.dcp",
+                            "bytes":  591237,
+                            "sha256":  "BE003FF28C5C4CD5E280B8F966FB6AE966E177253A6285FCC4B25D118DB8B637"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/national_finals_dual_rate_4x8x128x_areaopt.bit",
+                            "bytes":  2192139,
+                            "sha256":  "2BA97CCE337638D57268EE04CCE0D09D2FDF6637B1A4A25D35E57BCB49C3ED4B"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/power_vectorless_routed.rpt",
+                            "bytes":  9274,
+                            "sha256":  "B826B7425A5C4DC8F23779B5DBD2FFCD4924198F409C897B67CC6EFC443CDC5E"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/route_status_routed.rpt",
+                            "bytes":  588,
+                            "sha256":  "7348F3CAE1C55855377BBB7C11A7B6845454B616545D000C854D4811AAF2C5AD"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/rtl_release_cic_xsim.log",
+                            "bytes":  1526,
+                            "sha256":  "373D7F50833760798217432DC835C67307CE7B290DB0C8C512B5E451C72A98C7"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/rtl_release_dynamic_mode_xsim.log",
+                            "bytes":  1909,
+                            "sha256":  "4BA6E74675B473A2C84BCD435CDA335FA9D47BA0454170476C035FED525A4453"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/rtl_release_full_chain_xsim.log",
+                            "bytes":  2410,
+                            "sha256":  "04F34B67D117DE9DD1F15B8EB45AA8D529A36105712BCBEC2BE2DDCB4E26EEA6"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/rtl_release_reset_xsim.log",
+                            "bytes":  1932,
+                            "sha256":  "0B117819578C99C818E2D656961228C3009B84ADD1478B0170B50602F017F64B"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/rtl_smoke_full_chain_xsim.log",
+                            "bytes":  1656,
+                            "sha256":  "6FC795F1E91DEE750E1106143B851220585C9D2E850E29AC4B74E8FA2A53511B"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/source_state_at_build_start.json",
+                            "bytes":  289,
+                            "sha256":  "3221821F017680B8934CA2E11B5682D9ACB0E09A6784B3656A6D88F2453140AC"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/synthesis_provenance.txt",
+                            "bytes":  198,
+                            "sha256":  "06E5DAD70DDCBA9721F480876E75712E77AE1C4AD50B1463A1912D5D2B4DDB19"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/synthesis_sources.txt",
+                            "bytes":  6670,
+                            "sha256":  "F268FCF1B67AEB09A4E6023070053457C1E8C21B15285F2A7847EA30BC4A26BD"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/timing_summary_routed.rpt",
+                            "bytes":  1278863,
+                            "sha256":  "3F7EBE96F50AD6F95CF8E8960CD33CDE3A5595F201CA25D85539C37AB68F0973"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/utilization_hierarchical.rpt",
+                            "bytes":  1978,
+                            "sha256":  "A683658C7F9E746D31571820F52AA0A4D4F60DDF4D788DCDC078D0AD00F9D62B"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/utilization_hierarchical_synthesized.rpt",
+                            "bytes":  1900,
+                            "sha256":  "2D36AE1639BC1F5092AD7D4958AE00B96AB30ACB9222944A176ACB41E34DCB6F"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/utilization_placed.rpt",
+                            "bytes":  10532,
+                            "sha256":  "7FF6E54442718FF57AB49BB087A8810D1D9B22C696820FC5791E758E0C33C35E"
+                        },
+                        {
+                            "path":  "matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/utilization_synthesized.rpt",
+                            "bytes":  8448,
+                            "sha256":  "F919E7F967959E59F406E0B0BE91A320799E62C37206C8B749269323576DA204"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/constrs_1/new/board_demo_competition_dac8_top.xdc",
+                            "bytes":  11516,
+                            "sha256":  "8F0CDAD9440213A2698CFF61ECD29D0187230ACFCABA5AAA436607E474F608CD"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sim_1/new/all2x_v7/verification/tb_phase7_full_chain_bittrue.v",
+                            "bytes":  25938,
+                            "sha256":  "55EBB29E3FBFABEFFF78747D51B8414A498007B3BE804055475F4C92752B1234"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sim_1/new/all2x_v7/verification/tb_phase7_full_chain_reset_recovery.v",
+                            "bytes":  15632,
+                            "sha256":  "F515696D0FC80316694B12291A3C60F3249DD95FFA1AFD4BE4062F3ADB0F6295"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sim_1/new/national_finals/tb_nf_unified_fir_coeff_bram_primitive.v",
+                            "bytes":  7525,
+                            "sha256":  "EDD68FFBB843E5908809B39961FCE8517B3327E06400C8ACBD77AAD5707A470B"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v2/all2x_v2_coeff_pkg.vh",
+                            "bytes":  1698,
+                            "sha256":  "EFD7FD99C16B27E6FCFFA345D5DFA762D56F98B9470F23D1BDD79DF6EF4FF8D4"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v2/bridge_valid_only_to_interp2_ce.v",
+                            "bytes":  2372,
+                            "sha256":  "0224994376E2ED304FC3220A1FDC367434AF545EDCCD0C8F2C4D9A76B9A5F594"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v2/interp2_all2x_v2_stage_select.v",
+                            "bytes":  3127,
+                            "sha256":  "F1A53555AEDF23570B732CAB5A29CF3947762CBB467E4DA088742B5F74D1809C"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v2/interp2_halfband7_shiftadd_ce.v",
+                            "bytes":  4367,
+                            "sha256":  "C17CB25206E7F43D1DF7B21E67827B4261F10A12BF2DAD8AD516BC14AC25E6F8"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v3/all2x_v3_stage1_coeff_pkg.vh",
+                            "bytes":  1667,
+                            "sha256":  "76339322541A3C589561B45D17077CB8838F66A3EA1D7C0C591861EB1A94B21C"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v3/interp2_stage1_strict_halfband_bram_ce.v",
+                            "bytes":  16655,
+                            "sha256":  "BA6613EC9D94F3E8FE409DAC9829A671F680F24F23380DFAF9C05FBF533A53BB"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v4/interp2_stage23_shared_dsp_ce.v",
+                            "bytes":  18302,
+                            "sha256":  "3006F5A2A1E2DBE84E09F9EC15BAC2ECF535BC2105B2A92AB1064C18ADD1AD41"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v5/round_sat_q15_compact_to24.v",
+                            "bytes":  2695,
+                            "sha256":  "BD541EFE018C8CA05A97338DED197876855C052F9CE51B72046F9D6BAF1B02FD"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v6/bridge_valid_quantized_to_interp2_ce.v",
+                            "bytes":  2524,
+                            "sha256":  "2F94FBD28310DDEC850343243F8D10BB88F98B6B8978CBA1D02981BB8F8810D4"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v6/interp128_all2x_v6_mixed_width_top_ce.v",
+                            "bytes":  8606,
+                            "sha256":  "220BD06334D85A219F36AE2B6DB9F5274D6AFFDFA217BB91E07EE40DDB83BCD0"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v6/round_sat_shift_compact.v",
+                            "bytes":  2990,
+                            "sha256":  "10086FBAA9A3873F1EC613A7A9C396C4A44349C9FD276ADE39722D02F57EC86B"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/cic_interp16_core_dsp_ce.v",
+                            "bytes":  8241,
+                            "sha256":  "93F0C322F048D6863DD1DD4B928B16844A5DDD58A051EB61AD495540EE4948F3"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp128_all2x_v7_folded_fir_cic_top_ce.v",
+                            "bytes":  17939,
+                            "sha256":  "54BF8FE028A98A4A3FF7E63F1148DAF5A549B9A13FDF0FFF71A013E7D04FC726"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_folded_cic_dsp_ce.v",
+                            "bytes":  20015,
+                            "sha256":  "D411EE04893DF8B24CAC1A16F7D4287F2678BB52023AA948CDD2ACF052F1544C"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v",
+                            "bytes":  36458,
+                            "sha256":  "A08B0788A92AEF11ADA58059AE032D56F66747FBB2C699013F831FE87EEA1870"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/audio_pcm_rom_source.v",
+                            "bytes":  5932,
+                            "sha256":  "02E91FF451CF1618FF9564AA0C4AFF768D04A793B6D667D34F3469C81733D72C"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/board_demo_competition_dac8_top.v",
+                            "bytes":  24080,
+                            "sha256":  "4656EE0889D133033C556D248A84C1EA834E5BFF751A44E773B5B7CDAF264B2B"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/demo_interp_dac8_audio_pcm_common.v",
+                            "bytes":  19184,
+                            "sha256":  "99AD25DF9678AAB49364B137111DD68129D6C9EA82976806AD5D200BF20B738F"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/fir_core_symm_interp2_all2x.v",
+                            "bytes":  7691,
+                            "sha256":  "4109A0A67D22974C36FD73445E090DFC2E873A43C2C44B2D584A1FFC7F1A2191"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/fir_core_symm_interp2_stage1_mac.v",
+                            "bytes":  6001,
+                            "sha256":  "9F33F2B37534B2F170E540C78FF4CCB55A2EAA154A7A95DD07CADFC1C3EDA730"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/interp2_ctrl_ce.v",
+                            "bytes":  2755,
+                            "sha256":  "BBCCA9F39132696819314C9C24C691B2C4CB0540E52A43AF0B8C6B065D7DE48F"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/interp2_top_symm_ce_all2x.v",
+                            "bytes":  4324,
+                            "sha256":  "A83D72D3C93AA5E07278D14FD501166D7E562D8729CC1FC10AB38EC9EA48D806"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/matrix_keypad_mode_ctrl_compact.v",
+                            "bytes":  6594,
+                            "sha256":  "DC65132211715ACC55D6C62150649506279193B939DE2E2D9E24AAF9BE376158"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/cic_interp16_n3_hold2_dsp_ce.v",
+                            "bytes":  9572,
+                            "sha256":  "53863799DDC820251613AD9477E8D7D90C955D05BFFC73122D11CEAE680BD4F9"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/cic_interp16_serial_comb_dsp_ce.v",
+                            "bytes":  11136,
+                            "sha256":  "DDE478623BFF790E95433BDB092C620523ABC8A09F68F2DF471912EE3AA2C90B"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/cic3_compensator_shiftadd_ce.v",
+                            "bytes":  3880,
+                            "sha256":  "ABA53A024BE8D5BC618E3A378C2B49FF2DA0F58ED470FEE672064BC11DDE33EE"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/dual_family_audio_clock.v",
+                            "bytes":  5616,
+                            "sha256":  "CC9AFF1B67D44FBF90E3045A9328DB3204C899450349D66D70D419CDF7C99407"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/dual_rate_test_tone_rom_source.v",
+                            "bytes":  3350,
+                            "sha256":  "A2121BA465C5BB959990D3694543F3B8D179A7AD3807D7AA2DF540344517DF1E"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/interp2_stage1_single_bram_serial_ce.v",
+                            "bytes":  15010,
+                            "sha256":  "BC56CF989AE4955DDE57C35926F2B4306DC13FC19CA1E2713A19E370C715BB55"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/matrix_keypad_mode_ctrl_ultracompact.v",
+                            "bytes":  4315,
+                            "sha256":  "CBB3C20FB7E06D2B90FBD6A21008E54E38B9FE5E0610CFB30E43F2BFBEDA88DF"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/nf_mode_cdc_handshake.v",
+                            "bytes":  3295,
+                            "sha256":  "F4E58633BCD5D5C67742F5BF714FA646146159B326DA2078A574A1829AE46046"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/nf_signedoff_filter_core.v",
+                            "bytes":  4878,
+                            "sha256":  "5F761CE5D19A6E90E19D45C0A4493F05AA62A8DB1E9412FFB7E37762F5E78C72"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/nf_stage1_history_ramb18_sdp.v",
+                            "bytes":  2782,
+                            "sha256":  "D903B0FE410076163C9C04D8B9066E734308BE768041FA7F427EEBC97B06F0C8"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/nf_stage23_history_ramb18_sdp.v",
+                            "bytes":  2881,
+                            "sha256":  "9B9737D9EEFE0EFCE0F10595436D802CC412F49D0CF19A43AD687E671FCC5AFC"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/nf_unified_fir_coeff_bram.v",
+                            "bytes":  6096,
+                            "sha256":  "7495894BD17BF77F23C1BF8E029A87D3C281B98D4A9ED3547E27598F91F7CC8D"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/round_sat_q16_to24.v",
+                            "bytes":  3405,
+                            "sha256":  "20434764955D1BF6036E0A309EA6919925C3A976F8C495707E807113D8967788"
+                        },
+                        {
+                            "path":  "XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.xpr",
+                            "bytes":  36434,
+                            "sha256":  "C714D28CC6260D6CC731207F33720C3A98F4D7A357AC0E8D408DD52B26D85B49"
+                        }
+                    ]
+}

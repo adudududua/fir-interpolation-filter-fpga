@@ -1,8 +1,16 @@
 # 全国总决赛：双采样率可配置插值滤波器
 
-当前默认已更新为 P3-J Stage3/均衡器联合版，并从干净提交完成 MATLAB、Release 15/15、Vivado 综合/布局布线/时序/DRC/CDC/功耗评估和 bitstream 闭环。可复现结果为 **430 LUT / 431 FF / 176 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM**，WNS/WHS **+45.636/+0.119 ns**，vectorless 总/动态/静态功耗 **0.271/0.199/0.072 W**。最终 bitstream SHA-256 为 `C4DBB066030B92D387D799688D4010AB98F22B13BDA1623367EBCC8BE8BC0490`。由于当前环境无法接触实物开发板，物理板下载和仪器测量仍需按本文最后一节执行，不能把 bitstream 成功等同于实板通过。
+## 当前默认：P3-J Packed-ROM / Ultra-Keypad 424-LUT 版
 
-当前 P3-J Pareto 为默认 `430 LUT / 431 FF / 4 DSP / 2 BRAM`、低 DSP `466/457/3-DSP` 与 `488/486/2-DSP`、低 BRAM `456/450/4-DSP/1.5-BRAM`，以及交叉点 `478/476/3-DSP/1.5-BRAM`。这些版本均继承 P1 真 Q15 修复和 P3 的原子 CDC、同步复位、AD9708 输出时序闭环。P4-D `479/468/4-DSP/2-BRAM` 保留为联合 Stage3 之前的稳定回退；旧 Route 1 `424 LUT / 6 DSP` 与低 DSP `436 LUT / 5 DSP` 存在 8x/128x 约 −6.02 dB 标度缺陷，只保留为资源演进历史。
+当前默认分支为 `national-finals-p3j-4dsp-bram-microengine`。从干净提交 `785eb61c67e3d1005b7f2e59f65f7097b026109a` 重建的完整板级结果为 **424 LUT / 431 FF / 169 Slice / 4 DSP / 4 RAMB18E1（2 Tile）/ 2 MMCM**，WNS/WHS **+45.042/+0.080 ns**，AD9708 setup/hold **+76.116/+78.117 ns**，总/动态/静态功耗 **0.271/0.199/0.072 W**。bitstream SHA-256 为 `2BA97CCE337638D57268EE04CCE0D09D2FDF6637B1A4A25D35E57BCB49C3ED4B`。
+
+相对前一 P3-J 430-LUT 基线，本版把 ROM 空闲高位用于保存下一采样地址，并进一步压缩矩阵键盘扫描候选状态，减少 6 LUT/7 Slice，FF/DSP/BRAM/MMCM 不变。MATLAB 六工况、Release RTL 15/15、post-route、DRC/CDC、功耗、bitstream 和普通 GUI project rebuild 均通过；14 组全链输入的 4x/8x/128x 全部逐样本 0 LSB。当前没有物理开发板，因此仍须现场下载和测量。
+
+“增加 BRAM 进入 280～299 LUT”的假设未获实测支持：Stage2/3 历史拆分为 478 LUT/5 RAMB18，Stage1 双 BRAM 为 477 LUT/5 RAMB18；共享 CIC 又比原实现多 11 LUT。详细 Stop/Go 表、频响、时序和复现步骤见 [本轮执行反馈](results/p3j_4dsp_bram_microengine_execution_feedback.md)，正式证据见 [`p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom`](vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom)。
+
+前一 P3-J 430-LUT 基线已从干净提交完成 MATLAB、Release 15/15、Vivado 综合/布局布线/时序/DRC/CDC/功耗评估和 bitstream 闭环，继续作为当前 424-LUT 版的稳定回退。其资源为 **430 LUT / 431 FF / 176 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM**，WNS/WHS **+45.636/+0.119 ns**，bitstream SHA-256 为 `C4DBB066030B92D387D799688D4010AB98F22B13BDA1623367EBCC8BE8BC0490`。
+
+当前 P3-J Pareto 为默认 `424 LUT / 431 FF / 4 DSP / 2 BRAM`、低 DSP `466/457/3-DSP` 与 `488/486/2-DSP`、低 BRAM `456/450/4-DSP/1.5-BRAM`，以及交叉点 `478/476/3-DSP/1.5-BRAM`。这些版本均继承 P1 真 Q15 修复和 P3 的原子 CDC、同步复位、AD9708 输出时序闭环。P4-D `479/468/4-DSP/2-BRAM` 保留为联合 Stage3 之前的稳定回退；旧 Route 1 `424 LUT / 6 DSP` 与低 DSP `436 LUT / 5 DSP` 存在 8x/128x 约 −6.02 dB 标度缺陷，只保留为资源演进历史。
 
 ## P3-J 后续优化指导执行结果（2026-08-03）
 
@@ -10,7 +18,8 @@
 
 | 候选 | LUT | FF | Slice | DSP | RAMB18 / Tile | WNS/WHS | 结论 |
 |---|---:|---:|---:|---:|---:|---:|---|
-| **P3-J 最终默认** | **430** | **431** | **176** | **4** | **4 / 2.0** | **+45.636/+0.119 ns** | 推荐最低 LUT/FF |
+| **P3-J Packed-ROM 当前默认** | **424** | **431** | **169** | **4** | **4 / 2.0** | **+45.042/+0.080 ns** | 推荐最低 LUT |
+| P3-J 前一基线 | 430 | 431 | 176 | 4 | 4 / 2.0 | +45.636/+0.119 ns | 稳定回退 |
 | P3-J 3-DSP | 466 | 457 | 188 | 3 | 4 / 2.0 | +45.785/+0.121 ns | 低 DSP Pareto |
 | P3-J 2-DSP | 488 | 486 | 191 | 2 | 4 / 2.0 | +45.736/+0.060 ns | 最低 DSP Pareto |
 | P3-J 1.5-BRAM | 456 | 450 | 181 | 4 | 3 / 1.5 | +46.033/+0.116 ns | 低 BRAM Pareto |
@@ -20,7 +29,7 @@
 
 最终默认 Release 为 **15/15 PASS**。全链包括冲激、10 个固定 seed×4096、正/负满量程和 997 Hz/−1 dBFS 强信号共 14 组，4x/8x/128x 全部 0 LSB；复位恢复 8/8、动态切换 10/10。六工况最差绝对通带偏差 0.007730 dB、最差峰峰纹波 0.006192 dB、最差阻带 72.371 dB，严格线性相位。
 
-本轮还解决了“历史报告 430 LUT，手动重跑却是 436 LUT”的原因：430 实际使用 `AreaOptimized_high/full/on`，批处理旧默认却是 `rebuilt`，并且只实现步骤可能静默复用旧 DCP。现在批处理和 GUI 都固定 `full`，综合生成配置指纹，实现前校验，`-jobs` 固定为 4。正式证据目录为 [`p3j_final_430lut_431ff_176slice_4dsp_2bram_reproducible`](vivado_results/p3j_final_430lut_431ff_176slice_4dsp_2bram_reproducible)。
+前一轮还解决了“历史报告 430 LUT，手动重跑却是 436 LUT”的原因：430 实际使用 `AreaOptimized_high/full/on`，批处理旧默认却是 `rebuilt`，并且只实现步骤可能静默复用旧 DCP。现在批处理和 GUI 都固定 `full`，综合生成配置指纹，实现前校验，`-jobs` 固定为 4。前一证据目录为 [`p3j_final_430lut_431ff_176slice_4dsp_2bram_reproducible`](vivado_results/p3j_final_430lut_431ff_176slice_4dsp_2bram_reproducible)，当前正式目录见本文顶部。
 
 ## 历史 P4-D Release V2 与指导执行结果
 
@@ -424,7 +433,7 @@ SHA-256：`49DF03B71C6D73A73EE282A5D1EEE0D9F5EB91ADDB96879ACBA381F0D999D47C`
 - `ResourceSharing=on`
 - `opt_design Directive=Default`
 
-第五轮用普通工程 `synth_1/impl_1` 从头重建得到 440 LUT / 464 FF；第七轮在同一工程配置和更新后的 RTL 上从头重建为 **434 LUT / 469 FF / 6 DSP / 3 BRAM Tile / 2 MMCM**。随后 comb-LUT 历史版为 **436 LUT / 471 FF / 5 DSP / 3 BRAM Tile / 2 MMCM**。当前 XPR 已进一步固定 N3 Hold、Stage 1 单 RAM、Stage 2/3 统一历史、Stage1 DSP48 预加器、P3-J 联合 Stage3 和 CIC 4-DSP 默认映射，正式签核为 **430 LUT / 431 FF / 4 DSP / 2 BRAM Tile / 2 MMCM**。可用以下命令检查配置并重建：
+第五轮用普通工程 `synth_1/impl_1` 从头重建得到 440 LUT / 464 FF；第七轮在同一工程配置和更新后的 RTL 上从头重建为 **434 LUT / 469 FF / 6 DSP / 3 BRAM Tile / 2 MMCM**。随后 comb-LUT 历史版为 **436 LUT / 471 FF / 5 DSP / 3 BRAM Tile / 2 MMCM**。当前 XPR 已进一步固定 N3 Hold、Stage 1 单 RAM、Stage 2/3 统一历史、Stage1 DSP48 预加器、P3-J 联合 Stage3、CIC 4-DSP、Packed-ROM 与 Ultra-Keypad，正式签核为 **424 LUT / 431 FF / 4 DSP / 2 BRAM Tile / 2 MMCM**。可用以下命令检查配置并重建：
 
 ```powershell
 vivado.bat -mode batch -source `
