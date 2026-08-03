@@ -213,47 +213,84 @@ module board_demo_competition_dac8_top #(
     // 家族改变时先把音频数据通路保持复位，再切 BUFGMUX_CTRL，
     // 最后在新时钟域同步释放复位，防止跨采样率遗留滤波状态。
     //=========================================================
-    // Four 1024-cycle protected phases replace one 12-bit down-counter with
-    // two wide terminal decoders. Phase 0 commits the new family while the
-    // datapath is muted/reset; phases 1..3 provide the post-switch settling
-    // window. The total guard interval remains 4096 system clocks.
-    reg [9:0] family_switch_cycle = 10'd0;
-    reg [1:0] family_switch_phase = 2'd0;
-    reg       family_switch_busy = 1'b0;
-    reg       family_active = 1'b0;
+    // The signed-off build already keeps pwr_rst_cnt free-running for the
+    // compact-keypad scan tick. Reuse its low ten bits as the 1024-cycle
+    // family-switch timebase instead of building a second wide counter.
+    // State 1 commits the new family on the next tick; states 2..4 keep the
+    // datapath muted/reset for exactly 3072 clocks after the clock switch.
+    // The non-shared parameter path retains an independent guard counter so
+    // legacy configurations where pwr_rst_cnt saturates remain functional.
+    wire       family_switch_busy;
+    wire       family_active;
     wire       clk_audio_128x;
     wire       mmcm_locked_selected_unused;
     wire       mmcm_locked_44k1;
     wire       mmcm_locked_48k;
 
-    always @(posedge clk_sys_bufg) begin
-        if (!rst_n_int) begin
-            family_switch_cycle <= 10'd0;
-            family_switch_phase <= 2'd0;
-            family_switch_busy <= 1'b0;
-            family_active <= 1'b0;
-        end
-        else if (family_switch_busy) begin
-            if (family_switch_cycle == 10'd1023) begin
-                family_switch_cycle <= 10'd0;
-                if (family_switch_phase == 2'd0)
-                    family_active <= key_family_sel;
+    generate
+        if (USE_SHARED_KEYPAD_SCAN_TICK != 0) begin : gen_shared_family_guard
+            reg [2:0] family_switch_state = 3'd0;
+            reg       family_active_r = 1'b0;
+            wire      family_switch_tick;
 
-                if (family_switch_phase == 2'd3)
-                    family_switch_busy <= 1'b0;
-                else
-                    family_switch_phase <= family_switch_phase + 2'd1;
-            end
-            else begin
-                family_switch_cycle <= family_switch_cycle + 10'd1;
+            assign family_switch_tick = &pwr_rst_cnt[9:0];
+            assign family_switch_busy = |family_switch_state;
+            assign family_active = family_active_r;
+
+            always @(posedge clk_sys_bufg) begin
+                if (!rst_n_int) begin
+                    family_switch_state <= 3'd0;
+                    family_active_r <= 1'b0;
+                end
+                else if (family_switch_state != 3'd0) begin
+                    if (family_switch_tick) begin
+                        if (family_switch_state == 3'd1)
+                            family_active_r <= key_family_sel;
+
+                        if (family_switch_state == 3'd4)
+                            family_switch_state <= 3'd0;
+                        else
+                            family_switch_state <= family_switch_state + 3'd1;
+                    end
+                end
+                else if (key_family_sel != family_active_r) begin
+                    family_switch_state <= 3'd1;
+                end
             end
         end
-        else if (key_family_sel != family_active) begin
-            family_switch_cycle <= 10'd0;
-            family_switch_phase <= 2'd0;
-            family_switch_busy <= 1'b1;
+        else begin : gen_dedicated_family_guard
+            reg [11:0] family_switch_count = 12'd0;
+            reg        family_switch_busy_r = 1'b0;
+            reg        family_active_r = 1'b0;
+
+            assign family_switch_busy = family_switch_busy_r;
+            assign family_active = family_active_r;
+
+            always @(posedge clk_sys_bufg) begin
+                if (!rst_n_int) begin
+                    family_switch_count <= 12'd0;
+                    family_switch_busy_r <= 1'b0;
+                    family_active_r <= 1'b0;
+                end
+                else if (family_switch_busy_r) begin
+                    if (family_switch_count == 12'd1023)
+                        family_active_r <= key_family_sel;
+
+                    if (family_switch_count == 12'd4095) begin
+                        family_switch_count <= 12'd0;
+                        family_switch_busy_r <= 1'b0;
+                    end
+                    else begin
+                        family_switch_count <= family_switch_count + 12'd1;
+                    end
+                end
+                else if (key_family_sel != family_active_r) begin
+                    family_switch_count <= 12'd0;
+                    family_switch_busy_r <= 1'b1;
+                end
+            end
         end
-    end
+    endgenerate
 
     dual_family_audio_clock u_dual_family_audio_clock (
         .clk_20m(clk_sys_bufg),
