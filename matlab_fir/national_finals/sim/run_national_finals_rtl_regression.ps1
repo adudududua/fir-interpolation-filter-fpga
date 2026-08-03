@@ -255,6 +255,14 @@ $romDir = Invoke-RtlCase -Name 'rom' `
         (Join-Path $nfSource 'nf_sine_15k_dual_rate_packed32_256.mem')
     )
 
+$dacOffsetDir = Invoke-RtlCase -Name 'dac_offset_binary_equivalence' `
+    -VerilogFiles @(
+        (Join-Path $nfSim 'tb_dac_offset_binary_compact_equiv.v')
+    ) `
+    -Top 'tb_dac_offset_binary_compact_equiv' `
+    -Snapshot 'tb_nf_dac_offset_binary_sim' `
+    -ExpectedPassText 'DAC OFFSET-BINARY COMPACT EQUIVALENCE PASS: 1029 samples'
+
 $coeffPrimitiveDir = Invoke-RtlCase -Name 'unified_coeff_ramb18_primitive' `
     -VerilogFiles @(
         (Join-Path $nfSource 'nf_unified_fir_coeff_bram.v'),
@@ -493,6 +501,6 @@ if ($PublishImpulseOutputs) {
 }
 
 Write-Host ''
-Write-Host 'NATIONAL FINALS RTL REGRESSION PASS (15/15)'
+Write-Host 'NATIONAL FINALS RTL REGRESSION PASS (16/16)'
 Write-Host "CIC integrator DSP mode: $CicIntegratorDspMode"
 Write-Host "Run directory: $runRoot"
