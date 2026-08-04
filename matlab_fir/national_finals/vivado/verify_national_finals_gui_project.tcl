@@ -173,10 +173,10 @@ if {[get_property PROGRESS [get_runs impl_1]] eq "100%"} {
         "GUI implementation does not use the expected two BRAM tiles."
     require_condition [expr {$mmcm_count == 2}] \
         "GUI implementation does not use the expected two MMCMs."
-    require_condition [expr {$lut_count <= 440}] \
-        "GUI implementation exceeds the signed-off 440-LUT P3-J guard."
-    require_condition [expr {$ff_count <= 440}] \
-        "GUI implementation exceeds the signed-off 440-FF P3-J guard."
+    require_condition [expr {$lut_count <= 385}] \
+        "GUI implementation exceeds the P3-M 385-LUT release guard."
+    require_condition [expr {$ff_count <= 420}] \
+        "GUI implementation exceeds the P3-M 420-FF release guard."
 
     puts "NATIONAL_FINALS_GUI_IMPLEMENTATION_PASS"
     close_design

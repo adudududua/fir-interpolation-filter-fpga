@@ -301,6 +301,26 @@ $stage1SingleBramDir = Invoke-RtlCase -Name 'stage1_single_bram_equivalence' `
     -XelabOptions @('glbl', '-L', 'unisims_ver') `
     -Assets @((Join-Path $sourceRoot 'all2x_v3\all2x_v3_stage1_coeff_pkg.vh'))
 
+# The DSP-register Stage1 reads the just-written L0 sample back from the
+# physical RAMB18E1 on the following clock.  Keep a second equivalence case
+# with SYNTHESIS defined so the UNISIM RAMB18E1 proves this schedule and the
+# dynamic DSP48 INMODE behavior, not only the behavioral memory model.
+$stage1SingleBramPrimitiveDir = Invoke-RtlCase `
+    -Name 'stage1_single_bram_primitive_equivalence' `
+    -VerilogFiles @(
+        (Join-Path $sourceRoot 'all2x_v3\interp2_stage1_strict_halfband_bram_ce.v'),
+        (Join-Path $nfSource 'nf_stage1_history_ramb18_sdp.v'),
+        (Join-Path $nfSource 'interp2_stage1_single_bram_serial_ce.v'),
+        (Join-Path $nfSim 'tb_stage1_single_bram_equiv.v'),
+        $glbl
+    ) `
+    -Top 'tb_stage1_single_bram_equiv' `
+    -Snapshot 'tb_nf_stage1_single_bram_primitive_sim' `
+    -ExpectedPassText 'STAGE1 SINGLE BRAM EQUIVALENCE PASS' `
+    -XvlogOptions @('-d', 'SYNTHESIS') `
+    -XelabOptions @('glbl', '-L', 'unisims_ver') `
+    -Assets @((Join-Path $sourceRoot 'all2x_v3\all2x_v3_stage1_coeff_pkg.vh'))
+
 $equalizerDir = Invoke-RtlCase -Name 'equalizer' `
     -VerilogFiles @(
         (Join-Path $nfSource 'cic3_compensator_shiftadd_ce.v'),
@@ -501,6 +521,6 @@ if ($PublishImpulseOutputs) {
 }
 
 Write-Host ''
-Write-Host 'NATIONAL FINALS RTL REGRESSION PASS (16/16)'
+Write-Host 'NATIONAL FINALS RTL REGRESSION PASS (17/17)'
 Write-Host "CIC integrator DSP mode: $CicIntegratorDspMode"
 Write-Host "Run directory: $runRoot"

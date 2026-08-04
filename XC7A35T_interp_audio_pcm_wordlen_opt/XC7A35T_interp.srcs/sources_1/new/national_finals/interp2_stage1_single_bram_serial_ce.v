@@ -6,10 +6,11 @@
 //
 // The legacy core reads both members of a symmetric pair in one clock and
 // consumes two RAMB18 primitives.  This core exploits the 64-clock gap between
-// adjacent ce_out pulses: pair zero bypasses the just-arriving input on its
-// left side, then one synchronous RAM read is issued every clock in the order
-// R0,L1,R1,L2,R2,...,L25,R25.  Read metadata is pipelined with the RAM output,
-// allowing one DSP48 MAC every second clock and leaving ten clocks of margin.
+// adjacent ce_out pulses.  One synchronous RAM read is issued every clock in
+// the order L0,R0,L1,R1,...,L25,R25.  The just-written L0 word is read back on
+// the next clock, avoiding a 24-bit fabric bypass mux.  In preadder mode the
+// left word is retained in the DSP48 A register and history-valid masking is
+// performed by INMODE, avoiding a 24-bit fabric left-word register and masks.
 module interp2_stage1_single_bram_serial_ce #(
     parameter integer DATA_W      = 24,
     parameter integer COEFF_W     = `V3_S1_COEFF_W,
@@ -73,7 +74,10 @@ module interp2_stage1_single_bram_serial_ce #(
     reg read_mask;
     reg [4:0] read_coeff_index;
 
+    // Used only by the non-preadder compatibility configuration.  The signed-
+    // off preadder configuration stores the left operand inside DSP48 AREG.
     reg signed [DATA_W-1:0] left_sample;
+    reg left_mask;
     reg signed [DATA_W-1:0] delay_result;
     reg filter_commit_pending;
 
@@ -114,16 +118,19 @@ module interp2_stage1_single_bram_serial_ce #(
     );
 
     assign dsp_preadd_a =
-        {{(25-DATA_W){left_sample[DATA_W-1]}}, left_sample};
-    assign dsp_preadd_d = read_mask ?
-        {{(25-DATA_W){read_data[DATA_W-1]}}, read_data} : 25'sd0;
+        {{(25-DATA_W){read_data[DATA_W-1]}}, read_data};
+    assign dsp_preadd_d =
+        {{(25-DATA_W){read_data[DATA_W-1]}}, read_data};
     assign dsp_input_a = (USE_DSP48_PREADDER != 0) ?
         {{5{dsp_preadd_a[24]}}, dsp_preadd_a} :
         {{(30-PAIR_W){pair_sum_comb[PAIR_W-1]}}, pair_sum_comb};
     assign dsp_coeff_b =
         {{(18-COEFF_W){coeff_comb[COEFF_W-1]}}, coeff_comb};
+    // INMODE[1] removes an invalid registered A operand; INMODE[2] removes an
+    // invalid direct D operand.  A is loaded only on READ_LEFT and held for
+    // the immediately following READ_RIGHT MAC.
     assign dsp_inmode = (USE_DSP48_PREADDER != 0) ?
-        5'b00100 : 5'b00000;
+        {2'b00, read_mask, ~left_mask, 1'b0} : 5'b00000;
     assign dsp_p_reset = !rst_n || (ce_out && phase_cnt == 1'b0);
     assign dsp_p_ce =
         (read_data_valid && read_kind == READ_RIGHT) ||
@@ -137,7 +144,9 @@ module interp2_stage1_single_bram_serial_ce #(
     DSP48E1 #(
         .A_INPUT("DIRECT"), .B_INPUT("DIRECT"),
         .USE_DPORT("TRUE"), .USE_MULT("MULTIPLY"),
-        .USE_SIMD("ONE48"), .AREG(0), .ACASCREG(0),
+        .USE_SIMD("ONE48"),
+        .AREG((USE_DSP48_PREADDER != 0) ? 1 : 0),
+        .ACASCREG((USE_DSP48_PREADDER != 0) ? 1 : 0),
         .BREG(0), .BCASCREG(0), .CREG(0), .DREG(0),
         .ADREG(0), .MREG(0), .PREG(1), .INMODEREG(0),
         .OPMODEREG(0), .ALUMODEREG(0), .CARRYINREG(0),
@@ -151,11 +160,14 @@ module interp2_stage1_single_bram_serial_ce #(
         .CARRYIN(dsp_round_carryin),
         .ACIN(30'd0), .BCIN(18'd0), .PCIN(48'd0),
         .CARRYCASCIN(1'b0), .MULTSIGNIN(1'b0), .CLK(clk),
-        .CEA1(1'b0), .CEA2(1'b0), .CEAD(1'b0),
+        .CEA1(1'b0),
+        .CEA2((USE_DSP48_PREADDER != 0) && read_data_valid &&
+              read_kind == READ_LEFT),
+        .CEAD(1'b0),
         .CEALUMODE(1'b0), .CEB1(1'b0), .CEB2(1'b0),
         .CEC(1'b0), .CECARRYIN(1'b0), .CECTRL(1'b0),
         .CED(1'b0), .CEINMODE(1'b0), .CEM(1'b0), .CEP(dsp_p_ce),
-        .RSTA(1'b0), .RSTALLCARRYIN(1'b0), .RSTALUMODE(1'b0),
+        .RSTA(!rst_n), .RSTALLCARRYIN(1'b0), .RSTALUMODE(1'b0),
         .RSTB(1'b0), .RSTC(1'b0), .RSTCTRL(1'b0), .RSTD(1'b0),
         .RSTINMODE(1'b0), .RSTM(1'b0), .RSTP(dsp_p_reset),
         .ACOUT(), .BCOUT(), .CARRYCASCOUT(), .CARRYOUT(),
@@ -255,6 +267,7 @@ module interp2_stage1_single_bram_serial_ce #(
             issue_index <= 5'd0;
             read_addr <= {ADDR_W{1'b0}};
             left_sample <= {DATA_W{1'b0}};
+            left_mask <= 1'b0;
             delay_result <= {DATA_W{1'b0}};
             filter_commit_pending <= 1'b0;
             y_out <= {DATA_W{1'b0}};
@@ -273,6 +286,7 @@ module interp2_stage1_single_bram_serial_ce #(
                 if (read_kind == READ_LEFT) begin
                     left_sample <= read_mask ? read_data :
                                    {DATA_W{1'b0}};
+                    left_mask <= read_mask;
                 end
                 else if (read_kind == READ_DELAY) begin
                     delay_result <= read_mask ? read_data :
@@ -330,15 +344,13 @@ module interp2_stage1_single_bram_serial_ce #(
                     mac_active <= 1'b1;
                     filter_ready <= 1'b0;
                     issue_active <= 1'b1;
-                    next_issue_is_left <= 1'b1;
-                    schedule_index <= 5'd1;
+                    next_issue_is_left <= 1'b0;
+                    schedule_index <= 5'd0;
                     read_issue_valid <= 1'b1;
-                    read_issue_kind <= READ_RIGHT;
-                    read_issue_mask <= history_full ||
-                        (HISTORY_LEN-1) < (wr_ptr + 6'd1);
+                    read_issue_kind <= READ_LEFT;
+                    read_issue_mask <= 1'b1;
                     issue_index <= 5'd0;
-                    read_addr <= wr_ptr - (HISTORY_LEN-1);
-                    left_sample <= x_current;
+                    read_addr <= wr_ptr;
                 end
                 else begin
                     y_out <= filter_ready ? filter_rounded :
