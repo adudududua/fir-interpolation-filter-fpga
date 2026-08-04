@@ -1,5 +1,11 @@
 # 全国总决赛：双采样率可配置插值滤波器
 
+## 当前推荐板测候选：P3-M Stage1 DSP-register 版（368 LUT / 4 DSP）
+
+当前分支 `national-finals-p3m-stage1-dspreg-385target` 的完整板级实现为 **368 LUT / 386 FF / 156 Slice / 4 DSP / 4 RAMB18E1（2 Tile）/ 2 MMCM**，WNS/WHS **+44.836/+0.117 ns**，AD9708 setup/hold **+76.116/+78.117 ns**，vectorless 功耗 **0.271 W**。相对已板测的 P3-L 减少29 LUT、23 FF和5 Slice，DSP/BRAM/MMCM不变。
+
+P3-M 把Stage1左操作数从24-bit Fabric寄存器迁移到DSP48E1 `AREG`，把历史有效性宽掩码迁移到动态 `INMODE`，并将读调度改为 `L0,R0,...,L25,R25`。行为RAM和真实UNISIM RAMB18E1均完成1400输出0-LSB对比；最终同源码 Smoke/Release 均为 **17/17 PASS**，复位、动态切换、GUI从零综合/实现/Bitstream、默认和六模式routed-DCP DAC均通过。六档为44.1 kHz `177/353/5645 edges/ms`、48 kHz `192/384/6144 edges/ms`，DAC数据持续变化。详见 [P3-M 执行反馈](results/p3m_stage1_dspreg_368lut_execution_feedback.md) 与 [`p3m_stage1_dspreg_synth_r1`](vivado_results/p3m_stage1_dspreg_synth_r1)。**本候选尚待物理板复测，P3-L继续作为正式实板安全回退。**
+
 ## 当前正式实板通过：P3-L 共享保护时基版（397 LUT / 4 DSP）
 
 当前分支 `national-finals-p3l-safe-packedrom-395target` 的完整板级结果为 **397 LUT / 409 FF / 161 Slice / 4 DSP / 4 RAMB18E1（2 Tile）/ 2 MMCM**，WNS/WHS **+44.408/+0.121 ns**，AD9708 setup/hold **+76.116/+78.117 ns**，vectorless 功耗 **0.271 W**。bitstream SHA-256 为 `AC8735BAD24450FA038C79B104072DA70CEFA6FEF7B599C52CE16ECA5F091440`。
@@ -34,7 +40,7 @@
 
 Packed-ROM 之前的 P3-J 430-LUT 基线已从干净提交完成 MATLAB、Release 15/15、Vivado 综合/布局布线/时序/DRC/CDC/功耗评估和 bitstream 闭环，是当前修复版之外的安全历史回退。其资源为 **430 LUT / 431 FF / 176 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM**，WNS/WHS **+45.636/+0.119 ns**，bitstream SHA-256 为 `C4DBB066030B92D387D799688D4010AB98F22B13BDA1623367EBCC8BE8BC0490`。
 
-当前正式实板通过版本为 P3-L `397 LUT / 409 FF / 4 DSP / 2 BRAM`，P3-K `427 LUT / 416 FF / 4 DSP / 2 BRAM` 为安全实板回退。Packed-ROM 之前的 430-LUT P3-J 和 P4-D `479/468/4-DSP/2-BRAM` 可作更早安全历史回退；旧 Route 1 `424 LUT / 6 DSP` 与低 DSP `436 LUT / 5 DSP` 另有 8x/128x 约 −6.02 dB 标度缺陷，只保留为资源演进历史。
+当前推荐板测候选为 P3-M `368 LUT / 386 FF / 4 DSP / 2 BRAM`；当前正式实板通过版本仍为 P3-L `397 LUT / 409 FF / 4 DSP / 2 BRAM`，P3-K `427 LUT / 416 FF / 4 DSP / 2 BRAM` 为安全实板回退。Packed-ROM 之前的430-LUT P3-J和P4-D `479/468/4-DSP/2-BRAM`可作更早安全历史回退；旧Route 1 `424 LUT / 6 DSP`与低DSP `436 LUT / 5 DSP`另有8x/128x约−6.02 dB标度缺陷，只保留为资源演进历史。
 
 ## P3-J 后续优化指导执行结果（2026-08-03）
 
@@ -42,6 +48,7 @@ Packed-ROM 之前的 P3-J 430-LUT 基线已从干净提交完成 MATLAB、Releas
 
 | 候选 | LUT | FF | Slice | DSP | RAMB18 / Tile | WNS/WHS | 结论 |
 |---|---:|---:|---:|---:|---:|---:|---|
+| **P3-M Stage1 DSP-register** | **368** | **386** | **156** | **4** | **4 / 2.0** | **+44.836/+0.117 ns** | **工具签核、GUI与六模式post-route通过，待板测** |
 | **P3-L shared guard** | **397** | **409** | **161** | **4** | **4 / 2.0** | **+44.408/+0.121 ns** | **正式实板通过：DAC 与六档采样频率正确** |
 | **P3-K DAC-ROM 修复版** | **427** | **416** | **177** | **4** | **4 / 2.0** | **+44.983/+0.105 ns** | **安全实板回退** |
 | P3-K 指针推导旧版 | 412 | 418 | 168 | 4 | 4 / 2.0 | +45.083/+0.056 ns | ROM 地址锁死，禁止上板 |

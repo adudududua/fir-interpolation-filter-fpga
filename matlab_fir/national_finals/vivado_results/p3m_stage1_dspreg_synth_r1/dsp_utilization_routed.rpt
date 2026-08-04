@@ -1,0 +1,7 @@
+National-finals DSP utilization
+===============================
+Cell count: 4
+u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/u_stage23_dsp48e1 | DSP48E1 | DSP48_X0Y28
+u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_final_integrator_dsp.final_integrator_sum | DSP48E1 | DSP48_X0Y26
+u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_first_integrator_dsp.first_integrator_sum | DSP48E1 | DSP48_X0Y27
+u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_stage1_dsp48e1 | DSP48E1 | DSP48_X0Y30
