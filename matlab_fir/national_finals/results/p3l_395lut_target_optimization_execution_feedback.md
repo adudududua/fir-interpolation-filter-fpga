@@ -10,7 +10,7 @@
 
 相对 P3-K 实板通过版 `427 LUT / 416 FF / 177 Slice`，减少 **30 LUT、7 FF、16 Slice**，DSP、BRAM、MMCM 不变。当前分支为 `national-finals-p3l-safe-packedrom-395target`。
 
-必须严格区分：上述 397-LUT 版本已经完成工具侧完整签核，但尚未由用户重新下载到物理板，因此状态是 **推荐上板候选**，不是“实板通过”。在六档物理板复测完成前，P3-K 427-LUT 版本仍是实板安全回退。
+上述 397-LUT 版本已经完成工具侧完整签核。**2026-08-04 用户进一步完成物理板复测，确认 DAC 输出正常，44.1/48 kHz 两个家族下各倍率档位的实测采样频率均正确。** 因此本版状态由“推荐上板候选”正式提升为 **实板验证通过发布版**，P3-K 427-LUT 版本保留为安全实板回退。用户未提供逐档仪器数值，本文只记录已确认的通过结论，不虚构额外测量数据。
 
 ## 2. 优化演进与 Stop/Go 结果
 
@@ -22,7 +22,7 @@
 | 10-bit cycle + 2-bit phase | 408 | 419 | — | 4 | 2 | Go，但未达目标 | 相对 412 再减 4 LUT；仍存在独立计数器热点 |
 | 上述候选 + AddRemap | 408 | 419 | — | 4 | 2 | 无收益 | 与 Default 完全相同 |
 | 上述候选 + ExploreArea | 473 | 419 | — | 4 | 2 | No-Go | 面积策略在当前拓扑上明显反向劣化 |
-| **复用键盘计数器的 shared guard** | **397** | **409** | **161** | **4** | **2** | **最终工具候选** | 命中 395～405 目标，FF 同时下降 |
+| **复用键盘计数器的 shared guard** | **397** | **409** | **161** | **4** | **2** | **正式实板通过版** | 命中 395～405 目标，FF 同时下降；DAC 与六档采样频率板测正确 |
 
 策略扫描结果说明实现 directive 不能凭名称判断；正式设置继续固定为 `AreaOptimized_high / flatten full / resource sharing on + opt_design Default`。
 
@@ -131,7 +131,7 @@ P3-L 不再依赖第二段初始化。`nf_02_generate_dual_rate_rom.m` 离线生
 
 DRC 没有阻断 bitstream 的 Error/Critical Warning；存在 DSP 输入/输出流水建议。Methodology 的8个 `TIMING-18` 来自 DAC 外部接口未设置传统 output delay，但工程另外导出了 AD9708 data setup/hold 路径。CDC 的 `CDC-13 ×2` 是 BUFGMUX_CTRL 的专用选择输入，`CDC-15 ×4` 是带 max-delay/bus-skew 的两位原子模式握手；构建脚本锁定其数量，不能笼统写成“零告警”。
 
-## 7. Git 回退与待完成板测
+## 7. Git 回退与物理板验证结论
 
 - 分支：`national-finals-p3l-safe-packedrom-395target`
 - 单镜像 Packed-ROM 提交：`9770915`
@@ -139,11 +139,15 @@ DRC 没有阻断 bitstream 的 Error/Critical Warning；存在 DSP 输入/输出
 - phase guard 中间提交：`70ad6e7`
 - shared guard 提交：`49e7e5d`
 - P3-K 实板通过标签：`nf-p3k-final-427lut-416ff-177slice-4dsp-2bram-dacromfix`
+- P3-L 工具签核标签：`nf-p3l-toolverified-397lut-409ff-161slice-4dsp-2bram`
+- P3-L 正式板级发布标签：`nf-p3l-final-397lut-409ff-161slice-4dsp-2bram-boardverified`
 
-物理板最终门禁：
+物理板最终门禁及结果：
 
-1. 下载 P3-L bitstream，确认上电默认 44.1 kHz/128x 立即有稳定 DAC 波形；
-2. 逐档测试 SW2/SW3/SW4 与 SW6/SW7/SW8，记录六档 `DA_CLK`；
-3. 六档均观察 DAC 正弦波，不允许只测时钟；
-4. 44.1↔48 kHz 来回切换至少10次，确认无永久静音、无蜂鸣器误动作；
-5. 若任一项失败，立即回退 P3-K 427-LUT 标签，不把 P3-L 标为板级通过。
+1. [x] 下载 P3-L bitstream，DAC 输出正常；
+2. [x] 逐档测试 44.1/48 kHz 两个家族及 4x/8x/128x 倍率，实际采样频率均正确；
+3. [x] 用户确认各档板级输出无问题，本版可作为正式版本上传 Git；
+4. [ ] 未提供逐档仪器数值、频谱截图及切换次数，本文不作未获数据支持的量化声明；
+5. [x] P3-K 427-LUT 标签继续保留为安全回退，不覆盖历史 bitstream。
+
+最终结论：P3-L 已完成 MATLAB、RTL 0-LSB、复位与动态切换、综合、布局布线、Timing、DRC/CDC、post-route 六模式 DAC、bitstream 和物理板 DAC/采样频率闭环，可以作为全国总决赛正式版本。

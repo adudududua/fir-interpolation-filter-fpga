@@ -1,12 +1,12 @@
 # 全国总决赛：双采样率可配置插值滤波器
 
-## 当前工具侧推荐：P3-L 共享保护时基版（397 LUT / 4 DSP）
+## 当前正式实板通过：P3-L 共享保护时基版（397 LUT / 4 DSP）
 
 当前分支 `national-finals-p3l-safe-packedrom-395target` 的完整板级结果为 **397 LUT / 409 FF / 161 Slice / 4 DSP / 4 RAMB18E1（2 Tile）/ 2 MMCM**，WNS/WHS **+44.408/+0.121 ns**，AD9708 setup/hold **+76.116/+78.117 ns**，vectorless 功耗 **0.271 W**。bitstream SHA-256 为 `AC8735BAD24450FA038C79B104072DA70CEFA6FEF7B599C52CE16ECA5F091440`。
 
 本版用 MATLAB 离线生成单个 32-bit Packed-ROM 镜像，RTL 只执行一次 `$readmemh`，消除旧版二次 procedural 初始化未进入 RAMB18 INIT 的风险；同时复用持续运行的键盘/上电计数器低10位作为家族切换保护时基，以3-bit状态机替代独立宽计数器。Smoke/Release 均为 **16/16 PASS**。默认 44.1 kHz/128x 路由网表在2 ms内得到11290个 DAC 边沿和7461次数据变化；只通过 `key_kr/key_kc` 公开引脚驱动的六模式路由后测试得到 44.1 kHz 的 `177/353/5645 edges/ms` 与48 kHz的 `192/384/6144 edges/ms`，六档 DAC 数据均持续变化、无 X。
 
-完整优化、No-Go、RTL、RAMB INIT、Timing/DRC/CDC 和板测清单见 [P3-L 执行反馈](results/p3l_395lut_target_optimization_execution_feedback.md)，正式证据目录为 [`p3l_safe_packedrom_sharedguard`](vivado_results/p3l_safe_packedrom_sharedguard)。**P3-L 尚待用户下载到物理板复测，因此不能写成实板通过；P3-K 427-LUT 版本仍是当前实板安全回退。**
+完整优化、No-Go、RTL、RAMB INIT、Timing/DRC/CDC 和板测记录见 [P3-L 执行反馈](results/p3l_395lut_target_optimization_execution_feedback.md)，正式证据目录为 [`p3l_safe_packedrom_sharedguard`](vivado_results/p3l_safe_packedrom_sharedguard)。**2026-08-04 用户已完成物理板复测，确认 DAC 输出正常，44.1/48 kHz 两个家族下各倍率档位的采样频率均正确；P3-L 现为正式实板通过版，P3-K 427-LUT 版本为安全历史回退。**
 
 ## 当前实板通过回退：P3-K DAC-ROM 安全版（427 LUT / 4 DSP）
 
@@ -34,7 +34,7 @@
 
 Packed-ROM 之前的 P3-J 430-LUT 基线已从干净提交完成 MATLAB、Release 15/15、Vivado 综合/布局布线/时序/DRC/CDC/功耗评估和 bitstream 闭环，是当前修复版之外的安全历史回退。其资源为 **430 LUT / 431 FF / 176 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM**，WNS/WHS **+45.636/+0.119 ns**，bitstream SHA-256 为 `C4DBB066030B92D387D799688D4010AB98F22B13BDA1623367EBCC8BE8BC0490`。
 
-当前工具侧推荐候选为 P3-L `397 LUT / 409 FF / 4 DSP / 2 BRAM`，当前实板通过回退为 P3-K `427 LUT / 416 FF / 4 DSP / 2 BRAM`。Packed-ROM 之前的 430-LUT P3-J 和 P4-D `479/468/4-DSP/2-BRAM` 可作更早安全历史回退；旧 Route 1 `424 LUT / 6 DSP` 与低 DSP `436 LUT / 5 DSP` 另有 8x/128x 约 −6.02 dB 标度缺陷，只保留为资源演进历史。
+当前正式实板通过版本为 P3-L `397 LUT / 409 FF / 4 DSP / 2 BRAM`，P3-K `427 LUT / 416 FF / 4 DSP / 2 BRAM` 为安全实板回退。Packed-ROM 之前的 430-LUT P3-J 和 P4-D `479/468/4-DSP/2-BRAM` 可作更早安全历史回退；旧 Route 1 `424 LUT / 6 DSP` 与低 DSP `436 LUT / 5 DSP` 另有 8x/128x 约 −6.02 dB 标度缺陷，只保留为资源演进历史。
 
 ## P3-J 后续优化指导执行结果（2026-08-03）
 
@@ -42,8 +42,8 @@ Packed-ROM 之前的 P3-J 430-LUT 基线已从干净提交完成 MATLAB、Releas
 
 | 候选 | LUT | FF | Slice | DSP | RAMB18 / Tile | WNS/WHS | 结论 |
 |---|---:|---:|---:|---:|---:|---:|---|
-| **P3-L shared guard** | **397** | **409** | **161** | **4** | **4 / 2.0** | **+44.408/+0.121 ns** | **工具侧推荐，待物理板复测** |
-| **P3-K DAC-ROM 修复候选** | **427** | **416** | **177** | **4** | **4 / 2.0** | **+44.983/+0.105 ns** | **当前可上板候选** |
+| **P3-L shared guard** | **397** | **409** | **161** | **4** | **4 / 2.0** | **+44.408/+0.121 ns** | **正式实板通过：DAC 与六档采样频率正确** |
+| **P3-K DAC-ROM 修复版** | **427** | **416** | **177** | **4** | **4 / 2.0** | **+44.983/+0.105 ns** | **安全实板回退** |
 | P3-K 指针推导旧版 | 412 | 418 | 168 | 4 | 4 / 2.0 | +45.083/+0.056 ns | ROM 地址锁死，禁止上板 |
 | P3-J Packed-ROM 旧版 | 424 | 431 | 169 | 4 | 4 / 2.0 | +45.042/+0.080 ns | ROM 地址锁死，禁止上板 |
 | P3-J Packed-ROM 前基线 | 430 | 431 | 176 | 4 | 4 / 2.0 | +45.636/+0.119 ns | 安全历史回退 |

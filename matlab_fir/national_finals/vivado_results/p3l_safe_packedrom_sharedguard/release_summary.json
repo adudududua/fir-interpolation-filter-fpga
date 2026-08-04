@@ -1,6 +1,7 @@
 {
-  "status": "tool_verified_board_test_pending",
+  "status": "board_verified_release",
   "branch": "national-finals-p3l-safe-packedrom-395target",
+  "release_tag": "nf-p3l-final-397lut-409ff-161slice-4dsp-2bram-boardverified",
   "rtl_commit": "49e7e5de1aba53403b0221fbbb6cdeccd8f2ed49",
   "part": "xc7a35tfgg484-2",
   "resources_postroute": {
@@ -50,6 +51,13 @@
     "nonzero_init": 22,
     "nonzero_initp": 2,
     "passed": true
+  },
+  "physical_board": {
+    "verified_date": "2026-08-04",
+    "dac_output_all_modes": true,
+    "sampling_frequency_all_modes": true,
+    "source": "user-reported physical board measurement",
+    "note": "Per-mode instrument values were not provided; no additional values are inferred."
   },
   "bitstream_sha256": "AC8735BAD24450FA038C79B104072DA70CEFA6FEF7B599C52CE16ECA5F091440"
 }
