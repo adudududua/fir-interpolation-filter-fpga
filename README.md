@@ -1,5 +1,20 @@
 # 高阶数字插值滤波器设计与 FPGA 验证
 
+## P3-Q 4-DSP Pattern 饱和优化：No-Go，保留361-LUT P3-O（2026-08-05）
+
+本轮在DSP固定为4、BRAM固定为2 Tile的前提下，把Stage1与Stage2/3的宽位符号扩展/
+饱和判断尝试迁入现有DSP48E1的`PATTERNDETECT/PATTERNBDETECT`。候选先通过Smoke
+**17/17**：Stage1行为/真实RAMB18各1400输出、Stage2 336输出、Stage3 671输出和全链
+4x/8x/128x均为0 LSB，复位、CDC、时钟族及动态切档全部通过。但公平四组综合为
+**395（基线）/396（仅Stage1）/414（仅Stage2/3）/415（组合）LUT**，FF均388、DSP均4、
+BRAM均2 Tile。固定宽比较器原本能与饱和mux联合折叠，改用Pattern标志后反而增加LUT5，
+因此按Stop/Go规则不进入实现，不虚构候选Timing、功耗或bitstream结果。
+
+失败试验RTL和构建参数已逐项撤销，正式工程恢复P3-O；当前推荐仍为
+**361 LUT / 386 FF / 158 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM**，P3-M 368-LUT实板版仍是
+安全回退。完整原理、逐项验证、原语计数、资源矩阵、停止理由和回退路线见
+[P3-Q 4-DSP Pattern饱和优化执行反馈](matlab_fir/national_finals/results/p3q_4dsp_pattern_saturation_execution_feedback.md)。
+
 ## P3-P 近期论文驱动优化审计：No-Go，继续保留361-LUT P3-O（2026-08-05）
 
 本轮查阅并筛选了2022～2026年的BLMAC、有限字长最优FIR、MCM/ILP、乘累加联合优化、
@@ -102,7 +117,7 @@ P3-O 从已物理板通过的 P3-M 正式标签逐文件核对源码后建立，
 
 ## 优化演进总览（建议先读）
 
-本节按时间顺序统一整理“最初4x+2x、区域赛全2x、FIR-CIC、全国赛全2x对照、6-DSP CIC、440/442/434-LUT、Route 1、P1/P3/P4工程闭环、P3-J～P3-M RTL演进、P3-O实现重映射，以及P3-P近期论文驱动审计”。重要纠错：旧424-LUT/6-DSP与436-LUT/5-DSP版本有8x/128x约−6.02 dB标度缺陷；412-LUT/4-DSP与424-LUT/4-DSP又有测试音ROM地址锁死缺陷。当前推荐工具候选为P3-O `361 LUT / 386 FF / 158 Slice / 4 DSP / 2 BRAM Tile`；P3-P五类候选均No-Go并恢复P3-O正式RTL；当前正式实板通过安全回退为P3-M `368 LUT / 386 FF / 156 Slice / 4 DSP / 2 BRAM Tile`。
+本节按时间顺序统一整理“最初4x+2x、区域赛全2x、FIR-CIC、全国赛全2x对照、6-DSP CIC、440/442/434-LUT、Route 1、P1/P3/P4工程闭环、P3-J～P3-M RTL演进、P3-O实现重映射、P3-P近期论文驱动审计，以及P3-Q DSP Pattern饱和审计”。重要纠错：旧424-LUT/6-DSP与436-LUT/5-DSP版本有8x/128x约−6.02 dB标度缺陷；412-LUT/4-DSP与424-LUT/4-DSP又有测试音ROM地址锁死缺陷。当前推荐工具候选为P3-O `361 LUT / 386 FF / 158 Slice / 4 DSP / 2 BRAM Tile`；P3-P五类候选和P3-Q四组Pattern候选均No-Go并恢复P3-O正式RTL；当前正式实板通过安全回退为P3-M `368 LUT / 386 FF / 156 Slice / 4 DSP / 2 BRAM Tile`。
 
 ### 统计与比较口径
 
@@ -606,6 +621,7 @@ Route 1相对573-LUT基线减少149 LUT和150 FF，WNS减少 **0.983 ns**，WHS�
 | **P4-D 默认发布闭环版** | **全国赛板级** | **479** | **468** | **4** | **2** | **2** | **+45.734/+0.121 ns** | **0.271 W** | **继承P4-C资源结构；固定签核wrapper、Release长回归、CDC bus-skew** | **Smoke/Release 15/15、GUI行为/实现、双路径bitstream；待物理板测** |
 | **P3-O ExploreWithRemap候选** | **全国赛板级** | **361** | **386** | **4** | **2** | **2** | **+44.989/+0.103 ns** | **0.271 W** | **RTL与P3-M相同；同一综合网表重映射再少7 LUT，DSP/BRAM/FF不变** | **Release 17/17、routed DAC/六档通过；待用户板测** |
 | P3-P论文驱动审计 | 全国赛板级 | 361（保留P3-O） | 386 | 4 | 2 | 2 | +44.989/+0.103 ns（保留） | 0.271 W | 五类候选最佳为367/369/370/368 LUT，均No-Go，正式RTL恢复P3-O | 论文、原语、综合、实现审计完成；无新板测 |
+| P3-Q DSP Pattern饱和审计 | 全国赛板级 | 361（保留P3-O） | 386 | 4 | 2 | 2 | +44.989/+0.103 ns（保留） | 0.271 W | 四组综合395/396/414/415 LUT；Pattern标志破坏比较器与饱和mux折叠，No-Go | 候选Smoke 17/17；停止在综合，正式RTL恢复P3-O |
 | **P3-M DSP-register 正式版** | **全国赛板级** | **368** | **386** | **4** | **2** | **2** | **+44.836/+0.117 ns** | **0.271 W** | **Stage1 左操作数进入 DSP48 AREG，INMODE 屏蔽 A/D，无额外 DSP/BRAM** | **Smoke/Release 17/17、RTL/UNISIM、GUI、post-route、bitstream及用户实板 DAC/各档采样率通过** |
 | **P3-L 共享保护时基正式版** | **全国赛板级** | **397** | **409** | **4** | **2** | **2** | **+44.408/+0.121 ns** | **0.271 W** | **相对实板通过 P3-K 少30 LUT、7 FF、16 Slice；离线单镜像 Packed-ROM + 复用键盘计数器低10位** | **Smoke/Release 16/16、默认及六模式 post-route、DRC/CDC、bitstream、实板 DAC 与六档采样频率通过** |
 | **P3-K DAC-ROM 实板通过版** | **全国赛板级** | **427** | **416** | **4** | **2** | **2** | **+44.983/+0.105 ns** | **0.271 W** | **显式ROM地址计数；保留指针推导历史优化** | **Smoke/Release 15/15、post-route、DRC/CDC、bitstream、实板 DAC/采样率正常** |
