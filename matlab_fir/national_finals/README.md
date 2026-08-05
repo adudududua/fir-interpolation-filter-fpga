@@ -1,5 +1,18 @@
 # 全国总决赛：双采样率可配置插值滤波器
 
+## P3-P 近期论文驱动优化审计（2026-08-05，No-Go，保留 P3-O）
+
+本轮检索并筛选了2022～2026年的BLMAC、有限字长最优FIR、MCM/ILP、乘累加联合优化、
+adder-mux联合优化以及2025年的时分复用常数乘工作；随后用rebuilt层次综合定位
+Stage2/3、Stage1、CIC和测试音ROM热点。完成BRAM输出直连、级联饱和及四策略扫描、
+DSP PREG直出、窄valid屏蔽宽复位、显式RAMB18测试音ROM五类试验。
+
+五类候选的最佳实现LUT依次为367、369、综合416后停止、370和368，均不低于P3-O的
+361 LUT；DSP仍为4、BRAM仍为2 Tile，所有进入实现的候选均通过Timing/DRC/CDC和功耗
+报告。显式RAMB18还完成了SDP 36-bit原语、INIT位序、UNISIM GSR和双采样率回绕测试。
+因此正式RTL已恢复为P3-O，当前推荐候选和实板回退不变。论文链接、适用性判断、热点表、
+每项资源/Timing/Power和失败原因见 [P3-P论文驱动优化执行反馈](results/p3p_recent_paper_driven_optimization_execution_feedback.md)。
+
 ## 当前推荐工具签核候选：P3-O ExploreWithRemap 版（361 LUT / 4 DSP）
 
 P3-O 从已实板通过的 P3-M 逐文件核对源码后建立，**不修改任何滤波 RTL、系数、字长、舍入、饱和、valid 时序、时钟或 DAC 接口**，只把完整板级实现的 `opt_design` 从 `Default` 改为 `ExploreWithRemap`。同一份 395-LUT/388-FF 综合网表由 `368 LUT / 386 FF` 收敛到 **361 LUT / 386 FF / 158 Slice / 4 DSP / 4 RAMB18E1（2 Tile）/ 2 MMCM**，达到本轮 355～362 LUT 目标；WNS/WHS 为 **+44.989/+0.103 ns**，AD9708 setup/hold 为 **+76.116/+78.117 ns**，功耗仍为 **0.271/0.199/0.072 W**。
@@ -63,6 +76,7 @@ Packed-ROM 之前的 P3-J 430-LUT 基线已从干净提交完成 MATLAB、Releas
 | 候选 | LUT | FF | Slice | DSP | RAMB18 / Tile | WNS/WHS | 结论 |
 |---|---:|---:|---:|---:|---:|---:|---|
 | **P3-O ExploreWithRemap** | **361** | **386** | **158** | **4** | **4 / 2.0** | **+44.989/+0.103 ns** | **工具17/17、routed-DCP DAC/六档通过；待用户板测** |
+| P3-P论文驱动审计（保留P3-O） | 361 | 386 | 158 | 4 | 4 / 2.0 | +44.989/+0.103 ns | 五类候选均No-Go；正式RTL仍为P3-O |
 | **P3-M Stage1 DSP-register** | **368** | **386** | **156** | **4** | **4 / 2.0** | **+44.836/+0.117 ns** | **正式实板通过：DAC 与各档采样率正确** |
 | **P3-L shared guard** | **397** | **409** | **161** | **4** | **4 / 2.0** | **+44.408/+0.121 ns** | **正式实板通过：DAC 与六档采样频率正确** |
 | **P3-K DAC-ROM 修复版** | **427** | **416** | **177** | **4** | **4 / 2.0** | **+44.983/+0.105 ns** | **安全实板回退** |
