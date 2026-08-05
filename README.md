@@ -8,6 +8,12 @@
 
 本版已完成 Stage1 行为 RAM 与真实 UNISIM RAMB18E1 两套1400输出0-LSB对比、最终同源码 Smoke/Release 各 **17/17**、14组全链冲激/10 seed/满量程/强信号4x/8x/128x 0 LSB、8类复位恢复、10次动态倍率切换、普通Vivado GUI从零综合/实现/Bitstream，以及routed-DCP默认DAC活动和六模式公开按键路径测试。六档得到44.1 kHz `177/353/5645 edges/ms`、48 kHz `192/384/6144 edges/ms`，DAC数据均持续变化。**2026-08-05 用户完成物理板复测，确认各档位采样率均正确且 DAC 输出波形正常，因此 P3-M 正式升级为当前最低 LUT 的实板通过发布；P3-L 397-LUT 标签保留为前一实板安全回退。**完整方法和证据见 [P3-M Stage1 DSP 内部寄存器优化执行反馈](matlab_fir/national_finals/results/p3m_stage1_dspreg_368lut_execution_feedback.md) 与 [`p3m_stage1_dspreg_synth_r1`](matlab_fir/national_finals/vivado_results/p3m_stage1_dspreg_synth_r1)。
 
+## P3-N 后续实验：CIC one-hot burst 状态（No-Go，2026-08-05）
+
+在 P3-M 上继续审计后确认：N3 Hold CIC 的两级低速 comb 已经串行共享同一个 LUT/CARRY 减法数据通路，没有第二次共享空间。随后把4-bit递减 burst计数器改为15-bit thermometer/shift window，以少量FF换取减一器和比较LUT。候选通过CIC单元连续/随机停顿/突发中复位逐周期等价、最终Smoke/Release各 **17/17**，Release的冲激、10个随机种子、正负满量程和强−1 dBFS在4x/8x/128x均为 **0 LSB**。
+
+第一次综合虽然仍为395 LUT/388 FF，但网表审计发现板级参数实际绑定为0，因此立即作废；补齐 `board -> common -> filter -> CIC` 参数链并加入板级启用断言后，有效同策略综合为 **403 LUT / 399 FF / 4 DSP / 2 BRAM Tile / 2 MMCM**，相对P3-M综合基线增加 **8 LUT和11 FF**。本路线按Stop/Go规则停止在综合阶段，没有实现、Timing、功耗、bitstream或板测结果；正式工作版本仍为P3-M 368-LUT实板通过版。滤波器数值路径未改变，六工况频响严格继承P3-M。完整过程、首次假结果纠正、验证路径和资源表见 [P3-N CIC one-hot burst 执行反馈](matlab_fir/national_finals/results/p3n_cic_onehot_burst_nogo_execution_feedback.md)。
+
 ## 前一正式实板通过回退：397 LUT / 4 DSP P3-L 共享保护时基版（2026-08-04）
 
 当前正式分支为 `national-finals-p3l-safe-packedrom-395target`，最终布局布线资源为 **397 LUT / 409 FF / 161 Slice / 4 DSP / 2 BRAM Tile / 2 MMCM**，WNS/WHS 为 **+44.408/+0.121 ns**，AD9708 setup/hold slack 为 **+76.116/+78.117 ns**，vectorless 功耗为 **0.271 W（Medium confidence）**。正式 bitstream SHA-256 为 `AC8735BAD24450FA038C79B104072DA70CEFA6FEF7B599C52CE16ECA5F091440`。

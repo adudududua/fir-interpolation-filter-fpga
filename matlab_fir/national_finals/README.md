@@ -6,6 +6,12 @@
 
 P3-M 把Stage1左操作数从24-bit Fabric寄存器迁移到DSP48E1 `AREG`，把历史有效性宽掩码迁移到动态 `INMODE`，并将读调度改为 `L0,R0,...,L25,R25`。行为RAM和真实UNISIM RAMB18E1均完成1400输出0-LSB对比；最终同源码 Smoke/Release 均为 **17/17 PASS**，复位、动态切换、GUI从零综合/实现/Bitstream、默认和六模式routed-DCP DAC均通过。六档为44.1 kHz `177/353/5645 edges/ms`、48 kHz `192/384/6144 edges/ms`，DAC数据持续变化。**2026-08-05 用户完成物理板复测，确认各档位采样率均正确且 DAC 输出波形正常；P3-M 现为正式实板通过版，P3-L 降为前一实板安全回退。**详见 [P3-M 执行反馈](results/p3m_stage1_dspreg_368lut_execution_feedback.md) 与 [`p3m_stage1_dspreg_synth_r1`](vivado_results/p3m_stage1_dspreg_synth_r1)。
 
+## P3-N CIC one-hot burst 后续实验（No-Go）
+
+结构审计确认 P3-M 的两级低速 comb 已经串行共享一个LUT/CARRY减法数据通路。本轮把4-bit递减burst计数器改为15-bit thermometer移位状态，并保留任意 `ce_out` 停顿语义。CIC单元连续/随机停顿/突发中复位等价通过；板级参数链加入“候选必须启用”断言后，Smoke/Release均为 **17/17 PASS**，14组Release全链输入在4x/8x/128x均为 **0 LSB**。
+
+第一次395/388综合因板级参数仍为0被网表审计作废；修正后日志确认两级参数均绑定为1，有效综合为 **403 LUT / 399 FF / 4 DSP / 4 RAMB18E1（2 Tile）/ 2 MMCM**，比P3-M综合基线多 **8 LUT/11 FF**。因此没有继续实现、Timing、功耗或bitstream，正式版仍为P3-M 368/386/156。六工况频响完全继承P3-M；详见 [P3-N执行反馈](results/p3n_cic_onehot_burst_nogo_execution_feedback.md)。实验分支为 `national-finals-p3n-cic-onehot-burst`，名称不含 `codex`。
+
 ## 前一正式实板通过回退：P3-L 共享保护时基版（397 LUT / 4 DSP）
 
 当前分支 `national-finals-p3l-safe-packedrom-395target` 的完整板级结果为 **397 LUT / 409 FF / 161 Slice / 4 DSP / 4 RAMB18E1（2 Tile）/ 2 MMCM**，WNS/WHS **+44.408/+0.121 ns**，AD9708 setup/hold **+76.116/+78.117 ns**，vectorless 功耗 **0.271 W**。bitstream SHA-256 为 `AC8735BAD24450FA038C79B104072DA70CEFA6FEF7B599C52CE16ECA5F091440`。
