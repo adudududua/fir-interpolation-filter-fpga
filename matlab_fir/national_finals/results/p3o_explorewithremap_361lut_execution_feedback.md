@@ -103,8 +103,8 @@ ROM、插值链、DAC寄存器和ODDR。完整140 ms网表仿真结果为：
 | 48 kHz / 128x | 6144 | 3810 | PASS |
 
 `177 edges/ms` 是176.4 kHz在1 ms整数计数窗中的量化结果，不表示设计频率变成177 kHz。
-运行目录分别为 `_work/postroute_dac_activity/20260805_174102` 与
-`_work/postroute_six_mode_dac/20260805_174245`。六模式第一次在第4档后被外层15分钟命令
+正式发布DCP运行目录分别为 `_work/postroute_dac_activity/20260805_182536` 与
+`_work/postroute_six_mode_dac/20260805_182648`。此前候选DCP的六模式第一次在第4档后被外层15分钟命令
 超时终止；复用同一编译快照并放宽超时后完整重跑，六档全部通过，功能本身没有超时错误。
 
 ## 6. 频响、Timing、功耗与物理检查
@@ -128,10 +128,10 @@ ROM、插值链、DAC寄存器和ODDR。完整140 ms网表仿真结果为：
 - vectorless功耗：总/动态/静态 `0.271/0.199/0.072 W`，Medium confidence。
 
 Bitstream SHA-256：
-`6ABD2571C0DDB8E7CBC86D98E329D974C9D3B32E4162689240C639824CD34DCD`
+`A64D5817BB08841BF1ADB10E291F3533C3E2BEB7B898133AD334E61B3A153E6C`
 
 Routed DCP SHA-256：
-`4D5A7E9C94831C246BF01A8A9BDFE92017EB911D171497C09855C9283336A513`
+`1754F3395FA5293BB564B0F3D33EE59DC1804054570E19A30D00E24EEC77B0D6`
 
 ## 7. 普通 GUI 与脚本复现
 
@@ -159,6 +159,13 @@ source matlab_fir/national_finals/vivado/configure_national_finals_gui_project.t
 source matlab_fir/national_finals/vivado/verify_national_finals_gui_project.tcl rebuild
 ```
 
+2026-08-05 已实际执行上述 `rebuild`，不是只做配置检查。普通工程从零完成
+`synth_1 -> impl_1 -> write_bitstream`，约127秒结束，0 Error，并再次报告
+`GUI_LUT=361 / GUI_FF=386 / GUI_DSP=4 / GUI_BRAM18=4 / GUI_MMCM=2`，最终输出
+`NATIONAL_FINALS_GUI_IMPLEMENTATION_PASS`。完整日志已归档到正式结果目录的
+`gui_rebuild.log`。因此用户在GUI中手动运行时无需额外修改generic或实现指令；建议并行
+jobs保持为4。
+
 所有Vivado/XSim临时日志继续写入 `matlab_fir/national_finals/_work`，不会写到仓库根目录。
 
 ## 8. Git回退与板测待办
@@ -166,6 +173,11 @@ source matlab_fir/national_finals/vivado/verify_national_finals_gui_project.tcl 
 - 当前分支：`national-finals-p3o-355to362-target`；
 - 工具签核标签：`nf-p3o-toolverified-361lut-386ff-158slice-4dsp-2bram`；
 - 物理板回退：`nf-p3m-final-368lut-386ff-156slice-4dsp-2bram-boardverified`。
+
+正式证据目录为
+`matlab_fir/national_finals/vivado_results/p3o_final_361lut_386ff_4dsp_2bram`，其中包含
+bitstream、routed DCP、资源/Timing/功耗/DRC/CDC报告、17项RTL回归的关键XSim日志、
+两项routed-DCP DAC日志及普通GUI从零重建日志。
 
 用户板测只需确认：下载P3-O bitstream后DAC有正常波形，44.1/48 kHz下1x/4x/8x/128x
 边沿均正确，切换不锁死且无持续128直流码。通过后再增加`boardverified`标签；工具侧不会虚构

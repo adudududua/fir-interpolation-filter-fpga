@@ -6,7 +6,7 @@ P3-O 从已物理板通过的 P3-M 正式标签逐文件核对源码后建立，
 
 本轮Release RTL为 **17/17 PASS**：冲激、10个固定seed、正/负满量程和−1 dBFS强信号在4x/8x/128x均逐样本0 LSB；8类复位恢复、1200次CDC、100次时钟族切换和10次动态倍率切换均通过。361-LUT routed DCP默认启动6 ms得到11290个DAC边沿和7461次数据变化；公开按键级六模式得到44.1 kHz的`177/353/5645 edges/ms`与48 kHz的`192/384/6144 edges/ms`，六档数据均持续变化。
 
-普通GUI工程、包装脚本和实现Tcl已统一固定`ExploreWithRemap`，GUI发布门槛收紧为`LUT<=362 / FF<=400 / DSP=4 / RAMB18E1=4 / MMCM=2`，避免手动实现静默回到368-LUT Default或错误参数。P3-O当前为工具完整签核、待用户板测候选；P3-M仍是物理板安全回退。完整方法、超时重跑、Timing/功耗、哈希和复现步骤见 [P3-O 361-LUT执行反馈](matlab_fir/national_finals/results/p3o_explorewithremap_361lut_execution_feedback.md)。
+普通GUI工程、包装脚本和实现Tcl已统一固定`ExploreWithRemap`，GUI发布门槛收紧为`LUT<=362 / FF<=400 / DSP=4 / RAMB18E1=4 / MMCM=2`，避免手动实现静默回到368-LUT Default或错误参数。普通GUI工程从零执行`synth_1 -> impl_1 -> write_bitstream`约127秒，再次复现361/386/4-DSP/4-RAMB18并成功生成bitstream。P3-O当前为工具完整签核、待用户板测候选；P3-M仍是物理板安全回退。完整方法、超时重跑、Timing/功耗、哈希、正式证据目录和复现步骤见 [P3-O 361-LUT执行反馈](matlab_fir/national_finals/results/p3o_explorewithremap_361lut_execution_feedback.md)。
 
 ## 当前正式实板通过发布：368 LUT / 4 DSP P3-M Stage1 DSP-register 版（2026-08-05）
 

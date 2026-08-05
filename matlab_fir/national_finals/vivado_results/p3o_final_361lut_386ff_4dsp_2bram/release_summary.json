@@ -1,0 +1,42 @@
+{
+  "release": "P3-O ExploreWithRemap",
+  "date": "2026-08-05",
+  "branch": "national-finals-p3o-355to362-target",
+  "configuration_commit": "2381edc",
+  "rollback_tag": "nf-p3m-final-368lut-386ff-156slice-4dsp-2bram-boardverified",
+  "planned_release_tag": "nf-p3o-toolverified-361lut-386ff-158slice-4dsp-2bram",
+  "architecture": {
+    "rtl_equivalent_to_p3m": true,
+    "implementation_opt_directive": "ExploreWithRemap",
+    "dsp48e1": 4,
+    "ramb18e1": 4,
+    "bram_tiles": 2.0,
+    "mmcm": 2
+  },
+  "routed": {
+    "lut": 361,
+    "ff": 386,
+    "slice": 158,
+    "wns_ns": 44.989,
+    "tns_ns": 0.0,
+    "whs_ns": 0.103,
+    "ths_ns": 0.0,
+    "ad9708_setup_ns": 76.116,
+    "ad9708_hold_ns": 78.117,
+    "power_total_w": 0.271,
+    "power_dynamic_w": 0.199,
+    "power_static_w": 0.072
+  },
+  "verification": {
+    "rtl_release": "17/17 PASS",
+    "full_chain_bittrue": "14 cases, 4x/8x/128x all 0 LSB",
+    "postroute_default_dac": "PASS, 11290 edges and 7461 data changes in 6 ms",
+    "postroute_six_mode": "PASS, 44.1k: 177/353/5645; 48k: 192/384/6144 edges/ms",
+    "gui_clean_rebuild": "PASS, 361 LUT / 386 FF / 4 DSP / 4 RAMB18E1 / 2 MMCM",
+    "physical_board": "pending user test; P3-M remains board-verified rollback"
+  },
+  "sha256": {
+    "bitstream": "A64D5817BB08841BF1ADB10E291F3533C3E2BEB7B898133AD334E61B3A153E6C",
+    "routed_dcp": "1754F3395FA5293BB564B0F3D33EE59DC1804054570E19A30D00E24EEC77B0D6"
+  }
+}

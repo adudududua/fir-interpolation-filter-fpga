@@ -4,7 +4,7 @@
 
 P3-O 从已实板通过的 P3-M 逐文件核对源码后建立，**不修改任何滤波 RTL、系数、字长、舍入、饱和、valid 时序、时钟或 DAC 接口**，只把完整板级实现的 `opt_design` 从 `Default` 改为 `ExploreWithRemap`。同一份 395-LUT/388-FF 综合网表由 `368 LUT / 386 FF` 收敛到 **361 LUT / 386 FF / 158 Slice / 4 DSP / 4 RAMB18E1（2 Tile）/ 2 MMCM**，达到本轮 355～362 LUT 目标；WNS/WHS 为 **+44.989/+0.103 ns**，AD9708 setup/hold 为 **+76.116/+78.117 ns**，功耗仍为 **0.271/0.199/0.072 W**。
 
-本轮 Release RTL 为 **17/17 PASS**：冲激、10 个固定seed、正/负满量程和 −1 dBFS 强信号的4x/8x/128x全部0 LSB；8类复位恢复、1200次CDC、100次时钟族切换和10次动态倍率切换均通过。361-LUT routed DCP默认启动6 ms得到11290个DAC边沿和7461次数据变化；公开按键级六模式网表仿真得到44.1 kHz的`177/353/5645 edges/ms`和48 kHz的`192/384/6144 edges/ms`，六档DAC数据均持续变化。包装脚本与普通GUI工程已固定 `ExploreWithRemap`，GUI门槛收紧为`LUT<=362 / FF<=400 / DSP=4 / RAMB18E1=4 / MMCM=2`。详细依据、超时重跑记录、哈希和复现步骤见 [P3-O执行反馈](results/p3o_explorewithremap_361lut_execution_feedback.md)。
+本轮 Release RTL 为 **17/17 PASS**：冲激、10 个固定seed、正/负满量程和 −1 dBFS 强信号的4x/8x/128x全部0 LSB；8类复位恢复、1200次CDC、100次时钟族切换和10次动态倍率切换均通过。361-LUT routed DCP默认启动6 ms得到11290个DAC边沿和7461次数据变化；公开按键级六模式网表仿真得到44.1 kHz的`177/353/5645 edges/ms`和48 kHz的`192/384/6144 edges/ms`，六档DAC数据均持续变化。包装脚本与普通GUI工程已固定 `ExploreWithRemap`，GUI门槛收紧为`LUT<=362 / FF<=400 / DSP=4 / RAMB18E1=4 / MMCM=2`；普通GUI工程从零重建约127秒，再次复现361/386/4-DSP/4-RAMB18并成功生成bitstream。详细依据、超时重跑记录、哈希和复现步骤见 [P3-O执行反馈](results/p3o_explorewithremap_361lut_execution_feedback.md)。
 
 P3-O 当前是**工具完整签核、待用户板测**候选；P3-M 仍是物理板安全回退。分支为`national-finals-p3o-355to362-target`，计划工具标签为`nf-p3o-toolverified-361lut-386ff-158slice-4dsp-2bram`，名称均不含`codex`。
 

@@ -1,0 +1,28 @@
+#-----------------------------------------------------------
+# xsim v2018.3 (64-bit)
+# SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+# IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+# Start of session at: Wed Aug  5 17:39:36 2026
+# Process ID: 40792
+# Current directory: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/_work/rtl_regression/20260805_172537/full_chain_reset_recovery
+# Command line: xsim.exe -mode tcl -source {xsim.dir/tb_nf_full_reset_sim/xsim_script.tcl}
+# Log file: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/_work/rtl_regression/20260805_172537/full_chain_reset_recovery/xsim.log
+# Journal file: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/_work/rtl_regression/20260805_172537/full_chain_reset_recovery\xsim.jou
+#-----------------------------------------------------------
+source xsim.dir/tb_nf_full_reset_sim/xsim_script.tcl
+# xsim {tb_nf_full_reset_sim} -autoloadwcfg -runall
+Vivado Simulator 2018.3
+Time resolution is 1 ps
+run -all
+PHASE7 FULL RESET scenario=1 PASS compared=4096 y128 outputs
+PHASE7 FULL RESET scenario=2 PASS compared=4096 y128 outputs
+PHASE7 FULL RESET scenario=3 PASS compared=4096 y128 outputs
+PHASE7 FULL RESET scenario=4 PASS compared=4096 y128 outputs
+PHASE7 FULL RESET scenario=5 PASS compared=4096 y128 outputs
+PHASE7 FULL RESET scenario=6 PASS compared=4096 y128 outputs
+PHASE7 FULL RESET scenario=7 PASS compared=4096 y128 outputs
+PHASE7 FULL RESET scenario=8 PASS compared=4096 y128 outputs
+PHASE7 FULL RESET RECOVERY PASS: 8 internal-state scenarios clean.
+$finish called at time : 332490 ns : File "D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sim_1/new/all2x_v7/verification/tb_phase7_full_chain_reset_recovery.v" Line 446
+exit
+INFO: [Common 17-206] Exiting xsim at Wed Aug  5 17:39:45 2026...
