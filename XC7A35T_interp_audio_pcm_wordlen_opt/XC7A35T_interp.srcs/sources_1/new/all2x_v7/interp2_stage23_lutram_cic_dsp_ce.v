@@ -89,6 +89,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     localparam integer SHIFT_W = ACC_W - FRAC_W;
     localparam integer STAGE2_UPPER_W = SHIFT_W - STAGE2_DATA_W;
     localparam integer STAGE3_UPPER_W = SHIFT_W - STAGE3_OUTPUT_W;
+    localparam integer PATTERN_SAT_SUPPORTED =
+        (STAGE2_DATA_W == 22 && STAGE3_OUTPUT_W == 21);
     localparam signed [STAGE2_DATA_W-1:0] STAGE2_OUT_MAX =
         {1'b0, {(STAGE2_DATA_W-1){1'b1}}};
     localparam signed [STAGE2_DATA_W-1:0] STAGE2_OUT_MIN =
@@ -153,6 +155,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     reg signed [COEFF_W-1:0] coeff_bram_raw;
     reg job_result_pending;
     reg job_output_pending;
+    reg job_saturation_pending;
 
     wire [MEM_ADDR_W-1:0] stage2_write_addr;
     wire [MEM_ADDR_W-1:0] stage3_write_addr;
@@ -189,7 +192,15 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     wire dsp_p_reset;
     wire [6:0] dsp_opmode;
     wire signed [47:0] dsp_round_bias;
+    wire signed [47:0] dsp_c_input;
+    wire signed [47:0] dsp_saturation_value;
+    wire signed [47:0] stage2_sat_max_scaled;
+    wire signed [47:0] stage2_sat_min_scaled;
+    wire signed [47:0] stage3_sat_max_scaled;
+    wire signed [47:0] stage3_sat_min_scaled;
     wire dsp_round_carryin;
+    wire dsp_pattern_zero;
+    wire dsp_pattern_ones;
     wire signed [STAGE2_DATA_W-1:0] stage2_q15_rounded;
     wire signed [STAGE3_OUTPUT_W-1:0] stage3_q15_rounded;
     wire signed [SHIFT_W-1:0] truncated_value;
@@ -341,15 +352,38 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     // PREG is synchronously cleared as a new job is accepted, then feeds the
     // DSP48 ALU Z input on every MAC cycle.  After the final MAC, one otherwise
     // idle cycle adds the exact signed Q15 rounding bias inside the same DSP:
-    // +16384 for non-negative sums and +16383 for negative sums.
+    // +16384 for non-negative sums and +16383 for negative sums.  A second
+    // spare cycle uses PATTERNDETECT to keep an in-range result or loads the
+    // exact signed limit through the C input when saturation is required.
     assign dsp_p_reset = !rst_n ||
         (!job_active && !job_result_pending && !job_output_pending &&
+         !job_saturation_pending &&
          (stage2_pending || stage3_pending));
     assign dsp_round_bias = 48'sd16383;
+    assign stage2_sat_max_scaled =
+        {{(48-STAGE2_DATA_W-FRAC_W){1'b0}},
+         1'b0, {(STAGE2_DATA_W-1){1'b1}}, {FRAC_W{1'b0}}};
+    assign stage2_sat_min_scaled =
+        {{(48-STAGE2_DATA_W-FRAC_W){1'b1}},
+         1'b1, {(STAGE2_DATA_W-1){1'b0}}, {FRAC_W{1'b0}}};
+    assign stage3_sat_max_scaled =
+        {{(48-STAGE3_OUTPUT_W-FRAC_W){1'b0}},
+         1'b0, {(STAGE3_OUTPUT_W-1){1'b1}}, {FRAC_W{1'b0}}};
+    assign stage3_sat_min_scaled =
+        {{(48-STAGE3_OUTPUT_W-FRAC_W){1'b1}},
+         1'b1, {(STAGE3_OUTPUT_W-1){1'b0}}, {FRAC_W{1'b0}}};
+    assign dsp_saturation_value = !job_stage3 ?
+        (mac_sum_comb[ACC_W-1] ?
+         stage2_sat_min_scaled : stage2_sat_max_scaled) :
+        (mac_sum_comb[ACC_W-1] ?
+         stage3_sat_min_scaled : stage3_sat_max_scaled);
+    assign dsp_c_input = job_output_pending ?
+        dsp_saturation_value : dsp_round_bias;
     assign dsp_round_carryin =
         job_result_pending && !mac_sum_comb[ACC_W-1];
-    assign dsp_opmode = job_result_pending ?
-        7'b0001110 : 7'b0100101;
+    assign dsp_opmode = job_output_pending ?
+        7'b0001100 :
+        (job_result_pending ? 7'b0001110 : 7'b0100101);
 
     // 显式使用一颗 DSP48E1，避免综合器把乘法和累加拆成多颗 DSP。
     // MAC 周期用 M+P，提交周期用 P+C 加入符号相关舍入偏置。
@@ -358,6 +392,11 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         .B_INPUT("DIRECT"),
         .USE_DPORT("FALSE"),
         .USE_MULT("MULTIPLY"),
+        .USE_PATTERN_DETECT("PATDET"),
+        .SEL_MASK("MASK"),
+        .SEL_PATTERN("PATTERN"),
+        .MASK(48'h000FFFFFFFFF),
+        .PATTERN(48'h000000000000),
         .USE_SIMD("ONE48"),
         .AREG(0),
         .ACASCREG(0),
@@ -377,7 +416,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         .P(dsp_mac_full),
         .A(dsp_input_a),
         .B(dsp_coeff_b),
-        .C(dsp_round_bias),
+        .C(dsp_c_input),
         .D(dsp_input_d),
         .INMODE(5'b00000),
         .OPMODE(dsp_opmode),
@@ -402,7 +441,10 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         .CED(1'b0),
         .CEINMODE(1'b0),
         .CEM(1'b0),
-        .CEP(job_active || job_result_pending),
+        .CEP(job_active || job_result_pending ||
+             (job_output_pending &&
+              !(job_stage3 ? stage3_upper_is_sign_extension :
+                              stage2_upper_is_sign_extension))),
         .RSTA(1'b0),
         .RSTALLCARRYIN(1'b0),
         .RSTALUMODE(1'b0),
@@ -419,43 +461,48 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         .CARRYOUT(),
         .MULTSIGNOUT(),
         .OVERFLOW(),
-        .PATTERNBDETECT(),
-        .PATTERNDETECT(),
+        .PATTERNBDETECT(dsp_pattern_ones),
+        .PATTERNDETECT(dsp_pattern_zero),
         .PCOUT(),
         .UNDERFLOW()
     );
     assign mac_sum_comb = dsp_mac_full[ACC_W-1:0];
 
     // The PREG value has already received the exact signed rounding bias.
-    // Only arithmetic truncation and the two output-width saturation checks
-    // remain in Slice logic.
+    // For the signed-22/signed-21 national-finals profile, PATTERNDETECT checks
+    // P[47:36] and serves both widths exactly: Stage2 includes sign P[36],
+    // while Stage3 compares those bits against sign P[35].  Other legal
+    // parameterizations retain the generic Fabric comparison fallback.
     assign truncated_value = mac_sum_comb >>> FRAC_W;
 
     assign stage2_upper_is_sign_extension =
-        truncated_value[SHIFT_W-1:STAGE2_DATA_W] ==
-        {STAGE2_UPPER_W{truncated_value[STAGE2_DATA_W-1]}};
-    assign stage2_q15_rounded = stage2_upper_is_sign_extension ?
-        truncated_value[STAGE2_DATA_W-1:0] :
-        (truncated_value[SHIFT_W-1] ? STAGE2_OUT_MIN : STAGE2_OUT_MAX);
+        PATTERN_SAT_SUPPORTED ?
+        (mac_sum_comb[STAGE2_DATA_W+FRAC_W-1] ?
+         dsp_pattern_ones : dsp_pattern_zero) :
+        (truncated_value[SHIFT_W-1:STAGE2_DATA_W] ==
+         {STAGE2_UPPER_W{truncated_value[STAGE2_DATA_W-1]}});
+    assign stage2_q15_rounded =
+        truncated_value[STAGE2_DATA_W-1:0];
 
     // The national-finals Stage3 coefficients are true Q15 values.  Their
     // worst-case absolute branch sum no longer makes the former 35-bit
-    // direct slice safe, so retain the complete 38-bit view and explicit
-    // signed saturation for every Stage3 configuration.
+    // direct slice safe, so the complete 38-bit view and exact signed
+    // saturation remain mandatory.
     assign stage3_upper_is_sign_extension =
-        truncated_value[SHIFT_W-1:STAGE3_OUTPUT_W] ==
-        {STAGE3_UPPER_W{truncated_value[STAGE3_OUTPUT_W-1]}};
+        PATTERN_SAT_SUPPORTED ?
+        (mac_sum_comb[STAGE3_OUTPUT_W+FRAC_W-1] ?
+         dsp_pattern_ones : dsp_pattern_zero) :
+        (truncated_value[SHIFT_W-1:STAGE3_OUTPUT_W] ==
+         {STAGE3_UPPER_W{truncated_value[STAGE3_OUTPUT_W-1]}});
     assign stage3_q15_rounded =
-        stage3_upper_is_sign_extension ?
-        truncated_value[STAGE3_OUTPUT_W-1:0] :
-        (truncated_value[SHIFT_W-1] ?
-         STAGE3_OUT_MIN : STAGE3_OUT_MAX);
+        truncated_value[STAGE3_OUTPUT_W-1:0];
 
 
     assign stage2_phase_dbg = stage2_phase;
     assign stage3_phase_dbg = stage3_phase;
     assign scheduler_busy_dbg =
-        job_active || job_result_pending || job_output_pending;
+        job_active || job_result_pending || job_output_pending ||
+        job_saturation_pending;
     assign scheduler_stage_dbg = job_active ?
         {1'b1, job_stage3} : 2'd0;
     assign scheduler_mac_index_dbg = job_mac_index;
@@ -711,6 +758,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
             job_history_full <= 1'b0;
             job_result_pending <= 1'b0;
             job_output_pending <= 1'b0;
+            job_saturation_pending <= 1'b0;
             stage2_y_out <= {STAGE2_DATA_W{1'b0}};
             stage3_y_out <= {STAGE3_OUTPUT_W{1'b0}};
             stage2_y_out_valid <= 1'b0;
@@ -742,7 +790,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
                 stage3_phase <= ~stage3_phase;
             end
 
-            if (job_output_pending) begin
+            if (job_saturation_pending) begin
                 if (!job_stage3) begin
                     stage2_y_out <= stage2_q15_rounded;
                     stage2_y_out_valid <= 1'b1;
@@ -751,7 +799,11 @@ module interp2_stage23_lutram_cic_dsp_ce #(
                     stage3_y_out <= stage3_q15_rounded;
                     stage3_y_out_valid <= 1'b1;
                 end
+                job_saturation_pending <= 1'b0;
+            end
+            else if (job_output_pending) begin
                 job_output_pending <= 1'b0;
+                job_saturation_pending <= 1'b1;
             end
             else if (job_result_pending) begin
                 job_result_pending <= 1'b0;
