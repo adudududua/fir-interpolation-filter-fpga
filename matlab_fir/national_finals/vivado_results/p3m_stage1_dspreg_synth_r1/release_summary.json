@@ -1,5 +1,5 @@
 {
-  "release": "P3-M Stage1 DSP-register tool-verified candidate",
+  "release": "P3-M Stage1 DSP-register board-verified final",
   "branch": "national-finals-p3m-stage1-dspreg-385target",
   "device": "xc7a35tfgg484-2",
   "resources_routed": {
@@ -29,11 +29,12 @@
     "rtl_smoke": "17/17 PASS; _work/rtl_regression/20260805_003320",
     "postroute_default_dac": "PASS; _work/postroute_dac_activity/20260804_234857",
     "postroute_six_mode_dac": "6/6 PASS; _work/postroute_six_mode_dac/20260804_235012",
-    "gui_clean_rebuild": "PASS; LUT=368 FF=386 DSP=4 RAMB18=4 MMCM=2"
+    "gui_clean_rebuild": "PASS; LUT=368 FF=386 DSP=4 RAMB18=4 MMCM=2",
+    "physical_board": "PASS reported by user on 2026-08-05; all selected sample-rate modes normal and DAC waveform present"
   },
   "artifacts_sha256": {
     "bitstream": "7785D3B3110BC534A546BEAD1F05958DA736B99A46FA1D03800C406FCB5D7D7A",
     "routed_dcp": "631CDEF481C1DDE7D443C62B781392F467AFF98EEFC1A2ECBF267E6C146B2753"
   },
-  "release_status": "tool-verified; physical board verification pending"
+  "release_status": "board-verified final"
 }

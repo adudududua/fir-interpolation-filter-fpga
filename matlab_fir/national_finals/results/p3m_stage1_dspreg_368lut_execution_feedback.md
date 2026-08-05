@@ -7,12 +7,13 @@
 | 版本 | LUT | FF | Slice | DSP | RAMB18 / Tile | MMCM | WNS/WHS | Vectorless 功耗 |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | P3-L 实板通过基线 | 397 | 409 | 161 | 4 | 4 / 2.0 | 2 | +44.408/+0.121 ns | 0.271 W |
-| **P3-M DSP-register 候选** | **368** | **386** | **156** | **4** | **4 / 2.0** | **2** | **+44.836/+0.117 ns** | **0.271 W** |
+| **P3-M DSP-register 正式版** | **368** | **386** | **156** | **4** | **4 / 2.0** | **2** | **+44.836/+0.117 ns** | **0.271 W** |
 
-相对 P3-L 减少 **29 LUT、23 FF、5 Slice**；DSP、BRAM、MMCM 和功耗均不增加。P3-M 已完成 RTL、综合、实现、Timing、DRC/CDC、Bitstream、普通 Vivado GUI 重建和 routed-DCP 六模式 DAC 工具签核，但尚未由用户下载到物理板，因此当前口径为 **推荐板测候选**，不能替代已经实板验证的 P3-L 安全回退。
+相对 P3-L 减少 **29 LUT、23 FF、5 Slice**；DSP、BRAM、MMCM 和功耗均不增加。P3-M 已完成 RTL、综合、实现、Timing、DRC/CDC、Bitstream、普通 Vivado GUI 重建和 routed-DCP 六模式 DAC 工具签核。**2026-08-05 用户完成物理板复测，确认各档位采样率均正常且 DAC 输出波形正常，因此 P3-M 正式升级为当前最低 LUT 的实板通过发布；P3-L 保留为前一实板安全回退。**
 
 - 分支：`national-finals-p3m-stage1-dspreg-385target`
 - 工具签核标签：`nf-p3m-toolverified-368lut-386ff-156slice-4dsp-2bram`
+- 实板签核标签：`nf-p3m-final-368lut-386ff-156slice-4dsp-2bram-boardverified`
 - 正式证据目录：`matlab_fir/national_finals/vivado_results/p3m_stage1_dspreg_synth_r1`
 - Bitstream SHA-256：`7785D3B3110BC534A546BEAD1F05958DA736B99A46FA1D03800C406FCB5D7D7A`
 - Routed DCP SHA-256：`631CDEF481C1DDE7D443C62B781392F467AFF98EEFC1A2ECBF267E6C146B2753`
@@ -133,10 +134,12 @@ GUI 工程已核对 `AreaOptimized_high / flatten full / ResourceSharing on / op
 
 ## 9. 板测与回退
 
-工具侧已经尽可能覆盖此前“实现成功但 DAC 无波形”的失效模式，但物理板仍是最终门禁：
+工具侧覆盖了此前“实现成功但 DAC 无波形”的失效模式，物理板最终门禁也已完成：
 
-1. [ ] 下载 P3-M bitstream，确认默认档 DAC 有稳定波形；
-2. [ ] 依次切换44.1/48 kHz的4x/8x/128x，确认实际采样率；
-3. [ ] 检查家族与倍率切换期间没有持续静音、直流码或异常窄脉冲；
-4. [ ] 板测通过后再把标签升级为 `boardverified`；
-5. [x] P3-L `nf-p3l-final-397lut-409ff-161slice-4dsp-2bram-boardverified` 保持不动，作为已知实板安全回退。
+1. [x] 下载 P3-M bitstream，确认 DAC 输出波形正常；
+2. [x] 切换各个采样率/倍率档位，确认实际采样率正常；
+3. [x] 未发现持续静音或固定直流码；
+4. [x] 升级为 `boardverified` 正式发布；
+5. [x] P3-L `nf-p3l-final-397lut-409ff-161slice-4dsp-2bram-boardverified` 保持不动，作为前一实板安全回退。
+
+用户未提供逐档精确仪器数值，本文只记录已经确认的通过结论，不虚构测量值。1x 档连续采集画面的多轨迹来自 15 kHz 测试音在 44.1/48 kHz 下每周期仅约 2.94/3.2 个采样点，以及示波器没有锁定到完整 ROM 序列起点；Single 采集、采样率和 DAC 连续输出均正常，不作为数字数据通路故障。
