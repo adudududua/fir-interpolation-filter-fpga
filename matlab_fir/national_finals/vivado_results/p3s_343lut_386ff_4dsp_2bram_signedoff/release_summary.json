@@ -1,0 +1,62 @@
+{
+  "release": "P3-S ExtraTimingOpt implementation packing",
+  "status": "tool-verified; physical-board verification pending",
+  "board_fallback": "nf-p3r-final-348lut-386ff-154slice-4dsp-2bram-boardverified",
+  "rtl_regression": {
+    "smoke": "17/17 PASS",
+    "release": "17/17 PASS",
+    "full_chain_cases": 14,
+    "full_chain_max_error_lsb": {"4x": 0, "8x": 0, "128x": 0},
+    "reset_scenarios": 8,
+    "cdc_transitions": 1200,
+    "clock_family_switches": 100,
+    "dynamic_mode_switches": 10
+  },
+  "implementation": {
+    "opt_design_directive": "ExploreWithRemap",
+    "place_design_directive": "ExtraTimingOpt"
+  },
+  "synthesis": {"lut": 374, "ff": 388, "dsp48e1": 4, "ramb18e1": 4},
+  "post_route": {
+    "lut": 343,
+    "lut_logic": 342,
+    "lut_memory": 1,
+    "ff": 386,
+    "slice": 151,
+    "carry4": 30,
+    "dsp48e1": 4,
+    "ramb18e1": 4,
+    "bram_tile": 2.0,
+    "mmcm": 2,
+    "wns_ns": 45.025,
+    "whs_ns": 0.116,
+    "dac_setup_slack_ns": 76.116,
+    "dac_hold_slack_ns": 78.117,
+    "routing_errors": 0
+  },
+  "power_vectorless_w": {
+    "total": 0.271,
+    "dynamic": 0.199,
+    "static": 0.072,
+    "confidence": "Medium"
+  },
+  "postroute_dac": {
+    "default_6ms_edges": 11290,
+    "default_6ms_data_changes": 7462,
+    "six_modes": "PASS",
+    "44k1_edges_per_ms": [177, 353, 5645],
+    "48k_edges_per_ms": [192, 384, 6144]
+  },
+  "gui_rebuild": {
+    "status": "PASS",
+    "lut": 343,
+    "ff": 386,
+    "dsp48e1": 4,
+    "ramb18e1": 4,
+    "mmcm": 2
+  },
+  "sha256": {
+    "bitstream": "DDD4F906967F5E039181A9DB17CE339615AE2A7744173519C471F2316086ED2A",
+    "routed_dcp": "3338BAA1B0BD7BB33B84341E61CEE3FEB004A55BDDAF05854A81F0BCC7D67C47"
+  }
+}

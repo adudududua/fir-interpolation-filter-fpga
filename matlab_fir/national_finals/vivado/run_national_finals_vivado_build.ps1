@@ -11,6 +11,10 @@ param(
     [string]$ResourceSharing = 'on',
     [ValidateSet('Default', 'Explore', 'ExploreWithRemap', 'ExploreArea', 'AddRemap')]
     [string]$ImplementationOptDirective = 'ExploreWithRemap',
+    [ValidateSet('Default', 'Explore', 'EarlyBlockPlacement',
+        'WLDrivenBlockPlacement', 'ExtraPostPlacementOpt', 'ExtraTimingOpt',
+        'RuntimeOptimized', 'Quick')]
+    [string]$ImplementationPlaceDirective = 'ExtraTimingOpt',
     [ValidateSet(0, 1)]
     [int]$Stage1Dsp48Preadder = 1,
     [ValidateSet(0, 1, 2)]
@@ -151,7 +155,8 @@ try {
                 $Stage1Dsp48Preadder,
                 $CicIntegratorDspMode,
                 $Stage1SingleBram,
-                $Stage23UnifiedBram
+                $Stage23UnifiedBram,
+                $ImplementationPlaceDirective
             )
     }
 }

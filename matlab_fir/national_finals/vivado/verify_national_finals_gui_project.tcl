@@ -106,6 +106,8 @@ set gui_flatten_hierarchy [string tolower [get_property \
     STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY [get_runs synth_1]]]
 set gui_opt_directive [get_property \
     STEPS.OPT_DESIGN.ARGS.DIRECTIVE [get_runs impl_1]]
+set gui_place_directive [get_property \
+    STEPS.PLACE_DESIGN.ARGS.DIRECTIVE [get_runs impl_1]]
 require_condition \
     [expr {$gui_resource_sharing in {"on" "1" "true"}}] \
     "GUI synthesis ResourceSharing must be enabled."
@@ -115,6 +117,8 @@ require_condition [expr {$gui_flatten_hierarchy eq "full"}] \
     "GUI synthesis flatten_hierarchy must be full."
 require_condition [expr {$gui_opt_directive eq "ExploreWithRemap"}] \
     "GUI implementation opt_design directive must be ExploreWithRemap."
+require_condition [expr {$gui_place_directive eq "ExtraTimingOpt"}] \
+    "GUI implementation place_design directive must be ExtraTimingOpt."
 
 puts "NATIONAL_FINALS_GUI_CONFIG_PASS"
 puts "GUI_GENERICS=$project_generics"
@@ -123,6 +127,7 @@ puts "GUI_RESOURCE_SHARING=$gui_resource_sharing"
 puts "GUI_SYNTH_DIRECTIVE=$gui_synth_directive"
 puts "GUI_FLATTEN_HIERARCHY=$gui_flatten_hierarchy"
 puts "GUI_OPT_DIRECTIVE=$gui_opt_directive"
+puts "GUI_PLACE_DIRECTIVE=$gui_place_directive"
 
 if {$requested_action eq "rebuild"} {
     reset_run synth_1
@@ -173,10 +178,10 @@ if {[get_property PROGRESS [get_runs impl_1]] eq "100%"} {
         "GUI implementation does not use the expected two BRAM tiles."
     require_condition [expr {$mmcm_count == 2}] \
         "GUI implementation does not use the expected two MMCMs."
-    require_condition [expr {$lut_count <= 349}] \
-        "GUI implementation exceeds the P3-R 349-LUT release guard."
+    require_condition [expr {$lut_count <= 344}] \
+        "GUI implementation exceeds the P3-S 344-LUT release guard."
     require_condition [expr {$ff_count <= 400}] \
-        "GUI implementation exceeds the P3-R 400-FF release guard."
+        "GUI implementation exceeds the P3-S 400-FF release guard."
 
     puts "NATIONAL_FINALS_GUI_IMPLEMENTATION_PASS"
     close_design

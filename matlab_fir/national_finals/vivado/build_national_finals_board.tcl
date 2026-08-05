@@ -189,6 +189,7 @@ set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY $flatten_hierarchy \
 set_property STEPS.SYNTH_DESIGN.ARGS.RESOURCE_SHARING $resource_sharing \
     [get_runs synth_1]
 set_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE ExploreWithRemap [get_runs impl_1]
+set_property STEPS.PLACE_DESIGN.ARGS.DIRECTIVE ExtraTimingOpt [get_runs impl_1]
 
 reset_run impl_1
 if {$reuse_current_synthesis == 0} {

@@ -14,6 +14,7 @@ set board_xdc [file join $project_dir XC7A35T_interp.srcs constrs_1 new \
     board_demo_competition_dac8_top.xdc]
 set result_tag board_dual_rate_cic6_round7_headroom_opt
 set implementation_opt_directive ExploreWithRemap
+set implementation_place_directive ExtraTimingOpt
 set p3_joint_stage3 1
 set expected_synth_directive AreaOptimized_high
 set expected_flatten_hierarchy full
@@ -52,12 +53,20 @@ if {$argc > 8} {
 if {$argc > 9} {
     set expected_stage23_unified_bram [lindex $argv 9]
 }
+if {$argc > 10} {
+    set implementation_place_directive [lindex $argv 10]
+}
 if {![regexp {^[A-Za-z0-9_-]+$} $result_tag]} {
     error "result_tag may contain only letters, digits, underscore, and dash"
 }
 if {$implementation_opt_directive ni \
     {Default Explore ExploreWithRemap ExploreArea AddRemap}} {
     error "Unsupported implementation opt directive: $implementation_opt_directive"
+}
+if {$implementation_place_directive ni {Default Explore EarlyBlockPlacement \
+        WLDrivenBlockPlacement ExtraPostPlacementOpt ExtraTimingOpt \
+        RuntimeOptimized Quick}} {
+    error "Unsupported implementation place directive: $implementation_place_directive"
 }
 if {$p3_joint_stage3 != 0 && $p3_joint_stage3 != 1} {
     error "p3_joint_stage3 must be 0 or 1"
@@ -143,7 +152,11 @@ if {$implementation_opt_directive eq "Default"} {
 } else {
     opt_design -directive $implementation_opt_directive
 }
-place_design
+if {$implementation_place_directive eq "Default"} {
+    place_design
+} else {
+    place_design -directive $implementation_place_directive
+}
 route_design
 
 set setup_path [get_timing_paths -delay_type max -max_paths 1]
@@ -294,6 +307,7 @@ puts $manifest_handle "Requested CIC integrator DSP mode: $expected_cic_integrat
 puts $manifest_handle "Stage1 single-BRAM history mode: $expected_stage1_single_bram"
 puts $manifest_handle "Stage2/3 unified-BRAM history mode: $expected_stage23_unified_bram"
 puts $manifest_handle "Implementation opt directive: $implementation_opt_directive"
+puts $manifest_handle "Implementation place directive: $implementation_place_directive"
 puts $manifest_handle "P3 joint Stage3 mode: $p3_joint_stage3"
 close $manifest_handle
 
