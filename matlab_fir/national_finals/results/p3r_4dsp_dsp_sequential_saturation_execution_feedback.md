@@ -4,7 +4,7 @@
 
 P3-R 在不增加乘法器和存储器的条件下，把全国赛完整板级实现优化到：
 
-| 指标 | P3-O 工具候选 | P3-M 实板版 | P3-R 工具签核候选 |
+| 指标 | P3-O 工具候选 | P3-M 实板版 | P3-R 正式实板版 |
 |---|---:|---:|---:|
 | LUT | 361 | 368 | **348** |
 | FF | 386 | 386 | **386** |
@@ -14,18 +14,19 @@ P3-R 在不增加乘法器和存储器的条件下，把全国赛完整板级实
 | MMCM | 2 | 2 | **2** |
 | WNS / WHS | +44.989 / +0.103 ns | +44.836 / +0.117 ns | **+45.200 / +0.121 ns** |
 | Vectorless 总/动态/静态功耗 | 0.271/0.199/0.072 W | 0.271/0.199/0.072 W | **0.271/0.199/0.072 W** |
-| 物理板 | 待测 | 已通过 | **待用户下载确认** |
+| 物理板 | 待测 | 已通过 | **已通过** |
 
 因此 P3-R 相对 P3-O 再减少 **13 LUT、4 Slice**，相对当前已实板通过的
 P3-M 减少 **20 LUT、2 Slice**；FF、DSP、BRAM、MMCM和功耗均不增加。P3-R已经完成
 RTL、UNISIM原语、完整链、复位/CDC、布局布线、六模式DAC网表仿真和普通GUI工程从零
-生成bitstream的工具闭环，但不能用工具仿真替代实物板结论。在用户完成板测前，P3-M
-标签仍是安全回退。
+生成bitstream的工具闭环。**2026-08-06用户完成物理板验证，确认各档输出采样率正确且
+DAC输出波形正常，因此P3-R升级为正式实板通过版；P3-M标签保留为前一安全回退。**
 
 - 分支：`national-finals-p3r-4dsp-joint-optimization`
 - 360-LUT中间标签：`nf-p3r-checkpoint-360lut-385ff-4dsp-2bram`
 - 348-LUT RTL检查点：`nf-p3r-checkpoint-348lut-386ff-4dsp-2bram`
 - 正式工具签核标签：`nf-p3r-final-348lut-386ff-154slice-4dsp-2bram-toolverified`
+- 正式实板标签：`nf-p3r-final-348lut-386ff-154slice-4dsp-2bram-boardverified`
 - 正式结果：`vivado_results/p3r_348lut_386ff_4dsp_2bram_signedoff`
 
 ## 2. 为什么这次 Pattern 方法有效
@@ -164,6 +165,6 @@ powershell -ExecutionPolicy Bypass -File .\matlab_fir\national_finals\sim\run_po
 powershell -ExecutionPolicy Bypass -File .\matlab_fir\national_finals\sim\run_postroute_six_mode_dac.ps1 -DcpPath .\matlab_fir\national_finals\vivado_results\p3r_348lut_386ff_4dsp_2bram_signedoff\national_finals_board_routed.dcp
 ```
 
-板测仍建议逐项确认：44.1/48 kHz两个家族的4x/8x/128x采样率、六档DAC持续变化、
-模式切换后静音窗和自动恢复、1x旁路波形以及复位恢复。只有这些实测均通过后，才能把
-P3-R从“工具签核候选”提升为“正式实板通过版”；此前请保留P3-M实板标签和bitstream。
+2026-08-06用户已确认44.1/48 kHz两个家族的4x/8x/128x各档输出采样率均正确、DAC输出
+波形正常，P3-R据此升级为正式实板通过版。用户没有提供逐档仪器数值，本文只记录明确
+确认的结论，不虚构额外测量数据；后续优化仍必须保留P3-R板测标签和bitstream作为回退。

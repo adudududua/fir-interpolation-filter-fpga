@@ -1,6 +1,6 @@
 {
   "release": "P3-R DSP spare-cycle rounding and saturation",
-  "status": "tool-verified; physical-board verification pending",
+  "status": "tool-verified and physical-board verified on 2026-08-06",
   "rtl_regression": {
     "smoke": "17/17 PASS",
     "release": "17/17 PASS",
