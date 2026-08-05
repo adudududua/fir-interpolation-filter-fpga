@@ -119,8 +119,6 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     reg stage3_phase;
     reg stage2_pending;
     reg stage3_pending;
-    reg stage2_pending_phase;
-    reg stage3_pending_phase;
     reg stage3_pending_compensated;
 
     reg job_active;
@@ -219,6 +217,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     integer coeff_sequence_init_idx;
     integer packed_init_idx;
 
+
+
     assign stage2_x_current = stage2_x_in_valid ?
                               stage2_x_in : {STAGE2_DATA_W{1'b0}};
     assign stage3_x_current = stage3_x_in_valid ?
@@ -250,7 +250,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     assign coeff_bram_stage3 = job_active ? job_stage3 :
         (!stage2_pending && stage3_pending);
     assign coeff_bram_phase = job_active ? job_phase :
-        (stage2_pending ? stage2_pending_phase : stage3_pending_phase);
+        (stage2_pending ? ~stage2_phase : ~stage3_phase);
     assign coeff_bram_stage3_compensated =
         (USE_P3_JOINT_STAGE3 != 0) && coeff_bram_stage3 &&
         (job_active ? job_stage3_compensated :
@@ -701,8 +701,6 @@ module interp2_stage23_lutram_cic_dsp_ce #(
             stage3_phase <= 1'b1;
             stage2_pending <= 1'b0;
             stage3_pending <= 1'b0;
-            stage2_pending_phase <= 1'b0;
-            stage3_pending_phase <= 1'b0;
             stage3_pending_compensated <= 1'b0;
             job_active <= 1'b0;
             job_stage3 <= 1'b0;
@@ -724,7 +722,6 @@ module interp2_stage23_lutram_cic_dsp_ce #(
 
             if (stage2_ce_out) begin
                 stage2_pending <= 1'b1;
-                stage2_pending_phase <= stage2_phase;
                 if (stage2_phase == 1'b0) begin
                     stage2_head <= stage2_write_addr;
                     if (stage2_head == 4'd8)
@@ -735,7 +732,6 @@ module interp2_stage23_lutram_cic_dsp_ce #(
 
             if (stage3_ce_out) begin
                 stage3_pending <= 1'b1;
-                stage3_pending_phase <= stage3_phase;
                 stage3_pending_compensated <=
                     stage3_compensated_mode;
                 if (stage3_phase == 1'b0) begin
@@ -774,7 +770,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
             else if (stage2_pending) begin
                 job_active <= 1'b1;
                 job_stage3 <= 1'b0;
-                job_phase <= stage2_pending_phase;
+                job_phase <= ~stage2_phase;
                 job_mac_index <= 4'd0;
                 job_history_head <= stage2_head;
                 job_history_full <= stage2_history_full;
@@ -783,7 +779,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
             else if (stage3_pending) begin
                 job_active <= 1'b1;
                 job_stage3 <= 1'b1;
-                job_phase <= stage3_pending_phase;
+                job_phase <= ~stage3_phase;
                 job_stage3_compensated <=
                     stage3_pending_compensated;
                 job_mac_index <= 4'd0;

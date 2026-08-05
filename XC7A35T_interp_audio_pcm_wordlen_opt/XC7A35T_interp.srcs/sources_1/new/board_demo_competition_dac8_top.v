@@ -229,7 +229,11 @@ module board_demo_competition_dac8_top #(
 
     generate
         if (USE_SHARED_KEYPAD_SCAN_TICK != 0) begin : gen_shared_family_guard
-            reg [2:0] family_switch_state = 3'd0;
+            // One-hot shift state replaces the former 3-bit incrementer plus
+            // state==1/state==4 comparisons.  The first tick commits the new
+            // family; three more ticks retain reset/mute before returning
+            // idle.  This trades one FF for a smaller control cone.
+            reg [3:0] family_switch_state = 4'd0;
             reg       family_active_r = 1'b0;
             wire      family_switch_tick;
 
@@ -239,22 +243,19 @@ module board_demo_competition_dac8_top #(
 
             always @(posedge clk_sys_bufg) begin
                 if (!rst_n_int) begin
-                    family_switch_state <= 3'd0;
+                    family_switch_state <= 4'd0;
                     family_active_r <= 1'b0;
                 end
-                else if (family_switch_state != 3'd0) begin
+                else if (family_switch_state != 4'd0) begin
                     if (family_switch_tick) begin
-                        if (family_switch_state == 3'd1)
+                        if (family_switch_state[0])
                             family_active_r <= key_family_sel;
-
-                        if (family_switch_state == 3'd4)
-                            family_switch_state <= 3'd0;
-                        else
-                            family_switch_state <= family_switch_state + 3'd1;
+                        family_switch_state <=
+                            {family_switch_state[2:0], 1'b0};
                     end
                 end
                 else if (key_family_sel != family_active_r) begin
-                    family_switch_state <= 3'd1;
+                    family_switch_state <= 4'b0001;
                 end
             end
         end
