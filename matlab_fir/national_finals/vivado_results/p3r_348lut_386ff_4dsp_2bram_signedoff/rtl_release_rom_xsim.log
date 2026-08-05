@@ -1,0 +1,20 @@
+#-----------------------------------------------------------
+# xsim v2018.3 (64-bit)
+# SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+# IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+# Start of session at: Wed Aug  5 23:10:47 2026
+# Process ID: 32336
+# Current directory: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/_work/rtl_regression/20260805_231040/rom
+# Command line: xsim.exe -mode tcl -source {xsim.dir/tb_nf_rom_sim/xsim_script.tcl}
+# Log file: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/_work/rtl_regression/20260805_231040/rom/xsim.log
+# Journal file: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/_work/rtl_regression/20260805_231040/rom\xsim.jou
+#-----------------------------------------------------------
+source xsim.dir/tb_nf_rom_sim/xsim_script.tcl
+# xsim {tb_nf_rom_sim} -autoloadwcfg -runall
+Vivado Simulator 2018.3
+Time resolution is 1 ps
+run -all
+PASS: dual-rate ROM data, wrap, and synchronous family reset
+$finish called at time : 5375 ns : File "D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sim_1/new/national_finals/tb_dual_rate_test_tone_rom_source.v" Line 111
+exit
+INFO: [Common 17-206] Exiting xsim at Wed Aug  5 23:10:51 2026...

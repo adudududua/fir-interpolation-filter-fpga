@@ -168,15 +168,15 @@ if {[get_property PROGRESS [get_runs impl_1]] eq "100%"} {
     puts "GUI_MMCM=$mmcm_count"
 
     require_condition [expr {$dsp_count == 4}] \
-        "GUI implementation is not the P3-J 4-DSP architecture."
+        "GUI implementation is not the P3-R 4-DSP architecture."
     require_condition [expr {$bram18_count == 4}] \
         "GUI implementation does not use the expected two BRAM tiles."
     require_condition [expr {$mmcm_count == 2}] \
         "GUI implementation does not use the expected two MMCMs."
-    require_condition [expr {$lut_count <= 362}] \
-        "GUI implementation exceeds the P3-O 362-LUT release guard."
+    require_condition [expr {$lut_count <= 349}] \
+        "GUI implementation exceeds the P3-R 349-LUT release guard."
     require_condition [expr {$ff_count <= 400}] \
-        "GUI implementation exceeds the P3-O 400-FF release guard."
+        "GUI implementation exceeds the P3-R 400-FF release guard."
 
     puts "NATIONAL_FINALS_GUI_IMPLEMENTATION_PASS"
     close_design
