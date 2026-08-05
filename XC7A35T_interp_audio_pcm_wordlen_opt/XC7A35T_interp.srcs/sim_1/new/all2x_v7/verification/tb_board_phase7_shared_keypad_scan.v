@@ -207,6 +207,7 @@ module demo_interp_dac8_audio_pcm_common #(
     parameter integer USE_NATIONAL_FINALS_DATAPATH = 1,
     parameter integer USE_NATIONAL_FINALS_SERIAL_CIC_COMB = 0,
     parameter integer USE_NATIONAL_FINALS_N3_HOLD_EQUIV = 0,
+    parameter integer USE_NATIONAL_FINALS_CIC_BURST_COUNTER_ONEHOT_FF = 0,
     parameter integer USE_NATIONAL_FINALS_CIC_COMB_DSP = 0,
     parameter integer USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER = 0,
     parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 0,
@@ -222,6 +223,11 @@ module demo_interp_dac8_audio_pcm_common #(
     output wire [7:0] dac_data,
     output wire [1:0] mode_led
 );
+    initial begin
+        if (USE_NATIONAL_FINALS_CIC_BURST_COUNTER_ONEHOT_FF != 1)
+            $fatal(1, "Board path did not enable the P3-N one-hot CIC burst state");
+    end
+
     assign dac_clk = clk_audio_128x & rst_n;
     assign dac_data = 8'h80;
     assign mode_led = mode_sel;

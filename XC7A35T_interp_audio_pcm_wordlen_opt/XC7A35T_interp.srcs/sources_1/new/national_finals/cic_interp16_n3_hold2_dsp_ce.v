@@ -17,7 +17,12 @@ module cic_interp16_n3_hold2_dsp_ce #(
     parameter integer OUTPUT_W = 20,
     parameter integer FINAL_PRUNE_LSB = 0,
     parameter integer BURST_COUNTER_USE_DSP = 0,
-    parameter integer INTEGRATOR_DSP_MODE = 2
+    parameter integer INTEGRATOR_DSP_MODE = 2,
+    // Replace the 4-bit subtract/compare burst counter with a 15-bit
+    // thermometer shift window.  This deliberately trades eleven FFs for a
+    // smaller LUT cone while preserving arbitrary ce_out stalls and the
+    // exact cycle-by-cycle output sequence.
+    parameter integer BURST_COUNTER_ONEHOT_FF = 0
 )(
     input  wire                         clk,
     input  wire                         rst_n,
@@ -59,6 +64,7 @@ module cic_interp16_n3_hold2_dsp_ce #(
 
     reg burst_pending;
     reg [3:0] burst_remaining;
+    reg [14:0] burst_window;
 
     wire signed [COMB_W-1:0] x_comb_extended;
     wire signed [COMB_W-1:0] comb_delay_selected;
@@ -79,10 +85,12 @@ module cic_interp16_n3_hold2_dsp_ce #(
          comb_delay0};
     assign comb_stage_result = comb_operand - comb_delay_selected;
 
-    assign output_event = ce_out &&
-                          (burst_pending || burst_remaining != 4'd0);
-    assign first_output_event = ce_out && burst_pending &&
-                                burst_remaining == 4'd0;
+    assign output_event = (BURST_COUNTER_ONEHOT_FF != 0) ?
+        (ce_out && (burst_pending || burst_window[0])) :
+        (ce_out && (burst_pending || burst_remaining != 4'd0));
+    assign first_output_event = (BURST_COUNTER_ONEHOT_FF != 0) ?
+        (ce_out && burst_pending && !burst_window[0]) :
+        (ce_out && burst_pending && burst_remaining == 4'd0);
     // A new low-rate comb result is ready before the preceding 16-sample
     // hold burst has finished.  Keep hold_sample as the active burst value
     // and use comb_operand only on the first output of the next burst.
@@ -122,7 +130,8 @@ module cic_interp16_n3_hold2_dsp_ce #(
         end
     endgenerate
 
-    assign burst_remaining_dbg = {1'b0, burst_remaining};
+    assign burst_remaining_dbg = (BURST_COUNTER_ONEHOT_FF != 0) ?
+        {4'd0, burst_window[0]} : {1'b0, burst_remaining};
     assign pending_dbg = burst_pending;
     assign comb_busy_dbg = comb_active || align_pending;
     assign burst_remaining_decrement = burst_remaining - 4'd1;
@@ -166,6 +175,7 @@ module cic_interp16_n3_hold2_dsp_ce #(
             final_integrator_state <= {FINAL_W{1'b0}};
             burst_pending <= 1'b0;
             burst_remaining <= 4'd0;
+            burst_window <= 15'd0;
             y_out <= {OUTPUT_W{1'b0}};
             y_out_valid <= 1'b0;
         end
@@ -208,7 +218,13 @@ module cic_interp16_n3_hold2_dsp_ce #(
                 if (first_output_event) begin
                     hold_sample <= comb_operand;
                     burst_pending <= 1'b0;
-                    burst_remaining <= 4'd15;
+                    if (BURST_COUNTER_ONEHOT_FF != 0)
+                        burst_window <= 15'h7fff;
+                    else
+                        burst_remaining <= 4'd15;
+                end
+                else if (BURST_COUNTER_ONEHOT_FF != 0) begin
+                    burst_window <= {1'b0, burst_window[14:1]};
                 end
                 else if (burst_remaining == 4'd1) begin
                     burst_remaining <= 4'd0;
@@ -232,6 +248,9 @@ module cic_interp16_n3_hold2_dsp_ce #(
         if (rst_n && (INTEGRATOR_DSP_MODE < 0 ||
                       INTEGRATOR_DSP_MODE > 2))
             $fatal(1, "N3 Hold CIC INTEGRATOR_DSP_MODE must be 0, 1, or 2");
+        if (rst_n && (BURST_COUNTER_ONEHOT_FF < 0 ||
+                      BURST_COUNTER_ONEHOT_FF > 1))
+            $fatal(1, "N3 Hold CIC BURST_COUNTER_ONEHOT_FF must be 0 or 1");
         if (rst_n && LEGACY_FULL_W < FINAL_W)
             $fatal(1, "N3 Hold CIC derived width exceeds legacy width");
     end

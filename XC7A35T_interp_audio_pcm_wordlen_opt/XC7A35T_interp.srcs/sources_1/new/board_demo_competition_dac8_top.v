@@ -53,6 +53,7 @@ module board_demo_competition_dac8_top #(
     // Legacy/regional wrappers continue to select their own parameter values.
     parameter integer USE_NATIONAL_FINALS_SERIAL_CIC_COMB = 1,
     parameter integer USE_NATIONAL_FINALS_N3_HOLD_EQUIV = 1,
+    parameter integer USE_NATIONAL_FINALS_CIC_BURST_COUNTER_ONEHOT_FF = 1,
     parameter integer USE_NATIONAL_FINALS_CIC_COMB_DSP = 0,
     parameter integer USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER = 1,
     parameter integer USE_NATIONAL_FINALS_NARROW_STAGE23 = 1,
@@ -407,6 +408,8 @@ module board_demo_competition_dac8_top #(
             USE_NATIONAL_FINALS_SERIAL_CIC_COMB),
         .USE_NATIONAL_FINALS_N3_HOLD_EQUIV(
             USE_NATIONAL_FINALS_N3_HOLD_EQUIV),
+        .USE_NATIONAL_FINALS_CIC_BURST_COUNTER_ONEHOT_FF(
+            USE_NATIONAL_FINALS_CIC_BURST_COUNTER_ONEHOT_FF),
         .USE_NATIONAL_FINALS_CIC_COMB_DSP(
             USE_NATIONAL_FINALS_CIC_COMB_DSP),
         .USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER(

@@ -60,6 +60,7 @@ module nf_signedoff_filter_core (
         .USE_P3_JOINT_STAGE3(1),
         .ASSUME_ALIGNED_POW2_CE(1),
         .CIC_INTEGRATOR_DSP_MODE(2),
+        .CIC_BURST_COUNTER_ONEHOT_FF(1),
         .USE_UNIFIED_FIR_COEFF_BRAM(1)
     ) u_p3_compensated_core (
         .clk(clk),
@@ -112,6 +113,7 @@ module nf_signedoff_filter_core (
         .USE_P3_JOINT_STAGE3(1),
         .ASSUME_ALIGNED_POW2_CE(1),
         .CIC_INTEGRATOR_DSP_MODE(2),
+        .CIC_BURST_COUNTER_ONEHOT_FF(1),
         .USE_UNIFIED_FIR_COEFF_BRAM(1)
     ) u_p3_flat_core (
         .clk(clk),

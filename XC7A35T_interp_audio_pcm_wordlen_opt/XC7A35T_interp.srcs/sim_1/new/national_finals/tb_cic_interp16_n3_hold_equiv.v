@@ -21,6 +21,8 @@ module tb_cic_interp16_n3_hold_equiv;
     wire hold_3dsp_valid;
     wire signed [OUTPUT_W-1:0] y_hold_2dsp;
     wire hold_2dsp_valid;
+    wire signed [OUTPUT_W-1:0] y_hold_onehot;
+    wire hold_onehot_valid;
 
     integer random_seed;
     integer enabled_phase;
@@ -104,6 +106,26 @@ module tb_cic_interp16_n3_hold_equiv;
         .comb_busy_dbg()
     );
 
+    cic_interp16_n3_hold2_dsp_ce #(
+        .DATA_W(DATA_W),
+        .OUTPUT_W(OUTPUT_W),
+        .FINAL_PRUNE_LSB(0),
+        .BURST_COUNTER_USE_DSP(0),
+        .INTEGRATOR_DSP_MODE(2),
+        .BURST_COUNTER_ONEHOT_FF(1)
+    ) u_hold_onehot (
+        .clk(clk),
+        .rst_n(rst_n),
+        .ce_out(ce_out),
+        .x_in(x_in),
+        .x_in_valid(x_in_valid),
+        .y_out(y_hold_onehot),
+        .y_out_valid(hold_onehot_valid),
+        .burst_remaining_dbg(),
+        .pending_dbg(),
+        .comb_busy_dbg()
+    );
+
     always #5 clk = ~clk;
 
     always @(negedge clk) begin
@@ -114,17 +136,19 @@ module tb_cic_interp16_n3_hold_equiv;
         else begin
             if (legacy_valid !== hold_valid ||
                 legacy_valid !== hold_3dsp_valid ||
-                legacy_valid !== hold_2dsp_valid)
-                $fatal(1, "N3 Hold valid mismatch legacy=%b dsp4=%b dsp3=%b dsp2=%b",
+                legacy_valid !== hold_2dsp_valid ||
+                legacy_valid !== hold_onehot_valid)
+                $fatal(1, "N3 Hold valid mismatch legacy=%b dsp4=%b dsp3=%b dsp2=%b onehot=%b",
                        legacy_valid, hold_valid, hold_3dsp_valid,
-                       hold_2dsp_valid);
+                       hold_2dsp_valid, hold_onehot_valid);
             if (legacy_valid) begin
                 if (y_legacy !== y_hold || y_legacy !== y_hold_3dsp ||
-                    y_legacy !== y_hold_2dsp) begin
+                    y_legacy !== y_hold_2dsp ||
+                    y_legacy !== y_hold_onehot) begin
                     mismatch_count = mismatch_count + 1;
-                    $display("N3 Hold mismatch output=%0d legacy=%0d dsp4=%0d dsp3=%0d dsp2=%0d legacy_comb=%0d hold_sample=%0d legacy_i0=%0d legacy_i1=%0d hold_i0=%0d legacy_final=%0d hold_final=%0d",
+                    $display("N3 Hold mismatch output=%0d legacy=%0d dsp4=%0d dsp3=%0d dsp2=%0d onehot=%0d legacy_comb=%0d hold_sample=%0d legacy_i0=%0d legacy_i1=%0d hold_i0=%0d legacy_final=%0d hold_final=%0d",
                              output_count, y_legacy, y_hold, y_hold_3dsp,
-                             y_hold_2dsp,
+                             y_hold_2dsp, y_hold_onehot,
                              u_legacy.comb_operand, u_hold.hold_sample,
                              u_legacy.integrator_state[0],
                              u_legacy.integrator_state[1],
@@ -259,7 +283,7 @@ module tb_cic_interp16_n3_hold_equiv;
             drain_and_check(256);
         end
 
-        $display("N3 HOLD CIC EQUIVALENCE PASS: narrow 26/29-bit states, DSP modes 2/1/0, continuous=320 stalled=480 seeds=10x256 reset-mid-burst=PASS outputs=%0d",
+        $display("N3 HOLD CIC EQUIVALENCE PASS: narrow 26/29-bit states, DSP modes 2/1/0, binary/onehot burst, continuous=320 stalled=480 seeds=10x256 reset-mid-burst=PASS outputs=%0d",
                  output_count);
         $finish;
     end
