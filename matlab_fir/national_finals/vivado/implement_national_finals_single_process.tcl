@@ -13,7 +13,7 @@ set synth_dcp [file join $project_dir XC7A35T_interp.runs synth_1 \
 set board_xdc [file join $project_dir XC7A35T_interp.srcs constrs_1 new \
     board_demo_competition_dac8_top.xdc]
 set result_tag board_dual_rate_cic6_round7_headroom_opt
-set implementation_opt_directive Default
+set implementation_opt_directive ExploreWithRemap
 set p3_joint_stage3 1
 set expected_synth_directive AreaOptimized_high
 set expected_flatten_hierarchy full

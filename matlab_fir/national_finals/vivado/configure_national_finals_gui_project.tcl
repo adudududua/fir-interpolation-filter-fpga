@@ -58,14 +58,14 @@ require_generic $project_generics USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE 2
 require_generic $project_generics USE_NATIONAL_FINALS_NARROW_STAGE23 1
 require_generic $project_generics USE_NATIONAL_FINALS_P3_JOINT_STAGE3 1
 
-# Keep ordinary GUI runs bit-for-bit aligned with the selected P3-J strategy.
+# Keep ordinary GUI runs aligned with the P3-O 361-LUT implementation profile.
 set_property STEPS.SYNTH_DESIGN.ARGS.DIRECTIVE AreaOptimized_high \
     [get_runs synth_1]
 set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY full \
     [get_runs synth_1]
 set_property STEPS.SYNTH_DESIGN.ARGS.RESOURCE_SHARING on \
     [get_runs synth_1]
-set_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE Default \
+set_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE ExploreWithRemap \
     [get_runs impl_1]
 
 set sim_set [get_filesets sim_1]

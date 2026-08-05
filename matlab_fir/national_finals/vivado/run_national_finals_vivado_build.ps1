@@ -10,7 +10,7 @@ param(
     [ValidateSet('auto', 'on', 'off')]
     [string]$ResourceSharing = 'on',
     [ValidateSet('Default', 'Explore', 'ExploreWithRemap', 'ExploreArea', 'AddRemap')]
-    [string]$ImplementationOptDirective = 'Default',
+    [string]$ImplementationOptDirective = 'ExploreWithRemap',
     [ValidateSet(0, 1)]
     [int]$Stage1Dsp48Preadder = 1,
     [ValidateSet(0, 1, 2)]

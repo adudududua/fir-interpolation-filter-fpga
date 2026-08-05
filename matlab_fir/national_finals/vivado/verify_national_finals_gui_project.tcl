@@ -113,8 +113,8 @@ require_condition [expr {$gui_synth_directive eq "AreaOptimized_high"}] \
     "GUI synthesis directive must be AreaOptimized_high."
 require_condition [expr {$gui_flatten_hierarchy eq "full"}] \
     "GUI synthesis flatten_hierarchy must be full."
-require_condition [expr {$gui_opt_directive eq "Default"}] \
-    "GUI implementation opt_design directive must be Default."
+require_condition [expr {$gui_opt_directive eq "ExploreWithRemap"}] \
+    "GUI implementation opt_design directive must be ExploreWithRemap."
 
 puts "NATIONAL_FINALS_GUI_CONFIG_PASS"
 puts "GUI_GENERICS=$project_generics"
@@ -173,10 +173,10 @@ if {[get_property PROGRESS [get_runs impl_1]] eq "100%"} {
         "GUI implementation does not use the expected two BRAM tiles."
     require_condition [expr {$mmcm_count == 2}] \
         "GUI implementation does not use the expected two MMCMs."
-    require_condition [expr {$lut_count <= 385}] \
-        "GUI implementation exceeds the P3-M 385-LUT release guard."
-    require_condition [expr {$ff_count <= 420}] \
-        "GUI implementation exceeds the P3-M 420-FF release guard."
+    require_condition [expr {$lut_count <= 362}] \
+        "GUI implementation exceeds the P3-O 362-LUT release guard."
+    require_condition [expr {$ff_count <= 400}] \
+        "GUI implementation exceeds the P3-O 400-FF release guard."
 
     puts "NATIONAL_FINALS_GUI_IMPLEMENTATION_PASS"
     close_design
