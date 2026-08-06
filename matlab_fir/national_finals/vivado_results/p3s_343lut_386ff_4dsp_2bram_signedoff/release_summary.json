@@ -1,7 +1,14 @@
 {
   "release": "P3-S ExtraTimingOpt implementation packing",
-  "status": "tool-verified; physical-board verification pending",
+  "status": "tool-verified and physical-board verified",
   "board_fallback": "nf-p3r-final-348lut-386ff-154slice-4dsp-2bram-boardverified",
+  "board_verification": {
+    "date": "2026-08-06",
+    "status": "PASS",
+    "sample_rates": "44.1/48 kHz, 4x/8x/128x all correct",
+    "dac_waveform": "normal",
+    "source": "user-reported physical-board test"
+  },
   "rtl_regression": {
     "smoke": "17/17 PASS",
     "release": "17/17 PASS",

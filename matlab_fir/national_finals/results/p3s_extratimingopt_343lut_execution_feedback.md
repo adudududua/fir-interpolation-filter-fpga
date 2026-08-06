@@ -5,7 +5,7 @@
 P3-S 从已完成实板验证的 P3-R 标签出发，不修改滤波 RTL、系数、字长、舍入、饱和、
 valid 时序、时钟、复位、键盘或 DAC 接口，只继续优化完整板级实现策略。最终结果为：
 
-| 指标 | P3-R 实板基线 | P3-S 工具签核候选 | 变化 |
+| 指标 | P3-R 实板基线 | P3-S 实板通过发布 | 变化 |
 |---|---:|---:|---:|
 | LUT | 348 | **343** | **-5** |
 | FF | 386 | **386** | 0 |
@@ -18,10 +18,12 @@ valid 时序、时钟、复位、键盘或 DAC 接口，只继续优化完整板
 | 总/动态/静态功耗 | 0.271/0.199/0.072 W | **0.271/0.199/0.072 W** | 0 |
 
 P3-S 已完成 RTL、原语、完整链、复位/CDC、实现、Timing/Power、默认与六模式 routed-DCP
-DAC、普通 GUI 从零生成 bitstream 的工具闭环。**当前尚未进行 P3-S 实物板复测，因此它是
-新的工具签核候选；P3-R 348-LUT boardverified 标签和 bitstream 仍是正式实板安全回退。**
+DAC、普通 GUI 从零生成 bitstream 的工具闭环。**2026-08-06 用户进一步完成P3-S实物板
+验证，确认44.1/48 kHz两个家族下4x/8x/128x各档采样率均正确，DAC输出波形正常；
+P3-S据此升级为正式实板通过发布，P3-R 348-LUT boardverified版本保留为安全回退。**
 
 - 分支：`national-finals-p3s-4dsp-deep-optimization`
+- 实板通过标签：`nf-p3s-final-343lut-386ff-151slice-4dsp-2bram-boardverified`
 - 工具签核标签：`nf-p3s-final-343lut-386ff-151slice-4dsp-2bram-toolverified`
 - 正式结果：`vivado_results/p3s_343lut_386ff_4dsp_2bram_signedoff`
 
@@ -198,5 +200,5 @@ powershell -ExecutionPolicy Bypass -File .\matlab_fir\national_finals\sim\run_po
 `synth_1`和`impl_1`后重新运行；完成后确认`impl_1/runme.log`包含
 `Command: place_design -directive ExtraTimingOpt`，否则该结果只能按P3-R Default布局解释。
 
-板测应下载本目录的正式 bit，逐档检查44.1/48 kHz的4x/8x/128x采样率和DAC波形。完成
-实测前不要把P3-S标记为boardverified；若出现任何异常，立即回退P3-R的实板标签。
+板测使用本目录正式bit完成。用户反馈44.1/48 kHz的4x/8x/128x各档采样率均正确，
+DAC输出波形正常，因此本版本已满足boardverified发布门槛；P3-R实板标签继续作为前一安全回退。
