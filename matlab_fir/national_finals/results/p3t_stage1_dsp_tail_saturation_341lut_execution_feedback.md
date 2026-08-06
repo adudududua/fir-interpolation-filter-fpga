@@ -6,7 +6,7 @@
 4 DSP、2 BRAM Tile、2 MMCM、系数、定点语义、接口和六档采样率不变，继续压缩Stage1。
 最终工具签核结果为：
 
-| 指标 | P3-S实板基线 | P3-T工具候选 | 变化 |
+| 指标 | P3-S实板基线 | P3-T正式实板版 | 变化 |
 |---|---:|---:|---:|
 | 综合LUT | 374 | **367** | **-7** |
 | 综合FF | 388 | **383** | **-5** |
@@ -22,12 +22,13 @@
 
 P3-T降低了LUT和FF，但Slice比P3-S增加12个，因此它是“LUT/FF优先”的新Pareto点，并非
 每一项资源都支配P3-S。它已完成RTL、真实UNISIM原语、完整链、复位/CDC、综合实现、
-Timing/Power、默认及六模式routed-DCP DAC、GUI重实现和bitstream闭环。**当前只能标记为
-tool-verified；物理板六档采样率和DAC波形尚待用户验证。板测前，P3-S仍是正式发布和安全
-回退。**
+Timing/Power、默认及六模式routed-DCP DAC、GUI重实现和bitstream闭环。**用户随后完成
+物理板复测，确认44.1/48 kHz两族的4x/8x/128x六档采样率均正确，DAC输出波形正常；
+P3-T现提升为正式实板发布，P3-S保留为前一实板安全回退。**
 
 - 分支：`national-finals-p3t-341lut-stage1-dsp-tail`
 - 工具签核标签：`nf-p3t-final-341lut-381ff-163slice-4dsp-2bram-toolverified`
+- 实板签核标签：`nf-p3t-final-341lut-381ff-163slice-4dsp-2bram-boardverified`
 - 正式结果：`vivado_results/p3t_341lut_381ff_4dsp_2bram_signedoff`
 
 ## 2. 最终优化方法
@@ -140,6 +141,6 @@ powershell -ExecutionPolicy Bypass -File .\matlab_fir\national_finals\sim\run_po
 powershell -ExecutionPolicy Bypass -File .\matlab_fir\national_finals\sim\run_postroute_six_mode_dac.ps1 -DcpPath .\matlab_fir\national_finals\vivado_results\p3t_341lut_381ff_4dsp_2bram_signedoff\national_finals_board_routed.dcp
 ```
 
-板测必须使用签核目录内bit，依次检查44.1/48 kHz下4x/8x/128x六档实际采样率与DAC波形。
-在用户确认六档全部正常前，P3-T不能打`boardverified`标签；遇到任何异常应直接切回已板测的
-P3-S标签。
+板测使用签核目录内bit，依次检查了44.1/48 kHz下4x/8x/128x六档实际采样率与DAC波形。
+用户于2026-08-06确认六档采样率全部正确且DAC输出波形正常，因此该签核结果可打
+`boardverified`标签；P3-S继续作为独立的前一实板安全回退。

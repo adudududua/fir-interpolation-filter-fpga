@@ -1,10 +1,14 @@
 {
   "release": "P3-T Stage1 DSP-tail saturation and derived history pointer",
-  "status": "tool-verified; physical-board verification pending",
+  "status": "tool-verified and physical-board verified",
+  "boardverified_tag": "nf-p3t-final-341lut-381ff-163slice-4dsp-2bram-boardverified",
   "board_fallback": "nf-p3s-final-343lut-386ff-151slice-4dsp-2bram-boardverified",
   "board_verification": {
-    "status": "PENDING",
-    "note": "Do not promote this P3-T bitstream to boardverified until the user confirms all six sample-rate modes and DAC waveform on hardware."
+    "date": "2026-08-06",
+    "status": "PASS",
+    "sample_rates": "44.1/48 kHz, 4x/8x/128x all correct",
+    "dac_waveform": "normal",
+    "source": "user-reported physical-board test"
   },
   "rtl_regression": {
     "smoke": "17/17 PASS",
