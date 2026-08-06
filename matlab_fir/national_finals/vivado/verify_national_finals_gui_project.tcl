@@ -73,6 +73,30 @@ foreach asset_name $daily_asset_patterns {
         "GUI simulation asset is not from the signed-off P3-J vector set: $asset_file"
 }
 
+# Vivado 2018.3 can return from wait_on_run while an out-of-process child is
+# still routing or writing the bitstream.  Treat that as an intermediate
+# state, not a failed implementation, and keep polling the persisted run
+# status until it is genuinely terminal.
+proc wait_for_run_complete {run_name timeout_seconds} {
+    set deadline [expr {[clock seconds] + $timeout_seconds}]
+    while {1} {
+        wait_on_run $run_name
+        set run_object [get_runs $run_name]
+        set run_progress [get_property PROGRESS $run_object]
+        set run_status [get_property STATUS $run_object]
+        if {$run_progress eq "100%"} {
+            return
+        }
+        if {[regexp -nocase {error|fail|cancel} $run_status]} {
+            error "$run_name failed: status='$run_status', progress='$run_progress'"
+        }
+        if {[clock seconds] >= $deadline} {
+            error "$run_name timed out: status='$run_status', progress='$run_progress'"
+        }
+        after 1000
+    }
+}
+
 set serial_cic_file [get_files -quiet \
     "*national_finals/cic_interp16_serial_comb_dsp_ce.v"]
 set n3_hold_cic_file [get_files -quiet \
@@ -132,7 +156,7 @@ puts "GUI_PLACE_DIRECTIVE=$gui_place_directive"
 if {$requested_action eq "rebuild"} {
     reset_run synth_1
     launch_runs synth_1 -jobs 4
-    wait_on_run synth_1
+    wait_for_run_complete synth_1 900
     require_condition \
         [expr {[get_property PROGRESS [get_runs synth_1]] eq "100%"}] \
         "GUI synth_1 did not complete."
@@ -142,7 +166,7 @@ if {$requested_action eq "rebuild"} {
 if {$requested_action in {"rebuild" "reimplement"}} {
     reset_run impl_1
     launch_runs impl_1 -to_step write_bitstream -jobs 4
-    wait_on_run impl_1
+    wait_for_run_complete impl_1 1200
     require_condition \
         [expr {[get_property PROGRESS [get_runs impl_1]] eq "100%"}] \
         "GUI impl_1 did not complete."
@@ -187,15 +211,15 @@ if {[get_property PROGRESS [get_runs impl_1]] eq "100%"} {
     puts "GUI_MMCM=$mmcm_count"
 
     require_condition [expr {$dsp_count == 4}] \
-        "GUI implementation is not the P3-R 4-DSP architecture."
+        "GUI implementation is not the P3-T 4-DSP architecture."
     require_condition [expr {$bram18_count == 4}] \
         "GUI implementation does not use the expected two BRAM tiles."
     require_condition [expr {$mmcm_count == 2}] \
         "GUI implementation does not use the expected two MMCMs."
-    require_condition [expr {$lut_count <= 344}] \
-        "GUI implementation exceeds the P3-S 344-LUT release guard."
-    require_condition [expr {$ff_count <= 400}] \
-        "GUI implementation exceeds the P3-S 400-FF release guard."
+    require_condition [expr {$lut_count <= 342}] \
+        "GUI implementation exceeds the P3-T 342-LUT release guard."
+    require_condition [expr {$ff_count <= 390}] \
+        "GUI implementation exceeds the P3-T 390-FF release guard."
 
     puts "NATIONAL_FINALS_GUI_IMPLEMENTATION_PASS"
     close_design

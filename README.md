@@ -1,5 +1,26 @@
 # 高阶数字插值滤波器设计与 FPGA 验证
 
+## 当前最低LUT工具签核候选：341 LUT / 4 DSP P3-T Stage1 DSP尾周期版（2026-08-06）
+
+P3-T从已板测的P3-S继续优化，在 **4 DSP / 2 BRAM Tile / 2 MMCM** 不变的前提下，把
+Stage1串行MAC后的空闲周期用于精确Q15舍入、`PATTERNDETECT/PATTERNBDETECT`符号扩展
+检查和DSP PREG直接饱和钳位；同时由计算期间稳定的写指针派生历史基址，删除独立6-bit
+基址寄存器。最终综合为 **367 LUT / 383 FF**，布局布线为
+**341 LUT / 381 FF / 163 Slice / 4 DSP / 4 RAMB18E1（2 Tile）/ 2 MMCM**。相对P3-S少
+2 LUT、5 FF，但多12 Slice，因此是LUT/FF优先的新Pareto点，不是所有资源同时下降。
+
+最终源码Smoke/Release均为 **17/17 PASS**；Stage1行为RAM与真实RAMB18E1各1400输出
+0 LSB，全链14组4x/8x/128x均0 LSB，8类复位、1200次CDC、100次切族和10次动态切档
+全部通过。341-LUT routed DCP又通过默认DAC活动和六档网表仿真：44.1 kHz为
+`177/353/5645 edges/ms`，48 kHz为`192/384/6144 edges/ms`；GUI重实现成功生成bitstream。
+WNS/WHS为 **+45.270/+0.107 ns**，功耗仍为 **0.271 W**。Vivado 2018.3可能在外部实现
+进程仍运行时提前返回`wait_on_run`的问题也已修复，GUI脚本会持续等待到真实终态。
+
+**P3-T当前仅为tool-verified，尚未声称通过物理板；P3-S 343-LUT仍是正式实板发布。**
+详细候选矩阵、完整RTL/Timing/Power/DAC/GUI证据、哈希和板测步骤见
+[P3-T执行反馈](matlab_fir/national_finals/results/p3t_stage1_dsp_tail_saturation_341lut_execution_feedback.md)和
+[`p3t_341lut_381ff_4dsp_2bram_signedoff`](matlab_fir/national_finals/vivado_results/p3t_341lut_381ff_4dsp_2bram_signedoff)。
+
 ## 当前正式实板通过发布：343 LUT / 4 DSP P3-S ExtraTimingOpt 版（2026-08-06）
 
 P3-S 从已完成实板验证的 P3-R 348-LUT 标签继续优化，**不修改滤波RTL、系数、字长、
@@ -673,6 +694,7 @@ Route 1相对573-LUT基线减少149 LUT和150 FF，WNS减少 **0.983 ns**，WHS�
 | **P4-A 4-DSP Pareto 版** | **全国赛板级** | **491** | **444** | **4** | **3** | **2** | **+45.738/+0.052 ns** | **0.271 W** | **N3 Hold 严格等价，较 P3 少1 DSP、多29 LUT** | **12/12 RTL、实现、DRC/CDC、bitstream；待物理板测** |
 | **P4-B 2-BRAM-Tile Pareto 版** | **全国赛板级** | **504** | **493** | **4** | **2** | **2** | **+45.637/+0.119 ns** | **0.271 W** | **较 P4-A 多13 LUT/49 FF，少1 BRAM Tile** | **14/14 RTL、实现、DRC/CDC、bitstream；待物理板测** |
 | **P4-D 默认发布闭环版** | **全国赛板级** | **479** | **468** | **4** | **2** | **2** | **+45.734/+0.121 ns** | **0.271 W** | **继承P4-C资源结构；固定签核wrapper、Release长回归、CDC bus-skew** | **Smoke/Release 15/15、GUI行为/实现、双路径bitstream；待物理板测** |
+| **P3-T Stage1 DSP尾周期工具候选** | **全国赛板级** | **341** | **381** | **4** | **2** | **2** | **+45.270/+0.107 ns** | **0.271 W** | **Stage1 DSP接管舍入/Pattern溢出检测/PREG钳位，并由稳定写指针派生历史基址；相对P3-S少2 LUT/5 FF，但多12 Slice** | **Smoke/Release 17/17、三节点0-LSB、GUI、routed DAC/六档、bitstream通过；待用户板测** |
 | **P3-S ExtraTimingOpt正式实板版** | **全国赛板级** | **343** | **386** | **4** | **2** | **2** | **+45.025/+0.116 ns** | **0.271 W** | **不改P3-R RTL；以ExtraTimingOpt改善LUT打包，相对P3-R少5 LUT/3 Slice** | **Smoke/Release 17/17、0-LSB、GUI、routed DAC/六档、bitstream及用户实板DAC/各档采样率通过** |
 | **P3-R DSP空闲拍舍入饱和正式版** | **全国赛板级** | **348** | **386** | **4** | **2** | **2** | **+45.200/+0.121 ns** | **0.271 W** | **Stage2/3共享DSP在MAC后完成舍入、Pattern符号扩展检查和PREG直接钳位，移除Fabric宽比较器与饱和mux** | **Smoke/Release 17/17、0-LSB、GUI、routed DAC/六档、bitstream及用户实板DAC/各档采样率通过** |
 | **P3-O ExploreWithRemap候选** | **全国赛板级** | **361** | **386** | **4** | **2** | **2** | **+44.989/+0.103 ns** | **0.271 W** | **RTL与P3-M相同；同一综合网表重映射再少7 LUT，DSP/BRAM/FF不变** | **前一工具候选；Release 17/17、routed DAC/六档通过** |
@@ -695,6 +717,7 @@ Route 1相对573-LUT基线减少149 LUT和150 FF，WNS减少 **0.983 ns**，WHS�
 综合结论：
 
 - 旧 Route 1 `424 LUT / 6 DSP` 和第八轮 `436 LUT / 5 DSP` 是重要资源演进点，但存在 Stage 3 Q14/Q15 标度缺陷，不再作为发布候选；
+- **当前最低LUT工具签核候选为P3-T：341 LUT / 381 FF / 4 DSP / 2 BRAM Tile**；Stage1 DSP尾周期饱和与派生基址通过两轮17/17、0-LSB、GUI及routed-DCP六档门禁，尚待用户板测；
 - **当前最低LUT且正式实板通过版为P3-S：343 LUT / 386 FF / 4 DSP / 2 BRAM Tile**；滤波RTL与P3-R相同，完整17/17、GUI、routed-DCP DAC/六档、bitstream以及用户实板DAC/各档采样率均通过；
 - **前一实板安全回退为P3-R：348 LUT / 386 FF / 4 DSP / 2 BRAM Tile**；共享Stage2/3 DSP的空闲拍接管舍入和饱和，Release 17/17、GUI重建、routed-DCP DAC/六档以及用户实板DAC/各档采样率均通过；
 - **前一实板安全版为P3-M：368 LUT / 386 FF / 4 DSP / 2 BRAM Tile**；已通过真实RAMB18 Stage1对拍、完整Release、GUI重建、六模式布局后DAC门禁以及用户实板DAC/各档采样率复测；

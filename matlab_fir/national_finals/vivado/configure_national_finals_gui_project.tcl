@@ -58,7 +58,7 @@ require_generic $project_generics USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE 2
 require_generic $project_generics USE_NATIONAL_FINALS_NARROW_STAGE23 1
 require_generic $project_generics USE_NATIONAL_FINALS_P3_JOINT_STAGE3 1
 
-# Keep ordinary GUI runs aligned with the P3-S 343-LUT implementation profile.
+# Keep ordinary GUI runs aligned with the P3-T 341-LUT implementation profile.
 # Capture the previous values first.  If a stale GUI session or a manual
 # strategy reset changed this profile, invalidate the completed run so Vivado
 # cannot keep showing/using an old 348-LUT Default placement.

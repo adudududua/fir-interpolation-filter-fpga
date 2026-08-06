@@ -40,6 +40,8 @@ module interp2_stage1_single_bram_serial_ce #(
     localparam integer PAIR_W = DATA_W + 1;
     localparam integer QUOT_W = ACC_W - FRAC_W;
     localparam integer UPPER_W = QUOT_W - DATA_W;
+    localparam integer PATTERN_SAT_SUPPORTED =
+        (DATA_W == 24 && ACC_W == 41 && FRAC_W == 15);
     localparam [1:0] READ_LEFT  = 2'd0;
     localparam [1:0] READ_RIGHT = 2'd1;
     localparam [1:0] READ_DELAY = 2'd2;
@@ -51,7 +53,7 @@ module interp2_stage1_single_bram_serial_ce #(
     reg [ADDR_W-1:0] read_addr;
     wire signed [DATA_W-1:0] read_data;
     reg [ADDR_W-1:0] wr_ptr;
-    reg [ADDR_W-1:0] base_ptr;
+    wire [ADDR_W-1:0] history_base_ptr;
     // Before the circular pointer wraps, wr_ptr is also the exact number of
     // initialized history words.  One sticky bit preserves that information
     // after the 52-word history becomes full, replacing two 6-bit counters.
@@ -80,6 +82,7 @@ module interp2_stage1_single_bram_serial_ce #(
     reg left_mask;
     reg signed [DATA_W-1:0] delay_result;
     reg filter_commit_pending;
+    reg filter_saturation_pending;
 
     wire signed [DATA_W-1:0] x_current;
     reg signed [PAIR_W-1:0] pair_sum_comb;
@@ -96,11 +99,21 @@ module interp2_stage1_single_bram_serial_ce #(
     wire dsp_p_ce;
     wire [6:0] dsp_opmode;
     wire signed [47:0] dsp_round_bias;
+    wire signed [47:0] dsp_c_input;
+    wire signed [47:0] dsp_saturation_value;
+    wire signed [47:0] output_max_scaled;
+    wire signed [47:0] output_min_scaled;
     wire dsp_round_carryin;
+    wire dsp_pattern_zero;
+    wire dsp_pattern_ones;
     wire signed [QUOT_W-1:0] rounded_quotient;
     wire rounded_upper_is_sign_extension;
 
     assign x_current = x_in_valid ? x_in : {DATA_W{1'b0}};
+    // wr_ptr advances after writing the current input and remains stable for
+    // the complete serial schedule.  Its predecessor is therefore exactly
+    // the former 6-bit base-pointer snapshot, modulo the RAM address space.
+    assign history_base_ptr = wr_ptr - {{(ADDR_W-1){1'b0}}, 1'b1};
     assign fir_in_dbg = x_current;
     assign fir_in_valid_dbg = ce_out && (phase_cnt == 1'b0);
     assign external_coeff_addr = issue_index;
@@ -134,16 +147,33 @@ module interp2_stage1_single_bram_serial_ce #(
     assign dsp_p_reset = !rst_n || (ce_out && phase_cnt == 1'b0);
     assign dsp_p_ce =
         (read_data_valid && read_kind == READ_RIGHT) ||
-        filter_commit_pending;
+        filter_commit_pending ||
+        (filter_saturation_pending &&
+         !rounded_upper_is_sign_extension);
     assign dsp_round_bias = 48'sd16383;
+    assign output_max_scaled =
+        {{(48-DATA_W-FRAC_W){1'b0}},
+         1'b0, {(DATA_W-1){1'b1}}, {FRAC_W{1'b0}}};
+    assign output_min_scaled =
+        {{(48-DATA_W-FRAC_W){1'b1}},
+         1'b1, {(DATA_W-1){1'b0}}, {FRAC_W{1'b0}}};
+    assign dsp_saturation_value = mac_sum_comb[ACC_W-1] ?
+        output_min_scaled : output_max_scaled;
+    assign dsp_c_input = filter_saturation_pending ?
+        dsp_saturation_value : dsp_round_bias;
     assign dsp_round_carryin =
         filter_commit_pending && !mac_sum_comb[ACC_W-1];
-    assign dsp_opmode = filter_commit_pending ?
-        7'b0001110 : 7'b0100101;
+    assign dsp_opmode = filter_saturation_pending ?
+        7'b0001100 :
+        (filter_commit_pending ? 7'b0001110 : 7'b0100101);
 
     DSP48E1 #(
         .A_INPUT("DIRECT"), .B_INPUT("DIRECT"),
         .USE_DPORT("TRUE"), .USE_MULT("MULTIPLY"),
+        .USE_PATTERN_DETECT("PATDET"),
+        .SEL_MASK("MASK"), .SEL_PATTERN("PATTERN"),
+        .MASK(48'h007FFFFFFFFF),
+        .PATTERN(48'h000000000000),
         .USE_SIMD("ONE48"),
         .AREG((USE_DSP48_PREADDER != 0) ? 1 : 0),
         .ACASCREG((USE_DSP48_PREADDER != 0) ? 1 : 0),
@@ -153,7 +183,7 @@ module interp2_stage1_single_bram_serial_ce #(
         .CARRYINSELREG(0)
     ) u_stage1_dsp48e1 (
         .P(dsp_mac_full), .A(dsp_input_a), .B(dsp_coeff_b),
-        .C(dsp_round_bias),
+        .C(dsp_c_input),
         .D((USE_DSP48_PREADDER != 0) ? dsp_preadd_d : 25'sd0),
         .INMODE(dsp_inmode), .OPMODE(dsp_opmode),
         .ALUMODE(4'b0000), .CARRYINSEL(3'b000),
@@ -171,8 +201,9 @@ module interp2_stage1_single_bram_serial_ce #(
         .RSTB(1'b0), .RSTC(1'b0), .RSTCTRL(1'b0), .RSTD(1'b0),
         .RSTINMODE(1'b0), .RSTM(1'b0), .RSTP(dsp_p_reset),
         .ACOUT(), .BCOUT(), .CARRYCASCOUT(), .CARRYOUT(),
-        .MULTSIGNOUT(), .OVERFLOW(), .PATTERNBDETECT(),
-        .PATTERNDETECT(), .PCOUT(), .UNDERFLOW()
+        .MULTSIGNOUT(), .OVERFLOW(),
+        .PATTERNBDETECT(dsp_pattern_ones),
+        .PATTERNDETECT(dsp_pattern_zero), .PCOUT(), .UNDERFLOW()
     );
 
     assign mac_sum_comb = dsp_mac_full[ACC_W-1:0];
@@ -222,11 +253,20 @@ module interp2_stage1_single_bram_serial_ce #(
 
     assign rounded_quotient = mac_sum_comb >>> FRAC_W;
     assign rounded_upper_is_sign_extension =
-        rounded_quotient[QUOT_W-1:DATA_W] ==
-        {UPPER_W{rounded_quotient[DATA_W-1]}};
-    assign filter_rounded = rounded_upper_is_sign_extension ?
+        PATTERN_SAT_SUPPORTED ?
+        (rounded_quotient[DATA_W-1] ?
+         dsp_pattern_ones : dsp_pattern_zero) :
+        (rounded_quotient[QUOT_W-1:DATA_W] ==
+         {UPPER_W{rounded_quotient[DATA_W-1]}});
+    // In the national-finals profile an overflow is replaced by an exactly
+    // scaled limit in DSP PREG during the spare saturation tail cycle.  The
+    // output then needs only a fixed slice; generic widths retain the original
+    // fabric fallback.
+    assign filter_rounded = PATTERN_SAT_SUPPORTED ?
         rounded_quotient[DATA_W-1:0] :
-        (rounded_quotient[QUOT_W-1] ? OUT_MIN : OUT_MAX);
+        (rounded_upper_is_sign_extension ?
+         rounded_quotient[DATA_W-1:0] :
+         (rounded_quotient[QUOT_W-1] ? OUT_MIN : OUT_MAX));
 
     // Metadata is delayed one clock alongside the synchronous RAM output.
     // The controller consumes both on the following active edge, matching the
@@ -251,7 +291,6 @@ module interp2_stage1_single_bram_serial_ce #(
     always @(posedge clk) begin
         if (!rst_n) begin
             wr_ptr <= {ADDR_W{1'b0}};
-            base_ptr <= {ADDR_W{1'b0}};
             history_full <= 1'b0;
             phase_cnt <= 1'b1;
             phase_dbg <= 1'b1;
@@ -270,6 +309,7 @@ module interp2_stage1_single_bram_serial_ce #(
             left_mask <= 1'b0;
             delay_result <= {DATA_W{1'b0}};
             filter_commit_pending <= 1'b0;
+            filter_saturation_pending <= 1'b0;
             y_out <= {DATA_W{1'b0}};
             y_out_valid <= 1'b0;
         end
@@ -277,8 +317,12 @@ module interp2_stage1_single_bram_serial_ce #(
             y_out_valid <= 1'b0;
             read_issue_valid <= 1'b0;
 
-            if (filter_commit_pending) begin
+            if (filter_saturation_pending) begin
                 filter_ready <= 1'b1;
+                filter_saturation_pending <= 1'b0;
+            end
+            else if (filter_commit_pending) begin
+                filter_saturation_pending <= 1'b1;
                 filter_commit_pending <= 1'b0;
             end
 
@@ -305,14 +349,14 @@ module interp2_stage1_single_bram_serial_ce #(
 
                 if (next_issue_is_left) begin
                     read_issue_kind <= READ_LEFT;
-                    read_addr <= base_ptr - schedule_index;
+                    read_addr <= history_base_ptr - schedule_index;
                     read_issue_mask <= history_full ||
                                        schedule_index < wr_ptr;
                     next_issue_is_left <= 1'b0;
                 end
                 else begin
                     read_issue_kind <= READ_RIGHT;
-                    read_addr <= base_ptr -
+                    read_addr <= history_base_ptr -
                         (HISTORY_LEN-1-schedule_index);
                     read_issue_mask <= history_full ||
                         (HISTORY_LEN-1-schedule_index) < wr_ptr;
@@ -336,7 +380,6 @@ module interp2_stage1_single_bram_serial_ce #(
                              {DATA_W{1'b0}};
                     delay_ready <= 1'b0;
 
-                    base_ptr <= wr_ptr;
                     wr_ptr <= wr_ptr + 6'd1;
                     if (wr_ptr == HISTORY_LEN-1)
                         history_full <= 1'b1;

@@ -1,0 +1,72 @@
+{
+  "release": "P3-T Stage1 DSP-tail saturation and derived history pointer",
+  "status": "tool-verified; physical-board verification pending",
+  "board_fallback": "nf-p3s-final-343lut-386ff-151slice-4dsp-2bram-boardverified",
+  "board_verification": {
+    "status": "PENDING",
+    "note": "Do not promote this P3-T bitstream to boardverified until the user confirms all six sample-rate modes and DAC waveform on hardware."
+  },
+  "rtl_regression": {
+    "smoke": "17/17 PASS",
+    "release": "17/17 PASS",
+    "full_chain_cases": 14,
+    "full_chain_max_error_lsb": {"4x": 0, "8x": 0, "128x": 0},
+    "stage1_behavior_outputs": 1400,
+    "stage1_primitive_outputs": 1400,
+    "reset_scenarios": 8,
+    "cdc_transitions": 1200,
+    "clock_family_switches": 100,
+    "dynamic_mode_switches": 10
+  },
+  "implementation": {
+    "synth_directive": "AreaOptimized_high",
+    "opt_design_directive": "ExploreWithRemap",
+    "place_design_directive": "ExtraTimingOpt"
+  },
+  "synthesis": {"lut": 367, "ff": 383, "dsp48e1": 4, "ramb18e1": 4},
+  "post_route": {
+    "lut": 341,
+    "lut_logic": 340,
+    "lut_memory": 1,
+    "ff": 381,
+    "slice": 163,
+    "carry4": 30,
+    "dsp48e1": 4,
+    "ramb18e1": 4,
+    "bram_tile": 2.0,
+    "mmcm": 2,
+    "wns_ns": 45.270,
+    "whs_ns": 0.107,
+    "dac_setup_slack_ns": 76.116,
+    "dac_hold_slack_ns": 78.117,
+    "routing_errors": 0,
+    "drc_errors": 0,
+    "drc_warnings": {"DPIP-1": 9, "DPOP-1": 2, "AVAL-4_advisory": 1}
+  },
+  "power_vectorless_w": {
+    "total": 0.271,
+    "dynamic": 0.199,
+    "static": 0.072,
+    "confidence": "Medium"
+  },
+  "postroute_dac": {
+    "default_6ms_edges": 11290,
+    "default_6ms_data_changes": 7462,
+    "six_modes": "PASS",
+    "44k1_edges_per_ms": [177, 353, 5645],
+    "48k_edges_per_ms": [192, 384, 6144]
+  },
+  "gui_reimplementation": {
+    "status": "PASS",
+    "wait_race_fix_verified": true,
+    "lut": 341,
+    "ff": 381,
+    "dsp48e1": 4,
+    "ramb18e1": 4,
+    "mmcm": 2
+  },
+  "sha256": {
+    "bitstream": "5AC1C621941FC5207B85CAE225037E2A99A8676852A30E93C0DCACFE8B47C098",
+    "routed_dcp": "6426D844217E58F7BA1CABA125737FF82CA1FA14D84DCD113AE7064CF77F400B"
+  }
+}

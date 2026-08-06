@@ -1,0 +1,879 @@
+#-----------------------------------------------------------
+# Vivado v2018.3 (64-bit)
+# SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+# IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+# Start of session at: Thu Aug  6 15:32:01 2026
+# Process ID: 42492
+# Current directory: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/_work/vivado/20260806_153159
+# Command line: vivado.exe -mode batch -journal D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\_work\vivado\20260806_153159\implementation.jou -log D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\_work\vivado\20260806_153159\implementation.log -source D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\vivado\implement_national_finals_single_process.tcl -tclargs p3t_stage1_dsp_sat_derived_ptr_impl_r7 ExploreWithRemap 1 AreaOptimized_high full on 1 2 1 1 ExtraTimingOpt
+# Log file: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/_work/vivado/20260806_153159/implementation.log
+# Journal file: D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\_work\vivado\20260806_153159\implementation.jou
+#-----------------------------------------------------------
+CRITICAL WARNING: [Common 17-741] No write access right to the local Tcl store at 'C'. XilinxTclStore is reverted to the installation area. If you want to use local Tcl Store, please change the access right and relaunch Vivado.
+source {D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\vivado\implement_national_finals_single_process.tcl}
+# set script_dir [file dirname [file normalize [info script]]]
+# set repo_dir [file normalize [file join $script_dir .. .. ..]]
+# set project_dir [file join $repo_dir XC7A35T_interp_audio_pcm_wordlen_opt]
+# set synth_dcp [file join $project_dir XC7A35T_interp.runs synth_1 \
+#     board_demo_competition_dac8_top.dcp]
+# set board_xdc [file join $project_dir XC7A35T_interp.srcs constrs_1 new \
+#     board_demo_competition_dac8_top.xdc]
+# set result_tag board_dual_rate_cic6_round7_headroom_opt
+# set implementation_opt_directive ExploreWithRemap
+# set implementation_place_directive ExtraTimingOpt
+# set p3_joint_stage3 1
+# set expected_synth_directive AreaOptimized_high
+# set expected_flatten_hierarchy full
+# set expected_resource_sharing on
+# set expected_stage1_dsp48_preadder 1
+# set expected_cic_integrator_dsp_mode 2
+# set expected_stage1_single_bram 1
+# set expected_stage23_unified_bram 1
+# if {$argc > 0} {
+#     set result_tag [lindex $argv 0]
+# }
+# if {$argc > 1} {
+#     set implementation_opt_directive [lindex $argv 1]
+# }
+# if {$argc > 2} {
+#     set p3_joint_stage3 [lindex $argv 2]
+# }
+# if {$argc > 3} {
+#     set expected_synth_directive [lindex $argv 3]
+# }
+# if {$argc > 4} {
+#     set expected_flatten_hierarchy [lindex $argv 4]
+# }
+# if {$argc > 5} {
+#     set expected_resource_sharing [lindex $argv 5]
+# }
+# if {$argc > 6} {
+#     set expected_stage1_dsp48_preadder [lindex $argv 6]
+# }
+# if {$argc > 7} {
+#     set expected_cic_integrator_dsp_mode [lindex $argv 7]
+# }
+# if {$argc > 8} {
+#     set expected_stage1_single_bram [lindex $argv 8]
+# }
+# if {$argc > 9} {
+#     set expected_stage23_unified_bram [lindex $argv 9]
+# }
+# if {$argc > 10} {
+#     set implementation_place_directive [lindex $argv 10]
+# }
+# if {![regexp {^[A-Za-z0-9_-]+$} $result_tag]} {
+#     error "result_tag may contain only letters, digits, underscore, and dash"
+# }
+# if {$implementation_opt_directive ni \
+#     {Default Explore ExploreWithRemap ExploreArea AddRemap}} {
+#     error "Unsupported implementation opt directive: $implementation_opt_directive"
+# }
+# if {$implementation_place_directive ni {Default Explore EarlyBlockPlacement \
+#         WLDrivenBlockPlacement ExtraPostPlacementOpt ExtraTimingOpt \
+#         RuntimeOptimized Quick}} {
+#     error "Unsupported implementation place directive: $implementation_place_directive"
+# }
+# if {$p3_joint_stage3 != 0 && $p3_joint_stage3 != 1} {
+#     error "p3_joint_stage3 must be 0 or 1"
+# }
+# set result_dir [file normalize [file join $script_dir .. vivado_results \
+#     $result_tag]]
+# proc require_file {filename} {
+#     if {![file exists $filename]} {
+#         error "Required file does not exist: $filename"
+#     }
+# }
+# proc write_primitive_report {report_file pattern title} {
+#     set primitive_cells [get_cells -hierarchical \
+#         -filter [format {REF_NAME =~ %s} $pattern]]
+#     set report_handle [open $report_file w]
+#     puts $report_handle $title
+#     puts $report_handle [string repeat "=" [string length $title]]
+#     puts $report_handle "Cell count: [llength $primitive_cells]"
+#     foreach primitive_cell $primitive_cells {
+#         puts $report_handle [format "%s | %s | %s" \
+#             $primitive_cell \
+#             [get_property REF_NAME $primitive_cell] \
+#             [get_property LOC $primitive_cell]]
+#     }
+#     close $report_handle
+# }
+# require_file $synth_dcp
+# require_file $board_xdc
+# set synth_provenance_file [file join $project_dir XC7A35T_interp.runs synth_1 \
+#     national_finals_synth_provenance.txt]
+# require_file $synth_provenance_file
+# set expected_synth_provenance [join [list \
+#     "synth_directive=$expected_synth_directive" \
+#     "flatten_hierarchy=$expected_flatten_hierarchy" \
+#     "resource_sharing=$expected_resource_sharing" \
+#     "stage1_dsp48_preadder=$expected_stage1_dsp48_preadder" \
+#     "cic_integrator_dsp_mode=$expected_cic_integrator_dsp_mode" \
+#     "p3_joint_stage3=$p3_joint_stage3" \
+#     "stage1_single_bram=$expected_stage1_single_bram" \
+#     "stage23_unified_bram=$expected_stage23_unified_bram"] "\n"]
+# set synth_provenance_handle [open $synth_provenance_file r]
+# set actual_synth_provenance [string trim [read $synth_provenance_handle]]
+# close $synth_provenance_handle
+# if {$actual_synth_provenance ne $expected_synth_provenance} {
+#     error "Synthesis checkpoint provenance mismatch. Re-run synthesis with the requested profile before implementation. Expected:\n$expected_synth_provenance\nActual:\n$actual_synth_provenance"
+# }
+# file mkdir $result_dir
+# open_checkpoint $synth_dcp
+Command: open_checkpoint D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.runs/synth_1/board_demo_competition_dac8_top.dcp
+
+Starting open_checkpoint Task
+
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.025 . Memory (MB): peak = 254.348 ; gain = 0.000
+INFO: [Netlist 29-17] Analyzing 41 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Project 1-479] Netlist was created with Vivado 2018.3
+INFO: [Device 21-403] Loading part xc7a35tfgg484-2
+INFO: [Project 1-570] Preparing netlist for logic optimization
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 579.125 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+INFO: [Project 1-604] Checkpoint was created with Vivado v2018.3 (64-bit) build 2405991
+open_checkpoint: Time (s): cpu = 00:00:04 ; elapsed = 00:00:08 . Memory (MB): peak = 580.547 ; gain = 326.199
+# read_xdc $board_xdc
+Parsing XDC File [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/constrs_1/new/board_demo_competition_dac8_top.xdc]
+INFO: [Timing 38-35] Done setting XDC timing constraints. [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/constrs_1/new/board_demo_competition_dac8_top.xdc:158]
+INFO: [Timing 38-2] Deriving generated clocks [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/constrs_1/new/board_demo_competition_dac8_top.xdc:158]
+get_clocks: Time (s): cpu = 00:00:08 ; elapsed = 00:00:09 . Memory (MB): peak = 1100.266 ; gain = 503.746
+Finished Parsing XDC File [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/constrs_1/new/board_demo_competition_dac8_top.xdc]
+read_xdc: Time (s): cpu = 00:00:09 ; elapsed = 00:00:09 . Memory (MB): peak = 1100.266 ; gain = 519.719
+# set ctrl_to_audio_sync_pins [get_pins -hierarchical -regexp \
+#     {.*(family_audio_meta_reg|rst_request_sync_reg\[0\]|u_nf_mode_cdc_handshake/req_meta_reg)/D}]
+# set audio_to_ctrl_sync_pins [get_pins -hierarchical -regexp \
+#     {.*u_nf_mode_cdc_handshake/ack_meta_reg/D}]
+# set bufgmux_select_pins [get_pins -hierarchical -regexp \
+#     {.*u_dual_family_audio_clock/u_bufgmux_audio_family/S[01]}]
+# set mode_shadow_cells [get_cells -hierarchical -regexp \
+#     {.*u_nf_mode_cdc_handshake/mode_shadow_reg\[[01]\]}]
+# set audio_mode_cells [get_cells -hierarchical -regexp \
+#     {.*u_nf_mode_cdc_handshake/audio_mode_reg\[[01]\]}]
+# if {[llength $ctrl_to_audio_sync_pins] != 3 || \
+#         [llength $audio_to_ctrl_sync_pins] != 1 || \
+#         [llength $bufgmux_select_pins] != 2 || \
+#         [llength $mode_shadow_cells] != 2 || \
+#         [llength $audio_mode_cells] != 2} {
+#     error "Audited CDC endpoint set changed; update constraints and waivers"
+# }
+# proc write_text_report {report_file report_text} {
+#     set report_handle [open $report_file w]
+#     puts -nonewline $report_handle $report_text
+#     close $report_handle
+# }
+# if {$implementation_opt_directive eq "Default"} {
+#     opt_design
+# } else {
+#     opt_design -directive $implementation_opt_directive
+# }
+Command: opt_design -directive ExploreWithRemap
+INFO: [Vivado_Tcl 4-136] Directive used for opt_design is: ExploreWithRemap
+Attempting to get a license for feature 'Implementation' and/or device 'xc7a35t'
+INFO: [Common 17-349] Got license for feature 'Implementation' and/or device 'xc7a35t'
+Running DRC as a precondition to command opt_design
+
+Starting DRC Task
+INFO: [DRC 23-27] Running DRC with 2 threads
+INFO: [Project 1-461] DRC finished with 0 Errors
+INFO: [Project 1-462] Please refer to the DRC report (report_drc) for more information.
+
+Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.808 . Memory (MB): peak = 1118.941 ; gain = 17.352
+
+Starting Cache Timing Information Task
+Ending Cache Timing Information Task | Checksum: 13530de8f
+
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.030 . Memory (MB): peak = 1118.941 ; gain = 0.000
+
+Starting Logic Optimization Task
+
+Phase 1 Retarget
+INFO: [Opt 31-138] Pushed 3 inverter(s) to 4 load pin(s).
+INFO: [Opt 31-49] Retargeted 0 cell(s).
+Phase 1 Retarget | Checksum: 1119d1843
+
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.143 . Memory (MB): peak = 1198.746 ; gain = 0.000
+INFO: [Opt 31-389] Phase Retarget created 0 cells and removed 12 cells
+INFO: [Opt 31-1021] In phase Retarget, 1 netlist objects are constrained preventing optimization. Please run opt_design with -debug_log to get more detail. 
+
+Phase 2 Constant propagation
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Phase 2 Constant propagation | Checksum: 1119d1843
+
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.155 . Memory (MB): peak = 1198.746 ; gain = 0.000
+INFO: [Opt 31-389] Phase Constant propagation created 0 cells and removed 0 cells
+
+Phase 3 BUFG optimization
+INFO: [Opt 31-194] Inserted BUFG u_dual_family_audio_clock/clk_44k1_raw_BUFG_inst to drive 0 load(s) on clock net u_dual_family_audio_clock/clk_44k1_raw_BUFG
+INFO: [Opt 31-194] Inserted BUFG u_dual_family_audio_clock/clk_48k_raw_BUFG_inst to drive 0 load(s) on clock net u_dual_family_audio_clock/clk_48k_raw_BUFG
+INFO: [Opt 31-193] Inserted 2 BUFG(s) on clock nets
+Phase 3 BUFG optimization | Checksum: 1dc964d0c
+
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.302 . Memory (MB): peak = 1198.746 ; gain = 0.000
+INFO: [Opt 31-662] Phase BUFG optimization created 0 cells of which 0 are BUFGs and removed 0 cells.
+
+Phase 4 Shift Register Optimization
+Phase 4 Shift Register Optimization | Checksum: f3de65a4
+
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.343 . Memory (MB): peak = 1198.746 ; gain = 0.000
+INFO: [Opt 31-389] Phase Shift Register Optimization created 0 cells and removed 0 cells
+
+Phase 5 Sweep
+Phase 5 Sweep | Checksum: 11ed2a44f
+
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.370 . Memory (MB): peak = 1198.746 ; gain = 0.000
+INFO: [Opt 31-389] Phase Sweep created 0 cells and removed 0 cells
+
+Phase 6 Constant propagation
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Phase 6 Constant propagation | Checksum: 11ed2a44f
+
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.378 . Memory (MB): peak = 1198.746 ; gain = 0.000
+INFO: [Opt 31-389] Phase Constant propagation created 0 cells and removed 0 cells
+
+Phase 7 Sweep
+Phase 7 Sweep | Checksum: 11ed2a44f
+
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.392 . Memory (MB): peak = 1198.746 ; gain = 0.000
+INFO: [Opt 31-389] Phase Sweep created 0 cells and removed 0 cells
+
+Phase 8 Remap
+Phase 8 Remap | Checksum: 1e16c8f45
+
+Time (s): cpu = 00:00:01 ; elapsed = 00:00:01 . Memory (MB): peak = 1198.746 ; gain = 0.000
+INFO: [Opt 31-389] Phase Remap created 2 cells and removed 3 cells
+
+Phase 9 Post Processing Netlist
+Phase 9 Post Processing Netlist | Checksum: 1b1732960
+
+Time (s): cpu = 00:00:01 ; elapsed = 00:00:01 . Memory (MB): peak = 1198.746 ; gain = 0.000
+INFO: [Opt 31-389] Phase Post Processing Netlist created 0 cells and removed 0 cells
+Opt_design Change Summary
+=========================
+
+
+-------------------------------------------------------------------------------------------------------------------------
+|  Phase                        |  #Cells created  |  #Cells Removed  |  #Constrained objects preventing optimizations  |
+-------------------------------------------------------------------------------------------------------------------------
+|  Retarget                     |               0  |              12  |                                              1  |
+|  Constant propagation         |               0  |               0  |                                              0  |
+|  BUFG optimization            |               0  |               0  |                                              0  |
+|  Shift Register Optimization  |               0  |               0  |                                              0  |
+|  Sweep                        |               0  |               0  |                                              0  |
+|  Constant propagation         |               0  |               0  |                                              0  |
+|  Sweep                        |               0  |               0  |                                              0  |
+|  Remap                        |               2  |               3  |                                              0  |
+|  Post Processing Netlist      |               0  |               0  |                                              0  |
+-------------------------------------------------------------------------------------------------------------------------
+
+
+
+Starting Connectivity Check Task
+
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.001 . Memory (MB): peak = 1198.746 ; gain = 0.000
+Ending Logic Optimization Task | Checksum: 1795728f6
+
+Time (s): cpu = 00:00:01 ; elapsed = 00:00:01 . Memory (MB): peak = 1198.746 ; gain = 0.000
+
+Starting Power Optimization Task
+INFO: [Pwropt 34-132] Skipping clock gating for clocks with a period < 2.00 ns.
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+INFO: [Pwropt 34-9] Applying IDT optimizations ...
+INFO: [Pwropt 34-10] Applying ODC optimizations ...
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=46.078 | TNS=0.000 |
+Running Vector-less Activity Propagation...
+
+Finished Running Vector-less Activity Propagation
+
+
+Starting PowerOpt Patch Enables Task
+INFO: [Pwropt 34-162] WRITE_MODE attribute of 0 BRAM(s) out of a total of 4 has been updated to save power. Run report_power_opt to get a complete listing of the BRAMs updated.
+INFO: [Pwropt 34-201] Structural ODC has moved 0 WE to EN ports
+Number of BRAM Ports augmented: 0 newly gated: 2 Total Ports: 8
+Number of Flops added for Enable Generation: 6
+
+Ending PowerOpt Patch Enables Task | Checksum: 11ad3dd37
+
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.017 . Memory (MB): peak = 1368.152 ; gain = 0.000
+Ending Power Optimization Task | Checksum: 11ad3dd37
+
+Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.809 . Memory (MB): peak = 1368.152 ; gain = 169.406
+
+Starting Final Cleanup Task
+Ending Final Cleanup Task | Checksum: 11ad3dd37
+
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Starting Netlist Obfuscation Task
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.007 . Memory (MB): peak = 1368.152 ; gain = 0.000
+Ending Netlist Obfuscation Task | Checksum: 1422dabed
+
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.007 . Memory (MB): peak = 1368.152 ; gain = 0.000
+INFO: [Common 17-83] Releasing license: Implementation
+30 Infos, 0 Warnings, 0 Critical Warnings and 0 Errors encountered.
+opt_design completed successfully
+# if {$implementation_place_directive eq "Default"} {
+#     place_design
+# } else {
+#     place_design -directive $implementation_place_directive
+# }
+Command: place_design -directive ExtraTimingOpt
+Attempting to get a license for feature 'Implementation' and/or device 'xc7a35t'
+INFO: [Common 17-349] Got license for feature 'Implementation' and/or device 'xc7a35t'
+INFO: [DRC 23-27] Running DRC with 2 threads
+INFO: [Vivado_Tcl 4-198] DRC finished with 0 Errors
+INFO: [Vivado_Tcl 4-199] Please refer to the DRC report (report_drc) for more information.
+Running DRC as a precondition to command place_design
+INFO: [DRC 23-27] Running DRC with 2 threads
+INFO: [Vivado_Tcl 4-198] DRC finished with 0 Errors
+INFO: [Vivado_Tcl 4-199] Please refer to the DRC report (report_drc) for more information.
+
+Starting Placer Task
+INFO: [Place 46-5] The placer was invoked with the 'ExtraTimingOpt' directive.
+INFO: [Place 30-611] Multithreading enabled for place_design using a maximum of 2 CPUs
+
+Phase 1 Placer Initialization
+
+Phase 1.1 Placer Initialization Netlist Sorting
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.001 . Memory (MB): peak = 1368.152 ; gain = 0.000
+Phase 1.1 Placer Initialization Netlist Sorting | Checksum: 5ecef1f5
+
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.016 . Memory (MB): peak = 1368.152 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 1.2 IO Placement/ Clock Placement/ Build Placer Device
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+Phase 1.2 IO Placement/ Clock Placement/ Build Placer Device | Checksum: bb57eff3
+
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.523 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 1.3 Build Placer Netlist Model
+Phase 1.3 Build Placer Netlist Model | Checksum: 170f45ebb
+
+Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.713 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 1.4 Constrain Clocks/Macros
+Phase 1.4 Constrain Clocks/Macros | Checksum: 170f45ebb
+
+Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.716 . Memory (MB): peak = 1368.152 ; gain = 0.000
+Phase 1 Placer Initialization | Checksum: 170f45ebb
+
+Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.721 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 2 Global Placement
+
+Phase 2.1 Floorplanning
+Phase 2.1 Floorplanning | Checksum: 1423cae10
+
+Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.777 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 2.2 Physical Synthesis In Placer
+INFO: [Physopt 32-65] No nets found for high-fanout optimization.
+INFO: [Physopt 32-232] Optimized 0 net. Created 0 new instance.
+INFO: [Physopt 32-775] End 1 Pass. Optimized 0 net or cell. Created 0 new cell, deleted 0 existing cell and moved 0 existing cell
+INFO: [Physopt 32-670] No setup violation found.  DSP Register Optimization was not performed.
+INFO: [Physopt 32-670] No setup violation found.  Shift Register Optimization was not performed.
+INFO: [Physopt 32-670] No setup violation found.  BRAM Register Optimization was not performed.
+INFO: [Physopt 32-949] No candidate nets found for HD net replication
+INFO: [Physopt 32-775] End 1 Pass. Optimized 0 net or cell. Created 0 new cell, deleted 0 existing cell and moved 0 existing cell
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Summary of Physical Synthesis Optimizations
+============================================
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+|  Optimization                  |  Added Cells  |  Removed Cells  |  Optimized Cells/Nets  |  Dont Touch  |  Iterations  |  Elapsed   |
+----------------------------------------------------------------------------------------------------------------------------------------
+|  Very High Fanout              |            0  |              0  |                     0  |           0  |           1  |  00:00:00  |
+|  DSP Register                  |            0  |              0  |                     0  |           0  |           0  |  00:00:00  |
+|  Shift Register                |            0  |              0  |                     0  |           0  |           0  |  00:00:00  |
+|  BRAM Register                 |            0  |              0  |                     0  |           0  |           0  |  00:00:00  |
+|  HD Interface Net Replication  |            0  |              0  |                     0  |           0  |           1  |  00:00:00  |
+|  Total                         |            0  |              0  |                     0  |           0  |           2  |  00:00:00  |
+----------------------------------------------------------------------------------------------------------------------------------------
+
+
+Phase 2.2 Physical Synthesis In Placer | Checksum: 218c4a7fb
+
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 1368.152 ; gain = 0.000
+Phase 2 Global Placement | Checksum: 23bcbb3f1
+
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 3 Detail Placement
+
+Phase 3.1 Commit Multi Column Macros
+Phase 3.1 Commit Multi Column Macros | Checksum: 23bcbb3f1
+
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 3.2 Commit Most Macros & LUTRAMs
+Phase 3.2 Commit Most Macros & LUTRAMs | Checksum: 15af9406e
+
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 3.3 Area Swap Optimization
+Phase 3.3 Area Swap Optimization | Checksum: 16637455b
+
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 3.4 Pipeline Register Optimization
+Phase 3.4 Pipeline Register Optimization | Checksum: fef13cf5
+
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 3.5 Small Shape Detail Placement
+Phase 3.5 Small Shape Detail Placement | Checksum: 1665ccf6e
+
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 3.6 Re-assign LUT pins
+Phase 3.6 Re-assign LUT pins | Checksum: 1ee571d9b
+
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 3.7 Pipeline Register Optimization
+Phase 3.7 Pipeline Register Optimization | Checksum: 1850d25fd
+
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 1368.152 ; gain = 0.000
+Phase 3 Detail Placement | Checksum: 1850d25fd
+
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 4 Post Placement Optimization and Clean-Up
+
+Phase 4.1 Post Commit Optimization
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+
+Phase 4.1.1 Post Placement Optimization
+Post Placement Optimization Initialization | Checksum: 1b630aa89
+
+Phase 4.1.1.1 BUFG Insertion
+INFO: [Place 46-46] BUFG insertion identified 0 candidate nets, 0 success, 0 bufg driver replicated, 0 skipped for placement/routing, 0 skipped for timing, 0 skipped for netlist change reason
+Phase 4.1.1.1 BUFG Insertion | Checksum: 1b630aa89
+
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 1368.152 ; gain = 0.000
+INFO: [Place 30-746] Post Placement Timing Summary WNS=45.458. For the most accurate timing information please run report_timing.
+Phase 4.1.1 Post Placement Optimization | Checksum: 240729224
+
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 1368.152 ; gain = 0.000
+Phase 4.1 Post Commit Optimization | Checksum: 240729224
+
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 4.2 Post Placement Cleanup
+Phase 4.2 Post Placement Cleanup | Checksum: 240729224
+
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 4.3 Placer Reporting
+Phase 4.3 Placer Reporting | Checksum: 240729224
+
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 4.4 Final Placement Cleanup
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1368.152 ; gain = 0.000
+Phase 4.4 Final Placement Cleanup | Checksum: 1fff7208b
+
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 1368.152 ; gain = 0.000
+Phase 4 Post Placement Optimization and Clean-Up | Checksum: 1fff7208b
+
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 1368.152 ; gain = 0.000
+Ending Placer Task | Checksum: 111c60e64
+
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 1368.152 ; gain = 0.000
+INFO: [Common 17-83] Releasing license: Implementation
+22 Infos, 0 Warnings, 0 Critical Warnings and 0 Errors encountered.
+place_design completed successfully
+# route_design
+Command: route_design
+Attempting to get a license for feature 'Implementation' and/or device 'xc7a35t'
+INFO: [Common 17-349] Got license for feature 'Implementation' and/or device 'xc7a35t'
+Running DRC as a precondition to command route_design
+INFO: [DRC 23-27] Running DRC with 2 threads
+INFO: [Vivado_Tcl 4-198] DRC finished with 0 Errors
+INFO: [Vivado_Tcl 4-199] Please refer to the DRC report (report_drc) for more information.
+
+
+Starting Routing Task
+INFO: [Route 35-254] Multithreading enabled for route_design using a maximum of 2 CPUs
+Checksum: PlaceDB: abdf7f8a ConstDB: 0 ShapeSum: 65e68eda RouteDB: 0
+
+Phase 1 Build RT Design
+Phase 1 Build RT Design | Checksum: 7ec526da
+
+Time (s): cpu = 00:00:12 ; elapsed = 00:00:11 . Memory (MB): peak = 1368.152 ; gain = 0.000
+Post Restoration Checksum: NetGraph: 24370b04 NumContArr: 5a8e1bd6 Constraints: 0 Timing: 0
+
+Phase 2 Router Initialization
+
+Phase 2.1 Create Timer
+Phase 2.1 Create Timer | Checksum: 7ec526da
+
+Time (s): cpu = 00:00:12 ; elapsed = 00:00:11 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 2.2 Fix Topology Constraints
+Phase 2.2 Fix Topology Constraints | Checksum: 7ec526da
+
+Time (s): cpu = 00:00:12 ; elapsed = 00:00:11 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 2.3 Pre Route Cleanup
+Phase 2.3 Pre Route Cleanup | Checksum: 7ec526da
+
+Time (s): cpu = 00:00:12 ; elapsed = 00:00:11 . Memory (MB): peak = 1368.152 ; gain = 0.000
+ Number of Nodes with overlaps = 0
+
+Phase 2.4 Update Timing
+Phase 2.4 Update Timing | Checksum: 10b0ab9e2
+
+Time (s): cpu = 00:00:12 ; elapsed = 00:00:11 . Memory (MB): peak = 1368.152 ; gain = 0.000
+INFO: [Route 35-416] Intermediate Timing Summary | WNS=45.491 | TNS=0.000  | WHS=-0.301 | THS=-17.364|
+
+
+Phase 2.5 Update Timing for Bus Skew
+
+Phase 2.5.1 Update Timing
+Phase 2.5.1 Update Timing | Checksum: c07d8ae5
+
+Time (s): cpu = 00:00:12 ; elapsed = 00:00:11 . Memory (MB): peak = 1368.152 ; gain = 0.000
+INFO: [Route 35-416] Intermediate Timing Summary | WNS=45.491 | TNS=0.000  | WHS=N/A    | THS=N/A    |
+
+Phase 2.5 Update Timing for Bus Skew | Checksum: ab8bc5fa
+
+Time (s): cpu = 00:00:12 ; elapsed = 00:00:11 . Memory (MB): peak = 1368.152 ; gain = 0.000
+Phase 2 Router Initialization | Checksum: b7826880
+
+Time (s): cpu = 00:00:12 ; elapsed = 00:00:11 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 3 Initial Routing
+Phase 3 Initial Routing | Checksum: 1eb09e523
+
+Time (s): cpu = 00:00:13 ; elapsed = 00:00:11 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 4 Rip-up And Reroute
+
+Phase 4.1 Global Iteration 0
+ Number of Nodes with overlaps = 29
+ Number of Nodes with overlaps = 0
+INFO: [Route 35-416] Intermediate Timing Summary | WNS=45.187 | TNS=0.000  | WHS=N/A    | THS=N/A    |
+
+Phase 4.1 Global Iteration 0 | Checksum: 1d0f68656
+
+Time (s): cpu = 00:00:13 ; elapsed = 00:00:11 . Memory (MB): peak = 1368.152 ; gain = 0.000
+Phase 4 Rip-up And Reroute | Checksum: 1d0f68656
+
+Time (s): cpu = 00:00:13 ; elapsed = 00:00:11 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 5 Delay and Skew Optimization
+
+Phase 5.1 Delay CleanUp
+Phase 5.1 Delay CleanUp | Checksum: 1d0f68656
+
+Time (s): cpu = 00:00:13 ; elapsed = 00:00:11 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 5.2 Clock Skew Optimization
+Phase 5.2 Clock Skew Optimization | Checksum: 1d0f68656
+
+Time (s): cpu = 00:00:13 ; elapsed = 00:00:11 . Memory (MB): peak = 1368.152 ; gain = 0.000
+Phase 5 Delay and Skew Optimization | Checksum: 1d0f68656
+
+Time (s): cpu = 00:00:13 ; elapsed = 00:00:11 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 6 Post Hold Fix
+
+Phase 6.1 Hold Fix Iter
+
+Phase 6.1.1 Update Timing
+Phase 6.1.1 Update Timing | Checksum: 1d2dff915
+
+Time (s): cpu = 00:00:13 ; elapsed = 00:00:11 . Memory (MB): peak = 1368.152 ; gain = 0.000
+INFO: [Route 35-416] Intermediate Timing Summary | WNS=45.268 | TNS=0.000  | WHS=0.105  | THS=0.000  |
+
+Phase 6.1 Hold Fix Iter | Checksum: 1fd82eee7
+
+Time (s): cpu = 00:00:13 ; elapsed = 00:00:11 . Memory (MB): peak = 1368.152 ; gain = 0.000
+Phase 6 Post Hold Fix | Checksum: 1fd82eee7
+
+Time (s): cpu = 00:00:13 ; elapsed = 00:00:11 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 7 Route finalize
+
+Router Utilization Summary
+  Global Vertical Routing Utilization    = 0.244599 %
+  Global Horizontal Routing Utilization  = 0.232041 %
+  Routable Net Status*
+  *Does not include unroutable nets such as driverless and loadless.
+  Run report_route_status for detailed report.
+  Number of Failed Nets               = 0
+  Number of Unrouted Nets             = 0
+  Number of Partially Routed Nets     = 0
+  Number of Node Overlaps             = 0
+
+Phase 7 Route finalize | Checksum: 2786e7852
+
+Time (s): cpu = 00:00:13 ; elapsed = 00:00:11 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 8 Verifying routed nets
+
+ Verification completed successfully
+Phase 8 Verifying routed nets | Checksum: 2786e7852
+
+Time (s): cpu = 00:00:13 ; elapsed = 00:00:11 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 9 Depositing Routes
+Phase 9 Depositing Routes | Checksum: 1e47b1422
+
+Time (s): cpu = 00:00:13 ; elapsed = 00:00:11 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Phase 10 Post Router Timing
+INFO: [Route 35-57] Estimated Timing Summary | WNS=45.268 | TNS=0.000  | WHS=0.105  | THS=0.000  |
+
+INFO: [Route 35-327] The final timing numbers are based on the router estimated timing analysis. For a complete and accurate timing signoff, please run report_timing_summary.
+Phase 10 Post Router Timing | Checksum: 1e47b1422
+
+Time (s): cpu = 00:00:13 ; elapsed = 00:00:11 . Memory (MB): peak = 1368.152 ; gain = 0.000
+INFO: [Route 35-16] Router Completed Successfully
+
+Time (s): cpu = 00:00:13 ; elapsed = 00:00:11 . Memory (MB): peak = 1368.152 ; gain = 0.000
+
+Routing Is Done.
+INFO: [Common 17-83] Releasing license: Implementation
+13 Infos, 0 Warnings, 0 Critical Warnings and 0 Errors encountered.
+route_design completed successfully
+route_design: Time (s): cpu = 00:00:14 ; elapsed = 00:00:12 . Memory (MB): peak = 1368.152 ; gain = 0.000
+# set setup_path [get_timing_paths -delay_type max -max_paths 1]
+# set hold_path [get_timing_paths -delay_type min -max_paths 1]
+# set setup_slack [get_property SLACK $setup_path]
+# set hold_slack [get_property SLACK $hold_path]
+# write_checkpoint -force \
+#     [file join $result_dir national_finals_board_routed.dcp]
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1368.152 ; gain = 0.000
+INFO: [Timing 38-480] Writing timing data to binary archive.
+Writing placer database...
+Writing XDEF routing.
+Writing XDEF routing logical nets.
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1368.152 ; gain = 0.000
+Writing XDEF routing special nets.
+Write XDEF Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.086 . Memory (MB): peak = 1368.152 ; gain = 0.000
+INFO: [Common 17-1381] The checkpoint 'D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/vivado_results/p3t_stage1_dsp_sat_derived_ptr_impl_r7/national_finals_board_routed.dcp' has been generated.
+# if {$setup_slack < 0.0 || $hold_slack < 0.0} {
+#     error [format \
+#         "Timing failed after routing: setup slack %.3f ns, hold slack %.3f ns" \
+#         $setup_slack $hold_slack]
+# }
+# set bitstream_dst [file join $result_dir \
+#     national_finals_dual_rate_4x8x128x_areaopt.bit]
+# write_bitstream -force $bitstream_dst
+Command: write_bitstream -force D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/vivado_results/p3t_stage1_dsp_sat_derived_ptr_impl_r7/national_finals_dual_rate_4x8x128x_areaopt.bit
+Attempting to get a license for feature 'Implementation' and/or device 'xc7a35t'
+INFO: [Common 17-349] Got license for feature 'Implementation' and/or device 'xc7a35t'
+Running DRC as a precondition to command write_bitstream
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1704] No user IP repositories specified
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository 'E:/app/Xilinx2018.3/Vivado/2018.3/data/ip'.
+INFO: [DRC 23-27] Running DRC with 2 threads
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/u_stage23_dsp48e1 input u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/u_stage23_dsp48e1/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/u_stage23_dsp48e1 input u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/u_stage23_dsp48e1/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/u_stage23_dsp48e1 input u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/u_stage23_dsp48e1/C[47:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_final_integrator_dsp.final_integrator_sum input u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_final_integrator_dsp.final_integrator_sum/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_final_integrator_dsp.final_integrator_sum input u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_final_integrator_dsp.final_integrator_sum/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_first_integrator_dsp.first_integrator_sum input u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_first_integrator_dsp.first_integrator_sum/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_first_integrator_dsp.first_integrator_sum input u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_first_integrator_dsp.first_integrator_sum/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_stage1_dsp48e1 input u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_stage1_dsp48e1/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_stage1_dsp48e1 input u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_stage1_dsp48e1/C[47:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPOP-1] PREG Output pipelining: DSP u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_final_integrator_dsp.final_integrator_sum output u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_final_integrator_dsp.final_integrator_sum/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+WARNING: [DRC DPOP-1] PREG Output pipelining: DSP u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_first_integrator_dsp.first_integrator_sum output u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_first_integrator_dsp.first_integrator_sum/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+INFO: [DRC AVAL-4] enum_USE_DPORT_FALSE_enum_DREG_ADREG_0_connects_CED_CEAD_RSTD_GND: u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/u_stage23_dsp48e1: DSP48E1 is not using the D port (USE_DPORT = FALSE). For improved power characteristics, set DREG and ADREG to '1', tie CED, CEAD, and RSTD to logic '0'.
+INFO: [Vivado 12-3199] DRC finished with 0 Errors, 11 Warnings, 1 Advisories
+INFO: [Vivado 12-3200] Please refer to the DRC report (report_drc) for more information.
+INFO: [Designutils 20-2272] Running write_bitstream with 2 threads.
+Loading data files...
+Loading site data...
+Loading route data...
+Processing options...
+Creating bitmap...
+Creating bitstream...
+Writing bitstream D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/vivado_results/p3t_stage1_dsp_sat_derived_ptr_impl_r7/national_finals_dual_rate_4x8x128x_areaopt.bit...
+INFO: [Vivado 12-1842] Bitgen Completed Successfully.
+INFO: [Project 1-120] WebTalk data collection is mandatory when using a WebPACK part without a full Vivado license. To see the specific WebTalk data collected for your design, open the usage_statistics_webtalk.html or usage_statistics_webtalk.xml file in the implementation directory.
+CRITICAL WARNING: [Common 17-570] Unable to write the webtalk settings file.  Please check that the appropriate environment variable (APPDATA or HOME) is properly set.
+CRITICAL WARNING: [Common 17-570] Unable to write the webtalk settings file.  Please check that the appropriate environment variable (APPDATA or HOME) is properly set.
+INFO: [Common 17-83] Releasing license: Implementation
+12 Infos, 11 Warnings, 2 Critical Warnings and 0 Errors encountered.
+write_bitstream completed successfully
+write_bitstream: Time (s): cpu = 00:00:09 ; elapsed = 00:00:10 . Memory (MB): peak = 1798.938 ; gain = 430.785
+# report_clocks -file [file join $result_dir clock_report_routed.rpt]
+# report_utilization -file [file join $result_dir utilization_placed.rpt]
+# report_utilization -hierarchical \
+#     -file [file join $result_dir utilization_hierarchical.rpt]
+# report_timing_summary -delay_type min_max -max_paths 30 \
+#     -file [file join $result_dir timing_summary_routed.rpt]
+WARNING: [Timing 38-436] There are set_bus_skew constraint(s) in this design. Please run report_bus_skew to ensure that bus skew requirements are met.
+# report_timing -to [get_ports {dac_data[*]}] -delay_type max -max_paths 8 \
+#     -file [file join $result_dir dac_output_setup_routed.rpt]
+INFO: [Timing 38-78] ReportTimingParams: -to_pins  -max_paths 8 -nworst 1 -delay_type max -sort_by slack.
+# report_timing -to [get_ports {dac_data[*]}] -delay_type min -max_paths 8 \
+#     -file [file join $result_dir dac_output_hold_routed.rpt]
+INFO: [Timing 38-78] ReportTimingParams: -to_pins  -max_paths 8 -nworst 1 -delay_type min -sort_by slack.
+# report_clock_interaction -delay_type min_max \
+#     -file [file join $result_dir clock_interaction_routed.rpt]
+# report_route_status -file [file join $result_dir route_status_routed.rpt]
+# report_power -file [file join $result_dir power_vectorless_routed.rpt]
+Command: report_power -file D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/vivado_results/p3t_stage1_dsp_sat_derived_ptr_impl_r7/power_vectorless_routed.rpt
+Running Vector-less Activity Propagation...
+
+Finished Running Vector-less Activity Propagation
+WARNING: [Power 33-332] Found switching activity that implies high-fanout reset nets being asserted for excessive periods of time which may result in inaccurate power analysis.
+Resolution: To review and fix problems, please run Power Constraints Advisor in the GUI from Tools > Power Constraints Advisor or run report_power with the -advisory option to generate a text report.
+0 Infos, 1 Warnings, 0 Critical Warnings and 0 Errors encountered.
+report_power completed successfully
+# report_drc -file [file join $result_dir drc_routed.rpt]
+Command: report_drc -file D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/vivado_results/p3t_stage1_dsp_sat_derived_ptr_impl_r7/drc_routed.rpt
+INFO: [IP_Flow 19-1839] IP Catalog is up to date.
+INFO: [DRC 23-27] Running DRC with 2 threads
+INFO: [Coretcl 2-168] The results of DRC are in file D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/vivado_results/p3t_stage1_dsp_sat_derived_ptr_impl_r7/drc_routed.rpt.
+report_drc completed successfully
+Command: report_methodology -return_string
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+INFO: [DRC 23-133] Running Methodology with 2 threads
+report_methodology completed successfully
+# set methodology_text [report_methodology -return_string]
+# write_text_report [file join $result_dir methodology_routed.rpt] \
+#     $methodology_text
+# if {![regexp {\| TIMING-18 \| Warning\s+\|[^\n]+\| 8\s+\|} \
+#         $methodology_text]} {
+#     error "Methodology warning set changed: expected TIMING-18 count 8"
+# }
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+INFO: [Timing 38-433] Consider using Xilinx recommended XPM_CDC modules to avoid Critical severities
+INFO: [Timing 38-314] The report_cdc command only analyzes and reports clock domain crossing paths where clocks have been defined on both source and destination sides. Ports with no input delay constraint are skipped. Please run check_timing to verify there are no missing clock definitions in your design, nor any unconstrained input port.
+# set cdc_text [report_cdc -details -return_string]
+# write_text_report [file join $result_dir cdc_routed.rpt] $cdc_text
+# foreach expected_cdc_pattern [list \
+#         {CDC-3\s+Info\s+10\s} \
+#         {CDC-13\s+Critical\s+2\s} \
+#         {CDC-15\s+Warning\s+4\s}] {
+#     if {![regexp $expected_cdc_pattern $cdc_text]} {
+#         error "CDC warning ID/count changed: $expected_cdc_pattern"
+#     }
+# }
+# catch {
+#     check_timing -verbose \
+#         -file [file join $result_dir check_timing_routed.rpt]
+# }
+# catch {
+#     report_exceptions -coverage \
+#         -file [file join $result_dir exceptions_coverage_routed.rpt]
+# }
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+# catch {
+#     report_exceptions -ignored \
+#         -file [file join $result_dir exceptions_ignored_routed.rpt]
+# }
+# catch {
+#     report_bus_skew \
+#         -file [file join $result_dir bus_skew_routed.rpt]
+# }
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+# report_timing -from $mode_shadow_cells -to $audio_mode_cells \
+#     -delay_type max -max_paths 4 \
+#     -file [file join $result_dir mode_absolute_delay_routed.rpt]
+INFO: [Timing 38-78] ReportTimingParams: -from_pins  -to_pins  -max_paths 4 -nworst 1 -delay_type max -sort_by slack.
+WARNING: [Timing 38-127] No common period was found between clocks clk_20M {rise@0ns fall@25ns period=50ns} and u_dual_family_audio_clock/clk_44k1_raw {rise@0ns fall@88.5772ns period=177.154ns} in 1000 cycles.
+WARNING: [Timing 38-127] No common period was found between clocks clk_20M {rise@0ns fall@25ns period=50ns} and u_dual_family_audio_clock/clk_44k1_raw {rise@0ns fall@88.5772ns period=177.154ns} in 1000 cycles.
+# set mode_delay_paths [get_timing_paths -from $mode_shadow_cells \
+#     -to $audio_mode_cells -delay_type max -max_paths 4]
+# if {[llength $mode_delay_paths] != 4} {
+#     error "Expected four family/bit bundled-data max-delay paths"
+# }
+# foreach mode_delay_path $mode_delay_paths {
+#     set mode_delay_slack [get_property SLACK $mode_delay_path]
+#     if {$mode_delay_slack < 0.0 || $mode_delay_slack > 50.0} {
+#         error "Bundled-data absolute max-delay is failed or overridden: slack=$mode_delay_slack"
+#     }
+# }
+# write_primitive_report \
+#     [file join $result_dir dsp_utilization_routed.rpt] \
+#     "DSP48*" "National-finals DSP utilization"
+# write_primitive_report \
+#     [file join $result_dir bram_utilization_routed.rpt] \
+#     "RAMB*" "National-finals BRAM utilization"
+# write_primitive_report \
+#     [file join $result_dir mmcm_utilization_routed.rpt] \
+#     "MMCME2*" "National-finals MMCM utilization"
+# set total_dsp_count [llength [get_cells -hierarchical \
+#     -filter {REF_NAME =~ DSP48*}]]
+# set cic_integrator_dsp_count [expr {$total_dsp_count - 2}]
+# if {$cic_integrator_dsp_count < 0 || $cic_integrator_dsp_count > 2} {
+#     error "Unexpected DSP mapping: total DSP count is $total_dsp_count"
+# }
+# if {$cic_integrator_dsp_count == 2} {
+#     set cic_mapping_description \
+#         "both high-rate integrators use DSP48E1"
+# } elseif {$cic_integrator_dsp_count == 1} {
+#     set cic_mapping_description \
+#         "the 26-bit first integrator uses LUT CARRY4 and the 29-bit final integrator uses DSP48E1"
+# } else {
+#     set cic_mapping_description \
+#         "both high-rate integrators use LUT CARRY4"
+# }
+# set manifest_handle [open [file join $result_dir build_manifest.txt] w]
+# puts $manifest_handle "National-finals dual-rate board build"
+# puts $manifest_handle "Synthesis checkpoint: $synth_dcp"
+# puts $manifest_handle "Part: [get_property PART [current_design]]"
+# puts $manifest_handle "Top: board_demo_competition_dac8_top"
+# puts $manifest_handle "Bitstream: $bitstream_dst"
+# puts $manifest_handle [format "Routed setup slack: %.3f ns" $setup_slack]
+# puts $manifest_handle [format "Routed hold slack: %.3f ns" $hold_slack]
+# set dac_setup_path [get_timing_paths -to [get_ports {dac_data[*]}] \
+#     -delay_type max -max_paths 1]
+# set dac_hold_path [get_timing_paths -to [get_ports {dac_data[*]}] \
+#     -delay_type min -max_paths 1]
+# puts $manifest_handle [format "AD9708 output setup slack: %.3f ns" \
+#     [get_property SLACK $dac_setup_path]]
+# puts $manifest_handle [format "AD9708 output hold slack: %.3f ns" \
+#     [get_property SLACK $dac_hold_path]]
+# puts $manifest_handle "44.1-kHz family 128x clock: 5.644796 MHz (-0.64 ppm nominal)"
+# puts $manifest_handle "48-kHz family 128x clock: 6.144068 MHz (+11.03 ppm nominal)"
+# puts $manifest_handle "Bundled-data CDC: mode_shadow\[1:0\] has 50.000 ns relative bus-skew and absolute datapath-delay requirements; verify routed evidence in bus_skew_routed.rpt, mode_absolute_delay_routed.rpt, and exceptions_ignored_routed.rpt"
+# if {$p3_joint_stage3 != 0} {
+#     puts $manifest_handle "Architecture: 1-DSP Stage1 + 1-DSP shared Stage2/3 with mode-specific coefficient banks + exact N3 Hold CIC16 with $cic_integrator_dsp_count DSP integrator(s)"
+#     puts $manifest_handle "P3 equalizer fold: the 128x compensation response is folded into Stage3; 4x/8x retain the flat Stage3 bank and the separate shift-add equalizer is not elaborated"
+# } else {
+#     puts $manifest_handle "Architecture: 1-DSP Stage1 + 1-DSP shared Stage2/3 + shift-add equalizer + exact N3 Hold CIC16 with $cic_integrator_dsp_count DSP integrator(s)"
+#     puts $manifest_handle "Equalizer optimization: combinational hand-off plus lossless 21-bit headroom removes the intermediate 20-bit saturation mux; the CIC final quantizer remains 20-bit"
+# }
+# puts $manifest_handle "N3 Hold optimization: C^3 -> up16 -> I^3 is rewritten exactly as C^2 -> Hold16 -> I^2; proven 26-bit first and 29-bit final integrator widths replace the former conservative 33-bit states"
+# puts $manifest_handle "CIC mapping: two low-rate comb stages use LUT CARRY4; $cic_mapping_description"
+# puts $manifest_handle "Stage1 optimization: current L0 is written then read from the single RAMB18; DSP48E1 AREG retains each left operand and dynamic INMODE masks invalid A/D history, removing the 24-bit fabric left register/mux while preserving the A+D preadder, PREG MAC state, 41-bit bound, and exact Q15 rounding"
+# puts $manifest_handle "Stage2/3 optimization: shared DSP48E1 PREG MAC state; spare post-MAC cycles perform exact Q15 rounding, PATTERNDETECT/PATTERNBDETECT sign-extension checking, and direct DSP P-register clamp loading, removing the fabric overflow comparator and wide saturation mux"
+# puts $manifest_handle "Stage3 correctness: true Q15 coefficients, complete 38-bit MAC view, and exact signed 20/21-bit saturation retained inside the shared DSP schedule"
+# puts $manifest_handle "History-state optimization: existing circular write heads derive startup fill depth; one sticky full flag per history plus one job snapshot replace the former wide fill counters while preserving reset masking and active-job isolation"
+# puts $manifest_handle "Synthesis directive: $expected_synth_directive"
+# puts $manifest_handle "Synthesis flatten hierarchy: $expected_flatten_hierarchy"
+# puts $manifest_handle "Synthesis resource sharing: $expected_resource_sharing"
+# puts $manifest_handle "Stage1 DSP48 preadder: $expected_stage1_dsp48_preadder"
+# puts $manifest_handle "Requested CIC integrator DSP mode: $expected_cic_integrator_dsp_mode"
+# puts $manifest_handle "Stage1 single-BRAM history mode: $expected_stage1_single_bram"
+# puts $manifest_handle "Stage2/3 unified-BRAM history mode: $expected_stage23_unified_bram"
+# puts $manifest_handle "Implementation opt directive: $implementation_opt_directive"
+# puts $manifest_handle "Implementation place directive: $implementation_place_directive"
+# puts $manifest_handle "P3 joint Stage3 mode: $p3_joint_stage3"
+# close $manifest_handle
+# puts "NATIONAL_FINALS_SINGLE_PROCESS_BUILD_PASS"
+NATIONAL_FINALS_SINGLE_PROCESS_BUILD_PASS
+# puts [format "SETUP_SLACK_NS=%.3f" $setup_slack]
+SETUP_SLACK_NS=45.270
+# puts [format "HOLD_SLACK_NS=%.3f" $hold_slack]
+HOLD_SLACK_NS=0.107
+# puts "RESULT_DIR=$result_dir"
+RESULT_DIR=D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/vivado_results/p3t_stage1_dsp_sat_derived_ptr_impl_r7
+# puts "BITSTREAM=$bitstream_dst"
+BITSTREAM=D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/vivado_results/p3t_stage1_dsp_sat_derived_ptr_impl_r7/national_finals_dual_rate_4x8x128x_areaopt.bit
+# close_design
+INFO: [Common 17-206] Exiting Vivado at Thu Aug  6 15:32:54 2026...

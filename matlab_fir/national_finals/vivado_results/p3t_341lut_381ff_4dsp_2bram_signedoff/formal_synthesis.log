@@ -1,0 +1,1510 @@
+#-----------------------------------------------------------
+# Vivado v2018.3 (64-bit)
+# SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+# IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+# Start of session at: Thu Aug  6 15:07:36 2026
+# Process ID: 60868
+# Current directory: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/_work/vivado/20260806_150734
+# Command line: vivado.exe -mode batch -journal D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\_work\vivado\20260806_150734\synthesis.jou -log D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\_work\vivado\20260806_150734\synthesis.log -source D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\vivado\build_national_finals_board.tcl -tclargs 0 1 AreaOptimized_high full on p3t_stage1_dsp_sat_derived_ptr_synth_r7 1 2 1 1 1
+# Log file: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/_work/vivado/20260806_150734/synthesis.log
+# Journal file: D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\_work\vivado\20260806_150734\synthesis.jou
+#-----------------------------------------------------------
+CRITICAL WARNING: [Common 17-741] No write access right to the local Tcl store at 'C'. XilinxTclStore is reverted to the installation area. If you want to use local Tcl Store, please change the access right and relaunch Vivado.
+source {D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\vivado\build_national_finals_board.tcl}
+# set script_dir [file dirname [file normalize [info script]]]
+# set repo_dir [file normalize [file join $script_dir .. .. ..]]
+# set project_dir [file join $repo_dir XC7A35T_interp_audio_pcm_wordlen_opt]
+# set project_file [file join $project_dir XC7A35T_interp.xpr]
+# set src_dir [file join $project_dir XC7A35T_interp.srcs sources_1 new]
+# set nf_src_dir [file join $src_dir national_finals]
+# set sim_dir [file join $project_dir XC7A35T_interp.srcs sim_1 new]
+# set nf_sim_dir [file join $sim_dir national_finals]
+# set reuse_current_synthesis 0
+# set synthesis_only 0
+# set synth_directive AreaOptimized_high
+# set flatten_hierarchy full
+# set resource_sharing on
+# set result_tag board_dual_rate_cic6_round7_headroom_opt
+# set stage1_dsp48_preadder 1
+# set cic_integrator_dsp_mode 2
+# set p3_joint_stage3 1
+# set stage1_single_bram 1
+# set stage23_unified_bram 1
+# if {$argc > 0} {
+#     set reuse_current_synthesis [lindex $argv 0]
+# }
+# if {$argc > 1} {
+#     set synthesis_only [lindex $argv 1]
+# }
+# if {$argc > 2} {
+#     set synth_directive [lindex $argv 2]
+# }
+# if {$argc > 3} {
+#     set flatten_hierarchy [lindex $argv 3]
+# }
+# if {$argc > 4} {
+#     set resource_sharing [lindex $argv 4]
+# }
+# if {$argc > 5} {
+#     set result_tag [lindex $argv 5]
+# }
+# if {$argc > 6} {
+#     set stage1_dsp48_preadder [lindex $argv 6]
+# }
+# if {$argc > 7} {
+#     set cic_integrator_dsp_mode [lindex $argv 7]
+# }
+# if {$argc > 8} {
+#     set p3_joint_stage3 [lindex $argv 8]
+# }
+# if {$argc > 9} {
+#     set stage1_single_bram [lindex $argv 9]
+# }
+# if {$argc > 10} {
+#     set stage23_unified_bram [lindex $argv 10]
+# }
+# if {$reuse_current_synthesis != 0 && $reuse_current_synthesis != 1} {
+#     error "reuse_current_synthesis must be 0 or 1"
+# }
+# if {$synthesis_only != 0 && $synthesis_only != 1} {
+#     error "synthesis_only must be 0 or 1"
+# }
+# if {$stage1_dsp48_preadder != 0 && $stage1_dsp48_preadder != 1} {
+#     error "stage1_dsp48_preadder must be 0 or 1"
+# }
+# if {$cic_integrator_dsp_mode < 0 || $cic_integrator_dsp_mode > 2} {
+#     error "cic_integrator_dsp_mode must be 0, 1, or 2"
+# }
+# if {$p3_joint_stage3 != 0 && $p3_joint_stage3 != 1} {
+#     error "p3_joint_stage3 must be 0 or 1"
+# }
+# if {$stage1_single_bram != 0 && $stage1_single_bram != 1} {
+#     error "stage1_single_bram must be 0 or 1"
+# }
+# if {$stage23_unified_bram != 0 && $stage23_unified_bram != 1} {
+#     error "stage23_unified_bram must be 0 or 1"
+# }
+# if {![regexp {^[A-Za-z0-9_-]+$} $result_tag]} {
+#     error "result_tag may contain only letters, digits, underscore, and dash"
+# }
+# set result_dir [file normalize [file join $script_dir .. vivado_results $result_tag]]
+# set nf_sources [list \
+#     [file join $nf_src_dir nf_signedoff_filter_core.v] \
+#     [file join $nf_src_dir nf_unified_fir_coeff_bram.v] \
+#     [file join $nf_src_dir nf_stage1_history_ramb18_sdp.v] \
+#     [file join $nf_src_dir interp2_stage1_single_bram_serial_ce.v] \
+#     [file join $nf_src_dir nf_stage23_history_ramb18_sdp.v] \
+#     [file join $nf_src_dir cic3_compensator_shiftadd_ce.v] \
+#     [file join $nf_src_dir cic_interp16_serial_comb_dsp_ce.v] \
+#     [file join $nf_src_dir cic_interp16_n3_hold2_dsp_ce.v] \
+#     [file join $nf_src_dir dual_family_audio_clock.v] \
+#     [file join $nf_src_dir nf_mode_cdc_handshake.v] \
+#     [file join $nf_src_dir dual_rate_test_tone_rom_source.v] \
+#     [file join $nf_src_dir matrix_keypad_mode_ctrl_ultracompact.v] \
+#     [file join $nf_src_dir nf_sine_15k_dual_rate_24bit_256.mem] \
+#     [file join $nf_src_dir nf_sine_15k_dual_rate_packed32_256.mem]]
+# set nf_sim_sources [list \
+#     [file join $nf_sim_dir tb_cic3_compensator_shiftadd_ce.v] \
+#     [file join $nf_sim_dir tb_dual_family_audio_clock.v]]
+# proc require_file {filename} {
+#     if {![file exists $filename]} {
+#         error "Required file does not exist: $filename"
+#     }
+# }
+# proc write_primitive_report {report_file pattern title} {
+#     set primitive_cells [get_cells -hierarchical \
+#         -filter [format {REF_NAME =~ %s} $pattern]]
+#     set report_handle [open $report_file w]
+#     puts $report_handle $title
+#     puts $report_handle [string repeat "=" [string length $title]]
+#     puts $report_handle "Cell count: [llength $primitive_cells]"
+#     foreach primitive_cell $primitive_cells {
+#         puts $report_handle [format "%s | %s | %s" \
+#             $primitive_cell \
+#             [get_property REF_NAME $primitive_cell] \
+#             [get_property LOC $primitive_cell]]
+#     }
+#     close $report_handle
+# }
+# require_file $project_file
+# foreach source_file [concat $nf_sources $nf_sim_sources] {
+#     require_file $source_file
+# }
+# file mkdir $result_dir
+# open_project $project_file
+INFO: [ProjectBase 1-489] The host OS only allows 260 characters in a normal path. The project is stored in a path with more than 80 characters. If you experience issues with IP, Block Designs, or files not being found, please consider moving the project to a location with a shorter path. Alternately consider using the OS subst command to map part of the path to a drive letter.
+Current project path is 'D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt'
+Scanning sources...
+Finished scanning sources
+WARNING: [Project 1-509] GeneratedRun file for 'impl_1' not found
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1704] No user IP repositories specified
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository 'E:/app/Xilinx2018.3/Vivado/2018.3/data/ip'.
+# foreach source_file $nf_sources {
+#     if {[llength [get_files -quiet $source_file]] == 0} {
+#         add_files -fileset sources_1 -norecurse $source_file
+#     }
+# }
+# set mem_file [file join $nf_src_dir nf_sine_15k_dual_rate_24bit_256.mem]
+# set_property file_type {Memory Initialization Files} [get_files $mem_file]
+# set packed_mem_file [file join $nf_src_dir \
+#     nf_sine_15k_dual_rate_packed32_256.mem]
+# set_property file_type {Memory Initialization Files} [get_files $packed_mem_file]
+# foreach source_file $nf_sim_sources {
+#     if {[llength [get_files -quiet $source_file]] == 0} {
+#         add_files -fileset sim_1 -norecurse $source_file
+#     }
+# }
+# set_property top board_demo_competition_dac8_top [get_filesets sources_1]
+# set_property generic [list \
+#     USE_PHASE7_LUTRAM_STAGE23=1 \
+#     USE_COMPACT_KEYPAD=1 \
+#     USE_ULTRACOMPACT_KEYPAD=1 \
+#     COMPACT_KEYPAD_SCAN_DIV=20000 \
+#     USE_SHARED_KEYPAD_SCAN_TICK=1 \
+#     USE_PHASE7_BRAM_STAGE23_HISTORY=1 \
+#     USE_PHASE7_UNIFIED_BRAM_STAGE23_HISTORY=$stage23_unified_bram \
+#     USE_NATIONAL_FINALS_SINGLE_BRAM_STAGE1=$stage1_single_bram \
+#     USE_PHASE7_BRAM_STAGE23_COEFF=1 \
+#     USE_PHASE8_PACKED_BRAM_STAGE23=0 \
+#     USE_PHASE7_CIC_BURST_COUNTER_DSP=0 \
+#     USE_NATIONAL_FINALS_DATAPATH=1 \
+#     USE_NATIONAL_FINALS_SERIAL_CIC_COMB=1 \
+#     USE_NATIONAL_FINALS_N3_HOLD_EQUIV=1 \
+#     USE_NATIONAL_FINALS_CIC_COMB_DSP=0 \
+#     USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER=$stage1_dsp48_preadder \
+#     USE_NATIONAL_FINALS_NARROW_STAGE23=1 \
+#     USE_NATIONAL_FINALS_P3_JOINT_STAGE3=$p3_joint_stage3 \
+#     USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE=$cic_integrator_dsp_mode] \
+#     [get_filesets sources_1]
+# set_property top tb_phase7_full_chain_bittrue [get_filesets sim_1]
+# set_property verilog_define [list] [get_filesets sim_1]
+# update_compile_order -fileset sources_1
+# update_compile_order -fileset sim_1
+# set_property STEPS.SYNTH_DESIGN.ARGS.DIRECTIVE $synth_directive \
+#     [get_runs synth_1]
+# set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY $flatten_hierarchy \
+#     [get_runs synth_1]
+# set_property STEPS.SYNTH_DESIGN.ARGS.RESOURCE_SHARING $resource_sharing \
+#     [get_runs synth_1]
+# set_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE ExploreWithRemap [get_runs impl_1]
+# set_property STEPS.PLACE_DESIGN.ARGS.DIRECTIVE ExtraTimingOpt [get_runs impl_1]
+# reset_run impl_1
+# if {$reuse_current_synthesis == 0} {
+#     reset_run synth_1
+#     launch_runs synth_1 -jobs 4
+#     wait_on_run synth_1
+#     if {[get_property PROGRESS [get_runs synth_1]] != "100%"} {
+#         error "National-finals synthesis did not complete."
+#     }
+# } elseif {[get_property PROGRESS [get_runs synth_1]] != "100%"} {
+#     error "Requested synthesis reuse, but synth_1 is not complete."
+# }
+[Thu Aug  6 15:07:49 2026] Launched synth_1...
+Run output will be captured here: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.runs/synth_1/runme.log
+[Thu Aug  6 15:07:49 2026] Waiting for synth_1 to finish...
+
+*** Running vivado
+    with args -log board_demo_competition_dac8_top.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source board_demo_competition_dac8_top.tcl
+
+
+****** Vivado v2018.3 (64-bit)
+  **** SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+  **** IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+    ** Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+
+CRITICAL WARNING: [Common 17-741] No write access right to the local Tcl store at 'C'. XilinxTclStore is reverted to the installation area. If you want to use local Tcl Store, please change the access right and relaunch Vivado.
+source board_demo_competition_dac8_top.tcl -notrace
+Command: synth_design -top board_demo_competition_dac8_top -part xc7a35tfgg484-2 -flatten_hierarchy full -directive AreaOptimized_high -resource_sharing on
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xc7a35t'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7a35t'
+INFO: Launching helper process for spawning children vivado processes
+INFO: Helper process launched with PID 52668 
+---------------------------------------------------------------------------------
+Starting RTL Elaboration : Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 387.785 ; gain = 102.680
+---------------------------------------------------------------------------------
+INFO: [Synth 8-6157] synthesizing module 'board_demo_competition_dac8_top' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/board_demo_competition_dac8_top.v:39]
+	Parameter USE_PHASE7_LUTRAM_STAGE23 bound to: 1 - type: integer 
+	Parameter USE_COMPACT_KEYPAD bound to: 1 - type: integer 
+	Parameter USE_ULTRACOMPACT_KEYPAD bound to: 1 - type: integer 
+	Parameter COMPACT_KEYPAD_SCAN_DIV bound to: 20000 - type: integer 
+	Parameter USE_SHARED_KEYPAD_SCAN_TICK bound to: 1 - type: integer 
+	Parameter USE_PHASE7_BRAM_STAGE23_HISTORY bound to: 1 - type: integer 
+	Parameter USE_PHASE7_UNIFIED_BRAM_STAGE23_HISTORY bound to: 1 - type: integer 
+	Parameter USE_NATIONAL_FINALS_SINGLE_BRAM_STAGE1 bound to: 1 - type: integer 
+	Parameter USE_PHASE7_BRAM_STAGE23_COEFF bound to: 1 - type: integer 
+	Parameter USE_PHASE8_PACKED_BRAM_STAGE23 bound to: 0 - type: integer 
+	Parameter USE_PHASE7_CIC_BURST_COUNTER_DSP bound to: 0 - type: integer 
+	Parameter USE_NATIONAL_FINALS_DATAPATH bound to: 1 - type: integer 
+	Parameter USE_NATIONAL_FINALS_SERIAL_CIC_COMB bound to: 1 - type: integer 
+	Parameter USE_NATIONAL_FINALS_N3_HOLD_EQUIV bound to: 1 - type: integer 
+	Parameter USE_NATIONAL_FINALS_CIC_COMB_DSP bound to: 0 - type: integer 
+	Parameter USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER bound to: 1 - type: integer 
+	Parameter USE_NATIONAL_FINALS_NARROW_STAGE23 bound to: 1 - type: integer 
+	Parameter USE_NATIONAL_FINALS_P3_JOINT_STAGE3 bound to: 1 - type: integer 
+	Parameter USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE bound to: 2 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'matrix_keypad_mode_ctrl_ultracompact' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/matrix_keypad_mode_ctrl_ultracompact.v:9]
+	Parameter SCAN_DIV bound to: 20000 - type: integer 
+	Parameter DEBOUNCE_SCANS bound to: 5 - type: integer 
+	Parameter USE_EXTERNAL_SCAN_TICK bound to: 1 - type: integer 
+	Parameter SCAN_CNT_W bound to: 15 - type: integer 
+	Parameter STABLE_W bound to: 3 - type: integer 
+INFO: [Synth 8-5534] Detected attribute (* ASYNC_REG = "TRUE" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/matrix_keypad_mode_ctrl_ultracompact.v:43]
+INFO: [Synth 8-5534] Detected attribute (* ASYNC_REG = "TRUE" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/matrix_keypad_mode_ctrl_ultracompact.v:44]
+WARNING: [Synth 8-6014] Unused sequential element scan_cnt_reg was removed.  [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/matrix_keypad_mode_ctrl_ultracompact.v:68]
+INFO: [Synth 8-6155] done synthesizing module 'matrix_keypad_mode_ctrl_ultracompact' (1#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/matrix_keypad_mode_ctrl_ultracompact.v:9]
+INFO: [Synth 8-5534] Detected attribute (* ASYNC_REG = "TRUE" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/board_demo_competition_dac8_top.v:315]
+INFO: [Synth 8-5534] Detected attribute (* ASYNC_REG = "TRUE" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/board_demo_competition_dac8_top.v:316]
+INFO: [Synth 8-5534] Detected attribute (* ASYNC_REG = "TRUE" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/board_demo_competition_dac8_top.v:318]
+INFO: [Synth 8-5534] Detected attribute (* ASYNC_REG = "TRUE" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/board_demo_competition_dac8_top.v:377]
+INFO: [Synth 8-5534] Detected attribute (* ASYNC_REG = "TRUE" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/board_demo_competition_dac8_top.v:378]
+INFO: [Synth 8-6157] synthesizing module 'IBUF' [E:/app/Xilinx2018.3/Vivado/2018.3/scripts/rt/data/unisim_comp.v:20408]
+	Parameter CAPACITANCE bound to: DONT_CARE - type: string 
+	Parameter IBUF_DELAY_VALUE bound to: 0 - type: string 
+	Parameter IBUF_LOW_PWR bound to: TRUE - type: string 
+	Parameter IFD_DELAY_VALUE bound to: AUTO - type: string 
+	Parameter IOSTANDARD bound to: DEFAULT - type: string 
+INFO: [Synth 8-6155] done synthesizing module 'IBUF' (2#1) [E:/app/Xilinx2018.3/Vivado/2018.3/scripts/rt/data/unisim_comp.v:20408]
+INFO: [Synth 8-6157] synthesizing module 'BUFG' [E:/app/Xilinx2018.3/Vivado/2018.3/scripts/rt/data/unisim_comp.v:609]
+INFO: [Synth 8-6155] done synthesizing module 'BUFG' (3#1) [E:/app/Xilinx2018.3/Vivado/2018.3/scripts/rt/data/unisim_comp.v:609]
+INFO: [Synth 8-6157] synthesizing module 'dual_family_audio_clock' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/dual_family_audio_clock.v:18]
+INFO: [Synth 8-6157] synthesizing module 'MMCME2_ADV' [E:/app/Xilinx2018.3/Vivado/2018.3/scripts/rt/data/unisim_comp.v:26717]
+	Parameter BANDWIDTH bound to: OPTIMIZED - type: string 
+	Parameter CLKFBOUT_MULT_F bound to: 62.375000 - type: float 
+	Parameter CLKFBOUT_PHASE bound to: 0.000000 - type: float 
+	Parameter CLKFBOUT_USE_FINE_PS bound to: FALSE - type: string 
+	Parameter CLKIN1_PERIOD bound to: 50.000000 - type: float 
+	Parameter CLKIN2_PERIOD bound to: 0.000000 - type: float 
+	Parameter CLKOUT0_DIVIDE_F bound to: 110.500000 - type: float 
+	Parameter CLKOUT0_DUTY_CYCLE bound to: 0.500000 - type: float 
+	Parameter CLKOUT0_PHASE bound to: 0.000000 - type: float 
+	Parameter CLKOUT0_USE_FINE_PS bound to: FALSE - type: string 
+	Parameter CLKOUT1_DIVIDE bound to: 1 - type: integer 
+	Parameter CLKOUT1_DUTY_CYCLE bound to: 0.500000 - type: float 
+	Parameter CLKOUT1_PHASE bound to: 0.000000 - type: float 
+	Parameter CLKOUT1_USE_FINE_PS bound to: FALSE - type: string 
+	Parameter CLKOUT2_DIVIDE bound to: 1 - type: integer 
+	Parameter CLKOUT2_DUTY_CYCLE bound to: 0.500000 - type: float 
+	Parameter CLKOUT2_PHASE bound to: 0.000000 - type: float 
+	Parameter CLKOUT2_USE_FINE_PS bound to: FALSE - type: string 
+	Parameter CLKOUT3_DIVIDE bound to: 1 - type: integer 
+	Parameter CLKOUT3_DUTY_CYCLE bound to: 0.500000 - type: float 
+	Parameter CLKOUT3_PHASE bound to: 0.000000 - type: float 
+	Parameter CLKOUT3_USE_FINE_PS bound to: FALSE - type: string 
+	Parameter CLKOUT4_CASCADE bound to: FALSE - type: string 
+	Parameter CLKOUT4_DIVIDE bound to: 1 - type: integer 
+	Parameter CLKOUT4_DUTY_CYCLE bound to: 0.500000 - type: float 
+	Parameter CLKOUT4_PHASE bound to: 0.000000 - type: float 
+	Parameter CLKOUT4_USE_FINE_PS bound to: FALSE - type: string 
+	Parameter CLKOUT5_DIVIDE bound to: 1 - type: integer 
+	Parameter CLKOUT5_DUTY_CYCLE bound to: 0.500000 - type: float 
+	Parameter CLKOUT5_PHASE bound to: 0.000000 - type: float 
+	Parameter CLKOUT5_USE_FINE_PS bound to: FALSE - type: string 
+	Parameter CLKOUT6_DIVIDE bound to: 1 - type: integer 
+	Parameter CLKOUT6_DUTY_CYCLE bound to: 0.500000 - type: float 
+	Parameter CLKOUT6_PHASE bound to: 0.000000 - type: float 
+	Parameter CLKOUT6_USE_FINE_PS bound to: FALSE - type: string 
+	Parameter COMPENSATION bound to: ZHOLD - type: string 
+	Parameter DIVCLK_DIVIDE bound to: 2 - type: integer 
+	Parameter IS_CLKINSEL_INVERTED bound to: 1'b0 
+	Parameter IS_PSEN_INVERTED bound to: 1'b0 
+	Parameter IS_PSINCDEC_INVERTED bound to: 1'b0 
+	Parameter IS_PWRDWN_INVERTED bound to: 1'b0 
+	Parameter IS_RST_INVERTED bound to: 1'b0 
+	Parameter REF_JITTER1 bound to: 0.010000 - type: float 
+	Parameter REF_JITTER2 bound to: 0.010000 - type: float 
+	Parameter SS_EN bound to: FALSE - type: string 
+	Parameter SS_MODE bound to: CENTER_HIGH - type: string 
+	Parameter SS_MOD_PERIOD bound to: 10000 - type: integer 
+	Parameter STARTUP_WAIT bound to: FALSE - type: string 
+INFO: [Synth 8-6155] done synthesizing module 'MMCME2_ADV' (4#1) [E:/app/Xilinx2018.3/Vivado/2018.3/scripts/rt/data/unisim_comp.v:26717]
+INFO: [Synth 8-6157] synthesizing module 'MMCME2_ADV__parameterized0' [E:/app/Xilinx2018.3/Vivado/2018.3/scripts/rt/data/unisim_comp.v:26717]
+	Parameter BANDWIDTH bound to: OPTIMIZED - type: string 
+	Parameter CLKFBOUT_MULT_F bound to: 36.250000 - type: float 
+	Parameter CLKFBOUT_PHASE bound to: 0.000000 - type: float 
+	Parameter CLKFBOUT_USE_FINE_PS bound to: FALSE - type: string 
+	Parameter CLKIN1_PERIOD bound to: 50.000000 - type: float 
+	Parameter CLKIN2_PERIOD bound to: 0.000000 - type: float 
+	Parameter CLKOUT0_DIVIDE_F bound to: 118.000000 - type: float 
+	Parameter CLKOUT0_DUTY_CYCLE bound to: 0.500000 - type: float 
+	Parameter CLKOUT0_PHASE bound to: 0.000000 - type: float 
+	Parameter CLKOUT0_USE_FINE_PS bound to: FALSE - type: string 
+	Parameter CLKOUT1_DIVIDE bound to: 1 - type: integer 
+	Parameter CLKOUT1_DUTY_CYCLE bound to: 0.500000 - type: float 
+	Parameter CLKOUT1_PHASE bound to: 0.000000 - type: float 
+	Parameter CLKOUT1_USE_FINE_PS bound to: FALSE - type: string 
+	Parameter CLKOUT2_DIVIDE bound to: 1 - type: integer 
+	Parameter CLKOUT2_DUTY_CYCLE bound to: 0.500000 - type: float 
+	Parameter CLKOUT2_PHASE bound to: 0.000000 - type: float 
+	Parameter CLKOUT2_USE_FINE_PS bound to: FALSE - type: string 
+	Parameter CLKOUT3_DIVIDE bound to: 1 - type: integer 
+	Parameter CLKOUT3_DUTY_CYCLE bound to: 0.500000 - type: float 
+	Parameter CLKOUT3_PHASE bound to: 0.000000 - type: float 
+	Parameter CLKOUT3_USE_FINE_PS bound to: FALSE - type: string 
+	Parameter CLKOUT4_CASCADE bound to: FALSE - type: string 
+	Parameter CLKOUT4_DIVIDE bound to: 1 - type: integer 
+	Parameter CLKOUT4_DUTY_CYCLE bound to: 0.500000 - type: float 
+	Parameter CLKOUT4_PHASE bound to: 0.000000 - type: float 
+	Parameter CLKOUT4_USE_FINE_PS bound to: FALSE - type: string 
+	Parameter CLKOUT5_DIVIDE bound to: 1 - type: integer 
+	Parameter CLKOUT5_DUTY_CYCLE bound to: 0.500000 - type: float 
+	Parameter CLKOUT5_PHASE bound to: 0.000000 - type: float 
+	Parameter CLKOUT5_USE_FINE_PS bound to: FALSE - type: string 
+	Parameter CLKOUT6_DIVIDE bound to: 1 - type: integer 
+	Parameter CLKOUT6_DUTY_CYCLE bound to: 0.500000 - type: float 
+	Parameter CLKOUT6_PHASE bound to: 0.000000 - type: float 
+	Parameter CLKOUT6_USE_FINE_PS bound to: FALSE - type: string 
+	Parameter COMPENSATION bound to: ZHOLD - type: string 
+	Parameter DIVCLK_DIVIDE bound to: 1 - type: integer 
+	Parameter IS_CLKINSEL_INVERTED bound to: 1'b0 
+	Parameter IS_PSEN_INVERTED bound to: 1'b0 
+	Parameter IS_PSINCDEC_INVERTED bound to: 1'b0 
+	Parameter IS_PWRDWN_INVERTED bound to: 1'b0 
+	Parameter IS_RST_INVERTED bound to: 1'b0 
+	Parameter REF_JITTER1 bound to: 0.010000 - type: float 
+	Parameter REF_JITTER2 bound to: 0.010000 - type: float 
+	Parameter SS_EN bound to: FALSE - type: string 
+	Parameter SS_MODE bound to: CENTER_HIGH - type: string 
+	Parameter SS_MOD_PERIOD bound to: 10000 - type: integer 
+	Parameter STARTUP_WAIT bound to: FALSE - type: string 
+INFO: [Synth 8-6155] done synthesizing module 'MMCME2_ADV__parameterized0' (4#1) [E:/app/Xilinx2018.3/Vivado/2018.3/scripts/rt/data/unisim_comp.v:26717]
+INFO: [Synth 8-6157] synthesizing module 'BUFGMUX_CTRL' [E:/app/Xilinx2018.3/Vivado/2018.3/scripts/rt/data/unisim_comp.v:729]
+INFO: [Synth 8-6155] done synthesizing module 'BUFGMUX_CTRL' (5#1) [E:/app/Xilinx2018.3/Vivado/2018.3/scripts/rt/data/unisim_comp.v:729]
+INFO: [Synth 8-6155] done synthesizing module 'dual_family_audio_clock' (6#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/dual_family_audio_clock.v:18]
+INFO: [Synth 8-6157] synthesizing module 'nf_mode_cdc_handshake' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/nf_mode_cdc_handshake.v:10]
+	Parameter SETTLE_CYCLES bound to: 3 - type: integer 
+	Parameter SETTLE_COUNT_W bound to: 2 - type: integer 
+INFO: [Synth 8-5534] Detected attribute (* ASYNC_REG = "TRUE" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/nf_mode_cdc_handshake.v:29]
+INFO: [Synth 8-5534] Detected attribute (* ASYNC_REG = "TRUE" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/nf_mode_cdc_handshake.v:30]
+INFO: [Synth 8-5534] Detected attribute (* ASYNC_REG = "TRUE" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/nf_mode_cdc_handshake.v:33]
+INFO: [Synth 8-5534] Detected attribute (* ASYNC_REG = "TRUE" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/nf_mode_cdc_handshake.v:34]
+INFO: [Synth 8-6155] done synthesizing module 'nf_mode_cdc_handshake' (7#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/nf_mode_cdc_handshake.v:10]
+INFO: [Synth 8-6157] synthesizing module 'demo_interp_dac8_audio_pcm_common' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/demo_interp_dac8_audio_pcm_common.v:43]
+	Parameter USE_PHASE7_FOLDED bound to: 1 - type: integer 
+	Parameter USE_PHASE7_LUTRAM_STAGE23 bound to: 1 - type: integer 
+	Parameter USE_PHASE7_BRAM_STAGE23_HISTORY bound to: 1 - type: integer 
+	Parameter USE_PHASE7_UNIFIED_BRAM_STAGE23_HISTORY bound to: 1 - type: integer 
+	Parameter USE_NATIONAL_FINALS_SINGLE_BRAM_STAGE1 bound to: 1 - type: integer 
+	Parameter USE_PHASE7_BRAM_STAGE23_COEFF bound to: 1 - type: integer 
+	Parameter USE_PHASE8_PACKED_BRAM_STAGE23 bound to: 0 - type: integer 
+	Parameter USE_PHASE7_CIC_BURST_COUNTER_DSP bound to: 0 - type: integer 
+	Parameter USE_NATIONAL_FINALS_DATAPATH bound to: 1 - type: integer 
+	Parameter USE_NATIONAL_FINALS_SERIAL_CIC_COMB bound to: 1 - type: integer 
+	Parameter USE_NATIONAL_FINALS_N3_HOLD_EQUIV bound to: 1 - type: integer 
+	Parameter USE_NATIONAL_FINALS_CIC_COMB_DSP bound to: 0 - type: integer 
+	Parameter USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER bound to: 1 - type: integer 
+	Parameter USE_NATIONAL_FINALS_NARROW_STAGE23 bound to: 1 - type: integer 
+	Parameter USE_NATIONAL_FINALS_P3_JOINT_STAGE3 bound to: 1 - type: integer 
+	Parameter USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE bound to: 2 - type: integer 
+	Parameter MODE_1X bound to: 2'b00 
+	Parameter MODE_4X bound to: 2'b01 
+	Parameter MODE_8X bound to: 2'b10 
+	Parameter MODE_128X bound to: 2'b11 
+INFO: [Synth 8-6157] synthesizing module 'dual_rate_test_tone_rom_source' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/dual_rate_test_tone_rom_source.v:16]
+	Parameter MEM_FILE bound to: nf_sine_15k_dual_rate_packed32_256.mem - type: string 
+	Parameter ADDR_44K1_FIRST bound to: 8'b00000000 
+	Parameter ADDR_44K1_LAST bound to: 8'b10010010 
+	Parameter ADDR_48K_FIRST bound to: 8'b10010011 
+	Parameter ADDR_48K_LAST bound to: 8'b10100010 
+INFO: [Synth 8-5534] Detected attribute (* rom_style = "block" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/dual_rate_test_tone_rom_source.v:38]
+INFO: [Synth 8-3876] $readmem data file 'nf_sine_15k_dual_rate_packed32_256.mem' is read successfully [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/dual_rate_test_tone_rom_source.v:43]
+INFO: [Synth 8-6155] done synthesizing module 'dual_rate_test_tone_rom_source' (8#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/dual_rate_test_tone_rom_source.v:16]
+INFO: [Synth 8-6157] synthesizing module 'interp128_all2x_v7_folded_fir_cic_top_ce' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp128_all2x_v7_folded_fir_cic_top_ce.v:38]
+	Parameter STAGE1_ACC_W bound to: 41 - type: integer 
+	Parameter STAGE23_ACC_W bound to: 38 - type: integer 
+	Parameter CIC_ORDER bound to: 3 - type: integer 
+	Parameter FINAL_PRUNE_LSB bound to: 0 - type: integer 
+	Parameter USE_LUTRAM_STAGE23 bound to: 1 - type: integer 
+	Parameter STAGE3_FLAT bound to: 1 - type: integer 
+	Parameter USE_CIC3_SHIFTADD_COMPENSATOR bound to: 0 - type: integer 
+	Parameter USE_BRAM_STAGE23_HISTORY bound to: 1 - type: integer 
+	Parameter USE_UNIFIED_BRAM_STAGE23_HISTORY bound to: 1 - type: integer 
+	Parameter USE_SINGLE_BRAM_STAGE1 bound to: 1 - type: integer 
+	Parameter USE_BRAM_STAGE23_COEFF bound to: 1 - type: integer 
+	Parameter USE_PACKED_BRAM_STAGE23 bound to: 0 - type: integer 
+	Parameter CIC_BURST_COUNTER_USE_DSP bound to: 0 - type: integer 
+	Parameter CIC_COMB_USE_DSP bound to: 0 - type: integer 
+	Parameter USE_SERIAL_CIC_COMB bound to: 1 - type: integer 
+	Parameter USE_N3_HOLD_EQUIV bound to: 1 - type: integer 
+	Parameter USE_STAGE1_DSP48_PREADDER bound to: 1 - type: integer 
+	Parameter USE_NATIONAL_FINALS_NARROW_STAGE23 bound to: 1 - type: integer 
+	Parameter USE_P3_JOINT_STAGE3 bound to: 1 - type: integer 
+	Parameter ASSUME_ALIGNED_POW2_CE bound to: 1 - type: integer 
+	Parameter CIC_INTEGRATOR_DSP_MODE bound to: 2 - type: integer 
+	Parameter USE_UNIFIED_FIR_COEFF_BRAM bound to: 1 - type: integer 
+	Parameter STAGE3_RESULT_W bound to: 21 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'nf_unified_fir_coeff_bram' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/nf_unified_fir_coeff_bram.v:13]
+INFO: [Synth 8-6157] synthesizing module 'RAMB18E1' [E:/app/Xilinx2018.3/Vivado/2018.3/scripts/rt/data/unisim_comp.v:49848]
+	Parameter DOA_REG bound to: 0 - type: integer 
+	Parameter DOB_REG bound to: 0 - type: integer 
+	Parameter INITP_00 bound to: 256'b0000000000000000000000001100110000000000000000000000001100001100000000000000001100110011001100110011001100110011001100110011001100000000000000000000001100000011000000000000000000000011000011000000000000000000110011000011001100000000000000110011000000110011 
+	Parameter INITP_01 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INITP_02 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INITP_03 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INITP_04 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INITP_05 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INITP_06 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INITP_07 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_00 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000111111111000110100000010000101101111101011101010000010000100010001110110010110100000100001000100111110101110101000000010000101101111111110001101 
+	Parameter INIT_01 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011111111001101010000010011010001111011100000110101001101111010010100110111101001111011100000110100000100110100011111111100110101 
+	Parameter INIT_02 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011001010011110011001110000100101100110010010010110011001011110011001110000000000110010100 
+	Parameter INIT_03 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011111111011011000000001000001010011111010001000000000010000010101111111101101100 
+	Parameter INIT_04 bound to: 256'b0000001000110010111111100011100100000001011011111111111011011011000000001110100111111111010010100000000010001101111111111001010100000000010100001111111111000101000000000010101011111111111000110000000000010011111111111111010000000000000001111111111111111011 
+	Parameter INIT_05 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000101000101100100111001010010010000001111110011001111010100001101000010000010111011111001101000110000010100010000111110111110101100000011010100011111110101001101 
+	Parameter INIT_06 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100011000111101111011110000100111001001110010011100100111011101111011110000000001000110001 
+	Parameter INIT_07 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100010011111100111101110100010110000000011111001111011100000000010001001 
+	Parameter INIT_08 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_09 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_0A bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_0B bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_0C bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_0D bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_0E bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_0F bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_10 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_11 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_12 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_13 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_14 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_15 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_16 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_17 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_18 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_19 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_1A bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_1B bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_1C bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_1D bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_1E bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_1F bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_20 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_21 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_22 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_23 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_24 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_25 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_26 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_27 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_28 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_29 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_2A bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_2B bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_2C bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_2D bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_2E bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_2F bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_30 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_31 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_32 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_33 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_34 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_35 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_36 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_37 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_38 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_39 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_3A bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_3B bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_3C bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_3D bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_3E bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_3F bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_A bound to: 18'b000000000000000000 
+	Parameter INIT_B bound to: 18'b000000000000000000 
+	Parameter INIT_FILE bound to: NONE - type: string 
+	Parameter IS_CLKARDCLK_INVERTED bound to: 1'b0 
+	Parameter IS_CLKBWRCLK_INVERTED bound to: 1'b0 
+	Parameter IS_ENARDEN_INVERTED bound to: 1'b0 
+	Parameter IS_ENBWREN_INVERTED bound to: 1'b0 
+	Parameter IS_RSTRAMARSTRAM_INVERTED bound to: 1'b0 
+	Parameter IS_RSTRAMB_INVERTED bound to: 1'b0 
+	Parameter IS_RSTREGARSTREG_INVERTED bound to: 1'b0 
+	Parameter IS_RSTREGB_INVERTED bound to: 1'b0 
+	Parameter RAM_MODE bound to: TDP - type: string 
+	Parameter RDADDR_COLLISION_HWCONFIG bound to: DELAYED_WRITE - type: string 
+	Parameter READ_WIDTH_A bound to: 18 - type: integer 
+	Parameter READ_WIDTH_B bound to: 18 - type: integer 
+	Parameter RSTREG_PRIORITY_A bound to: RSTREG - type: string 
+	Parameter RSTREG_PRIORITY_B bound to: RSTREG - type: string 
+	Parameter SIM_COLLISION_CHECK bound to: ALL - type: string 
+	Parameter SIM_DEVICE bound to: 7SERIES - type: string 
+	Parameter SRVAL_A bound to: 18'b000000000000000000 
+	Parameter SRVAL_B bound to: 18'b000000000000000000 
+	Parameter WRITE_MODE_A bound to: READ_FIRST - type: string 
+	Parameter WRITE_MODE_B bound to: READ_FIRST - type: string 
+	Parameter WRITE_WIDTH_A bound to: 18 - type: integer 
+	Parameter WRITE_WIDTH_B bound to: 18 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'RAMB18E1' (9#1) [E:/app/Xilinx2018.3/Vivado/2018.3/scripts/rt/data/unisim_comp.v:49848]
+INFO: [Synth 8-6155] done synthesizing module 'nf_unified_fir_coeff_bram' (10#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/nf_unified_fir_coeff_bram.v:13]
+INFO: [Synth 8-6157] synthesizing module 'interp2_stage1_single_bram_serial_ce' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/interp2_stage1_single_bram_serial_ce.v:14]
+	Parameter DATA_W bound to: 24 - type: integer 
+	Parameter COEFF_W bound to: 17 - type: integer 
+	Parameter ACC_W bound to: 41 - type: integer 
+	Parameter FRAC_W bound to: 15 - type: integer 
+	Parameter HISTORY_LEN bound to: 52 - type: integer 
+	Parameter PAIR_COUNT bound to: 26 - type: integer 
+	Parameter DELAY_INDEX bound to: 25 - type: integer 
+	Parameter USE_DSP48_PREADDER bound to: 1 - type: integer 
+	Parameter USE_EXTERNAL_COEFF_BRAM bound to: 1 - type: integer 
+	Parameter ADDR_W bound to: 6 - type: integer 
+	Parameter PAIR_W bound to: 25 - type: integer 
+	Parameter QUOT_W bound to: 26 - type: integer 
+	Parameter UPPER_W bound to: 2 - type: integer 
+	Parameter PATTERN_SAT_SUPPORTED bound to: 1 - type: integer 
+	Parameter READ_LEFT bound to: 2'b00 
+	Parameter READ_RIGHT bound to: 2'b01 
+	Parameter READ_DELAY bound to: 2'b10 
+	Parameter OUT_MAX bound to: 24'sb011111111111111111111111 
+	Parameter OUT_MIN bound to: 24'sb100000000000000000000000 
+INFO: [Synth 8-6157] synthesizing module 'nf_stage1_history_ramb18_sdp' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/nf_stage1_history_ramb18_sdp.v:7]
+	Parameter DATA_W bound to: 24 - type: integer 
+	Parameter ADDR_W bound to: 6 - type: integer 
+	Parameter SIM_USE_PRIMITIVE bound to: 0 - type: integer 
+	Parameter USE_PRIMITIVE bound to: 1 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'RAMB18E1__parameterized0' [E:/app/Xilinx2018.3/Vivado/2018.3/scripts/rt/data/unisim_comp.v:49848]
+	Parameter DOA_REG bound to: 0 - type: integer 
+	Parameter DOB_REG bound to: 0 - type: integer 
+	Parameter INITP_00 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INITP_01 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INITP_02 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INITP_03 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INITP_04 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INITP_05 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INITP_06 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INITP_07 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_00 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_01 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_02 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_03 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_04 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_05 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_06 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_07 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_08 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_09 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_0A bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_0B bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_0C bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_0D bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_0E bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_0F bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_10 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_11 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_12 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_13 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_14 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_15 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_16 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_17 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_18 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_19 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_1A bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_1B bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_1C bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_1D bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_1E bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_1F bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_20 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_21 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_22 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_23 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_24 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_25 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_26 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_27 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_28 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_29 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_2A bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_2B bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_2C bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_2D bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_2E bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_2F bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_30 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_31 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_32 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_33 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_34 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_35 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_36 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_37 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_38 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_39 bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_3A bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_3B bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_3C bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_3D bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_3E bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_3F bound to: 256'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 
+	Parameter INIT_A bound to: 18'b000000000000000000 
+	Parameter INIT_B bound to: 18'b000000000000000000 
+	Parameter INIT_FILE bound to: NONE - type: string 
+	Parameter IS_CLKARDCLK_INVERTED bound to: 1'b0 
+	Parameter IS_CLKBWRCLK_INVERTED bound to: 1'b0 
+	Parameter IS_ENARDEN_INVERTED bound to: 1'b0 
+	Parameter IS_ENBWREN_INVERTED bound to: 1'b0 
+	Parameter IS_RSTRAMARSTRAM_INVERTED bound to: 1'b0 
+	Parameter IS_RSTRAMB_INVERTED bound to: 1'b0 
+	Parameter IS_RSTREGARSTREG_INVERTED bound to: 1'b0 
+	Parameter IS_RSTREGB_INVERTED bound to: 1'b0 
+	Parameter RAM_MODE bound to: SDP - type: string 
+	Parameter RDADDR_COLLISION_HWCONFIG bound to: DELAYED_WRITE - type: string 
+	Parameter READ_WIDTH_A bound to: 36 - type: integer 
+	Parameter READ_WIDTH_B bound to: 0 - type: integer 
+	Parameter RSTREG_PRIORITY_A bound to: RSTREG - type: string 
+	Parameter RSTREG_PRIORITY_B bound to: RSTREG - type: string 
+	Parameter SIM_COLLISION_CHECK bound to: ALL - type: string 
+	Parameter SIM_DEVICE bound to: 7SERIES - type: string 
+	Parameter SRVAL_A bound to: 18'b000000000000000000 
+	Parameter SRVAL_B bound to: 18'b000000000000000000 
+	Parameter WRITE_MODE_A bound to: READ_FIRST - type: string 
+	Parameter WRITE_MODE_B bound to: READ_FIRST - type: string 
+	Parameter WRITE_WIDTH_A bound to: 0 - type: integer 
+	Parameter WRITE_WIDTH_B bound to: 36 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'RAMB18E1__parameterized0' (10#1) [E:/app/Xilinx2018.3/Vivado/2018.3/scripts/rt/data/unisim_comp.v:49848]
+INFO: [Synth 8-6155] done synthesizing module 'nf_stage1_history_ramb18_sdp' (11#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/nf_stage1_history_ramb18_sdp.v:7]
+INFO: [Synth 8-6157] synthesizing module 'DSP48E1' [E:/app/Xilinx2018.3/Vivado/2018.3/scripts/rt/data/unisim_comp.v:3435]
+	Parameter ACASCREG bound to: 1 - type: integer 
+	Parameter ADREG bound to: 0 - type: integer 
+	Parameter ALUMODEREG bound to: 0 - type: integer 
+	Parameter AREG bound to: 1 - type: integer 
+	Parameter AUTORESET_PATDET bound to: NO_RESET - type: string 
+	Parameter A_INPUT bound to: DIRECT - type: string 
+	Parameter BCASCREG bound to: 0 - type: integer 
+	Parameter BREG bound to: 0 - type: integer 
+	Parameter B_INPUT bound to: DIRECT - type: string 
+	Parameter CARRYINREG bound to: 0 - type: integer 
+	Parameter CARRYINSELREG bound to: 0 - type: integer 
+	Parameter CREG bound to: 0 - type: integer 
+	Parameter DREG bound to: 0 - type: integer 
+	Parameter INMODEREG bound to: 0 - type: integer 
+	Parameter IS_ALUMODE_INVERTED bound to: 4'b0000 
+	Parameter IS_CARRYIN_INVERTED bound to: 1'b0 
+	Parameter IS_CLK_INVERTED bound to: 1'b0 
+	Parameter IS_INMODE_INVERTED bound to: 5'b00000 
+	Parameter IS_OPMODE_INVERTED bound to: 7'b0000000 
+	Parameter MASK bound to: 48'b000000000111111111111111111111111111111111111111 
+	Parameter MREG bound to: 0 - type: integer 
+	Parameter OPMODEREG bound to: 0 - type: integer 
+	Parameter PATTERN bound to: 48'b000000000000000000000000000000000000000000000000 
+	Parameter PREG bound to: 1 - type: integer 
+	Parameter SEL_MASK bound to: MASK - type: string 
+	Parameter SEL_PATTERN bound to: PATTERN - type: string 
+	Parameter USE_DPORT bound to: TRUE - type: string 
+	Parameter USE_MULT bound to: MULTIPLY - type: string 
+	Parameter USE_PATTERN_DETECT bound to: PATDET - type: string 
+	Parameter USE_SIMD bound to: ONE48 - type: string 
+INFO: [Synth 8-6155] done synthesizing module 'DSP48E1' (12#1) [E:/app/Xilinx2018.3/Vivado/2018.3/scripts/rt/data/unisim_comp.v:3435]
+WARNING: [Synth 8-6014] Unused sequential element mac_active_reg was removed.  [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/interp2_stage1_single_bram_serial_ce.v:297]
+WARNING: [Synth 8-6014] Unused sequential element left_sample_reg was removed.  [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/interp2_stage1_single_bram_serial_ce.v:308]
+INFO: [Synth 8-6155] done synthesizing module 'interp2_stage1_single_bram_serial_ce' (13#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/interp2_stage1_single_bram_serial_ce.v:14]
+INFO: [Synth 8-6157] synthesizing module 'interp2_stage23_lutram_cic_dsp_ce' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:43]
+	Parameter DATA_W bound to: 24 - type: integer 
+	Parameter STAGE2_DATA_W bound to: 22 - type: integer 
+	Parameter STAGE3_DATA_W bound to: 20 - type: integer 
+	Parameter STAGE3_OUTPUT_W bound to: 21 - type: integer 
+	Parameter COEFF_W bound to: 18 - type: integer 
+	Parameter ACC_W bound to: 38 - type: integer 
+	Parameter CIC_ORDER bound to: 3 - type: integer 
+	Parameter STAGE3_FLAT bound to: 1 - type: integer 
+	Parameter USE_BRAM_HISTORY bound to: 1 - type: integer 
+	Parameter USE_UNIFIED_BRAM_HISTORY bound to: 1 - type: integer 
+	Parameter USE_BRAM_COEFF bound to: 1 - type: integer 
+	Parameter USE_PACKED_BRAM bound to: 0 - type: integer 
+	Parameter USE_EXTERNAL_COEFF_BRAM bound to: 1 - type: integer 
+	Parameter USE_P3_JOINT_STAGE3 bound to: 1 - type: integer 
+	Parameter ASSUME_ALIGNED_POW2_CE bound to: 1 - type: integer 
+	Parameter MEM_ADDR_W bound to: 4 - type: integer 
+	Parameter MEM_DEPTH bound to: 16 - type: integer 
+	Parameter FRAC_W bound to: 15 - type: integer 
+	Parameter SHIFT_W bound to: 23 - type: integer 
+	Parameter STAGE2_UPPER_W bound to: 1 - type: integer 
+	Parameter STAGE3_UPPER_W bound to: 2 - type: integer 
+	Parameter PATTERN_SAT_SUPPORTED bound to: 1 - type: integer 
+	Parameter STAGE2_OUT_MAX bound to: 22'sb0111111111111111111111 
+	Parameter STAGE2_OUT_MIN bound to: 22'sb1000000000000000000000 
+	Parameter STAGE3_OUT_MAX bound to: 21'sb011111111111111111111 
+	Parameter STAGE3_OUT_MIN bound to: 21'sb100000000000000000000 
+INFO: [Synth 8-5534] Detected attribute (* ram_style = "distributed" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:104]
+INFO: [Synth 8-5534] Detected attribute (* ram_style = "distributed" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:106]
+INFO: [Synth 8-5534] Detected attribute (* ram_style = "block" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:108]
+INFO: [Synth 8-5534] Detected attribute (* ram_style = "block" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:110]
+INFO: [Synth 8-5534] Detected attribute (* rom_style = "distributed" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:144]
+INFO: [Synth 8-5534] Detected attribute (* rom_style = "block" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:146]
+INFO: [Synth 8-5534] Detected attribute (* ram_style = "block" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:151]
+INFO: [Synth 8-5534] Detected attribute (* ram_style = "block" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:153]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:622]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:624]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:626]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:628]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:622]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:624]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:626]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:628]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:622]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:624]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:626]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:628]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:622]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:624]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:626]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:628]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:622]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:624]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:626]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:628]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:622]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:624]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:626]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:628]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:622]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:624]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:626]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:628]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:622]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:624]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:626]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:628]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:622]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:624]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:626]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:628]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:622]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:624]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:626]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:628]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:622]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:624]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:626]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:628]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:622]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:624]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:626]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:628]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:622]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:624]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:626]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:628]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:622]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:624]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:626]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:628]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:622]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:624]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:626]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:628]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:622]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:624]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:626]
+WARNING: [Synth 8-311] ignoring non-constant assignment in initial block [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:628]
+INFO: [Synth 8-6157] synthesizing module 'nf_stage23_history_ramb18_sdp' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/nf_stage23_history_ramb18_sdp.v:8]
+	Parameter DATA_W bound to: 22 - type: integer 
+	Parameter ADDR_W bound to: 5 - type: integer 
+	Parameter SIM_USE_PRIMITIVE bound to: 0 - type: integer 
+	Parameter USE_PRIMITIVE bound to: 1 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'nf_stage23_history_ramb18_sdp' (14#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/nf_stage23_history_ramb18_sdp.v:8]
+INFO: [Synth 8-6157] synthesizing module 'DSP48E1__parameterized0' [E:/app/Xilinx2018.3/Vivado/2018.3/scripts/rt/data/unisim_comp.v:3435]
+	Parameter ACASCREG bound to: 0 - type: integer 
+	Parameter ADREG bound to: 0 - type: integer 
+	Parameter ALUMODEREG bound to: 0 - type: integer 
+	Parameter AREG bound to: 0 - type: integer 
+	Parameter AUTORESET_PATDET bound to: NO_RESET - type: string 
+	Parameter A_INPUT bound to: DIRECT - type: string 
+	Parameter BCASCREG bound to: 0 - type: integer 
+	Parameter BREG bound to: 0 - type: integer 
+	Parameter B_INPUT bound to: DIRECT - type: string 
+	Parameter CARRYINREG bound to: 0 - type: integer 
+	Parameter CARRYINSELREG bound to: 0 - type: integer 
+	Parameter CREG bound to: 0 - type: integer 
+	Parameter DREG bound to: 0 - type: integer 
+	Parameter INMODEREG bound to: 0 - type: integer 
+	Parameter IS_ALUMODE_INVERTED bound to: 4'b0000 
+	Parameter IS_CARRYIN_INVERTED bound to: 1'b0 
+	Parameter IS_CLK_INVERTED bound to: 1'b0 
+	Parameter IS_INMODE_INVERTED bound to: 5'b00000 
+	Parameter IS_OPMODE_INVERTED bound to: 7'b0000000 
+	Parameter MASK bound to: 48'b000000000000111111111111111111111111111111111111 
+	Parameter MREG bound to: 0 - type: integer 
+	Parameter OPMODEREG bound to: 0 - type: integer 
+	Parameter PATTERN bound to: 48'b000000000000000000000000000000000000000000000000 
+	Parameter PREG bound to: 1 - type: integer 
+	Parameter SEL_MASK bound to: MASK - type: string 
+	Parameter SEL_PATTERN bound to: PATTERN - type: string 
+	Parameter USE_DPORT bound to: FALSE - type: string 
+	Parameter USE_MULT bound to: MULTIPLY - type: string 
+	Parameter USE_PATTERN_DETECT bound to: PATDET - type: string 
+	Parameter USE_SIMD bound to: ONE48 - type: string 
+INFO: [Synth 8-6155] done synthesizing module 'DSP48E1__parameterized0' (14#1) [E:/app/Xilinx2018.3/Vivado/2018.3/scripts/rt/data/unisim_comp.v:3435]
+INFO: [Synth 8-6155] done synthesizing module 'interp2_stage23_lutram_cic_dsp_ce' (15#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp2_stage23_lutram_cic_dsp_ce.v:43]
+WARNING: [Synth 8-693] zero replication count - replication ignored [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp128_all2x_v7_folded_fir_cic_top_ce.v:259]
+INFO: [Synth 8-6157] synthesizing module 'cic_interp16_n3_hold2_dsp_ce' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/cic_interp16_n3_hold2_dsp_ce.v:15]
+	Parameter DATA_W bound to: 21 - type: integer 
+	Parameter OUTPUT_W bound to: 20 - type: integer 
+	Parameter FINAL_PRUNE_LSB bound to: 0 - type: integer 
+	Parameter BURST_COUNTER_USE_DSP bound to: 0 - type: integer 
+	Parameter INTEGRATOR_DSP_MODE bound to: 2 - type: integer 
+	Parameter CIC_ORDER bound to: 3 - type: integer 
+	Parameter RATE_LOG2 bound to: 4 - type: integer 
+	Parameter LEGACY_FULL_W bound to: 33 - type: integer 
+	Parameter COMB_W bound to: 23 - type: integer 
+	Parameter COMB_DELAY_W bound to: 22 - type: integer 
+	Parameter FIRST_INT_W bound to: 26 - type: integer 
+	Parameter FINAL_W bound to: 29 - type: integer 
+	Parameter OUTPUT_SHIFT bound to: 8 - type: integer 
+INFO: [Synth 8-5534] Detected attribute (* use_dsp = "no" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/cic_interp16_n3_hold2_dsp_ce.v:65]
+INFO: [Synth 8-5534] Detected attribute (* use_dsp = "no" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/cic_interp16_n3_hold2_dsp_ce.v:73]
+INFO: [Synth 8-5534] Detected attribute (* use_dsp = "yes" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/cic_interp16_n3_hold2_dsp_ce.v:95]
+INFO: [Synth 8-5534] Detected attribute (* use_dsp = "yes" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/cic_interp16_n3_hold2_dsp_ce.v:110]
+INFO: [Synth 8-6157] synthesizing module 'round_sat_shift_compact' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v6/round_sat_shift_compact.v:28]
+	Parameter IN_W bound to: 29 - type: integer 
+	Parameter OUT_W bound to: 20 - type: integer 
+	Parameter SHIFT_N bound to: 8 - type: integer 
+	Parameter QUOT_W bound to: 21 - type: integer 
+	Parameter UPPER_W bound to: 2 - type: integer 
+	Parameter OUT_MAX bound to: 20'sb01111111111111111111 
+	Parameter OUT_MIN bound to: 20'sb10000000000000000000 
+INFO: [Synth 8-6155] done synthesizing module 'round_sat_shift_compact' (16#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v6/round_sat_shift_compact.v:28]
+INFO: [Synth 8-6155] done synthesizing module 'cic_interp16_n3_hold2_dsp_ce' (17#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/cic_interp16_n3_hold2_dsp_ce.v:15]
+INFO: [Synth 8-6157] synthesizing module 'bridge_valid_quantized_to_interp2_ce' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v6/bridge_valid_quantized_to_interp2_ce.v:24]
+	Parameter IN_W bound to: 24 - type: integer 
+	Parameter OUT_W bound to: 22 - type: integer 
+	Parameter SHIFT_N bound to: 2 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'round_sat_shift_compact__parameterized0' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v6/round_sat_shift_compact.v:28]
+	Parameter IN_W bound to: 24 - type: integer 
+	Parameter OUT_W bound to: 22 - type: integer 
+	Parameter SHIFT_N bound to: 2 - type: integer 
+	Parameter QUOT_W bound to: 22 - type: integer 
+	Parameter UPPER_W bound to: 1 - type: integer 
+	Parameter OUT_MAX bound to: 22'sb0111111111111111111111 
+	Parameter OUT_MIN bound to: 22'sb1000000000000000000000 
+INFO: [Synth 8-6155] done synthesizing module 'round_sat_shift_compact__parameterized0' (17#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v6/round_sat_shift_compact.v:28]
+INFO: [Synth 8-6155] done synthesizing module 'bridge_valid_quantized_to_interp2_ce' (18#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v6/bridge_valid_quantized_to_interp2_ce.v:24]
+INFO: [Synth 8-6157] synthesizing module 'bridge_valid_quantized_to_interp2_ce__parameterized0' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v6/bridge_valid_quantized_to_interp2_ce.v:24]
+	Parameter IN_W bound to: 22 - type: integer 
+	Parameter OUT_W bound to: 20 - type: integer 
+	Parameter SHIFT_N bound to: 2 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'round_sat_shift_compact__parameterized1' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v6/round_sat_shift_compact.v:28]
+	Parameter IN_W bound to: 22 - type: integer 
+	Parameter OUT_W bound to: 20 - type: integer 
+	Parameter SHIFT_N bound to: 2 - type: integer 
+	Parameter QUOT_W bound to: 20 - type: integer 
+	Parameter UPPER_W bound to: 1 - type: integer 
+	Parameter OUT_MAX bound to: 20'sb01111111111111111111 
+	Parameter OUT_MIN bound to: 20'sb10000000000000000000 
+INFO: [Synth 8-6155] done synthesizing module 'round_sat_shift_compact__parameterized1' (18#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v6/round_sat_shift_compact.v:28]
+INFO: [Synth 8-6155] done synthesizing module 'bridge_valid_quantized_to_interp2_ce__parameterized0' (18#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v6/bridge_valid_quantized_to_interp2_ce.v:24]
+WARNING: [Synth 8-693] zero replication count - replication ignored [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp128_all2x_v7_folded_fir_cic_top_ce.v:357]
+INFO: [Synth 8-6155] done synthesizing module 'interp128_all2x_v7_folded_fir_cic_top_ce' (19#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/all2x_v7/interp128_all2x_v7_folded_fir_cic_top_ce.v:38]
+INFO: [Synth 8-5534] Detected attribute (* IOB = "TRUE" *) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/demo_interp_dac8_audio_pcm_common.v:421]
+INFO: [Synth 8-6157] synthesizing module 'ODDR' [E:/app/Xilinx2018.3/Vivado/2018.3/scripts/rt/data/unisim_comp.v:31641]
+	Parameter DDR_CLK_EDGE bound to: SAME_EDGE - type: string 
+	Parameter INIT bound to: 1'b0 
+	Parameter IS_C_INVERTED bound to: 1'b0 
+	Parameter IS_D1_INVERTED bound to: 1'b0 
+	Parameter IS_D2_INVERTED bound to: 1'b0 
+	Parameter SRTYPE bound to: SYNC - type: string 
+INFO: [Synth 8-6155] done synthesizing module 'ODDR' (20#1) [E:/app/Xilinx2018.3/Vivado/2018.3/scripts/rt/data/unisim_comp.v:31641]
+INFO: [Synth 8-6155] done synthesizing module 'demo_interp_dac8_audio_pcm_common' (21#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/demo_interp_dac8_audio_pcm_common.v:43]
+INFO: [Synth 8-6155] done synthesizing module 'board_demo_competition_dac8_top' (22#1) [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/board_demo_competition_dac8_top.v:39]
+WARNING: [Synth 8-3917] design board_demo_competition_dac8_top has port beep_io driven by constant 1
+WARNING: [Synth 8-3331] design interp128_all2x_v7_folded_fir_cic_top_ce has unconnected port ce16_out
+WARNING: [Synth 8-3331] design interp128_all2x_v7_folded_fir_cic_top_ce has unconnected port ce32_out
+WARNING: [Synth 8-3331] design interp128_all2x_v7_folded_fir_cic_top_ce has unconnected port ce64_out
+WARNING: [Synth 8-3331] design matrix_keypad_mode_ctrl_ultracompact has unconnected port kc[3]
+WARNING: [Synth 8-3331] design matrix_keypad_mode_ctrl_ultracompact has unconnected port kc[2]
+---------------------------------------------------------------------------------
+Finished RTL Elaboration : Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 446.523 ; gain = 161.418
+---------------------------------------------------------------------------------
+
+Report Check Netlist: 
++------+------------------+-------+---------+-------+------------------+
+|      |Item              |Errors |Warnings |Status |Description       |
++------+------------------+-------+---------+-------+------------------+
+|1     |multi_driven_nets |      0|        0|Passed |Multi driven nets |
++------+------------------+-------+---------+-------+------------------+
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:03 ; elapsed = 00:00:03 . Memory (MB): peak = 446.523 ; gain = 161.418
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:03 ; elapsed = 00:00:03 . Memory (MB): peak = 446.523 ; gain = 161.418
+---------------------------------------------------------------------------------
+INFO: [Netlist 29-17] Analyzing 9 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Device 21-403] Loading part xc7a35tfgg484-2
+INFO: [Project 1-570] Preparing netlist for logic optimization
+
+Processing XDC Constraints
+Initializing timing engine
+Parsing XDC File [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/constrs_1/new/board_demo_competition_dac8_top.xdc]
+INFO: [Timing 38-2] Deriving generated clocks [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/constrs_1/new/board_demo_competition_dac8_top.xdc:158]
+Finished Parsing XDC File [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/constrs_1/new/board_demo_competition_dac8_top.xdc]
+INFO: [Project 1-236] Implementation specific constraints were found while reading constraint file [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/constrs_1/new/board_demo_competition_dac8_top.xdc]. These constraints will be ignored for synthesis but will be used in implementation. Impacted constraints are listed in the file [.Xil/board_demo_competition_dac8_top_propImpl.xdc].
+Resolution: To avoid this warning, move constraints listed in [.Xil/board_demo_competition_dac8_top_propImpl.xdc] to another XDC file and exclude this new file from synthesis with the used_in_synthesis property (File Properties dialog in GUI) and re-run elaboration/synthesis.
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 713.312 ; gain = 0.000
+Completed Processing XDC Constraints
+
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 713.383 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 1 instances were transformed.
+  BUFGMUX_CTRL => BUFGCTRL (inverted pins: S0): 1 instances
+
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.001 . Memory (MB): peak = 713.383 ; gain = 0.000
+Constraint Validation Runtime : Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.005 . Memory (MB): peak = 713.383 ; gain = 0.000
+---------------------------------------------------------------------------------
+Finished Constraint Validation : Time (s): cpu = 00:00:07 ; elapsed = 00:00:09 . Memory (MB): peak = 713.383 ; gain = 428.277
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Loading Part and Timing Information
+---------------------------------------------------------------------------------
+Loading part: xc7a35tfgg484-2
+---------------------------------------------------------------------------------
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:07 ; elapsed = 00:00:09 . Memory (MB): peak = 713.383 ; gain = 428.277
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying 'set_property' XDC Constraints
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:07 ; elapsed = 00:00:09 . Memory (MB): peak = 713.383 ; gain = 428.277
+---------------------------------------------------------------------------------
+INFO: [Synth 8-5544] ROM "kr_drive_low" won't be mapped to Block RAM because address size (2) smaller than threshold (5)
+INFO: [Synth 8-4471] merging register 'ack_toggle_reg' into 'req_seen_reg' [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/nf_mode_cdc_handshake.v:68]
+INFO: [Synth 8-5547] Trying to map ROM "pcm_rom" into Block RAM due to explicit "ram_style" or "rom_style" specification
+INFO: [Synth 8-5818] HDL ADVISOR - The operator resource <adder> is shared. To prevent sharing consider applying a KEEP on the output of the operator [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/sources_1/new/national_finals/interp2_stage1_single_bram_serial_ce.v:350]
+INFO: [Synth 8-5546] ROM "history_full" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "issue_active" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "next_issue_is_left" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5544] ROM "left_mask" won't be mapped to Block RAM because address size (2) smaller than threshold (5)
+INFO: [Synth 8-5546] ROM "filter_commit_pending" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5544] ROM "stage2_history_full" won't be mapped to Block RAM because address size (4) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "stage3_history_full" won't be mapped to Block RAM because address size (4) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "stage2_history_full" won't be mapped to Block RAM because address size (4) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "stage3_history_full" won't be mapped to Block RAM because address size (4) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "job_mac_count0" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "job_mac_count0" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "dsp_saturation_value0" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "dsp_saturation_value0" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "dsp_opmode0" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:08 ; elapsed = 00:00:09 . Memory (MB): peak = 713.383 ; gain = 428.277
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+---------------------------------------------------------------------------------
+Start RTL Component Statistics 
+---------------------------------------------------------------------------------
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input     23 Bit       Adders := 1     
+	   2 Input     22 Bit       Adders := 1     
+	   2 Input     21 Bit       Adders := 1     
+	   2 Input      9 Bit       Adders := 1     
+	   2 Input      7 Bit       Adders := 2     
+	   2 Input      6 Bit       Adders := 3     
+	   3 Input      6 Bit       Adders := 1     
+	   2 Input      5 Bit       Adders := 1     
+	   2 Input      4 Bit       Adders := 9     
+	   2 Input      3 Bit       Adders := 1     
+	   2 Input      2 Bit       Adders := 2     
++---Registers : 
+	               32 Bit    Registers := 1     
+	               29 Bit    Registers := 1     
+	               26 Bit    Registers := 1     
+	               24 Bit    Registers := 3     
+	               23 Bit    Registers := 2     
+	               22 Bit    Registers := 3     
+	               21 Bit    Registers := 1     
+	               20 Bit    Registers := 1     
+	                8 Bit    Registers := 4     
+	                7 Bit    Registers := 1     
+	                6 Bit    Registers := 2     
+	                5 Bit    Registers := 3     
+	                4 Bit    Registers := 9     
+	                3 Bit    Registers := 2     
+	                2 Bit    Registers := 13    
+	                1 Bit    Registers := 58    
++---ROMs : 
+	                              ROMs := 1     
++---Muxes : 
+	   3 Input     39 Bit        Muxes := 1     
+	   2 Input     37 Bit        Muxes := 1     
+	   3 Input     37 Bit        Muxes := 1     
+	   2 Input     36 Bit        Muxes := 1     
+	   2 Input     24 Bit        Muxes := 4     
+	   4 Input     24 Bit        Muxes := 1     
+	   2 Input     23 Bit        Muxes := 1     
+	   2 Input     22 Bit        Muxes := 4     
+	   3 Input     22 Bit        Muxes := 1     
+	   2 Input     20 Bit        Muxes := 2     
+	   3 Input     20 Bit        Muxes := 3     
+	   2 Input      8 Bit        Muxes := 3     
+	   3 Input      8 Bit        Muxes := 2     
+	   2 Input      7 Bit        Muxes := 3     
+	   3 Input      6 Bit        Muxes := 2     
+	   2 Input      6 Bit        Muxes := 2     
+	   2 Input      5 Bit        Muxes := 1     
+	   2 Input      4 Bit        Muxes := 11    
+	   3 Input      4 Bit        Muxes := 3     
+	   2 Input      3 Bit        Muxes := 1     
+	   2 Input      2 Bit        Muxes := 3     
+	   3 Input      2 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 69    
+	   3 Input      1 Bit        Muxes := 3     
+	   4 Input      1 Bit        Muxes := 4     
+	   6 Input      1 Bit        Muxes := 2     
+	   5 Input      1 Bit        Muxes := 1     
+	   7 Input      1 Bit        Muxes := 1     
+---------------------------------------------------------------------------------
+Finished RTL Component Statistics 
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start RTL Hierarchical Component Statistics 
+---------------------------------------------------------------------------------
+Hierarchical RTL Component report 
+Module board_demo_competition_dac8_top 
+Detailed RTL Component Info : 
++---Registers : 
+	                4 Bit    Registers := 1     
+	                3 Bit    Registers := 1     
+	                2 Bit    Registers := 3     
+	                1 Bit    Registers := 6     
++---Muxes : 
+	   2 Input      4 Bit        Muxes := 1     
+	   3 Input      4 Bit        Muxes := 2     
+	   2 Input      1 Bit        Muxes := 4     
+Module matrix_keypad_mode_ctrl_ultracompact 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      3 Bit       Adders := 1     
+	   2 Input      2 Bit       Adders := 1     
++---Registers : 
+	                4 Bit    Registers := 3     
+	                3 Bit    Registers := 1     
+	                2 Bit    Registers := 4     
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   2 Input      4 Bit        Muxes := 7     
+	   2 Input      2 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 7     
+Module dual_family_audio_clock 
+Detailed RTL Component Info : 
++---Muxes : 
+	   2 Input      1 Bit        Muxes := 1     
+Module nf_mode_cdc_handshake 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      2 Bit       Adders := 1     
++---Registers : 
+	                2 Bit    Registers := 3     
+	                1 Bit    Registers := 8     
++---Muxes : 
+	   2 Input      1 Bit        Muxes := 3     
+Module dual_rate_test_tone_rom_source 
+Detailed RTL Component Info : 
++---Registers : 
+	               32 Bit    Registers := 1     
+	               24 Bit    Registers := 1     
+	                8 Bit    Registers := 3     
+	                1 Bit    Registers := 1     
++---ROMs : 
+	                              ROMs := 1     
++---Muxes : 
+	   2 Input      8 Bit        Muxes := 1     
+	   3 Input      8 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 1     
+Module interp2_stage1_single_bram_serial_ce 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      6 Bit       Adders := 3     
+	   3 Input      6 Bit       Adders := 1     
+	   2 Input      5 Bit       Adders := 1     
++---Registers : 
+	               24 Bit    Registers := 2     
+	                6 Bit    Registers := 2     
+	                5 Bit    Registers := 3     
+	                2 Bit    Registers := 2     
+	                1 Bit    Registers := 15    
++---Muxes : 
+	   3 Input     39 Bit        Muxes := 1     
+	   2 Input     24 Bit        Muxes := 2     
+	   3 Input      6 Bit        Muxes := 1     
+	   2 Input      6 Bit        Muxes := 2     
+	   2 Input      2 Bit        Muxes := 1     
+	   3 Input      2 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 21    
+	   3 Input      1 Bit        Muxes := 3     
+	   4 Input      1 Bit        Muxes := 1     
+Module interp2_stage23_lutram_cic_dsp_ce 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      4 Bit       Adders := 8     
++---Registers : 
+	               22 Bit    Registers := 1     
+	               21 Bit    Registers := 1     
+	                4 Bit    Registers := 4     
+	                1 Bit    Registers := 17    
++---Muxes : 
+	   2 Input     37 Bit        Muxes := 1     
+	   3 Input     37 Bit        Muxes := 1     
+	   2 Input     36 Bit        Muxes := 1     
+	   2 Input     22 Bit        Muxes := 4     
+	   2 Input     20 Bit        Muxes := 2     
+	   2 Input      7 Bit        Muxes := 1     
+	   3 Input      6 Bit        Muxes := 1     
+	   2 Input      5 Bit        Muxes := 1     
+	   3 Input      4 Bit        Muxes := 1     
+	   2 Input      4 Bit        Muxes := 2     
+	   2 Input      3 Bit        Muxes := 1     
+	   2 Input      2 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 20    
+	   6 Input      1 Bit        Muxes := 2     
+	   5 Input      1 Bit        Muxes := 1     
+	   7 Input      1 Bit        Muxes := 1     
+Module round_sat_shift_compact 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input     22 Bit       Adders := 1     
++---Muxes : 
+	   3 Input     20 Bit        Muxes := 1     
+Module cic_interp16_n3_hold2_dsp_ce 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      4 Bit       Adders := 1     
++---Registers : 
+	               29 Bit    Registers := 1     
+	               26 Bit    Registers := 1     
+	               23 Bit    Registers := 2     
+	               22 Bit    Registers := 2     
+	               20 Bit    Registers := 1     
+	                4 Bit    Registers := 1     
+	                1 Bit    Registers := 5     
++---Muxes : 
+	   2 Input     23 Bit        Muxes := 1     
+	   2 Input      4 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 8     
+Module round_sat_shift_compact__parameterized0 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input     23 Bit       Adders := 1     
++---Muxes : 
+	   3 Input     22 Bit        Muxes := 1     
+Module bridge_valid_quantized_to_interp2_ce 
+Detailed RTL Component Info : 
++---Registers : 
+	                1 Bit    Registers := 2     
++---Muxes : 
+	   2 Input      1 Bit        Muxes := 1     
+Module round_sat_shift_compact__parameterized1 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input     21 Bit       Adders := 1     
++---Muxes : 
+	   3 Input     20 Bit        Muxes := 1     
+Module bridge_valid_quantized_to_interp2_ce__parameterized0 
+Detailed RTL Component Info : 
++---Registers : 
+	                1 Bit    Registers := 2     
++---Muxes : 
+	   2 Input      1 Bit        Muxes := 1     
+Module interp128_all2x_v7_folded_fir_cic_top_ce 
+Detailed RTL Component Info : 
++---Muxes : 
+	   3 Input     20 Bit        Muxes := 1     
+Module demo_interp_dac8_audio_pcm_common 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      9 Bit       Adders := 1     
+	   2 Input      7 Bit       Adders := 2     
++---Registers : 
+	                8 Bit    Registers := 1     
+	                7 Bit    Registers := 1     
+	                2 Bit    Registers := 1     
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   4 Input     24 Bit        Muxes := 1     
+	   2 Input     24 Bit        Muxes := 2     
+	   3 Input      8 Bit        Muxes := 1     
+	   2 Input      8 Bit        Muxes := 2     
+	   2 Input      7 Bit        Muxes := 2     
+	   4 Input      1 Bit        Muxes := 3     
+	   2 Input      1 Bit        Muxes := 2     
+---------------------------------------------------------------------------------
+Finished RTL Hierarchical Component Statistics
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Part Resource Summary
+---------------------------------------------------------------------------------
+Part Resources:
+DSPs: 90 (col length:60)
+BRAMs: 100 (col length: RAMB18 60 RAMB36 30)
+---------------------------------------------------------------------------------
+Finished Part Resource Summary
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Cross Boundary and Area Optimization
+---------------------------------------------------------------------------------
+Warning: Parallel synthesis criteria is not met 
+INFO: [Synth 8-5544] ROM "gen_compact_keypad.gen_ultracompact.u_matrix_keypad_mode_ctrl_ultracompact/kr_drive_low" won't be mapped to Block RAM because address size (2) smaller than threshold (5)
+INFO: [Synth 8-5546] ROM "u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/history_full" won't be mapped to RAM because it is too sparse
+DSP Report: Generating DSP u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_first_integrator_dsp.first_integrator_sum, operation Mode is: C+A:B.
+DSP Report: operator u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_first_integrator_dsp.first_integrator_sum is absorbed into DSP u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_first_integrator_dsp.first_integrator_sum.
+DSP Report: Generating DSP u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_final_integrator_dsp.final_integrator_sum, operation Mode is: C+A:B.
+DSP Report: operator u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_final_integrator_dsp.final_integrator_sum is absorbed into DSP u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_final_integrator_dsp.final_integrator_sum.
+WARNING: [Synth 8-3917] design board_demo_competition_dac8_top has port beep_io driven by constant 1
+WARNING: [Synth 8-3331] design board_demo_competition_dac8_top has unconnected port key_kc[3]
+WARNING: [Synth 8-3331] design board_demo_competition_dac8_top has unconnected port key_kc[2]
+---------------------------------------------------------------------------------
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:09 ; elapsed = 00:00:11 . Memory (MB): peak = 713.383 ; gain = 428.277
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start ROM, RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+
+DSP: Preliminary Mapping  Report (see note below)
++-----------------------------+-------------+--------+--------+--------+--------+--------+------+------+------+------+-------+------+------+
+|Module Name                  | DSP Mapping | A Size | B Size | C Size | D Size | P Size | AREG | BREG | CREG | DREG | ADREG | MREG | PREG | 
++-----------------------------+-------------+--------+--------+--------+--------+--------+------+------+------+------+-------+------+------+
+|cic_interp16_n3_hold2_dsp_ce | C+A:B       | 5      | 18     | 26     | -      | 26     | 0    | 0    | 0    | -    | -     | 0    | 0    | 
+|cic_interp16_n3_hold2_dsp_ce | C+A:B       | 8      | 18     | 29     | -      | 29     | 0    | 0    | 0    | -    | -     | 0    | 0    | 
++-----------------------------+-------------+--------+--------+--------+--------+--------+------+------+------+------+-------+------+------+
+
+Note: The table above is a preliminary report that shows the DSPs inferred at the current stage of the synthesis flow. Some DSP may be reimplemented as non DSP primitives later in the synthesis flow. Multiple instantiated DSPs are reported only once.
+---------------------------------------------------------------------------------
+Finished ROM, RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+INFO: [Synth 8-6837] The timing for the instance i_4/u_demo_interp_dac8_audio_pcm_common/gen_dual_rate_test_tone.u_dual_rate_test_tone_rom_source/rom_word_q_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the block ram. Providing additional output register may help in improving timing.
+INFO: [Synth 8-6837] The timing for the instance i_4/u_demo_interp_dac8_audio_pcm_common/gen_dual_rate_test_tone.u_dual_rate_test_tone_rom_source/rom_word_q_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the block ram. Providing additional output register may help in improving timing.
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+---------------------------------------------------------------------------------
+Start Applying XDC Timing Constraints
+---------------------------------------------------------------------------------
+WARNING: [Synth 8-3321] set_false_path : Empty to list for constraint at line 235 of D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/constrs_1/new/board_demo_competition_dac8_top.xdc. [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/constrs_1/new/board_demo_competition_dac8_top.xdc:235]
+---------------------------------------------------------------------------------
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:00:17 ; elapsed = 00:00:19 . Memory (MB): peak = 822.773 ; gain = 537.668
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Timing Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Timing Optimization : Time (s): cpu = 00:00:18 ; elapsed = 00:00:20 . Memory (MB): peak = 846.266 ; gain = 561.160
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+---------------------------------------------------------------------------------
+Start Technology Mapping
+---------------------------------------------------------------------------------
+INFO: [Synth 8-6837] The timing for the instance u_demo_interp_dac8_audio_pcm_common/gen_dual_rate_test_tone.u_dual_rate_test_tone_rom_source/rom_word_q_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the block ram. Providing additional output register may help in improving timing.
+---------------------------------------------------------------------------------
+Finished Technology Mapping : Time (s): cpu = 00:00:18 ; elapsed = 00:00:20 . Memory (MB): peak = 846.281 ; gain = 561.176
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+---------------------------------------------------------------------------------
+Start IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished IO Insertion : Time (s): cpu = 00:00:19 ; elapsed = 00:00:21 . Memory (MB): peak = 846.281 ; gain = 561.176
+---------------------------------------------------------------------------------
+
+Report Check Netlist: 
++------+------------------+-------+---------+-------+------------------+
+|      |Item              |Errors |Warnings |Status |Description       |
++------+------------------+-------+---------+-------+------------------+
+|1     |multi_driven_nets |      0|        0|Passed |Multi driven nets |
++------+------------------+-------+---------+-------+------------------+
+---------------------------------------------------------------------------------
+Start Renaming Generated Instances
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Instances : Time (s): cpu = 00:00:19 ; elapsed = 00:00:21 . Memory (MB): peak = 846.281 ; gain = 561.176
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:19 ; elapsed = 00:00:21 . Memory (MB): peak = 846.281 ; gain = 561.176
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start ROM, RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+
+Static Shift Register Report:
++--------------------------------+--------------------------+--------+-------+--------------+--------------------+-------------------+--------+---------+
+|Module Name                     | RTL Name                 | Length | Width | Reset Signal | Pull out first Reg | Pull out last Reg | SRL16E | SRLC32E | 
++--------------------------------+--------------------------+--------+-------+--------------+--------------------+-------------------+--------+---------+
+|board_demo_competition_dac8_top | rst_audio_datapath_n_reg | 4      | 1     | NO           | NO                 | YES               | 1      | 0       | 
++--------------------------------+--------------------------+--------+-------+--------------+--------------------+-------------------+--------+---------+
+
+---------------------------------------------------------------------------------
+Finished ROM, RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Writing Synthesis Report
+---------------------------------------------------------------------------------
+
+Report BlackBoxes: 
++-+--------------+----------+
+| |BlackBox name |Instances |
++-+--------------+----------+
++-+--------------+----------+
+
+Report Cell Usage: 
++------+-------------+------+
+|      |Cell         |Count |
++------+-------------+------+
+|1     |BUFG         |     1|
+|2     |BUFGMUX_CTRL |     1|
+|3     |CARRY4       |    30|
+|4     |DSP48E1      |     1|
+|5     |DSP48E1_1    |     1|
+|6     |DSP48E1_2    |     2|
+|7     |LUT1         |    34|
+|8     |LUT2         |   141|
+|9     |LUT3         |    98|
+|10    |LUT4         |    94|
+|11    |LUT5         |    44|
+|12    |LUT6         |    62|
+|13    |MMCME2_ADV   |     2|
+|14    |ODDR         |     1|
+|15    |RAMB18E1_1   |     1|
+|16    |RAMB18E1_2   |     2|
+|17    |RAMB18E1_3   |     1|
+|18    |SRL16E       |     1|
+|19    |FDRE         |   355|
+|20    |FDSE         |    28|
+|21    |IBUF         |     3|
+|22    |OBUF         |    10|
+|23    |OBUFT        |     4|
++------+-------------+------+
+
+Report Instance Areas: 
++------+---------+-------+------+
+|      |Instance |Module |Cells |
++------+---------+-------+------+
+|1     |top      |       |   917|
++------+---------+-------+------+
+---------------------------------------------------------------------------------
+Finished Writing Synthesis Report : Time (s): cpu = 00:00:19 ; elapsed = 00:00:21 . Memory (MB): peak = 846.281 ; gain = 561.176
+---------------------------------------------------------------------------------
+Synthesis finished with 0 errors, 0 critical warnings and 4 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:00:13 ; elapsed = 00:00:16 . Memory (MB): peak = 846.281 ; gain = 294.316
+Synthesis Optimization Complete : Time (s): cpu = 00:00:19 ; elapsed = 00:00:21 . Memory (MB): peak = 846.281 ; gain = 561.176
+INFO: [Project 1-571] Translating synthesized netlist
+INFO: [Netlist 29-17] Analyzing 42 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Project 1-570] Preparing netlist for logic optimization
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 846.281 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 1 instances were transformed.
+  BUFGMUX_CTRL => BUFGCTRL (inverted pins: S0): 1 instances
+
+INFO: [Common 17-83] Releasing license: Synthesis
+120 Infos, 79 Warnings, 0 Critical Warnings and 0 Errors encountered.
+synth_design completed successfully
+synth_design: Time (s): cpu = 00:00:19 ; elapsed = 00:00:23 . Memory (MB): peak = 846.281 ; gain = 574.199
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 846.281 ; gain = 0.000
+WARNING: [Constraints 18-5210] No constraints selected for write.
+Resolution: This message can indicate that there are no constraints for the design, or it can indicate that the used_in flags are set such that the constraints are ignored. This later case is used when running synth_design to not write synthesis constraints to the resulting checkpoint. Instead, project constraints are read when the synthesized design is opened.
+INFO: [Common 17-1381] The checkpoint 'D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.runs/synth_1/board_demo_competition_dac8_top.dcp' has been generated.
+INFO: [runtcl-4] Executing : report_utilization -file board_demo_competition_dac8_top_utilization_synth.rpt -pb board_demo_competition_dac8_top_utilization_synth.pb
+INFO: [Common 17-206] Exiting Vivado at Thu Aug  6 15:08:17 2026...
+[Thu Aug  6 15:08:19 2026] synth_1 finished
+wait_on_run: Time (s): cpu = 00:00:00 ; elapsed = 00:00:30 . Memory (MB): peak = 332.660 ; gain = 0.000
+# set synth_provenance_file [file join $project_dir XC7A35T_interp.runs synth_1 \
+#     national_finals_synth_provenance.txt]
+# set synth_provenance_handle [open $synth_provenance_file w]
+# puts $synth_provenance_handle "synth_directive=$synth_directive"
+# puts $synth_provenance_handle "flatten_hierarchy=$flatten_hierarchy"
+# puts $synth_provenance_handle "resource_sharing=$resource_sharing"
+# puts $synth_provenance_handle "stage1_dsp48_preadder=$stage1_dsp48_preadder"
+# puts $synth_provenance_handle "cic_integrator_dsp_mode=$cic_integrator_dsp_mode"
+# puts $synth_provenance_handle "p3_joint_stage3=$p3_joint_stage3"
+# puts $synth_provenance_handle "stage1_single_bram=$stage1_single_bram"
+# puts $synth_provenance_handle "stage23_unified_bram=$stage23_unified_bram"
+# close $synth_provenance_handle
+# if {$synthesis_only != 0} {
+#     open_run synth_1
+#     set source_manifest_handle [open \
+#         [file join $result_dir synthesis_sources.txt] w]
+#     foreach source_file [get_files -compile_order sources \
+#             -used_in synthesis] {
+#         puts $source_manifest_handle [file normalize $source_file]
+#     }
+#     foreach constraint_file [get_files -of_objects [get_filesets constrs_1]] {
+#         puts $source_manifest_handle [file normalize $constraint_file]
+#     }
+#     close $source_manifest_handle
+#     report_utilization \
+#         -file [file join $result_dir utilization_synthesized.rpt]
+#     report_utilization -hierarchical \
+#         -file [file join $result_dir utilization_hierarchical_synthesized.rpt]
+#     write_primitive_report \
+#         [file join $result_dir dsp_utilization_synthesized.rpt] \
+#         "DSP48*" "National-finals synthesized DSP utilization"
+#     write_primitive_report \
+#         [file join $result_dir bram_utilization_synthesized.rpt] \
+#         "RAMB*" "National-finals synthesized BRAM utilization"
+#     close_design
+#     puts "NATIONAL_FINALS_SYNTHESIS_PASS"
+#     close_project
+#     return
+# }
+Design is defaulting to impl run constrset: constrs_1
+Design is defaulting to synth run part: xc7a35tfgg484-2
+INFO: [Netlist 29-17] Analyzing 41 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Project 1-479] Netlist was created with Vivado 2018.3
+INFO: [Device 21-403] Loading part xc7a35tfgg484-2
+INFO: [Project 1-570] Preparing netlist for logic optimization
+Parsing XDC File [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/constrs_1/new/board_demo_competition_dac8_top.xdc]
+INFO: [Timing 38-35] Done setting XDC timing constraints. [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/constrs_1/new/board_demo_competition_dac8_top.xdc:158]
+INFO: [Timing 38-2] Deriving generated clocks [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/constrs_1/new/board_demo_competition_dac8_top.xdc:158]
+get_clocks: Time (s): cpu = 00:00:07 ; elapsed = 00:00:07 . Memory (MB): peak = 1145.645 ; gain = 504.895
+Finished Parsing XDC File [D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.srcs/constrs_1/new/board_demo_competition_dac8_top.xdc]
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1145.645 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+open_run: Time (s): cpu = 00:00:11 ; elapsed = 00:00:12 . Memory (MB): peak = 1145.645 ; gain = 812.984
+NATIONAL_FINALS_SYNTHESIS_PASS
+INFO: [Common 17-206] Exiting Vivado at Thu Aug  6 15:08:32 2026...
