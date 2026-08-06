@@ -16,6 +16,13 @@ P3-R 348-LUT boardverified版本继续作为正式实板安全回退。详见
 [P3-S执行反馈](results/p3s_extratimingopt_343lut_execution_feedback.md)与
 [`p3s_343lut_386ff_4dsp_2bram_signedoff`](vivado_results/p3s_343lut_386ff_4dsp_2bram_signedoff)。
 
+手动GUI若得到348 LUT，先检查`XC7A35T_interp.runs/impl_1/runme.log`：P3-S必须包含
+`Command: place_design -directive ExtraTimingOpt`；无参数`place_design`就是P3-R默认布局。
+不要在Vivado仍打开时切换Git分支或改`.xpr`，否则旧的内存工程会在保存时覆盖策略。关闭
+全部Vivado窗口后，用`vivado/open_national_finals_gui_clean.ps1`重新打开；入口会校验并
+恢复P3-S profile，策略发生漂移时自动Reset陈旧run。2026-08-06按此流程重新从零构建，
+再次复现343 LUT/386 FF/151 Slice和`+45.025/+0.116 ns`。
+
 ## 当前正式实板通过发布：P3-R DSP空闲拍舍入饱和版（348 LUT / 4 DSP）
 
 P3-R保持4 DSP、2 BRAM Tile和全部滤波系数/定点语义不变，复用Stage2/3共享DSP48E1

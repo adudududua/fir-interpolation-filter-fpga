@@ -152,6 +152,32 @@ P3-S 未修改系数和定点语义，严格继承 P3-R 的线性相位频响：
 GUI从零重建又完整通过。因此该次是配置脚本写回阶段的非签核失败，不是实现失败，也未被
 当作成功结果。
 
+### 8.1 手动GUI出现348 LUT的复现与修复
+
+2026-08-06用户手动执行综合和实现后看到348 LUT。检查该次工程产物后确认：
+
+- `impl_1/runme.log`为`Command: place_design`，没有`-directive ExtraTimingOpt`；
+- 同一时刻`.xpr`中的`<Option Id="Directive">8</Option>`已被改回默认的空
+  `<Step Id="place_design"/>`；
+- `opt_design -directive ExploreWithRemap`、386 FF、4 DSP和2 BRAM仍正确，因此348 LUT
+  正是P3-R Default place结果，不是343报告测量错误或布局随机波动。
+
+根因是本次运行使用了Vivado内存中的旧Default run profile；当Vivado在P3-S配置写入或Git
+分支切换前已经打开时，后续保存工程会用旧内存状态覆盖磁盘`.xpr`。修复时先关闭全部
+Vivado进程，再运行GUI配置脚本恢复`ExtraTimingOpt`，随后Reset `synth_1/impl_1`并通过
+普通project flow从源代码重建。修复后的直接证据为：
+
+- `runme.log`：`Command: place_design -directive ExtraTimingOpt`；
+- placer确认：`The placer was invoked with the 'ExtraTimingOpt' directive`；
+- 资源：343 LUT / 386 FF / 151 Slice / 4 DSP / 4 RAMB18E1 / 2 MMCM；
+- Timing：WNS/WHS `+45.025/+0.116 ns`；
+- `write_bitstream`成功，总运行时间约133.7秒。
+
+为防止再次发生，`open_national_finals_gui_clean.ps1`现在检测并拒绝已有Vivado进程；
+`configure_national_finals_gui_project.tcl`在发现综合或实现profile漂移时自动Reset对应陈旧
+run；`verify_national_finals_gui_project.tcl`除检查资源外，还读取`runme.log`强制确认真实
+执行了`ExtraTimingOpt`。这些保护不会修改滤波RTL或定点结果。
+
 正式bitstream SHA-256：
 `DDD4F906967F5E039181A9DB17CE339615AE2A7744173519C471F2316086ED2A`
 
@@ -161,11 +187,16 @@ GUI从零重建又完整通过。因此该次是配置脚本写回阶段的非�
 ## 9. 复现与板测
 
 ```powershell
+powershell -ExecutionPolicy Bypass -File .\matlab_fir\national_finals\vivado\open_national_finals_gui_clean.ps1
 powershell -ExecutionPolicy Bypass -File .\matlab_fir\national_finals\vivado\run_national_finals_vivado_build.ps1 -Step all -ResultTag p3s_rebuild
 powershell -ExecutionPolicy Bypass -File .\matlab_fir\national_finals\sim\run_national_finals_rtl_regression.ps1 -RegressionScale Release
 powershell -ExecutionPolicy Bypass -File .\matlab_fir\national_finals\sim\run_postroute_board_dac_activity.ps1 -DcpPath .\matlab_fir\national_finals\vivado_results\p3s_343lut_386ff_4dsp_2bram_signedoff\national_finals_board_routed.dcp
 powershell -ExecutionPolicy Bypass -File .\matlab_fir\national_finals\sim\run_postroute_six_mode_dac.ps1 -DcpPath .\matlab_fir\national_finals\vivado_results\p3s_343lut_386ff_4dsp_2bram_signedoff\national_finals_board_routed.dcp
 ```
+
+手动GUI重跑前必须关闭所有旧Vivado窗口，再使用第一条命令打开工程。在GUI中Reset
+`synth_1`和`impl_1`后重新运行；完成后确认`impl_1/runme.log`包含
+`Command: place_design -directive ExtraTimingOpt`，否则该结果只能按P3-R Default布局解释。
 
 板测应下载本目录的正式 bit，逐档检查44.1/48 kHz的4x/8x/128x采样率和DAC波形。完成
 实测前不要把P3-S标记为boardverified；若出现任何异常，立即回退P3-R的实板标签。

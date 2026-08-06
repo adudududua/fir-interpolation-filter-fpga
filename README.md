@@ -18,6 +18,15 @@ setup/hold为 **+76.116/+78.117 ns**，总/动态/静态功耗仍为
 44.1 kHz为`177/353/5645 edges/ms`，48 kHz为`192/384/6144 edges/ms`，六档DAC均持续
 变化。普通Vivado工程从零约113秒复现343/386/4-DSP/4-RAMB18并生成bitstream。
 
+2026-08-06 对一次手动GUI重跑得到348 LUT的问题完成闭环：该次`impl_1/runme.log`实际执行
+的是无参数`place_design`，同时Vivado把工程中的`ExtraTimingOpt`写回为Default，因此它
+复现的是P3-R而不是P3-S。常见触发方式是在工程配置或Git分支切换前已经打开Vivado，旧的
+内存工程在保存时覆盖新`.xpr`。关闭全部Vivado进程、重新写入P3-S profile并Reset
+`synth_1/impl_1`后，普通project flow再次得到343 LUT、386 FF和151 Slice，WNS/WHS仍为
+`+45.025/+0.116 ns`。以后请使用
+`matlab_fir/national_finals/vivado/open_national_finals_gui_clean.ps1`打开工程；该入口会拒绝
+已有Vivado进程，并在发现策略漂移时自动清除陈旧run。
+
 **P3-S目前是工具完整签核、待用户实板复测的候选；P3-R 348-LUT仍是当前正式实板通过
 回退。**正式bit SHA-256为
 `DDD4F906967F5E039181A9DB17CE339615AE2A7744173519C471F2316086ED2A`。完整策略矩阵、

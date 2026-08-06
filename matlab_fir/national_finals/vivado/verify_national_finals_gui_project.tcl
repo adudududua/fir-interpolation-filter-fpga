@@ -116,9 +116,9 @@ require_condition [expr {$gui_synth_directive eq "AreaOptimized_high"}] \
 require_condition [expr {$gui_flatten_hierarchy eq "full"}] \
     "GUI synthesis flatten_hierarchy must be full."
 require_condition [expr {$gui_opt_directive eq "ExploreWithRemap"}] \
-    "GUI implementation opt_design directive must be ExploreWithRemap."
+    "GUI implementation opt_design directive must be ExploreWithRemap; got '$gui_opt_directive'. Close every Vivado window and run open_national_finals_gui_clean.ps1."
 require_condition [expr {$gui_place_directive eq "ExtraTimingOpt"}] \
-    "GUI implementation place_design directive must be ExtraTimingOpt."
+    "GUI implementation place_design directive must be ExtraTimingOpt; got '$gui_place_directive'. A stale GUI session can overwrite the XPR. Close every Vivado window and run open_national_finals_gui_clean.ps1."
 
 puts "NATIONAL_FINALS_GUI_CONFIG_PASS"
 puts "GUI_GENERICS=$project_generics"
@@ -146,6 +146,20 @@ if {$requested_action in {"rebuild" "reimplement"}} {
     require_condition \
         [expr {[get_property PROGRESS [get_runs impl_1]] eq "100%"}] \
         "GUI impl_1 did not complete."
+
+    set impl_directory [get_property DIRECTORY [get_runs impl_1]]
+    set impl_runme_log [file join $impl_directory runme.log]
+    require_condition [file exists $impl_runme_log] \
+        "GUI implementation runme.log is missing: $impl_runme_log"
+    set log_handle [open $impl_runme_log r]
+    set impl_runme_text [read $log_handle]
+    close $log_handle
+    require_condition \
+        [expr {[string first \
+            "Command: place_design -directive ExtraTimingOpt" \
+            $impl_runme_text] >= 0}] \
+        "GUI run did not execute place_design -directive ExtraTimingOpt."
+    puts "GUI_RUNME_PLACE_DIRECTIVE=ExtraTimingOpt"
 }
 
 if {[get_property PROGRESS [get_runs impl_1]] eq "100%"} {

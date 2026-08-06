@@ -59,16 +59,57 @@ require_generic $project_generics USE_NATIONAL_FINALS_NARROW_STAGE23 1
 require_generic $project_generics USE_NATIONAL_FINALS_P3_JOINT_STAGE3 1
 
 # Keep ordinary GUI runs aligned with the P3-S 343-LUT implementation profile.
+# Capture the previous values first.  If a stale GUI session or a manual
+# strategy reset changed this profile, invalidate the completed run so Vivado
+# cannot keep showing/using an old 348-LUT Default placement.
+set synth_run [get_runs synth_1]
+set impl_run [get_runs impl_1]
+set old_synth_directive [get_property \
+    STEPS.SYNTH_DESIGN.ARGS.DIRECTIVE $synth_run]
+set old_flatten_hierarchy [get_property \
+    STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY $synth_run]
+set old_resource_sharing [get_property \
+    STEPS.SYNTH_DESIGN.ARGS.RESOURCE_SHARING $synth_run]
+set old_opt_directive [get_property \
+    STEPS.OPT_DESIGN.ARGS.DIRECTIVE $impl_run]
+set old_place_directive [get_property \
+    STEPS.PLACE_DESIGN.ARGS.DIRECTIVE $impl_run]
+
 set_property STEPS.SYNTH_DESIGN.ARGS.DIRECTIVE AreaOptimized_high \
-    [get_runs synth_1]
+    $synth_run
 set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY full \
-    [get_runs synth_1]
+    $synth_run
 set_property STEPS.SYNTH_DESIGN.ARGS.RESOURCE_SHARING on \
-    [get_runs synth_1]
+    $synth_run
 set_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE ExploreWithRemap \
-    [get_runs impl_1]
+    $impl_run
 set_property STEPS.PLACE_DESIGN.ARGS.DIRECTIVE ExtraTimingOpt \
-    [get_runs impl_1]
+    $impl_run
+
+set synth_profile_changed [expr { \
+    $old_synth_directive ne "AreaOptimized_high" || \
+    [string tolower $old_flatten_hierarchy] ne "full" || \
+    [string tolower $old_resource_sharing] ni {"on" "1" "true"}}]
+set impl_profile_changed [expr { \
+    $old_opt_directive ne "ExploreWithRemap" || \
+    $old_place_directive ne "ExtraTimingOpt"}]
+
+if {$synth_profile_changed} {
+    if {[get_property PROGRESS $impl_run] ne "0%"} {
+        reset_run $impl_run
+        puts "GUI_STALE_IMPL_RUN_RESET=1"
+    }
+    if {[get_property PROGRESS $synth_run] ne "0%"} {
+        reset_run $synth_run
+        puts "GUI_STALE_SYNTH_RUN_RESET=1"
+    }
+} elseif {$impl_profile_changed && \
+        [get_property PROGRESS $impl_run] ne "0%"} {
+    reset_run $impl_run
+    puts "GUI_STALE_IMPL_RUN_RESET=1"
+}
+puts "GUI_SYNTH_PROFILE_CHANGED=$synth_profile_changed"
+puts "GUI_IMPL_PROFILE_CHANGED=$impl_profile_changed"
 
 set sim_set [get_filesets sim_1]
 set daily_vector_names [list \
