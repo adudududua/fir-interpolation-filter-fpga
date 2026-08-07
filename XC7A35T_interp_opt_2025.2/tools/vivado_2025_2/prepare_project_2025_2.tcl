@@ -30,6 +30,7 @@ set impl_run [get_runs impl_1]
 set_property STEPS.SYNTH_DESIGN.ARGS.DIRECTIVE AreaOptimized_high $synth_run
 set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY full $synth_run
 set_property STEPS.SYNTH_DESIGN.ARGS.RESOURCE_SHARING on $synth_run
+set_property STEPS.SYNTH_DESIGN.ARGS.SHREG_MIN_SIZE 5 $synth_run
 set_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE ExploreArea $impl_run
 set_property STEPS.PLACE_DESIGN.ARGS.DIRECTIVE Explore $impl_run
 
@@ -40,6 +41,7 @@ reset_run $synth_run
 puts "PREPARE_SYNTH_DIRECTIVE=[get_property STEPS.SYNTH_DESIGN.ARGS.DIRECTIVE $synth_run]"
 puts "PREPARE_FLATTEN=[get_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY $synth_run]"
 puts "PREPARE_RESOURCE_SHARING=[get_property STEPS.SYNTH_DESIGN.ARGS.RESOURCE_SHARING $synth_run]"
+puts "PREPARE_SHREG_MIN_SIZE=[get_property STEPS.SYNTH_DESIGN.ARGS.SHREG_MIN_SIZE $synth_run]"
 puts "PREPARE_OPT_DIRECTIVE=[get_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE $impl_run]"
 puts "PREPARE_PLACE_DIRECTIVE=[get_property STEPS.PLACE_DESIGN.ARGS.DIRECTIVE $impl_run]"
 puts "PREPARE_PROJECT_2025_2_PASS"

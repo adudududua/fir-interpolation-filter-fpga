@@ -751,6 +751,7 @@
           <Option Id="Directive">1</Option>
           <Option Id="FlattenHierarchy">0</Option>
           <Option Id="ResourceSharing">1</Option>
+          <Option Id="ShregMinSize">5</Option>
         </Step>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
