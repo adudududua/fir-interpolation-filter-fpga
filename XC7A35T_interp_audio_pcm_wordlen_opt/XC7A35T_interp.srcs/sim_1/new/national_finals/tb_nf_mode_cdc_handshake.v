@@ -147,10 +147,10 @@ module tb_nf_mode_cdc_handshake;
         repeat (8) @(posedge ctrl_clk);
         ctrl_rst_n = 1'b1;
         repeat (5) @(posedge audio_clk);
-        if (u_dut.settle_count !== 7) begin
+        if (u_dut.transfer_pipe[7:0] !== 8'b00000001) begin
             errors = errors + 1;
-            $display("ERROR: SETTLE_CYCLES=7 was truncated to %0d",
-                     u_dut.settle_count);
+            $display("ERROR: SETTLE_CYCLES=7 token width/state is %b",
+                     u_dut.transfer_pipe);
         end
         audio_rst_n = 1'b1;
 

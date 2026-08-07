@@ -21,9 +21,6 @@ module nf_mode_cdc_handshake #(
     output reg        audio_mute
 );
 
-    localparam integer SETTLE_COUNT_W =
-        (SETTLE_CYCLES < 1) ? 1 : $clog2(SETTLE_CYCLES + 1);
-
     reg [1:0] mode_shadow = 2'b11;
     reg       req_toggle = 1'b0;
     (* ASYNC_REG = "TRUE" *) reg ack_meta = 1'b0;
@@ -33,9 +30,12 @@ module nf_mode_cdc_handshake #(
     (* ASYNC_REG = "TRUE" *) reg req_meta = 1'b0;
     (* ASYNC_REG = "TRUE" *) reg req_sync = 1'b0;
     reg       req_seen = 1'b0;
-    reg       transfer_pending = 1'b1;
-    reg [SETTLE_COUNT_W-1:0] settle_count = SETTLE_CYCLES;
-
+    // A one-hot token replaces the pending flag plus binary down-counter.
+    // With SETTLE_CYCLES=3 the request follows
+    // 0001 -> 0010 -> 0100 -> 1000 -> capture, which is cycle-identical to
+    // count 3 -> 2 -> 1 -> 0 -> capture and removes the decrementer.
+    reg [SETTLE_CYCLES:0] transfer_pipe =
+        {{SETTLE_CYCLES{1'b0}}, 1'b1};
     assign ctrl_busy = (req_toggle != ack_sync);
 
     // Changes received while busy are folded into one latest-value transfer
@@ -68,28 +68,26 @@ module nf_mode_cdc_handshake #(
             ack_toggle   <= 1'b0;
             audio_mode   <= 2'b11;
             audio_mute   <= 1'b1;
-            transfer_pending <= 1'b1;
-            settle_count <= SETTLE_CYCLES;
+            transfer_pipe <= {{SETTLE_CYCLES{1'b0}}, 1'b1};
         end
         else begin
             req_meta <= req_toggle;
             req_sync <= req_meta;
 
-            if (transfer_pending) begin
+            if (transfer_pipe != {(SETTLE_CYCLES + 1){1'b0}}) begin
                 audio_mute <= 1'b1;
-                if (settle_count != {SETTLE_COUNT_W{1'b0}})
-                    settle_count <= settle_count - 1'b1;
-                else begin
+                if (transfer_pipe[SETTLE_CYCLES]) begin
                     audio_mode <= mode_shadow;
                     req_seen <= req_sync;
                     ack_toggle <= req_sync;
-                    transfer_pending <= 1'b0;
+                    transfer_pipe <= {(SETTLE_CYCLES + 1){1'b0}};
                 end
+                else
+                    transfer_pipe <= transfer_pipe << 1;
             end
             else if (req_sync != req_seen) begin
                 audio_mute <= 1'b1;
-                settle_count <= SETTLE_CYCLES;
-                transfer_pending <= 1'b1;
+                transfer_pipe <= {{SETTLE_CYCLES{1'b0}}, 1'b1};
             end
             else begin
                 audio_mute <= 1'b0;
