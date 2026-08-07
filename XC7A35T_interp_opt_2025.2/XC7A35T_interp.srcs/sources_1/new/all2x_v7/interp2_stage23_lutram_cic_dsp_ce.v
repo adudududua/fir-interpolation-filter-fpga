@@ -132,6 +132,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     reg job_history_full;
     wire [3:0] job_mac_count;
     wire [MEM_ADDR_W-1:0] job_fill_from_head;
+    wire job_history_valid;
 
     wire [MEM_ADDR_W-1:0] hist_index;
     wire [MEM_ADDR_W-1:0] hist_pair_limit;
@@ -257,6 +258,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         (job_phase ? 4'd8 : 4'd9) :
         (job_phase ? 4'd5 : 4'd6);
     assign job_fill_from_head = (~job_history_head) + 4'd1;
+    assign job_history_valid = job_history_full ||
+                               hist_index < job_fill_from_head;
 
     assign coeff_bram_stage3 = job_active ? job_stage3 :
         (!stage2_pending && stage3_pending);
@@ -328,12 +331,13 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     assign stage2_lutram_raw = stage2_hist_mem[stage2_read_addr];
     assign stage3_lutram_raw = stage3_hist_mem[stage3_read_addr];
 
-    assign stage2_mem = (job_history_full ||
-                         hist_index < job_fill_from_head) ?
-                        stage2_mem_raw : {STAGE2_DATA_W{1'b0}};
-    assign stage3_mem = (job_history_full ||
-                         hist_index < job_fill_from_head) ?
-                        stage3_mem_raw : {STAGE3_DATA_W{1'b0}};
+    // Do not build a DATA_W-wide Fabric mux to replace unread BRAM history
+    // with zero.  Invalid startup taps instead disable the DSP48 P register,
+    // which is exactly equivalent to accumulating a zero product and leaves
+    // the running sum unchanged.  This also preserves arbitrary reset
+    // recovery without clearing the BRAM arrays.
+    assign stage2_mem = stage2_mem_raw;
+    assign stage3_mem = stage3_mem_raw;
 
     assign selected_sample = !job_stage3 ? stage2_mem :
         {{(STAGE2_DATA_W-STAGE3_DATA_W){stage3_mem[STAGE3_DATA_W-1]}},
@@ -441,7 +445,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         .CED(1'b0),
         .CEINMODE(1'b0),
         .CEM(1'b0),
-        .CEP(job_active || job_result_pending ||
+        .CEP((job_active && job_history_valid) || job_result_pending ||
              (job_output_pending &&
               !(job_stage3 ? stage3_upper_is_sign_extension :
                               stage2_upper_is_sign_extension))),
