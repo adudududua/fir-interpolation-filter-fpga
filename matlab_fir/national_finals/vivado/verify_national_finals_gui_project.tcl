@@ -141,8 +141,8 @@ require_condition [expr {$gui_flatten_hierarchy eq "full"}] \
     "GUI synthesis flatten_hierarchy must be full."
 require_condition [expr {$gui_opt_directive eq "ExploreWithRemap"}] \
     "GUI implementation opt_design directive must be ExploreWithRemap; got '$gui_opt_directive'. Close every Vivado window and run open_national_finals_gui_clean.ps1."
-require_condition [expr {$gui_place_directive eq "ExtraTimingOpt"}] \
-    "GUI implementation place_design directive must be ExtraTimingOpt; got '$gui_place_directive'. A stale GUI session can overwrite the XPR. Close every Vivado window and run open_national_finals_gui_clean.ps1."
+require_condition [expr {$gui_place_directive eq "Explore"}] \
+    "GUI implementation place_design directive must be Explore; got '$gui_place_directive'. A stale GUI session can overwrite the XPR. Close every Vivado window and run open_national_finals_gui_clean.ps1."
 
 puts "NATIONAL_FINALS_GUI_CONFIG_PASS"
 puts "GUI_GENERICS=$project_generics"
@@ -180,10 +180,10 @@ if {$requested_action in {"rebuild" "reimplement"}} {
     close $log_handle
     require_condition \
         [expr {[string first \
-            "Command: place_design -directive ExtraTimingOpt" \
+            "Command: place_design -directive Explore" \
             $impl_runme_text] >= 0}] \
-        "GUI run did not execute place_design -directive ExtraTimingOpt."
-    puts "GUI_RUNME_PLACE_DIRECTIVE=ExtraTimingOpt"
+        "GUI run did not execute place_design -directive Explore."
+    puts "GUI_RUNME_PLACE_DIRECTIVE=Explore"
 }
 
 if {[get_property PROGRESS [get_runs impl_1]] eq "100%"} {
@@ -211,15 +211,15 @@ if {[get_property PROGRESS [get_runs impl_1]] eq "100%"} {
     puts "GUI_MMCM=$mmcm_count"
 
     require_condition [expr {$dsp_count == 4}] \
-        "GUI implementation is not the P3-T 4-DSP architecture."
+        "GUI implementation is not the P3-U 4-DSP architecture."
     require_condition [expr {$bram18_count == 4}] \
         "GUI implementation does not use the expected two BRAM tiles."
     require_condition [expr {$mmcm_count == 2}] \
         "GUI implementation does not use the expected two MMCMs."
-    require_condition [expr {$lut_count <= 342}] \
-        "GUI implementation exceeds the P3-T 342-LUT release guard."
+    require_condition [expr {$lut_count <= 334}] \
+        "GUI implementation exceeds the P3-U 334-LUT release guard."
     require_condition [expr {$ff_count <= 390}] \
-        "GUI implementation exceeds the P3-T 390-FF release guard."
+        "GUI implementation exceeds the P3-U 390-FF release guard."
 
     puts "NATIONAL_FINALS_GUI_IMPLEMENTATION_PASS"
     close_design

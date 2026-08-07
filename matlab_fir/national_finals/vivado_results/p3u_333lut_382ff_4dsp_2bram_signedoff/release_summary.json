@@ -1,0 +1,97 @@
+{
+  "release": "P3-U exact keypad debounce and CDC settle-token optimization",
+  "status": "tool-verified; awaiting physical-board verification",
+  "branch": "national-finals-p3u-4dsp-deep-optimization",
+  "planned_tag": "nf-p3u-final-333lut-382ff-152slice-4dsp-2bram-toolverified",
+  "board_fallback": "nf-p3t-final-341lut-381ff-163slice-4dsp-2bram-boardverified",
+  "board_verification": {
+    "status": "PENDING",
+    "required": "44.1/48 kHz, 4x/8x/128x sample rates and DAC waveform",
+    "note": "P3-T is the latest user-reported physical-board PASS; P3-U is not labelled boardverified."
+  },
+  "rtl_regression": {
+    "smoke": "17/17 PASS",
+    "release": "17/17 PASS",
+    "full_chain_cases": 14,
+    "full_chain_cases_description": "impulse + 10 fixed seeds + positive/negative fullscale + strong -1 dBFS",
+    "full_chain_max_error_lsb": {"4x": 0, "8x": 0, "128x": 0},
+    "stage1_behavior_outputs": 1400,
+    "stage1_primitive_outputs": 1400,
+    "history_bram_random_cases": 5000,
+    "reset_scenarios": 8,
+    "cdc_transitions": 1200,
+    "clock_family_switches": 100,
+    "dynamic_mode_switches": 10
+  },
+  "frequency_response_inherited_bit_exact": {
+    "phase": "strict linear phase; symmetry error 0 LSB",
+    "44k1": {
+      "4x": {"passband_abs_db": 0.003022, "ripple_pp_db": 0.005709, "stopband_db": 78.568},
+      "8x": {"passband_abs_db": 0.003521, "ripple_pp_db": 0.006192, "stopband_db": 78.609},
+      "128x": {"passband_abs_db": 0.007730, "ripple_pp_db": 0.005848, "stopband_db": 72.371}
+    },
+    "48k": {
+      "4x": {"passband_abs_db": 0.003022, "ripple_pp_db": 0.005709, "stopband_db": 78.568},
+      "8x": {"passband_abs_db": 0.003007, "ripple_pp_db": 0.005678, "stopband_db": 78.609},
+      "128x": {"passband_abs_db": 0.007606, "ripple_pp_db": 0.005724, "stopband_db": 72.371}
+    }
+  },
+  "implementation": {
+    "synth_directive": "AreaOptimized_high",
+    "flatten_hierarchy": "full",
+    "resource_sharing": "on",
+    "opt_design_directive": "ExploreWithRemap",
+    "place_design_directive": "Explore"
+  },
+  "synthesis": {"lut": 365, "ff": 384, "dsp48e1": 4, "ramb18e1": 4},
+  "post_route": {
+    "lut": 333,
+    "ff": 382,
+    "slice": 152,
+    "dsp48e1": 4,
+    "ramb18e1": 4,
+    "bram_tile": 2.0,
+    "mmcm": 2,
+    "wns_ns": 45.704,
+    "whs_ns": 0.079,
+    "dac_setup_slack_ns": 76.116,
+    "dac_hold_slack_ns": 78.117,
+    "routing_errors": 0,
+    "unconstrained_internal_endpoints": 0,
+    "drc_errors": 0,
+    "drc_warnings": {"DPIP-1": 9, "DPOP-1": 2, "AVAL-4_advisory": 1},
+    "cdc_expected": {"CDC-13_BUFGMUX": 2, "CDC-15_bundled_mode_bus": 4}
+  },
+  "power_vectorless_w": {
+    "total": 0.271,
+    "dynamic": 0.199,
+    "static": 0.072,
+    "confidence": "Medium"
+  },
+  "postroute_dac": {
+    "default_6ms_edges": 11290,
+    "default_6ms_data_changes": 7462,
+    "six_modes": "PASS",
+    "44k1_edges_per_ms": [177, 353, 5645],
+    "44k1_data_changes": [175, 342, 3710],
+    "48k_edges_per_ms": [192, 384, 6144],
+    "48k_data_changes": [192, 372, 3810]
+  },
+  "gui_clean_rebuild": {
+    "status": "PASS",
+    "bitstream_generated": true,
+    "lut": 333,
+    "ff": 382,
+    "slice": 152,
+    "dsp48e1": 4,
+    "ramb18e1": 4,
+    "mmcm": 2,
+    "wns_ns": 45.704,
+    "whs_ns": 0.079
+  },
+  "sha256": {
+    "signedoff_bitstream": "F9B670CEF444B4C60D66AF1898FC57F3BAB9C66BFDAF14E7D2E2BA8CD526C688",
+    "signedoff_routed_dcp": "75D2D8C9865A8952051102DC35BD188A9D7AE175F20B25FB256B8B108CEBB57C",
+    "gui_rebuild_bitstream": "7436FF2A7954CC1CDFDBE82CC06625BA9E450F1484873979FFF81689D750217C"
+  }
+}

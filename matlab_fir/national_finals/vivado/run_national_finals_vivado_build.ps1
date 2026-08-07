@@ -14,7 +14,7 @@ param(
     [ValidateSet('Default', 'Explore', 'EarlyBlockPlacement',
         'WLDrivenBlockPlacement', 'ExtraPostPlacementOpt', 'ExtraTimingOpt',
         'RuntimeOptimized', 'Quick')]
-    [string]$ImplementationPlaceDirective = 'ExtraTimingOpt',
+    [string]$ImplementationPlaceDirective = 'Explore',
     [ValidateSet(0, 1)]
     [int]$Stage1Dsp48Preadder = 1,
     [ValidateSet(0, 1, 2)]

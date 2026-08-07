@@ -28,7 +28,7 @@ foreach ($requiredFile in @($VivadoExe, $projectPath, $configureScript)) {
 $existingVivado = @(Get-Process -Name 'vivado' -ErrorAction SilentlyContinue)
 if ($existingVivado.Count -gt 0) {
     $vivadoPids = ($existingVivado.Id | Sort-Object) -join ', '
-    throw "Vivado is already running (PID: $vivadoPids). Close every Vivado window before switching branches or preparing the P3-S GUI run; an older in-memory project can overwrite the ExtraTimingOpt setting."
+    throw "Vivado is already running (PID: $vivadoPids). Close every Vivado window before switching branches or preparing the P3-U GUI run; an older in-memory project can overwrite the Explore setting."
 }
 
 New-Item -ItemType Directory -Path $runRoot -Force | Out-Null
@@ -49,7 +49,7 @@ $arguments = @(
 
 Write-Host "Opening Vivado project: $projectPath"
 Write-Host "Isolated GUI work/log directory: $runRoot"
-Write-Host 'Expected P3-S run profile: AreaOptimized_high/full/on + ExploreWithRemap + ExtraTimingOpt'
+Write-Host 'Expected P3-U run profile: AreaOptimized_high/full/on + ExploreWithRemap + Explore'
 
 Push-Location $runRoot
 try {

@@ -58,7 +58,7 @@ require_generic $project_generics USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE 2
 require_generic $project_generics USE_NATIONAL_FINALS_NARROW_STAGE23 1
 require_generic $project_generics USE_NATIONAL_FINALS_P3_JOINT_STAGE3 1
 
-# Keep ordinary GUI runs aligned with the P3-T 341-LUT implementation profile.
+# Keep ordinary GUI runs aligned with the P3-U 333-LUT implementation profile.
 # Capture the previous values first.  If a stale GUI session or a manual
 # strategy reset changed this profile, invalidate the completed run so Vivado
 # cannot keep showing/using an old 348-LUT Default placement.
@@ -83,7 +83,7 @@ set_property STEPS.SYNTH_DESIGN.ARGS.RESOURCE_SHARING on \
     $synth_run
 set_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE ExploreWithRemap \
     $impl_run
-set_property STEPS.PLACE_DESIGN.ARGS.DIRECTIVE ExtraTimingOpt \
+set_property STEPS.PLACE_DESIGN.ARGS.DIRECTIVE Explore \
     $impl_run
 
 set synth_profile_changed [expr { \
@@ -92,7 +92,7 @@ set synth_profile_changed [expr { \
     [string tolower $old_resource_sharing] ni {"on" "1" "true"}}]
 set impl_profile_changed [expr { \
     $old_opt_directive ne "ExploreWithRemap" || \
-    $old_place_directive ne "ExtraTimingOpt"}]
+    $old_place_directive ne "Explore"}]
 
 if {$synth_profile_changed} {
     if {[get_property PROGRESS $impl_run] ne "0%"} {
