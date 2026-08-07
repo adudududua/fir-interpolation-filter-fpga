@@ -1,5 +1,80 @@
 # Vivado 2025.2 迁移、修复与验证记录
 
+## 当前状态：276-LUT 工具签核候选，292-LUT 板测安全回退
+
+当前分支 `national-finals-v2025.2-4dsp-2bram-lut-opt` 在已板测 292-LUT 版本上继续完成
+策略与 RTL 优化。最新候选在 Vivado 2025.2 下布局布线为
+**276 LUT / 0 LUTRAM / 379 FF / 4 DSP / 4 RAMB18E1（2 BRAM Tile）/ 17 IO / 2 MMCM**，
+比 292-LUT 基线减少 16 LUT、增加 3 FF，DSP/BRAM/IO/MMCM 不变。它已通过完整工具签核，
+但仍待用户物理板复测；标签
+`nf-vivado2025.2-292lut-1lutram-376ff-4dsp-2bram-17io-2mmcm-board-pass`
+继续作为板测安全回退。
+
+### 优化演进与方法
+
+| 检查点 | Routed LUT | LUTRAM | FF | DSP | BRAM Tile | 方法 | 状态 |
+|---|---:|---:|---:|---:|---:|---|---|
+| 板测基线 | 292 | 1 | 376 | 4 | 2 | 2025.2 迁移及 IP 升级 | 板测通过 |
+| `5faa60b` | 285 | 1 | 376 | 4 | 2 | `AreaOptimized_high/full/on + ExploreArea/Explore` | 工具通过 |
+| `22b9b55` | 284 | 0 | 379 | 4 | 2 | `SHREG_MIN_SIZE=5`，短复位链保留为 FF | 工具通过 |
+| `099390e` | **276** | **0** | **379** | **4** | **2** | Stage2/3 DSP PREG 抽头有效位门控 | **完整工具签核，待板测** |
+
+Stage2/3 原实现根据历史有效位，在 Fabric 中将 22-bit/20-bit 样本选择为真实值或零，再送入
+共享 DSP。当前实现让 BRAM 原始样本直接进入 DSP，并用任务启动时锁存的
+`job_history_valid` 控制 DSP PREG 的更新；无效抽头保持当前累加值，严格等价于累加零。由此
+删除两个宽数据选择器，不改变系数、位宽、舍入/饱和、valid 时序、时钟和 DAC 接口。
+当前架构仍为补偿已经折叠进 Stage3 的三级 FIR 加 CIC16，不是“独立补偿器 + CIC comb”。
+
+Stage1 DSP PREG 延迟复用也完成了实际 A/B：Smoke 17/17 通过，FF 从 387 降到 363，但综合
+LUT 从 341 增至 363（+22），所以按 LUT 优先门槛停止并回退，没有进入正式实现。
+
+### 276-LUT 正式构建结果
+
+结果目录：`tools/vivado_2025_2/results/20260808_012650`
+
+| 阶段 | LUT | LUTRAM | FF | DSP48E1 | BRAM Tile | RAMB18E1 | IO | MMCM |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| 综合 | 341 | 0 | 387 | 4 | 2 | 4 | 17 | 2 |
+| 布局布线后 | **276** | **0** | **379** | **4** | **2** | **4** | **17** | **2** |
+
+| 检查项 | 结果 |
+|---|---:|
+| WNS / TNS | +44.885 ns / 0 ns |
+| WHS / THS | +0.112 ns / 0 ns |
+| setup / hold 失败端点 | 0 / 0 |
+| DRC Error | 0 |
+| 总片上功耗 | 0.271 W |
+| 动态 / 静态功耗 | 0.199 W / 0.072 W |
+| 功耗置信度 | Medium（无 SAIF 的 vectorless 估算） |
+
+生成文件：
+
+- `tools/vivado_2025_2/results/20260808_012650/board_demo_competition_dac8_top_2025_2.bit`
+- `tools/vivado_2025_2/results/20260808_012650/board_routed_2025_2.dcp`
+- 同目录的综合/实现利用率、时序、DRC、功耗、route status 与完整日志。
+
+bitstream SHA-256：
+`1A6CDA833627AA197AB111EB426E6CA70405E69D657B3528C3B6D9CF1A0BCB2F`
+
+### 276-LUT 验证结果
+
+- Release RTL 回归 17/17 PASS；全链冲激、10 seeds、正/负满量程和强 −1 dBFS 共 14 组，
+  4x/8x/128x 全部 0 LSB；
+- Stage1 行为 RAM 与 RAMB18E1 原语各 1400 个输出 0 LSB；
+- 8 类内部状态复位恢复、10 次不停机动态切档、ROM、DAC offset-binary、系数/历史 BRAM、
+  CDC、按键和双时钟族测试全部通过；
+- 外层回归脚本在最后一个动态切档用例 elaboration 时到达 603 s 时限；随后在同一用例目录
+  完成该仿真并 PASS。最终审计 17 份 `xsim.log` 均包含 PASS/finish，且无 ERROR/FATAL；
+- 正式 routed DCP 六档测试全部通过：44.1 kHz 为 `177/353/5645 edges/ms`，48 kHz 为
+  `192/384/6144 edges/ms`，各档 DAC 数据均持续变化且无 X。177/353/5645 是 1 ms 窗口内
+  的整数计数，对应理论 176.4/352.8/5644.8 kHz。
+
+RTL 回归目录：
+`matlab_fir/national_finals/_work/rtl_regression/20260808_011426`
+
+六档布局布线后回归目录：
+`matlab_fir/national_finals/_work/postroute_six_mode_dac/20260808_013106`
+
 ## 结论
 
 工程 `XC7A35T_interp_opt_2025.2/XC7A35T_interp.xpr` 已在 Vivado 2025.2 下完成迁移和验证。
