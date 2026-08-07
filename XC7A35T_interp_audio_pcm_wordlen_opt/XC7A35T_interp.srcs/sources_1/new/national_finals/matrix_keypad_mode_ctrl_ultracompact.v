@@ -49,10 +49,29 @@ module matrix_keypad_mode_ctrl_ultracompact #(
     reg [STABLE_W-1:0] stable_cnt;
     reg [3:0] scan_candidate_now;
 
+    wire [STABLE_W-1:0] stable_next;
+    wire stable_done;
+
     wire row0_pressed = ~kc_sync[0];
     wire row1_pressed = ~kc_sync[1];
     wire scan_advance = (USE_EXTERNAL_SCAN_TICK != 0) ? scan_tick :
                         (scan_cnt == SCAN_DIV - 1);
+
+    // The signed-off DEBOUNCE_SCANS=5 profile needs six consecutive matching
+    // completed scans before committing a key.  A 3-bit Johnson sequence
+    // 000,001,011,111,110,100 reaches the same terminal point without a
+    // 3-bit incrementer.  Other parameter values retain the generic counter.
+    generate
+        if (DEBOUNCE_SCANS == 5) begin : gen_johnson_debounce
+            assign stable_next = {stable_cnt[1:0], ~stable_cnt[2]};
+            assign stable_done = (stable_cnt == 3'b100);
+        end
+        else begin : gen_generic_debounce
+            assign stable_next = stable_cnt +
+                {{(STABLE_W-1){1'b0}}, 1'b1};
+            assign stable_done = (stable_cnt >= DEBOUNCE_SCANS);
+        end
+    endgenerate
 
     always @(*) begin
         scan_candidate_now = scan_candidate;
@@ -102,9 +121,8 @@ module matrix_keypad_mode_ctrl_ultracompact #(
                 scan_candidate <= 4'd0;
 
                 if (scan_candidate_now == raw_candidate) begin
-                    if (stable_cnt < DEBOUNCE_SCANS)
-                        stable_cnt <= stable_cnt +
-                            {{(STABLE_W-1){1'b0}}, 1'b1};
+                    if (!stable_done)
+                        stable_cnt <= stable_next;
                     else if (scan_candidate_now[3]) begin
                         family_sel <= scan_candidate_now[2];
                         mode_sel <= scan_candidate_now[1:0];
