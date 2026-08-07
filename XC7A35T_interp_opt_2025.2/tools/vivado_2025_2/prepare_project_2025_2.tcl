@@ -25,11 +25,12 @@ update_compile_order -fileset sim_1
 set synth_run [get_runs synth_1]
 set impl_run [get_runs impl_1]
 
-# Preserve the signed-off P3-U synthesis and implementation profile.
+# Preserve the signed-off P3-U synthesis profile and use the Vivado 2025.2
+# area-oriented implementation directive validated by the strategy audit.
 set_property STEPS.SYNTH_DESIGN.ARGS.DIRECTIVE AreaOptimized_high $synth_run
 set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY full $synth_run
 set_property STEPS.SYNTH_DESIGN.ARGS.RESOURCE_SHARING on $synth_run
-set_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE ExploreWithRemap $impl_run
+set_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE ExploreArea $impl_run
 set_property STEPS.PLACE_DESIGN.ARGS.DIRECTIVE Explore $impl_run
 
 # Reset through Vivado so source files and project metadata are preserved.

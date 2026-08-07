@@ -43,7 +43,9 @@ set impl_run [get_runs impl_1]
 set_property STEPS.SYNTH_DESIGN.ARGS.DIRECTIVE AreaOptimized_high $synth_run
 set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY full $synth_run
 set_property STEPS.SYNTH_DESIGN.ARGS.RESOURCE_SHARING on $synth_run
-set_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE ExploreWithRemap $impl_run
+# Vivado 2025.2 ExploreArea preserves the signed-off netlist behavior while
+# packing the routed design from 292 LUTs to the measured 285-LUT candidate.
+set_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE ExploreArea $impl_run
 set_property STEPS.PLACE_DESIGN.ARGS.DIRECTIVE Explore $impl_run
 
 reset_run $synth_run
