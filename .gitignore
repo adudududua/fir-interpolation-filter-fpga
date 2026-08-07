@@ -131,6 +131,18 @@ matlab_fir/national_finals/_work/
 matlab_fir/national_finals/**/_work/
 /README_save.md
 
+# Vivado/DFX runtime scratch files can be regenerated and otherwise reappear
+# in project roots after GUI or simulator launches.
+**/dfx_runtime.txt
+
+# Local migration diagnostics are archived under the project but are not part
+# of the reproducible release payload. Selected reports/DCPs are force-added.
+/XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/evidence/
+
+# The copied project contains legacy 2018.3 screenshots/reports and an old
+# bitstream. Keep the authoritative 2025.2 result set under tools instead.
+/XC7A35T_interp_opt_2025.2/reports_*/
+
 # National-finals P3 intermediate implementation experiments.  The selected
 # v5 signoff directory remains visible and is committed separately.
 matlab_fir/national_finals/vivado_results/board_dual_rate_p3_cdc_atomic/

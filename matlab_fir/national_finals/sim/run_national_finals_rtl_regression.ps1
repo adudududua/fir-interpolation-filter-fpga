@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
     [string]$VivadoBin = 'E:\app\Xilinx2018.3\Vivado\2018.3\bin',
+    [string]$ProjectDirectory = '',
     [ValidateSet('Smoke', 'Release')]
     [string]$RegressionScale = 'Smoke',
     [ValidateSet(0, 1, 2)]
@@ -13,7 +14,16 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
-$projectRoot = Join-Path $repoRoot 'XC7A35T_interp_audio_pcm_wordlen_opt\XC7A35T_interp.srcs'
+if ([string]::IsNullOrWhiteSpace($ProjectDirectory)) {
+    $projectDirectoryPath = Join-Path $repoRoot 'XC7A35T_interp_audio_pcm_wordlen_opt'
+}
+else {
+    $projectDirectoryPath = (Resolve-Path -LiteralPath $ProjectDirectory).Path
+}
+$projectRoot = Join-Path $projectDirectoryPath 'XC7A35T_interp.srcs'
+if (-not (Test-Path -LiteralPath $projectRoot -PathType Container)) {
+    throw "Vivado project sources directory not found: $projectRoot"
+}
 $sourceRoot = Join-Path $projectRoot 'sources_1\new'
 $simRoot = Join-Path $projectRoot 'sim_1\new'
 $nfRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path

@@ -1,5 +1,27 @@
 # 高阶数字插值滤波器设计与 FPGA 验证
 
+## 当前 Vivado 2025.2 板测正式版：292 LUT / 4 DSP（2026-08-07）
+
+`XC7A35T_interp_opt_2025.2` 的综合失败已修复。根因不是 RTL 语法，而是 Windows 提交内存
+余量一度只有约 3.04 GB（GUI 与综合子进程峰值叠加会超过余量），同时用户 Tcl Store 缺失
+`::tclapp::support::appinit 1.2`，复制工程还带有 Vivado 2018.3 的旧 IP/运行缓存。现已重建
+Tcl Store、把 Clocking Wizard 升级到 2025.2 Rev17、重新生成 IP target，并通过 Vivado
+原生 `reset_run` 重置综合与实现。用户关闭无关软件后，提交内存余量已提高到约 8.67 GB。
+
+Vivado 2025.2 完整构建已通过：综合 361 LUT / 1 LUTRAM / 384 FF，布局布线后为
+**292 LUT / 1 LUTRAM / 376 FF / 4 DSP / 4 RAMB18E1（2 BRAM Tile）/ 17 IO / 2 MMCM**，WNS/WHS 为
+**+44.234/+0.112 ns**，TNS/THS 均为 0，DRC 0 Error，vectorless 总功耗 0.271 W，并成功
+生成 bitstream。直接针对新工程源码运行的全国赛 RTL Smoke 回归为 **17/17 PASS**；2025.2
+routed DCP 的六档网表仿真也通过，44.1 kHz 族为 `177/353/5645 edges/ms`，48 kHz 族为
+`192/384/6144 edges/ms`，六档 DAC 数据均持续变化。
+
+用户随后使用该 2025.2 bitstream 完成实板验证：44.1 kHz/48 kHz 两个输入族及所有公开插值
+档位的实测采样率均正确，DAC 输出波形全部正常，因此本版本已由 tool-verified 更新为
+**board-verified 正式版本**。292 LUT 是同一 RTL 经 Vivado 2025.2 新版综合/实现得到的工具
+结果，不能与 2018.3 数字混为一次新的 RTL 优化；原 P3-U/P3-T 仍保留为旧工具链安全回退。
+修复脚本、手动复现步骤、资源/时序/功耗报告及验证路径见
+[Vivado 2025.2 迁移记录](XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/README.md)。
+
 ## 当前最低 LUT 工具签核候选：333 LUT / 4 DSP P3-U 控制路径深度优化版（2026-08-07）
 
 P3-U 在已实板通过的 P3-T 上保持全部滤波系数、定点运算和板级接口不变，以两项周期

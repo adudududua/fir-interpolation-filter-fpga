@@ -1,0 +1,98 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2025.2 (win64) Build 6299465 Fri Nov 14 19:35:11 GMT 2025
+| Date         : Fri Aug  7 21:10:02 2026
+| Host         : LAPTOP-476JT8H0 running 64-bit major release  (build 9200)
+| Command      : report_drc -file D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/results/20260807_210642/drc_routed.rpt
+| Design       : board_demo_competition_dac8_top
+| Device       : xc7a35tfgg484-2
+| Speed File   : -2
+| Design State : Fully Routed
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Report DRC
+
+Table of Contents
+-----------------
+1. REPORT SUMMARY
+2. REPORT DETAILS
+
+1. REPORT SUMMARY
+-----------------
+            Netlist: netlist
+          Floorplan: impl_1
+      Design limits: <entire design considered>
+           Ruledeck: default
+             Max checks: <unlimited>
+             Checks found: 12
++--------+----------+-------------------------------------------------------------------+--------+
+| Rule   | Severity | Description                                                       | Checks |
++--------+----------+-------------------------------------------------------------------+--------+
+| DPIP-1 | Warning  | Input pipelining                                                  | 9      |
+| DPOP-1 | Warning  | PREG Output pipelining                                            | 2      |
+| AVAL-4 | Advisory | enum_USE_DPORT_FALSE_enum_DREG_ADREG_0_connects_CED_CEAD_RSTD_GND | 1      |
++--------+----------+-------------------------------------------------------------------+--------+
+
+2. REPORT DETAILS
+-----------------
+DPIP-1#1 Warning
+Input pipelining  
+DSP u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/u_stage23_dsp48e1 input u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/u_stage23_dsp48e1/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#2 Warning
+Input pipelining  
+DSP u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/u_stage23_dsp48e1 input u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/u_stage23_dsp48e1/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#3 Warning
+Input pipelining  
+DSP u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/u_stage23_dsp48e1 input u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/u_stage23_dsp48e1/C[47:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#4 Warning
+Input pipelining  
+DSP u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_final_integrator_dsp.final_integrator_sum input u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_final_integrator_dsp.final_integrator_sum/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#5 Warning
+Input pipelining  
+DSP u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_final_integrator_dsp.final_integrator_sum input u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_final_integrator_dsp.final_integrator_sum/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#6 Warning
+Input pipelining  
+DSP u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_first_integrator_dsp.first_integrator_sum input u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_first_integrator_dsp.first_integrator_sum/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#7 Warning
+Input pipelining  
+DSP u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_first_integrator_dsp.first_integrator_sum input u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_first_integrator_dsp.first_integrator_sum/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#8 Warning
+Input pipelining  
+DSP u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_stage1_dsp48e1 input u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_stage1_dsp48e1/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#9 Warning
+Input pipelining  
+DSP u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_stage1_dsp48e1 input u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_stage1_dsp48e1/C[47:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPOP-1#1 Warning
+PREG Output pipelining  
+DSP u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_final_integrator_dsp.final_integrator_sum output u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_final_integrator_dsp.final_integrator_sum/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#2 Warning
+PREG Output pipelining  
+DSP u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_first_integrator_dsp.first_integrator_sum output u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_first_integrator_dsp.first_integrator_sum/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+AVAL-4#1 Advisory
+enum_USE_DPORT_FALSE_enum_DREG_ADREG_0_connects_CED_CEAD_RSTD_GND  
+u_demo_interp_dac8_audio_pcm_common/gen_phase7_folded.u_interp128_all2x_v7_folded_fir_cic_top_ce/gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/u_stage23_dsp48e1: DSP48E1 is not using the D port (USE_DPORT = FALSE). For improved power characteristics, set DREG and ADREG to '1', tie CED, CEAD, and RSTD to logic '0'.
+Related violations: <none>
+
+
