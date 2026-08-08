@@ -1,14 +1,15 @@
 # Vivado 2025.2 迁移、修复与验证记录
 
-## 当前状态：276-LUT 工具签核候选，292-LUT 板测安全回退
+## 当前状态：276-LUT 正式板测版，292-LUT 前一安全回退
 
 当前分支 `national-finals-v2025.2-4dsp-2bram-lut-opt` 在已板测 292-LUT 版本上继续完成
 策略与 RTL 优化。最新候选在 Vivado 2025.2 下布局布线为
 **276 LUT / 0 LUTRAM / 379 FF / 4 DSP / 4 RAMB18E1（2 BRAM Tile）/ 17 IO / 2 MMCM**，
-比 292-LUT 基线减少 16 LUT、增加 3 FF，DSP/BRAM/IO/MMCM 不变。它已通过完整工具签核，
-但仍待用户物理板复测；标签
-`nf-vivado2025.2-292lut-1lutram-376ff-4dsp-2bram-17io-2mmcm-board-pass`
-继续作为板测安全回退。
+比 292-LUT 基线减少 16 LUT、增加 3 FF，DSP/BRAM/IO/MMCM 不变。它已通过完整工具签核；
+2026-08-08 用户完成物理板验证，确认 44.1/48 kHz 两个输入采样率族下各公开插值档位的
+输出采样率均正确，AD9708 DAC 输出波形均正常。正式标签为
+`nf-vivado2025.2-276lut-379ff-4dsp-2bram-17io-2mmcm-board-pass`；292-LUT board-pass 标签
+继续作为前一实板安全回退。
 
 ### 优化演进与方法
 
@@ -17,7 +18,7 @@
 | 板测基线 | 292 | 1 | 376 | 4 | 2 | 2025.2 迁移及 IP 升级 | 板测通过 |
 | `5faa60b` | 285 | 1 | 376 | 4 | 2 | `AreaOptimized_high/full/on + ExploreArea/Explore` | 工具通过 |
 | `22b9b55` | 284 | 0 | 379 | 4 | 2 | `SHREG_MIN_SIZE=5`，短复位链保留为 FF | 工具通过 |
-| `099390e` | **276** | **0** | **379** | **4** | **2** | Stage2/3 DSP PREG 抽头有效位门控 | **完整工具签核，待板测** |
+| `099390e` | **276** | **0** | **379** | **4** | **2** | Stage2/3 DSP PREG 抽头有效位门控 | **工具与用户实板均通过** |
 
 Stage2/3 原实现根据历史有效位，在 Fabric 中将 22-bit/20-bit 样本选择为真实值或零，再送入
 共享 DSP。当前实现让 BRAM 原始样本直接进入 DSP，并用任务启动时锁存的
@@ -74,6 +75,14 @@ RTL 回归目录：
 
 六档布局布线后回归目录：
 `matlab_fir/national_finals/_work/postroute_six_mode_dac/20260808_013106`
+
+### 276-LUT 实板验证
+
+2026-08-08 用户下载上述 SHA-256 对应的 276-LUT bitstream 完成物理板验证：44.1 kHz 与
+48 kHz 两个输入采样率族下，各公开插值档位的输出采样率均正确，AD9708 DAC 输出波形均
+正常。该结论与 RTL 17/17、routed-DCP 六档计数和 DAC 数据活动测试一致，因此本版状态由
+`tool-verified` 正式升级为 `board-verified`。用户未提供逐档仪器数值，本文只记录已确认的
+通过结论，不虚构额外测量数据。
 
 ## 结论
 
@@ -141,7 +150,7 @@ DRC 中保留 9 条 DPIP-1 和 2 条 DPOP-1 DSP 流水线建议。这些是性�
 bitstream SHA-256：
 `040D70619A0693FA9E450350801E79BE934B6E2AA8B2C4A20159249B1A1ECBEC`
 
-## 实板验证
+## 前一 292-LUT 基线实板验证
 
 2026-08-07 用户使用上述 2025.2 bitstream 完成板级验证：44.1 kHz/48 kHz 两个输入采样率族、
 全部公开插值档位的 DA_CLK 实测均正确，AD9708 DAC 输出波形均正常。该结果与 RTL 回归及
