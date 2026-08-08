@@ -6,6 +6,8 @@
 
 工具签核标签：`nf-vivado2025.2-258lut-376ff-4dsp-2bram-toolverified`
 
+实板签核标签：`nf-vivado2025.2-258lut-376ff-4dsp-2bram-board-pass`
+
 板测安全基线提交：`aecc2b3`
 
 板测安全基线标签：`nf-vivado2025.2-276lut-379ff-4dsp-2bram-17io-2mmcm-board-pass`
@@ -20,8 +22,9 @@ Stage1 的系数存储布局和串行 MAC 控制。新候选在 Vivado 2025.2 �
 
 相对 276-LUT 板测基线减少 **18 LUT（6.52%）**、减少 3 FF，DSP、BRAM、IO、MMCM 和
 0.271 W vectorless 功耗均不变；setup/hold、DRC、bitstream、RTL Release 17/17 和 routed
-六档 DAC/采样率仿真全部通过。该结果已达到 **tool-verified**，但尚未使用新 bitstream 做物理
-板复测，所以 276-LUT 标签仍是当前正式板测安全回退。
+六档 DAC/采样率仿真全部通过。2026-08-08 用户进一步完成物理板复测，确认 44.1/48 kHz
+各倍率档位采样率以及 DAC 输出波形均正常，因此该结果正式升级为 **board-verified**；
+276-LUT 标签保留为前一正式板测安全回退。
 
 ## 2. 为什么选择重构 Stage1
 
@@ -144,9 +147,11 @@ Vivado 会把权限错误误报为用户 Tcl Store 损坏或缺失 appinit/xsim/
 
 ## 8. 发布与回退策略
 
-- 258-LUT 候选保存为独立工具签核提交和标签，状态写作 `tool-verified`；
-- 在物理板确认 44.1/48 kHz 六档采样率和 DAC 波形前，不把它写成 board-verified；
-- 任何板级异常均可直接切回 `aecc2b3` 或
+- 258-LUT 版本已先保存独立工具签核提交和标签，再根据用户物理板复测结果升级为
+  `board-verified` 并补充独立实板标签；
+- 后续优化不得改写该提交和标签，任何板级异常均可直接切回当前 258-LUT 实板标签，或前一
+  `aecc2b3` / 276-LUT 标签；
+- 前一实板回退为 `aecc2b3` 或
   `nf-vivado2025.2-276lut-379ff-4dsp-2bram-17io-2mmcm-board-pass`；
 - 所有 DCP、仿真目录和 Vivado 临时文件均放在 Git 忽略的 `_work` 或时间戳 `results` 下，仓库
   主目录没有新增 `.Xil`、`xsim.dir`、`vivado*.log/.jou` 等杂项。
