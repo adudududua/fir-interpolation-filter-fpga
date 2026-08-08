@@ -226,7 +226,10 @@ module tb_cic_interp16_n3_hold_equiv;
         x_in_valid = 1'b0;
         random_seed = 32'h4a91_c35d;
 
-        repeat (4) @(negedge clk);
+        // Explicit DSP48E1 validation runs with the UNISIM glbl model.  Keep
+        // reset asserted beyond its 100 ns configuration GSR interval so the
+        // first accepted comb sample cannot be discarded by startup reset.
+        repeat (12) @(negedge clk);
         rst_n = 1'b1;
 
         // Reset inside an active hold/burst epoch.

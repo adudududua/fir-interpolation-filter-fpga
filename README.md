@@ -1,5 +1,37 @@
 # 高阶数字插值滤波器设计与 FPGA 验证
 
+## 当前最低 LUT 工具签核候选：Vivado 2025.2 249 LUT / 4 DSP（2026-08-08）
+
+在 258-LUT 实板通过版已经由独立提交和标签保留后，分支
+`national-finals-v2025.2-245to249-lut-challenge` 挑战 245～249 LUT。最终没有改滤波器系数、
+定点字长、舍入/饱和、valid 时序、4x/8x/128x 接口或双采样率时钟；主要把 CIC 的三级
+串行 comb 减法映射到一个显式 DSP48E1 P 寄存器，把原来占用 DSP 的第一级 26-bit 积分器
+交换到 CARRY4，并复用 comb 阶段索引承担一拍对齐状态。整机 DSP 数仍为 4，BRAM 仍为
+4 个 RAMB18E1（2 BRAM Tile），但删除了 Fabric 中的宽减法器及一组独立状态寄存器。
+
+标准 Vivado 2025.2 从头综合、实现并生成 bitstream 的结果为：
+
+**249 LUT / 0 LUTRAM / 377 FF / 4 DSP48E1 / 4 RAMB18E1（2 BRAM Tile）/
+17 IO / 2 MMCM**。综合为 **325 LUT / 385 FF**；相对已板测 258-LUT 基线再减少
+**9 LUT（3.49%）**，增加 1 FF，DSP、BRAM、IO、MMCM 与功耗均不变。WNS/TNS 为
+`+43.997/0 ns`，WHS/THS 为 `+0.085/0 ns`，失败端点 0，DRC Error 0；总/动态/静态功耗为
+`0.271/0.199/0.072 W`。
+
+验证不是以“跑通综合”为通过条件：CIC 定向等价测试覆盖连续/停顿输入、10 个随机 seed、
+中途复位并逐样本比较 **4096 个输出**；Smoke 与 Vivado 2025.2 Release 回归均为
+**17/17 PASS**，14 组全链输入的 4x/8x/128x 三节点全部 **0 LSB**；正式 routed DCP 的
+六档检查得到 44.1 kHz `177/353/5645 edges/ms`、48 kHz `192/384/6144 edges/ms`，六档
+DAC 数据均持续变化且无 X。当前状态为 **tool-verified，待用户物理板复测**；在复测确认前，
+258-LUT 版仍是正式实板安全回退，本文不把仿真结果写成板测结果。
+工具签核标签为 `nf-vivado2025.2-249lut-377ff-4dsp-2bram-toolverified`。
+
+频响严格继承已经签核的正确标度路径：4x/8x/128x 最差通带最大绝对偏差分别为
+`0.003022/0.003521/0.007730 dB`，最差峰峰纹波为
+`0.005709/0.006192/0.005848 dB`，阻带衰减为 `78.568/78.609/72.371 dB`，均满足
+±0.05 dB、≥70 dB 和严格线性相位要求。详细 A/B 尝试、失败原因、完整验证矩阵、报告路径、
+bitstream 哈希和回退方法见
+[249-LUT CIC DSP 角色交换执行反馈](matlab_fir/national_finals/results/vivado2025_2_cic_dsp_role_exchange_249lut_execution_feedback.md)。
+
 ## 当前最低 LUT 正式实板版：Vivado 2025.2 258 LUT / 4 DSP（2026-08-08）
 
 在 276-LUT 正式板测版已经由提交、标签和独立分支完整保留后，分支
@@ -848,6 +880,7 @@ Route 1相对573-LUT基线减少149 LUT和150 FF，WNS减少 **0.983 ns**，WHS�
 | **2025.2 SHREG检查点** | **全国赛板级** | **284** | **379** | **4** | **2** | **2** | **+45.025/+0.091 ns** | **0.271 W** | **SHREG_MIN_SIZE=5，短复位链由1 LUTRAM改为3 FF** | **完整实现/时序/DRC/bitstream；可回退提交 `22b9b55`** |
 | **2025.2 DSP抽头门控正式实板版** | **全国赛板级** | **276** | **379** | **4** | **2** | **2** | **+44.885/+0.112 ns** | **0.271 W** | **Stage2/3用DSP PREG CE表达无效历史抽头，删除22/20-bit零值mux；较292少16 LUT** | **Release 17/17、三节点0-LSB、实现/DRC/bitstream、routed六档及用户实板DAC/各档采样率通过** |
 | **2025.2 Stage1顺序抽头正式实板版** | **全国赛板级** | **258** | **376** | **4** | **2** | **2** | **+45.222/+0.077 ns** | **0.271 W** | **26个对称系数展开进原系数BRAM空闲区，单地址52拍顺序MAC；较276少18 LUT/3 FF** | **Smoke/Release 17/17、三节点0-LSB、GUI从零重建、DRC/bitstream、routed六档及用户实板DAC/各档采样率通过** |
+| **2025.2 CIC DSP角色交换工具候选** | **全国赛板级** | **249** | **377** | **4** | **2** | **2** | **+43.997/+0.085 ns** | **0.271 W** | **三级comb串行减法进入DSP PREG，第一级26-bit积分器换至CARRY4，并复用comb索引作对齐状态；较258少9 LUT/多1 FF** | **CIC 4096输出定向等价、Smoke/Release 17/17、三节点0-LSB、实现/DRC/bitstream及routed六档通过；待用户物理板复测** |
 | **P3-U 控制路径深度优化候选** | **全国赛板级** | **333** | **382** | **4** | **2** | **2** | **+45.704/+0.079 ns** | **0.271 W** | **精确Johnson键盘消抖 + CDC one-hot settle token；相对P3-T少8 LUT/11 Slice，仅多1 FF** | **Smoke/Release 17/17、三节点0-LSB、GUI从零重建、routed DAC/六档与bitstream通过；待物理板测** |
 | **P3-T Stage1 DSP尾周期正式实板版** | **全国赛板级** | **341** | **381** | **4** | **2** | **2** | **+45.270/+0.107 ns** | **0.271 W** | **Stage1 DSP接管舍入/Pattern溢出检测/PREG钳位，并由稳定写指针派生历史基址；相对P3-S少2 LUT/5 FF，但多12 Slice** | **Smoke/Release 17/17、三节点0-LSB、GUI、routed DAC/六档、bitstream及用户实板DAC/六档采样率通过** |
 | **P3-S ExtraTimingOpt正式实板版** | **全国赛板级** | **343** | **386** | **4** | **2** | **2** | **+45.025/+0.116 ns** | **0.271 W** | **不改P3-R RTL；以ExtraTimingOpt改善LUT打包，相对P3-R少5 LUT/3 Slice** | **Smoke/Release 17/17、0-LSB、GUI、routed DAC/六档、bitstream及用户实板DAC/各档采样率通过** |
@@ -871,6 +904,7 @@ Route 1相对573-LUT基线减少149 LUT和150 FF，WNS减少 **0.983 ns**，WHS�
 
 综合结论：
 
+- **当前最低 LUT 工具签核候选为 Vivado 2025.2 CIC DSP 角色交换版：249 LUT / 377 FF / 4 DSP / 2 BRAM Tile**；已完成 CIC 4096 输出定向等价、Smoke/Release 17/17、14组全链三节点0-LSB、正式实现/DRC/时序/功耗/bitstream及 routed 六档门禁，当前待用户物理板复测；
 - **当前最低 LUT 且正式实板通过版为 Vivado 2025.2 Stage1顺序抽头版：258 LUT / 376 FF / 4 DSP / 2 BRAM Tile**；相对276-LUT基线少18 LUT/3 FF，Release 17/17、全链三节点0-LSB、正式实现/DRC/bitstream、routed六档以及用户物理板各档采样率/DAC波形均通过；
 - **前一 Vivado 2025.2 实板安全回退为276 LUT / 379 FF / 4 DSP / 2 BRAM Tile**；292 LUT版本继续作为更早实板回退；
 - 旧 Route 1 `424 LUT / 6 DSP` 和第八轮 `436 LUT / 5 DSP` 是重要资源演进点，但存在 Stage 3 Q14/Q15 标度缺陷，不再作为发布候选；
@@ -1031,8 +1065,9 @@ GUI 与批处理配置均固定为 `AreaOptimized_high/full/on + Default`。当�
 
 软件、RTL、FPGA 实现及物理板 DAC/六档采样频率签核均已通过。完整架构、指标、RTL 一键回归、bitstream、SW1～SW8 映射和板测记录见 [全国总决赛交付说明](matlab_fir/national_finals/README.md)。
 
-> **版本口径说明**：当前最低 LUT 且正式实板通过版是 Vivado 2025.2 的 258 LUT / 376 FF / 4 DSP / 2 BRAM / 2 MMCM Stage1顺序抽头版；前一2025.2实板回退是276 LUT / 379 FF / 4 DSP / 2 BRAM / 2 MMCM，292 LUT版本为更早回退。P3-U 333 LUT、P3-T 341 LUT、P3-S 343 LUT、P3-R 348 LUT、P3-M 368 LUT与P3-L 397 LUT为更早回退。旧 412-LUT P3-K 与424-LUT P3-J虽然真Q15和RTL 0-LSB均通过，但测试音ROM在综合后锁死，不能上板；历史424 LUT / 6 DSP Route 1和436 LUT / 5 DSP版另有Stage3约−6.02 dB标度错误。
+> **版本口径说明**：当前最低 LUT 工具签核候选是 Vivado 2025.2 的 249 LUT / 377 FF / 4 DSP / 2 BRAM / 2 MMCM CIC DSP角色交换版，完整RTL、实现与routed六档均通过，待物理板复测；当前最低 LUT 且正式实板通过版仍是258 LUT / 376 FF / 4 DSP / 2 BRAM / 2 MMCM Stage1顺序抽头版。前一2025.2实板回退是276 LUT / 379 FF，292 LUT版本为更早回退。P3-U 333 LUT、P3-T 341 LUT、P3-S 343 LUT、P3-R 348 LUT、P3-M 368 LUT与P3-L 397 LUT为更早回退。旧 412-LUT P3-K 与424-LUT P3-J虽然真Q15和RTL 0-LSB均通过，但测试音ROM在综合后锁死，不能上板；历史424 LUT / 6 DSP Route 1和436 LUT / 5 DSP版另有Stage3约−6.02 dB标度错误。
 
+> 当前最低 LUT 工具签核候选：Vivado 2025.2 CIC DSP角色交换版，249 LUT / 377 FF / 4 DSP / 2 BRAM Tile / 2 MMCM（待板测）<br>
 > 当前最低 LUT 正式实板版：Vivado 2025.2 Stage1顺序抽头版，258 LUT / 376 FF / 4 DSP / 2 BRAM Tile / 2 MMCM<br>
 > 前一 Vivado 2025.2 实板回退：276 LUT / 379 FF / 4 DSP / 2 BRAM Tile / 2 MMCM<br>
 > 上一面积策略候选：相同滤波算法与板级功能、478 LUT / 565 FF / 9 DSP / 3 BRAM Tile<br>

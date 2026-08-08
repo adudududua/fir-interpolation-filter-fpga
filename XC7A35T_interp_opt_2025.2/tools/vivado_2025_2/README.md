@@ -1,21 +1,44 @@
 # Vivado 2025.2 迁移、修复与验证记录
 
-## 当前状态：258-LUT 工具签核候选，276-LUT 正式板测安全回退
+## 当前状态：249-LUT 工具签核候选，258-LUT 正式板测安全回退
+
+挑战分支 `national-finals-v2025.2-245to249-lut-challenge` 已在 258-LUT 实板版上完成 CIC
+DSP 角色交换：三级串行 comb 减法使用一个显式 DSP48E1 P 寄存器，第一级 26-bit 积分器
+改由 CARRY4 实现，最后一级积分器仍使用 DSP；同时复用 comb 阶段索引作为 DSP 输出的一拍
+对齐状态。整机 DSP 数保持 4，BRAM 保持 4 个 RAMB18E1（2 Tile）。正式构建结果为：
+
+**249 LUT / 0 LUTRAM / 377 FF / 4 DSP / 4 RAMB18E1（2 BRAM Tile）/
+17 IO / 2 MMCM**；综合为 **325 LUT / 385 FF**，WNS/WHS=`+43.997/+0.085 ns`，DRC Error=0，
+总/动态/静态功耗=`0.271/0.199/0.072 W`。相对已板测 258-LUT 版减少 9 LUT、增加 1 FF，
+其余列举资源不变。
+
+正式结果目录：`tools/vivado_2025_2/results/20260808_233550`；bitstream SHA-256 为
+`353308536B12E16CE896236D3754430B372ED1F957CB52B744EA2A8F57B6D1AB`。CIC 定向等价共比较
+4096 个输出，并覆盖连续、停顿、10 seed 和中途复位；Smoke 与 Vivado 2025.2 Release 均为
+17/17 PASS，14 组全链输入在 4x/8x/128x 三节点全部 0 LSB；routed DCP 六档 DAC/采样率
+检查全部通过。该版本是 **tool-verified，待用户物理板复测**，258-LUT board-pass 标签仍是
+正式实板回退。工具签核标签为
+`nf-vivado2025.2-249lut-377ff-4dsp-2bram-toolverified`。完整 A/B 数据与回退说明见
+`matlab_fir/national_finals/results/vivado2025_2_cic_dsp_role_exchange_249lut_execution_feedback.md`。
+
+## 前一状态：258-LUT 正式板测版，276-LUT 更早板测回退
 
 分支 `national-finals-v2025.2-post276-lut-optimization` 已完成 Stage1 存储/控制架构重构：
 把 26 个对称系数展开为 52 个顺序系数并写入现有统一系数 RAMB18E1 的空闲地址，Stage1 以
 单地址历史扫描每拍直接 MAC，同时捕获中心延迟样本。标准工程完整重建为
 **258 LUT / 0 LUTRAM / 376 FF / 4 DSP / 4 RAMB18E1（2 BRAM Tile）/ 17 IO / 2 MMCM**；
 WNS/WHS=`+45.222/+0.077 ns`，DRC Error=0，功耗 0.271 W。Smoke/Release 17/17、三节点
-0 LSB、routed 六档和 bitstream 全部通过，当前状态为 tool-verified，尚待物理板复测。
+0 LSB、routed 六档和 bitstream 全部通过；用户随后完成物理板复测，确认六档采样率与 DAC
+波形正常，因此该版本已经升级为 board-verified。
 
 GUI 完整构建结果目录：`tools/vivado_2025_2/results/20260808_161249`；bitstream SHA-256 为
 `A9BD34D4770434330B199E1AADC23B71C2DF76B3B4EFEB8DAC4F15498526B491`。详细结构、数值证明、
 验证矩阵和回退方法见
 `matlab_fir/national_finals/results/vivado2025_2_stage1_sequential_258lut_execution_feedback.md`。
-工具签核标签为 `nf-vivado2025.2-258lut-376ff-4dsp-2bram-toolverified`。
+工具签核标签为 `nf-vivado2025.2-258lut-376ff-4dsp-2bram-toolverified`，实板标签为
+`nf-vivado2025.2-258lut-376ff-4dsp-2bram-board-pass`。
 
-276-LUT 版本已经完成用户实板验证，仍是当前正式板测安全回退；其提交、标签和分支均未改写。
+276-LUT 版本也已完成用户实板验证，作为更早安全回退；其提交、标签和分支均未改写。
 
 ## 276-LUT 正式板测版，292-LUT 前一安全回退
 
@@ -36,7 +59,8 @@ GUI 完整构建结果目录：`tools/vivado_2025_2/results/20260808_161249`；b
 | `5faa60b` | 285 | 1 | 376 | 4 | 2 | `AreaOptimized_high/full/on + ExploreArea/Explore` | 工具通过 |
 | `22b9b55` | 284 | 0 | 379 | 4 | 2 | `SHREG_MIN_SIZE=5`，短复位链保留为 FF | 工具通过 |
 | `099390e` | **276** | **0** | **379** | **4** | **2** | Stage2/3 DSP PREG 抽头有效位门控 | **工具与用户实板均通过** |
-| Stage1 顺序抽头候选 | **258** | **0** | **376** | **4** | **2** | 系数展开进原 BRAM 空闲区，单地址 52 拍直接 MAC | **工具通过，待物理板复测** |
+| Stage1 顺序抽头正式版 | **258** | **0** | **376** | **4** | **2** | 系数展开进原 BRAM 空闲区，单地址 52 拍直接 MAC | **工具与用户实板均通过** |
+| CIC DSP角色交换候选 | **249** | **0** | **377** | **4** | **2** | comb进DSP、第一级积分器进CARRY4、对齐状态复用 | **工具通过，待物理板复测** |
 
 Stage2/3 原实现根据历史有效位，在 Fabric 中将 22-bit/20-bit 样本选择为真实值或零，再送入
 共享 DSP。当前实现让 BRAM 原始样本直接进入 DSP，并用任务启动时锁存的

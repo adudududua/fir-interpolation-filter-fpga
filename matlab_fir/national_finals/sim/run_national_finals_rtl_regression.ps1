@@ -15,7 +15,7 @@ Set-StrictMode -Version Latest
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
 if ([string]::IsNullOrWhiteSpace($ProjectDirectory)) {
-    $projectDirectoryPath = Join-Path $repoRoot 'XC7A35T_interp_audio_pcm_wordlen_opt'
+    $projectDirectoryPath = Join-Path $repoRoot 'XC7A35T_interp_opt_2025.2'
 }
 else {
     $projectDirectoryPath = (Resolve-Path -LiteralPath $ProjectDirectory).Path
@@ -376,11 +376,13 @@ $cicHoldDir = Invoke-RtlCase -Name 'cic_n3_hold_equivalence' `
         (Join-Path $sourceRoot 'all2x_v6\round_sat_shift_compact.v'),
         (Join-Path $nfSource 'cic_interp16_serial_comb_dsp_ce.v'),
         (Join-Path $nfSource 'cic_interp16_n3_hold2_dsp_ce.v'),
-        (Join-Path $nfSim 'tb_cic_interp16_n3_hold_equiv.v')
+        (Join-Path $nfSim 'tb_cic_interp16_n3_hold_equiv.v'),
+        $glbl
     ) `
     -Top 'tb_cic_interp16_n3_hold_equiv' `
     -Snapshot 'tb_nf_cic_n3_hold_equiv_sim' `
-    -ExpectedPassText 'N3 HOLD CIC EQUIVALENCE PASS'
+    -ExpectedPassText 'N3 HOLD CIC EQUIVALENCE PASS' `
+    -XelabOptions @('glbl', '-L', 'unisims_ver')
 
 $clockDir = Invoke-RtlCase -Name 'clock' `
     -VerilogFiles @(

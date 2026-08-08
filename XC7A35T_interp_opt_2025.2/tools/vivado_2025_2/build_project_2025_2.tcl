@@ -47,8 +47,9 @@ set_property STEPS.SYNTH_DESIGN.ARGS.RESOURCE_SHARING on $synth_run
 # it in FFs removes one LUTRAM while preserving the exact cycle latency.
 set_property STEPS.SYNTH_DESIGN.ARGS.SHREG_MIN_SIZE 5 $synth_run
 # ExploreArea + Explore is the reproducible LUT-first implementation pair for
-# the current 2025.2 source tree; the Stage1 sequential-tap architecture routes
-# at 258 LUT / 376 FF / 4 DSP / 4 RAMB18E1.
+# the current 2025.2 source tree.  The CIC DSP-role-exchange architecture plus
+# comb alignment-state reuse is expected at no more than 249 LUT while keeping
+# 4 DSP / 4 RAMB18E1; the hard gates below prevent stale or wrong-run results.
 set_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE ExploreArea $impl_run
 set_property STEPS.PLACE_DESIGN.ARGS.DIRECTIVE Explore $impl_run
 
@@ -115,6 +116,10 @@ puts "V2025_2_DRC_ERRORS=[llength $drc_errors]"
 require_condition [expr {$dsp_count == 4}] "Expected exactly 4 DSP48E1 cells."
 require_condition [expr {$bram18_count == 4}] "Expected exactly 4 RAMB18E1 cells."
 require_condition [expr {$mmcm_count == 2}] "Expected exactly 2 MMCME2_ADV cells."
+require_condition [expr {$lut_count <= 249}] \
+    "LUT regression: expected no more than 249, got $lut_count."
+require_condition [expr {$ff_count <= 390}] \
+    "FF regression: expected no more than 390, got $ff_count."
 require_condition [expr {$wns >= 0.0}] "Setup timing failed: WNS=$wns ns."
 require_condition [expr {$whs >= 0.0}] "Hold timing failed: WHS=$whs ns."
 require_condition [expr {[llength $drc_errors] == 0}] \

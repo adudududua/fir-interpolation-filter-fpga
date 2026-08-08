@@ -63,7 +63,12 @@ module interp2_stage1_single_bram_serial_ce #(
     // Kept as an observable schedule mirror for the reset/deadline
     // regression.  Functional control uses issue_active and the tail flags.
     reg mac_active;
+`ifndef SYNTHESIS
+    // Fixed-latency schedule mirror used only by deadline assertions.  The
+    // hardware output path does not need a redundant ready state because all
+    // 52 reads plus the two DSP tail cycles finish before the next odd phase.
     reg filter_ready;
+`endif
     reg issue_active;
     reg scan_exhausted;
     reg [INDEX_W-1:0] schedule_index;
@@ -257,7 +262,9 @@ module interp2_stage1_single_bram_serial_ce #(
             phase_cnt <= 1'b1;
             phase_dbg <= 1'b1;
             mac_active <= 1'b0;
+`ifndef SYNTHESIS
             filter_ready <= 1'b0;
+`endif
             issue_active <= 1'b0;
             scan_exhausted <= 1'b0;
             schedule_index <= {INDEX_W{1'b0}};
@@ -275,7 +282,9 @@ module interp2_stage1_single_bram_serial_ce #(
             read_issue_valid <= 1'b0;
 
             if (filter_saturation_pending) begin
+`ifndef SYNTHESIS
                 filter_ready <= 1'b1;
+`endif
                 filter_saturation_pending <= 1'b0;
             end
             else if (filter_commit_pending) begin
@@ -325,7 +334,9 @@ module interp2_stage1_single_bram_serial_ce #(
                     if (wr_ptr == HISTORY_LEN-1)
                         history_full <= 1'b1;
 
+`ifndef SYNTHESIS
                     filter_ready <= 1'b0;
+`endif
                     mac_active <= 1'b1;
                     issue_active <= 1'b1;
                     scan_exhausted <= (wr_ptr == {ADDR_W{1'b0}});
@@ -336,9 +347,10 @@ module interp2_stage1_single_bram_serial_ce #(
                     read_addr <= wr_ptr;
                 end
                 else begin
-                    y_out <= filter_ready ? filter_rounded :
-                             {DATA_W{1'b0}};
+                    y_out <= filter_rounded;
+`ifndef SYNTHESIS
                     filter_ready <= 1'b0;
+`endif
                 end
 
                 phase_cnt <= ~phase_cnt;
