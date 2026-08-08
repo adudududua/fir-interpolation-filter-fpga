@@ -203,8 +203,17 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
 若 Tcl Store 错误再次出现，请先关闭 Vivado，再执行：
 
 ```powershell
-& 'E:\app\Xilinx20252\2025.2\Vivado\bin\vivado.bat' -mode batch -notrace `
-  -source '.\tools\vivado_2025_2\reset_tclstore.tcl'
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
+  ".\tools\vivado_2025_2\run_tclstore_maintenance_clean.ps1" -Action Reset
 ```
 
-然后用 `query_tclstore.tcl` 检查输出是否包含 `APPINIT_REQUIRE_PASS=1.2`。
+然后执行同一脚本的 `-Action Query`，检查输出是否包含 `APPINIT_REQUIRE_PASS=1.2`：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
+  ".\tools\vivado_2025_2\run_tclstore_maintenance_clean.ps1" -Action Query
+```
+
+该入口会先切换到系统临时目录，并使用 `-nojournal -nolog` 启动 Vivado，因此不会再在仓库
+主目录生成 `.Xil`、`dfx_runtime.txt`、`vivado.jou/.log` 或 backup journal。不要在仓库根目录
+直接调用 `vivado.bat -source reset_tclstore.tcl/query_tclstore.tcl`。

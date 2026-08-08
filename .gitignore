@@ -134,6 +134,7 @@ matlab_fir/national_finals/**/_work/
 # Vivado/DFX runtime scratch files can be regenerated and otherwise reappear
 # in project roots after GUI or simulator launches.
 **/dfx_runtime.txt
+**/clockInfo.txt
 
 # Local migration diagnostics are archived under the project but are not part
 # of the reproducible release payload. Selected reports/DCPs are force-added.
