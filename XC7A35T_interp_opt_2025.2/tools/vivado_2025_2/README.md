@@ -1,6 +1,23 @@
 # Vivado 2025.2 迁移、修复与验证记录
 
-## 当前状态：276-LUT 正式板测版，292-LUT 前一安全回退
+## 当前状态：258-LUT 工具签核候选，276-LUT 正式板测安全回退
+
+分支 `national-finals-v2025.2-post276-lut-optimization` 已完成 Stage1 存储/控制架构重构：
+把 26 个对称系数展开为 52 个顺序系数并写入现有统一系数 RAMB18E1 的空闲地址，Stage1 以
+单地址历史扫描每拍直接 MAC，同时捕获中心延迟样本。标准工程完整重建为
+**258 LUT / 0 LUTRAM / 376 FF / 4 DSP / 4 RAMB18E1（2 BRAM Tile）/ 17 IO / 2 MMCM**；
+WNS/WHS=`+45.222/+0.077 ns`，DRC Error=0，功耗 0.271 W。Smoke/Release 17/17、三节点
+0 LSB、routed 六档和 bitstream 全部通过，当前状态为 tool-verified，尚待物理板复测。
+
+GUI 完整构建结果目录：`tools/vivado_2025_2/results/20260808_161249`；bitstream SHA-256 为
+`A9BD34D4770434330B199E1AADC23B71C2DF76B3B4EFEB8DAC4F15498526B491`。详细结构、数值证明、
+验证矩阵和回退方法见
+`matlab_fir/national_finals/results/vivado2025_2_stage1_sequential_258lut_execution_feedback.md`。
+工具签核标签为 `nf-vivado2025.2-258lut-376ff-4dsp-2bram-toolverified`。
+
+276-LUT 版本已经完成用户实板验证，仍是当前正式板测安全回退；其提交、标签和分支均未改写。
+
+## 276-LUT 正式板测版，292-LUT 前一安全回退
 
 当前分支 `national-finals-v2025.2-4dsp-2bram-lut-opt` 在已板测 292-LUT 版本上继续完成
 策略与 RTL 优化。最新候选在 Vivado 2025.2 下布局布线为
@@ -19,6 +36,7 @@
 | `5faa60b` | 285 | 1 | 376 | 4 | 2 | `AreaOptimized_high/full/on + ExploreArea/Explore` | 工具通过 |
 | `22b9b55` | 284 | 0 | 379 | 4 | 2 | `SHREG_MIN_SIZE=5`，短复位链保留为 FF | 工具通过 |
 | `099390e` | **276** | **0** | **379** | **4** | **2** | Stage2/3 DSP PREG 抽头有效位门控 | **工具与用户实板均通过** |
+| Stage1 顺序抽头候选 | **258** | **0** | **376** | **4** | **2** | 系数展开进原 BRAM 空闲区，单地址 52 拍直接 MAC | **工具通过，待物理板复测** |
 
 Stage2/3 原实现根据历史有效位，在 Fabric 中将 22-bit/20-bit 样本选择为真实值或零，再送入
 共享 DSP。当前实现让 BRAM 原始样本直接进入 DSP，并用任务启动时锁存的
@@ -206,6 +224,9 @@ Release RTL 回归 17/17 和 routed-DCP 六档仿真均通过。2026-08-08 用�
 RTL 候选虽通过 17/17 回归，但综合恶化为 345 LUT / 388 FF，已经回退。因此没有新的
 bitstream 替代该板测版本。完整审计见
 `matlab_fir/national_finals/results/post276_lut_optimization_audit_execution_feedback.md`。
+
+该结论只对应当时的微调和策略扫描。后续采用本文件顶部所述 Stage1 顺序抽头重大架构重构后，
+已经得到 258-LUT 工具签核候选；在其物理板复测完成前，276-LUT 版本仍保持正式发布状态。
 
 ## 推荐的手动使用方法
 

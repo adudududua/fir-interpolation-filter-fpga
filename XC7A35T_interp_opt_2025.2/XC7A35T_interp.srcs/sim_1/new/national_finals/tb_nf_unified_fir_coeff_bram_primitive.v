@@ -5,7 +5,7 @@
 // the primitive branch rather than the behavioral coefficient array.
 module tb_nf_unified_fir_coeff_bram_primitive;
     reg clk = 1'b0;
-    reg [4:0] stage1_addr = 5'd0;
+    reg [5:0] stage1_addr = 6'd0;
     reg [6:0] stage23_addr = 7'd0;
     wire signed [15:0] stage1_coeff;
     wire signed [17:0] stage23_coeff;
@@ -24,9 +24,12 @@ module tb_nf_unified_fir_coeff_bram_primitive;
     );
 
     function signed [15:0] expected_stage1;
-        input [4:0] index;
+        input [5:0] index;
+        reg [4:0] symmetric_index;
         begin
-            case (index)
+            symmetric_index = (index < 6'd26) ? index[4:0] :
+                              (6'd51-index);
+            case (symmetric_index)
                 5'd0:  expected_stage1 = -16'sd5;
                 5'd1:  expected_stage1 =  16'sd7;
                 5'd2:  expected_stage1 = -16'sd12;
@@ -139,16 +142,16 @@ module tb_nf_unified_fir_coeff_bram_primitive;
         // Check every address, including all intentionally zero-filled holes.
         for (addr = 0; addr < 128; addr = addr + 1) begin
             @(negedge clk);
-            stage1_addr = addr[4:0];
+            stage1_addr = addr[5:0];
             stage23_addr = addr[6:0];
             @(posedge clk);
             #1;
 
-            if (addr < 32 &&
-                stage1_coeff !== expected_stage1(addr[4:0])) begin
+            if (addr < 52 &&
+                stage1_coeff !== expected_stage1(addr[5:0])) begin
                 $display("Stage1 primitive mismatch addr=%0d actual=%0d expected=%0d",
                          stage1_addr, stage1_coeff,
-                         expected_stage1(addr[4:0]));
+                         expected_stage1(addr[5:0]));
                 errors = errors + 1;
             end
 
@@ -164,7 +167,7 @@ module tb_nf_unified_fir_coeff_bram_primitive;
             $fatal(1, "Unified coefficient RAMB18 primitive FAIL errors=%0d",
                    errors);
 
-        $display("UNIFIED COEFFICIENT RAMB18 PRIMITIVE PASS: 32 Stage1 + 128 Stage23 addresses with signed18 parity");
+        $display("UNIFIED COEFFICIENT RAMB18 PRIMITIVE PASS: 52 expanded Stage1 + 128 Stage23 addresses with signed18 parity");
         $finish;
     end
 endmodule

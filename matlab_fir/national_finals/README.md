@@ -1,6 +1,19 @@
 # 全国总决赛：双采样率可配置插值滤波器
 
-## 当前最低 LUT 工具签核候选：P3-U 控制路径深度优化版（333 LUT / 4 DSP）
+## Vivado 2025.2 当前最低 LUT 工具签核候选：Stage1 顺序抽头版（258 LUT / 4 DSP）
+
+从已板测 276-LUT 基线建立独立分支后，Stage1 改为单地址顺序抽头微引擎：把 26 个对称系数
+展开成 52 个顺序系数，复用现有统一系数 RAMB18E1 的空闲地址，每拍直接执行一个乘加，并在
+同一轮扫描中获取中心延迟样本。该结构删除左右抽头控制、第二地址公式和独立预取状态，资源为
+**258 LUT / 376 FF / 4 DSP / 4 RAMB18E1（2 Tile）/ 2 MMCM**，相对板测基线减少 18 LUT 和
+3 FF，DSP/BRAM 不变。WNS/WHS 为 **+45.222/+0.077 ns**，DRC Error=0，功耗 0.271 W。
+
+Smoke/Release 各 17/17、14 组全链三节点 0 LSB、标准 GUI 完整构建和 bitstream、routed-DCP
+六档 DAC/采样率检查均通过。系数和定点路径不变，频响严格继承正式正确标度路径。该版本目前是
+**tool-verified，尚待物理板复测**；276 LUT / 379 FF / 4 DSP / 2 BRAM Tile 仍是正式板测安全
+回退。详见 [258-LUT 执行反馈](results/vivado2025_2_stage1_sequential_258lut_execution_feedback.md)。
+
+## 前一 2018.3 最低 LUT 工具签核候选：P3-U 控制路径深度优化版（333 LUT / 4 DSP）
 
 P3-U 在已实板通过的 P3-T 上保持滤波系数、定点数据通路、4 DSP、2 BRAM Tile 和板级
 接口不变，完成两项精确控制路径优化：正式 `DEBOUNCE_SCANS=5` 的键盘消抖由二进制

@@ -98,3 +98,13 @@ bitstream。
 产生 `.Xil`、`vivado*.log/.jou`、`xsim.dir` 等临时文件。正式提交和标签已经在本地建立；本轮
 推送曾分别通过代理和直连重试，但热点到 GitHub 的 TLS/443 连接失败或超时，不是仓库权限、
 认证或 RTL 问题，待网络通路恢复后继续推送即可。
+
+## 7. 后续重大架构试验结果
+
+上述审计完成后，用户确认已经接受更高的结构改动与验证成本，并要求继续尝试。后续分支没有
+改写 276-LUT 板测标签，而是把 Stage1 的 26 个对称系数展开成 52 个顺序系数，复用原统一
+系数 RAMB18E1 空闲空间，以单地址顺序扫描替代左右抽头双地址控制。最终标准 Vivado 2025.2
+工程结果为 **258 LUT / 376 FF / 4 DSP / 4 RAMB18E1（2 Tile）**，相对板测基线减少 18 LUT
+和 3 FF；Release 17/17、GUI 完整构建、bitstream、时序、DRC 和 routed 六档均通过。该候选
+仍待物理板复测，完整执行反馈见
+`vivado2025_2_stage1_sequential_258lut_execution_feedback.md`。

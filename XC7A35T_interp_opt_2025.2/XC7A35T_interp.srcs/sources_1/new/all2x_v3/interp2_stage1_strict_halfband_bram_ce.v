@@ -60,7 +60,7 @@ module interp2_stage1_strict_halfband_bram_ce #(
     // lock-step with the Stage1 sample-BRAM reads; the external dual-port
     // coefficient BRAM therefore returns a coefficient aligned with
     // read_data_a/read_data_b one clock later.
-    output wire [4:0]                   external_coeff_addr,
+    output wire [5:0]                   external_coeff_addr,
     input  wire signed [15:0]           external_coeff_data
 );
 
@@ -127,7 +127,7 @@ module interp2_stage1_strict_halfband_bram_ce #(
     assign x_current = x_in_valid ? x_in : {DATA_W{1'b0}};
     assign fir_in_dbg = x_current;
     assign fir_in_valid_dbg = ce_out && (phase_cnt == 1'b0);
-    assign external_coeff_addr = issue_index;
+    assign external_coeff_addr = {1'b0, issue_index};
 
     assign dsp_preadd_a = read_mask_a ?
         {{(25-DATA_W){read_data_a[DATA_W-1]}}, read_data_a} : 25'sd0;

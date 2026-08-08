@@ -3,7 +3,7 @@
 // National-finals route-1 unified coefficient plane.
 //
 // One physical RAMB18E1 services both FIR DSP lanes:
-//   port A, addresses 64..89: Stage1 strict-halfband coefficients;
+//   port A, addresses 128..179: expanded Stage1 sequential coefficients;
 //   port B, addresses   0..63: Stage2 + flat Stage3 coefficients;
 //   port B, addresses 96..127: P3 compensated Stage3 coefficients.
 //
@@ -12,7 +12,7 @@
 // center coefficient 35584 without another BRAM or a LUT decoder.
 module nf_unified_fir_coeff_bram (
     input  wire                         clk,
-    input  wire [4:0]                   stage1_addr,
+    input  wire [5:0]                   stage1_addr,
     output wire signed [15:0]           stage1_coeff,
     input  wire [6:0]                   stage23_addr,
     output wire signed [17:0]           stage23_coeff
@@ -42,13 +42,17 @@ module nf_unified_fir_coeff_bram (
         .INIT_05(256'h0000000000000000000000005164E5240FCCF50D082EF9A30510FBEB0351FD4D),
         .INIT_06(256'h00000000000000000000000000000000000000000231EF784E4E4E4EEF780231),
         .INIT_07(256'h000000000000000000000000000000000000000000000089F9EE8B00F9EE0089),
+        .INIT_08(256'h0232FE39016FFEDB00E9FF4A008DFF950050FFC5002AFFE30013FFF40007FFFB),
+        .INIT_09(256'hF9A3082EF50D0FCCE52451645164E5240FCCF50D082EF9A30510FBEB0351FD4D),
+        .INIT_0A(256'hFFE3002AFFC50050FF95008DFF4A00E9FEDB016FFE390232FD4D0351FBEB0510),
+        .INIT_0B(256'h000000000000000000000000000000000000000000000000FFFB0007FFF40013),
         .INITP_00(256'h000000CC0000030C0003333333333333000003030000030C0000CC3300033033)
     ) u_unified_coeff_ramb18e1 (
         .DOADO(doa),
         .DOPADOP(dopa),
         .DOBDO(dob),
         .DOPBDOP(dopb),
-        .ADDRARDADDR({3'b000, 2'b10, stage1_addr, 4'b0000}),
+        .ADDRARDADDR({4'b0010, stage1_addr, 4'b0000}),
         .ADDRBWRADDR({3'b000, stage23_addr, 4'b0000}),
         .CLKARDCLK(clk),
         .CLKBWRCLK(clk),
@@ -71,13 +75,13 @@ module nf_unified_fir_coeff_bram (
     assign stage1_coeff = doa;
     assign stage23_coeff = {dopb, dob};
 `else
-    reg signed [17:0] coeff_mem [0:127];
+    reg signed [17:0] coeff_mem [0:255];
     reg signed [15:0] stage1_coeff_q;
     reg signed [17:0] stage23_coeff_q;
     integer idx;
 
     initial begin
-        for (idx = 0; idx < 128; idx = idx + 1)
+        for (idx = 0; idx < 256; idx = idx + 1)
             coeff_mem[idx] = 18'sd0;
 
         coeff_mem[0] = -16'sd115;
@@ -157,6 +161,60 @@ module nf_unified_fir_coeff_bram (
         coeff_mem[114] = 18'sd35584;
         coeff_mem[115] = -18'sd1554;
         coeff_mem[116] = 18'sd137;
+
+        // Expanded Stage1 scan order: C0..C25,C25..C0.
+        coeff_mem[128] = -16'sd5;
+        coeff_mem[129] = 16'sd7;
+        coeff_mem[130] = -16'sd12;
+        coeff_mem[131] = 16'sd19;
+        coeff_mem[132] = -16'sd29;
+        coeff_mem[133] = 16'sd42;
+        coeff_mem[134] = -16'sd59;
+        coeff_mem[135] = 16'sd80;
+        coeff_mem[136] = -16'sd107;
+        coeff_mem[137] = 16'sd141;
+        coeff_mem[138] = -16'sd182;
+        coeff_mem[139] = 16'sd233;
+        coeff_mem[140] = -16'sd293;
+        coeff_mem[141] = 16'sd367;
+        coeff_mem[142] = -16'sd455;
+        coeff_mem[143] = 16'sd562;
+        coeff_mem[144] = -16'sd691;
+        coeff_mem[145] = 16'sd849;
+        coeff_mem[146] = -16'sd1045;
+        coeff_mem[147] = 16'sd1296;
+        coeff_mem[148] = -16'sd1629;
+        coeff_mem[149] = 16'sd2094;
+        coeff_mem[150] = -16'sd2803;
+        coeff_mem[151] = 16'sd4044;
+        coeff_mem[152] = -16'sd6876;
+        coeff_mem[153] = 16'sd20836;
+        coeff_mem[154] = 16'sd20836;
+        coeff_mem[155] = -16'sd6876;
+        coeff_mem[156] = 16'sd4044;
+        coeff_mem[157] = -16'sd2803;
+        coeff_mem[158] = 16'sd2094;
+        coeff_mem[159] = -16'sd1629;
+        coeff_mem[160] = 16'sd1296;
+        coeff_mem[161] = -16'sd1045;
+        coeff_mem[162] = 16'sd849;
+        coeff_mem[163] = -16'sd691;
+        coeff_mem[164] = 16'sd562;
+        coeff_mem[165] = -16'sd455;
+        coeff_mem[166] = 16'sd367;
+        coeff_mem[167] = -16'sd293;
+        coeff_mem[168] = 16'sd233;
+        coeff_mem[169] = -16'sd182;
+        coeff_mem[170] = 16'sd141;
+        coeff_mem[171] = -16'sd107;
+        coeff_mem[172] = 16'sd80;
+        coeff_mem[173] = -16'sd59;
+        coeff_mem[174] = 16'sd42;
+        coeff_mem[175] = -16'sd29;
+        coeff_mem[176] = 16'sd19;
+        coeff_mem[177] = -16'sd12;
+        coeff_mem[178] = 16'sd7;
+        coeff_mem[179] = -16'sd5;
     end
 
     always @(posedge clk) begin

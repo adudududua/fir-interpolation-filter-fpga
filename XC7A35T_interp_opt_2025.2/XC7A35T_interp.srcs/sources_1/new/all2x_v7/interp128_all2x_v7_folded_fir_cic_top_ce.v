@@ -107,7 +107,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     wire cic_x_valid_w;
     wire signed [19:0] y128_w;
     wire y128_valid_w;
-    wire [4:0] stage1_coeff_addr_w;
+    wire [5:0] stage1_coeff_addr_w;
     wire signed [15:0] stage1_coeff_data_w;
     wire [6:0] stage23_coeff_addr_w;
     wire signed [17:0] stage23_coeff_data_w;
