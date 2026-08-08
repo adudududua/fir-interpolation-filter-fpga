@@ -187,6 +187,26 @@ RTL 回归目录：
 布线后回归目录：
 `matlab_fir/national_finals/_work/postroute_six_mode_dac/20260807_211646`
 
+## 276-LUT 正式实板版及板测后审计
+
+在 292-LUT 板测基线上继续采用 `AreaOptimized_high/full/on`、`SHREG_MIN_SIZE=5`，并把
+Stage2/3 无效历史抽头由 Fabric 宽零值选择器改为 DSP PREG CE 门控后，正式实现为：
+
+| 阶段 | LUT | LUTRAM | FF | DSP48E1 | BRAM Tile | RAMB18E1 | IO | MMCM |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| 综合 | 341 | 0 | 387 | 4 | 2 | 4 | 17 | 2 |
+| 布局布线 | **276** | **0** | **379** | **4** | **2** | **4** | **17** | **2** |
+
+WNS/WHS 为 `+44.885/+0.112 ns`，TNS/THS 为 0，DRC Error 为 0，总功耗为 0.271 W。
+Release RTL 回归 17/17 和 routed-DCP 六档仿真均通过。2026-08-08 用户完成物理板复测，确认
+两个输入采样率族下各公开档位采样率正确、DAC 输出波形正常，故标签
+`nf-vivado2025.2-276lut-379ff-4dsp-2bram-17io-2mmcm-board-pass` 为当前正式发布点。
+
+板测后从同一 341-LUT 综合 DCP 扫描 7 组实现策略，最低仍为 276 LUT；历史有效位粘滞化
+RTL 候选虽通过 17/17 回归，但综合恶化为 345 LUT / 388 FF，已经回退。因此没有新的
+bitstream 替代该板测版本。完整审计见
+`matlab_fir/national_finals/results/post276_lut_optimization_audit_execution_feedback.md`。
+
 ## 推荐的手动使用方法
 
 ### GUI

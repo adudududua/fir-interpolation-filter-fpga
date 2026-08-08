@@ -61,6 +61,19 @@ PREG 更新与“向当前累加值加零”在该串行 MAC 调度中严格等�
 完整的 2025.2 构建、验证和手动 GUI 复现说明见
 [Vivado 2025.2 迁移与优化记录](XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/README.md)。
 
+### 276-LUT 板测后进一步优化审计（2026-08-08）
+
+在用户确认 276-LUT 版本六档采样率和 DAC 波形均正常后，另建
+`national-finals-v2025.2-post276-lut-optimization` 分支继续试验，正式板测 RTL 不动。
+重新综合精确复现 **341 LUT / 387 FF / 4 DSP / 2 BRAM Tile**；从同一综合 DCP 扫描 7 组
+`opt/place` 策略，最低仍为 **276 LUT / 379 FF**，没有策略优于正式结果。
+
+首个 RTL 候选把 Stage2/3 历史有效比较改为粘滞状态，完整 Smoke 回归 **17/17 PASS**，但
+综合变为 **345 LUT / 388 FF**，相对基线多 4 LUT、1 FF，故判定 No-Go 并完整回退。本轮没有
+用较差候选生成 bitstream，正式推荐仍为板测通过的 276-LUT R5。结构审计、七组策略数据、
+失败原因和下一步风险边界见
+[276-LUT 板测后优化审计与执行反馈](matlab_fir/national_finals/results/post276_lut_optimization_audit_execution_feedback.md)。
+
 ## 前一 Vivado 2025.2 板测回退：292 LUT / 4 DSP（2026-08-07）
 
 `XC7A35T_interp_opt_2025.2` 的综合失败已修复。根因不是 RTL 语法，而是 Windows 提交内存
