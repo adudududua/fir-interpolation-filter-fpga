@@ -1,6 +1,31 @@
 # Vivado 2025.2 迁移、修复与验证记录
 
-## 当前状态：249-LUT 工具签核候选，258-LUT 正式板测安全回退
+## 当前状态：239-LUT 工具签核候选，249-LUT 正式板测安全回退
+
+分支 `national-finals-v2025.2-post249-lut-optimization` 将 Stage1 中心延迟寄存器的无效启动期
+处理由 24-bit `read_data/0` 数据选择改写为寄存器使能。中心抽头的历史有效性在复位周期内
+单调增加，且寄存器复位值为零，因此无效期保持零与反复写零严格等价；有效后每次中心抽头读取
+都正常更新。该表达删除了综合后物理网表中的宽数据选择器，不改变系数、位宽、valid 时序或输出。
+
+正式工程从 `reset_run` 开始完整重建并生成 bitstream，结果目录为
+`tools/vivado_2025_2/results/20260809_173232`：
+
+**239 LUT / 0 LUTRAM / 377 FF / 4 DSP / 4 RAMB18E1（2 BRAM Tile）/
+17 IO / 2 MMCM**；综合为 **314 LUT / 385 FF**，WNS/WHS=`+45.306/+0.082 ns`，
+TNS/THS=0，DRC Error=0，路由错误=0，总/动态/静态功耗=`0.271/0.199/0.072 W`。
+相对 249-LUT 实板版减少 10 LUT，其他列举资源不变。
+
+Smoke/Release 均为 17/17 PASS；Release 全链 14 组输入在 4x/8x/128x 三节点全部 0 LSB；
+239-LUT routed DCP 的六模式后仿真为 44.1 kHz `177/353/5645 edges/ms`、48 kHz
+`192/384/6144 edges/ms`，六档 DAC 数据均持续变化且无 X。bitstream SHA-256 为
+`56248A6FFD013B020012B397ED32E9FA9F2285644978E5016CEB2F5506911EEA`。该版本当前为
+**tool-verified，待用户物理板复测**。
+
+独立核心 OOC 从空结果目录复跑并通过精确门禁：
+**197 LUT / 0 LUTRAM / 290 FF / 4 DSP / 3 RAMB18E1（1.5 Tile）/ 0 MMCM**，内部
+WNS/WHS=`+151.665/+0.054 ns`，DRC Error=0。现场复现见 [`core_ooc/README.md`](core_ooc/README.md)。
+
+## 前一状态：249-LUT 正式板测版，258-LUT 更早板测回退
 
 挑战分支 `national-finals-v2025.2-245to249-lut-challenge` 已在 258-LUT 实板版上完成 CIC
 DSP 角色交换：三级串行 comb 减法使用一个显式 DSP48E1 P 寄存器，第一级 26-bit 积分器
@@ -16,10 +41,19 @@ DSP 角色交换：三级串行 comb 减法使用一个显式 DSP48E1 P 寄存�
 `353308536B12E16CE896236D3754430B372ED1F957CB52B744EA2A8F57B6D1AB`。CIC 定向等价共比较
 4096 个输出，并覆盖连续、停顿、10 seed 和中途复位；Smoke 与 Vivado 2025.2 Release 均为
 17/17 PASS，14 组全链输入在 4x/8x/128x 三节点全部 0 LSB；routed DCP 六档 DAC/采样率
-检查全部通过。该版本是 **tool-verified，待用户物理板复测**，258-LUT board-pass 标签仍是
-正式实板回退。工具签核标签为
-`nf-vivado2025.2-249lut-377ff-4dsp-2bram-toolverified`。完整 A/B 数据与回退说明见
+检查全部通过。2026-08-09 用户完成物理板复测，确认六档采样率和 DAC 波形均正常，因此
+该版本已经升级为 **board-verified**，并作为 239-LUT 候选的正式实板回退。工具签核标签为
+`nf-vivado2025.2-249lut-377ff-4dsp-2bram-toolverified`，实板标签为
+`nf-vivado2025.2-249lut-377ff-4dsp-2bram-board-pass`。完整 A/B 数据与回退说明见
 `matlab_fir/national_finals/results/vivado2025_2_cic_dsp_role_exchange_249lut_execution_feedback.md`。
+
+### 249-LUT 版本的历史插值核心 OOC 报告
+
+整板 249 LUT 不能直接称为滤波器核心资源。专用脚本已把
+`interp128_all2x_v7_folded_fir_cic_top_ce` 作为独立顶层完成 Vivado 2025.2 post-route：
+**210 LUT / 0 LUTRAM / 290 FF / 4 DSP48E1 / 3 RAMB18E1（1.5 BRAM Tile）/ 0 MMCM**，
+核心内部 WNS/WHS=`+150.963/+0.128 ns`，0 DRC Error。现场从零运行命令、非默认安装路径参数、
+报告文件和 GUI 展示步骤见 [`core_ooc/README.md`](core_ooc/README.md)。
 
 ## 前一状态：258-LUT 正式板测版，276-LUT 更早板测回退
 
@@ -60,7 +94,8 @@ GUI 完整构建结果目录：`tools/vivado_2025_2/results/20260808_161249`；b
 | `22b9b55` | 284 | 0 | 379 | 4 | 2 | `SHREG_MIN_SIZE=5`，短复位链保留为 FF | 工具通过 |
 | `099390e` | **276** | **0** | **379** | **4** | **2** | Stage2/3 DSP PREG 抽头有效位门控 | **工具与用户实板均通过** |
 | Stage1 顺序抽头正式版 | **258** | **0** | **376** | **4** | **2** | 系数展开进原 BRAM 空闲区，单地址 52 拍直接 MAC | **工具与用户实板均通过** |
-| CIC DSP角色交换候选 | **249** | **0** | **377** | **4** | **2** | comb进DSP、第一级积分器进CARRY4、对齐状态复用 | **工具通过，待物理板复测** |
+| CIC DSP角色交换正式版 | **249** | **0** | **377** | **4** | **2** | comb进DSP、第一级积分器进CARRY4、对齐状态复用 | **工具与用户实板均通过** |
+| Stage1 延迟寄存器使能候选 | **239** | **0** | **377** | **4** | **2** | 利用中心抽头有效性单调不变量，删除24-bit数据/零mux | **完整工具签核通过，待用户物理板复测** |
 
 Stage2/3 原实现根据历史有效位，在 Fabric 中将 22-bit/20-bit 样本选择为真实值或零，再送入
 共享 DSP。当前实现让 BRAM 原始样本直接进入 DSP，并用任务启动时锁存的

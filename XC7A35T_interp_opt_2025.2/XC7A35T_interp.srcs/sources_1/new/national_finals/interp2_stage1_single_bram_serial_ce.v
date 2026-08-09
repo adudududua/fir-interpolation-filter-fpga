@@ -293,9 +293,15 @@ module interp2_stage1_single_bram_serial_ce #(
             end
 
             if (read_data_valid) begin
-                if (read_coeff_index == DELAY_INDEX)
-                    delay_result <= read_mask ? read_data :
-                                    {DATA_W{1'b0}};
+                // delay_result is reset to zero, and the center-tap history
+                // validity is monotonic until the next reset.  Keeping the
+                // previous value while this tap is invalid is therefore
+                // exactly equivalent to repeatedly writing zero during
+                // startup.  Once valid, every later center-tap read remains
+                // valid.  Expressing that invariant as a register enable
+                // removes the DATA_W-wide BRAM-data/zero input mux.
+                if (read_coeff_index == DELAY_INDEX && read_mask)
+                    delay_result <= read_data;
 
                 if (read_coeff_index == HISTORY_LEN-1) begin
                     filter_commit_pending <= 1'b1;
