@@ -111,6 +111,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     wire signed [15:0] stage1_coeff_data_w;
     wire [6:0] stage23_coeff_addr_w;
     wire signed [17:0] stage23_coeff_data_w;
+    wire stage2_phase_w;
+    wire stage3_phase_w;
 
     wire unused_ce;
     assign unused_ce = ce16_out ^ ce32_out ^ ce64_out;
@@ -166,20 +168,24 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     endgenerate
 
     bridge_valid_quantized_to_interp2_ce #(
-        .IN_W(24), .OUT_W(22), .SHIFT_N(2)
+        .IN_W(24), .OUT_W(22), .SHIFT_N(2),
+        .USE_EXTERNAL_PHASE(1)
     ) u_bridge_2_to_4_quantized (
         .clk(clk), .rst_n(rst_n),
         .in_data(y2_w), .in_valid(y2_valid_w),
         .ce_out_next(ce4_out),
+        .phase_current(stage2_phase_w),
         .out_data(y2_to_4_data), .out_valid(y2_to_4_valid)
     );
 
     bridge_valid_quantized_to_interp2_ce #(
-        .IN_W(22), .OUT_W(20), .SHIFT_N(2)
+        .IN_W(22), .OUT_W(20), .SHIFT_N(2),
+        .USE_EXTERNAL_PHASE(1)
     ) u_bridge_4_to_8_quantized (
         .clk(clk), .rst_n(rst_n),
         .in_data(y4_w), .in_valid(y4_valid_w),
         .ce_out_next(ce8_out),
+        .phase_current(stage3_phase_w),
         .out_data(y4_to_8_data), .out_valid(y4_to_8_valid)
     );
 
@@ -217,7 +223,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
                 .stage3_compensated_mode(stage3_compensated_mode),
                 .stage3_y_out(y8_w),
                 .stage3_y_out_valid(y8_valid_w),
-                .stage2_phase_dbg(), .stage3_phase_dbg(),
+                .stage2_phase_dbg(stage2_phase_w),
+                .stage3_phase_dbg(stage3_phase_w),
                 .scheduler_busy_dbg(), .scheduler_stage_dbg(),
                 .scheduler_mac_index_dbg(),
                 .external_coeff_addr(stage23_coeff_addr_w),
@@ -245,7 +252,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
                 .stage3_x_in_valid(y4_to_8_valid),
                 .stage3_y_out(y8_w),
                 .stage3_y_out_valid(y8_valid_w),
-                .stage2_phase_dbg(), .stage3_phase_dbg(),
+                .stage2_phase_dbg(stage2_phase_w),
+                .stage3_phase_dbg(stage3_phase_w),
                 .scheduler_busy_dbg(), .scheduler_stage_dbg(),
                 .scheduler_mac_index_dbg()
             );

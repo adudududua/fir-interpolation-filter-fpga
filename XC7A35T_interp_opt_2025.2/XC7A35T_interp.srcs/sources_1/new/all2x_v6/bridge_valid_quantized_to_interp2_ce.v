@@ -24,13 +24,15 @@
 module bridge_valid_quantized_to_interp2_ce #(
     parameter integer IN_W = 24,
     parameter integer OUT_W = 22,
-    parameter integer SHIFT_N = IN_W - OUT_W
+    parameter integer SHIFT_N = IN_W - OUT_W,
+    parameter integer USE_EXTERNAL_PHASE = 0
 )(
     input  wire                         clk,
     input  wire                         rst_n,
     input  wire signed [IN_W-1:0]       in_data,
     input  wire                         in_valid,
     input  wire                         ce_out_next,
+    input  wire                         phase_current,
     output wire signed [OUT_W-1:0]      out_data,
     output wire                         out_valid
 );
@@ -38,6 +40,7 @@ module bridge_valid_quantized_to_interp2_ce #(
     reg pending;
     reg phase_mirror;
     wire consume_now;
+    wire phase_for_consume;
 
     round_sat_shift_compact #(
         .IN_W    (IN_W),
@@ -49,8 +52,13 @@ module bridge_valid_quantized_to_interp2_ce #(
     );
 
     assign out_valid = pending;
+    // The folded Stage2/3 core already owns phase registers clocked by the
+    // same CE events. National-finals builds reuse those canonical states;
+    // legacy tops retain the self-contained mirror through the default.
+    assign phase_for_consume = (USE_EXTERNAL_PHASE != 0) ?
+        phase_current : phase_mirror;
     assign consume_now = ce_out_next &&
-                         (phase_mirror == 1'b0) && pending;
+                         (phase_for_consume == 1'b0) && pending;
 
     always @(posedge clk) begin
         if (!rst_n) begin
@@ -63,7 +71,7 @@ module bridge_valid_quantized_to_interp2_ce #(
             else if (in_valid)
                 pending <= 1'b1;
 
-            if (ce_out_next)
+            if ((USE_EXTERNAL_PHASE == 0) && ce_out_next)
                 phase_mirror <= ~phase_mirror;
         end
     end

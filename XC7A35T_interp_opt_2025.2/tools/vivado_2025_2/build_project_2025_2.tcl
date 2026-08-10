@@ -11,27 +11,6 @@ proc require_condition {condition message} {
     }
 }
 
-proc wait_for_run_complete {run_name timeout_seconds} {
-    set deadline [expr {[clock seconds] + $timeout_seconds}]
-    while {1} {
-        wait_on_run $run_name
-        set run_object [get_runs $run_name]
-        set run_progress [get_property PROGRESS $run_object]
-        set run_status [get_property STATUS $run_object]
-        puts "RUN_STATE name=$run_name progress=$run_progress status=$run_status"
-        if {$run_progress eq "100%"} {
-            return
-        }
-        if {[regexp -nocase {error|fail|cancel} $run_status]} {
-            error "$run_name failed: status='$run_status', progress='$run_progress'"
-        }
-        if {[clock seconds] >= $deadline} {
-            error "$run_name timed out: status='$run_status', progress='$run_progress'"
-        }
-        after 1000
-    }
-}
-
 puts "BUILD_PROJECT=$project_file"
 puts "BUILD_RESULT_DIR=$result_dir"
 puts "BUILD_JOBS=$jobs"
@@ -50,32 +29,32 @@ set_property STEPS.SYNTH_DESIGN.ARGS.SHREG_MIN_SIZE 5 $synth_run
 # the current 2025.2 source tree.  Stage1 keeps its reset-zero center-delay
 # register unchanged while invalid startup reads are expressed as a register
 # enable, removing the 24-bit BRAM-data/zero mux.  Together with the CIC DSP
-# role exchange, the release target is no more than 239 LUT while keeping
+# role exchange, shared Stage2/3 phase state, and atomic mode commit, the
+# release target is no more than 234 LUT while keeping
 # 4 DSP / 4 RAMB18E1; the hard gates below prevent stale or wrong-run results.
 set_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE ExploreArea $impl_run
 set_property STEPS.PLACE_DESIGN.ARGS.DIRECTIVE Explore $impl_run
 
-reset_run $synth_run
-launch_runs $synth_run -jobs $jobs
-wait_for_run_complete synth_1 1200
-require_condition [expr {[get_property PROGRESS $synth_run] eq "100%"}] \
-    "synth_1 did not complete."
-
-open_run synth_1
+# Vivado 2025.2 can leave the command-line launch_runs/VRS scheduler waiting
+# indefinitely before synthesis starts on this Windows host.  Run the exact
+# project sources and constraints in one Vivado process instead.  The GUI run
+# strategies above remain synchronized for normal manual Generate Bitstream.
+set top_name [get_property TOP [get_filesets sources_1]]
+set part_name [get_property PART [current_project]]
+synth_design -top $top_name -part $part_name \
+    -flatten_hierarchy full -directive AreaOptimized_high \
+    -resource_sharing on -shreg_min_size 5
 report_utilization -file [file join $result_dir utilization_synthesized.rpt]
-close_design
+write_checkpoint -force [file join $result_dir board_synthesized_2025_2.dcp]
 
-reset_run $impl_run
-launch_runs $impl_run -to_step write_bitstream -jobs $jobs
-wait_for_run_complete impl_1 1800
-require_condition [expr {[get_property PROGRESS $impl_run] eq "100%"}] \
-    "impl_1 did not complete through write_bitstream."
-
-open_run impl_1
+opt_design -directive ExploreArea
+place_design -directive Explore
+route_design
 set utilization_report [report_utilization -return_string]
 report_utilization -file [file join $result_dir utilization_routed.rpt]
 report_timing_summary -delay_type min_max -max_paths 10 \
     -file [file join $result_dir timing_summary_routed.rpt]
+report_bus_skew -file [file join $result_dir bus_skew_routed.rpt]
 report_route_status -file [file join $result_dir route_status_routed.rpt]
 report_drc -file [file join $result_dir drc_routed.rpt]
 check_timing -verbose -file [file join $result_dir check_timing_routed.rpt]
@@ -102,9 +81,7 @@ set wns [get_property SLACK $setup_path]
 set whs [get_property SLACK $hold_path]
 
 set drc_errors [get_drc_violations -quiet -filter {SEVERITY == Error}]
-set bit_file [file join [get_property DIRECTORY $impl_run] board_demo_competition_dac8_top.bit]
-require_condition [file exists $bit_file] "Expected bitstream is missing: $bit_file"
-file copy -force $bit_file [file join $result_dir board_demo_competition_dac8_top_2025_2.bit]
+set bit_file [file join $result_dir board_demo_competition_dac8_top_2025_2.bit]
 
 puts "V2025_2_LUT=$lut_count"
 puts "V2025_2_FF=$ff_count"
@@ -118,14 +95,18 @@ puts "V2025_2_DRC_ERRORS=[llength $drc_errors]"
 require_condition [expr {$dsp_count == 4}] "Expected exactly 4 DSP48E1 cells."
 require_condition [expr {$bram18_count == 4}] "Expected exactly 4 RAMB18E1 cells."
 require_condition [expr {$mmcm_count == 2}] "Expected exactly 2 MMCME2_ADV cells."
-require_condition [expr {$lut_count <= 239}] \
-    "LUT regression: expected no more than 239, got $lut_count."
+require_condition [expr {$lut_count <= 234}] \
+    "LUT regression: expected no more than 234, got $lut_count."
 require_condition [expr {$ff_count <= 390}] \
     "FF regression: expected no more than 390, got $ff_count."
 require_condition [expr {$wns >= 0.0}] "Setup timing failed: WNS=$wns ns."
 require_condition [expr {$whs >= 0.0}] "Hold timing failed: WHS=$whs ns."
 require_condition [expr {[llength $drc_errors] == 0}] \
     "DRC contains [llength $drc_errors] error(s)."
+
+set_property BITSTREAM.GENERAL.COMPRESS TRUE [current_design]
+write_bitstream -force $bit_file
+require_condition [file exists $bit_file] "Expected bitstream is missing: $bit_file"
 
 puts "VIVADO_2025_2_FULL_BUILD_PASS"
 close_design

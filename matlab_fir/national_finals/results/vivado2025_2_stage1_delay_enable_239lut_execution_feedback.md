@@ -10,14 +10,15 @@ bitstream，布局布线后得到：
 17 IO / 2 MMCM**。
 
 相对 249-LUT 实板安全基线减少 10 LUT（4.02%），FF、DSP、BRAM、IO、MMCM 和功耗不变。
-该版本已经完成 RTL、实现和 routed-DCP 工具闭环，当前状态为 **tool-verified**；物理板验证
-仍需用户下载本文件所列 bitstream 完成，不能把工具结果提前写成板测结果。
+该版本已经完成 RTL、实现和 routed-DCP 工具闭环；用户随后完成物理板验证，确认各档输出
+采样率与 DAC 波形均正常，因此当前状态已升级为 **board-verified**。
 
 ## 2. Git 与回退边界
 
 - 优化分支：`national-finals-v2025.2-post249-lut-optimization`；
 - 249-LUT 工具标签：`nf-vivado2025.2-249lut-377ff-4dsp-2bram-toolverified`；
 - 249-LUT 实板回退标签：`nf-vivado2025.2-249lut-377ff-4dsp-2bram-board-pass`；
+- 239-LUT 实板标签：`nf-vivado2025.2-239lut-377ff-4dsp-2bram-board-pass`；
 - 本轮提交和标签不使用 `codex` 字样；
 - 临时网表、仿真和审计文件全部位于 `matlab_fir/national_finals/_work`，未放入仓库主目录。
 
@@ -186,13 +187,13 @@ powershell -ExecutionPolicy Bypass -File .\XC7A35T_interp_opt_2025.2\tools\vivad
 3. 工作区原有大量无关修改、删除和未跟踪历史结果。本轮提交只应包含 239-LUT 正式 RTL、
    构建门槛、OOC 复现脚本/说明、README、执行反馈和对应正式报告，不能混入无关文件。
 
-## 11. 板测门槛
+## 11. 板测结果
 
-工具验证不能替代物理板验证。用户板测时至少应确认：
+工具验证不能替代物理板验证。用户已经完成以下项目：
 
 - 44.1 kHz 与 48 kHz 输入族下 4x、8x、128x 输出采样率正确；
 - 六档 DAC 均有持续波形输出，无静默、卡码或切档后失锁；
 - 多次复位和切档后仍可恢复正常；
 - 使用的 bitstream SHA-256 与本文件一致。
 
-只有上述板测通过后，才能创建 `board-pass` 标签并将 239-LUT 版本升级为正式实板版。
+上述板测均已通过，239-LUT 版本已经升级为正式实板版并创建 `board-pass` 标签。

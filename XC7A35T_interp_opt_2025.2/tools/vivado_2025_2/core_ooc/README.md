@@ -27,7 +27,7 @@ powershell -ExecutionPolicy Bypass -File .\XC7A35T_interp_opt_2025.2\tools\vivad
 命令结束必须出现 `CORE_OOC_2025_2_DEMO_PASS`。然后打开最新的
 `results/<时间戳>/core_ooc_summary.txt` 和 `utilization_post_route.rpt`，应显示：
 
-- 197 LUT、0 LUTRAM、290 FF；
+- 194 LUT、0 LUTRAM、282 FF；
 - 4 DSP48E1；
 - 3 RAMB18E1，即 1.5 BRAM Tile；
 - 0 MMCM、0 DRC Error；
@@ -44,14 +44,14 @@ powershell -ExecutionPolicy Bypass -File .\XC7A35T_interp_opt_2025.2\tools\vivad
    `drc_post_route.rpt`。
 
 2026-08-09 已使用上述正式入口从空结果目录实际复跑，得到
-197 LUT / 290 FF / 4 DSP48E1 / 3 RAMB18E1，内部 WNS/WHS=`+151.665/+0.054 ns`，
+194 LUT / 282 FF / 4 DSP48E1 / 3 RAMB18E1，内部 WNS/WHS=`+151.280/+0.089 ns`，
 0 DRC Error，并输出 `CORE_OOC_2025_2_DEMO_PASS`。
 
 OOC 资源实现保留零延迟顶层边界，以复现签核的面积导向放置结果；脚本另外从实现后网表中筛选
 “内部寄存器→内部寄存器”路径作为核心内部时序门禁。顶层输入输出边界没有整板中的真实启动/
 捕获寄存器，因此其原始 OOC hold 数字不能替代完整系统时序。完整系统接口与跨模块时序应同时
-展示整板正式报告，其结果为 239 LUT、377 FF、4 DSP、
-4 RAMB18E1（2 BRAM Tile）、2 MMCM，WNS/WHS=`+45.306/+0.082 ns`。
+展示整板正式报告，其结果为 234 LUT、369 FF、4 DSP、
+4 RAMB18E1（2 BRAM Tile）、2 MMCM，WNS/WHS=`+44.925/+0.060 ns`。
 
-不要用 `239-197` 宣称外围精确消耗 42 LUT：OOC 与整板综合存在跨层级优化和打包差异，两组数据
+不要用 `234-194` 宣称外围精确消耗 40 LUT：OOC 与整板综合存在跨层级优化和打包差异，两组数据
 应分别称为“核心独立实现资源”和“完整系统实现资源”。

@@ -145,12 +145,16 @@ module demo_interp_dac8_audio_pcm_common #(
             ce_cnt <= ce_cnt + 7'd1;
     end
 
-    // 只在所有候选 DAC 时钟均为低电平时切换时钟源。
-    // 这样 mode_sel 即使在任意基准时钟上升沿更新，也不会让
-    // 组合时钟选择器产生零宽或不足半个基准周期的脉冲。
+    // The national-finals path uses an ODDR and receives an atomic audio_mode
+    // while force_mute is asserted. Commit on the following falling edge so
+    // mode_state is settled before mute can be released at the next rising
+    // edge. The legacy combinational clock mux keeps its all-dividers-low
+    // switching rule.
     always @(negedge clk_audio_128x) begin
         if (!rst_n)
             mode_state <= MODE_128X;
+        else if (USE_NATIONAL_FINALS_DATAPATH != 0)
+            mode_state <= mode_request;
         else if (!ce_cnt[6] && !ce_cnt[4] && !ce_cnt[3])
             mode_state <= mode_request;
     end
@@ -423,7 +427,12 @@ module demo_interp_dac8_audio_pcm_common #(
     always @(negedge clk_audio_128x) begin
         if (!rst_n)
             dac_data_r <= 8'd128;
-        else if (force_mute || (mode_state != mode_request))
+        // In the ODDR path the atomic mode is committed on the intervening
+        // falling edge, before force_mute can deassert. The mismatch term is
+        // retained only for the legacy combinational clock-mux fallback.
+        else if (force_mute ||
+                 ((USE_NATIONAL_FINALS_DATAPATH == 0) &&
+                  (mode_state != mode_request)))
             dac_data_r <= 8'd128;
         else if (selected_valid)
             dac_data_r <= sample_u8_w;

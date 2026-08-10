@@ -69,13 +69,12 @@ module interp2_stage1_single_bram_serial_ce #(
     // 52 reads plus the two DSP tail cycles finish before the next odd phase.
     reg filter_ready;
 `endif
-    reg issue_active;
     reg scan_exhausted;
-    reg [INDEX_W-1:0] schedule_index;
 
     reg read_issue_valid;
     reg read_issue_mask;
     reg [INDEX_W-1:0] issue_index;
+    reg issue_active;
     reg read_data_valid;
     reg read_mask;
     reg [INDEX_W-1:0] read_coeff_index;
@@ -265,11 +264,10 @@ module interp2_stage1_single_bram_serial_ce #(
 `ifndef SYNTHESIS
             filter_ready <= 1'b0;
 `endif
-            issue_active <= 1'b0;
             scan_exhausted <= 1'b0;
-            schedule_index <= {INDEX_W{1'b0}};
             read_issue_valid <= 1'b0;
             read_issue_mask <= 1'b0;
+            issue_active <= 1'b0;
             issue_index <= {INDEX_W{1'b0}};
             delay_result <= {DATA_W{1'b0}};
             filter_commit_pending <= 1'b0;
@@ -312,21 +310,26 @@ module interp2_stage1_single_bram_serial_ce #(
             // After the first request, the address simply decrements.  Before
             // the history is full, address zero marks the last initialized
             // word; scan_exhausted masks all later wrapped addresses through
-            // DSP CEP rather than a DATA_W-wide Fabric mux.
+            // DSP CEP rather than a DATA_W-wide Fabric mux.  issue_index is
+            // both the live coefficient-BRAM address and the issue counter;
+            // the return pipeline already retains the corresponding index,
+            // so a second schedule counter would be redundant.
             if (issue_active) begin
                 read_issue_valid <= 1'b1;
                 read_addr <= read_addr - {{(ADDR_W-1){1'b0}}, 1'b1};
-                issue_index <= schedule_index;
                 read_issue_mask <= history_full || !scan_exhausted;
 
                 if (read_addr == {{(ADDR_W-1){1'b0}}, 1'b1})
                     scan_exhausted <= 1'b1;
 
-                if (schedule_index == HISTORY_LEN-1)
+                // The address placed on the BRAM port at this edge is
+                // consumed by the existing return-valid pipeline.  Stop
+                // after advancing 50 -> 51 so address 51 is sampled once,
+                // matching the former next-index counter exactly.
+                if (issue_index == HISTORY_LEN-2)
                     issue_active <= 1'b0;
-                else
-                    schedule_index <= schedule_index +
-                                      {{(INDEX_W-1){1'b0}}, 1'b1};
+                issue_index <= issue_index +
+                               {{(INDEX_W-1){1'b0}}, 1'b1};
             end
 
             if (ce_out) begin
@@ -346,7 +349,6 @@ module interp2_stage1_single_bram_serial_ce #(
                     mac_active <= 1'b1;
                     issue_active <= 1'b1;
                     scan_exhausted <= (wr_ptr == {ADDR_W{1'b0}});
-                    schedule_index <= {{(INDEX_W-1){1'b0}}, 1'b1};
                     read_issue_valid <= 1'b1;
                     read_issue_mask <= 1'b1;
                     issue_index <= {INDEX_W{1'b0}};

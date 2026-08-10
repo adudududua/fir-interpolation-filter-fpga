@@ -1,6 +1,31 @@
 # Vivado 2025.2 迁移、修复与验证记录
 
-## 当前状态：239-LUT 工具签核候选，249-LUT 正式板测安全回退
+## 当前状态：234-LUT 工具签核候选，239-LUT 正式板测安全回退
+
+分支 `national-finals-v2025.2-230to234-lut-challenge` 在 239-LUT board-pass 版本上完成三项
+等价控制优化：Stage1 合并调度/发射索引，Stage2/3 bridge 复用滤波核权威 phase 状态，以及
+在 `force_mute` 有效期间于 DAC 分频负边沿原子提交模式并删除活动路径上的冗余 mismatch
+静音项。滤波系数、字长、舍入/饱和、valid、双时钟族、DSP 与 BRAM 数均不变。
+
+正式归档目录为 `tools/vivado_2025_2/results/20260810_160858`：
+
+**234 LUT / 0 LUTRAM / 369 FF / 4 DSP / 4 RAMB18E1（2 BRAM Tile）/
+17 IO / 2 MMCM**；综合为 **310 LUT / 377 FF**，WNS/WHS=`+44.925/+0.060 ns`，
+TNS/THS=0，DRC Error=0，路由错误=0，bus-skew 余量 `+49.467 ns (MET)`，
+总/动态/静态功耗=`0.271/0.199/0.072 W`。
+相对 239-LUT 板测版减少 5 LUT 和 8 FF，其他列举资源不变。
+
+Smoke/Release 均为 17/17 PASS；正式 routed DCP 六模式后仿真为 44.1 kHz
+`177/353/5645 edges/ms`、48 kHz `192/384/6144 edges/ms`，六档 DAC 数据均持续变化且无 X。
+bitstream SHA-256 为
+`3076AB46767D4BA6DB058DA73662E074053A4E5E694FF0E6417DE1D7ABDF7025`。当前状态为
+**tool-verified，待用户物理板验证**。
+
+独立核心 OOC 从空结果目录复跑并通过精确门禁：
+**194 LUT / 0 LUTRAM / 282 FF / 4 DSP / 3 RAMB18E1（1.5 Tile）/ 0 MMCM**，内部
+WNS/WHS=`+151.280/+0.089 ns`，DRC Error=0。现场复现见 [`core_ooc/README.md`](core_ooc/README.md)。
+
+## 前一状态：239-LUT 正式板测版，249-LUT 更早板测回退
 
 分支 `national-finals-v2025.2-post249-lut-optimization` 将 Stage1 中心延迟寄存器的无效启动期
 处理由 24-bit `read_data/0` 数据选择改写为寄存器使能。中心抽头的历史有效性在复位周期内
@@ -18,8 +43,9 @@ TNS/THS=0，DRC Error=0，路由错误=0，总/动态/静态功耗=`0.271/0.199/
 Smoke/Release 均为 17/17 PASS；Release 全链 14 组输入在 4x/8x/128x 三节点全部 0 LSB；
 239-LUT routed DCP 的六模式后仿真为 44.1 kHz `177/353/5645 edges/ms`、48 kHz
 `192/384/6144 edges/ms`，六档 DAC 数据均持续变化且无 X。bitstream SHA-256 为
-`56248A6FFD013B020012B397ED32E9FA9F2285644978E5016CEB2F5506911EEA`。该版本当前为
-**tool-verified，待用户物理板复测**。
+`56248A6FFD013B020012B397ED32E9FA9F2285644978E5016CEB2F5506911EEA`。用户随后完成物理板
+验证，确认各档采样率和 DAC 输出波形正常，因此该版本已升级为 **board-verified**；标签为
+`nf-vivado2025.2-239lut-377ff-4dsp-2bram-board-pass`。
 
 独立核心 OOC 从空结果目录复跑并通过精确门禁：
 **197 LUT / 0 LUTRAM / 290 FF / 4 DSP / 3 RAMB18E1（1.5 Tile）/ 0 MMCM**，内部
@@ -95,7 +121,8 @@ GUI 完整构建结果目录：`tools/vivado_2025_2/results/20260808_161249`；b
 | `099390e` | **276** | **0** | **379** | **4** | **2** | Stage2/3 DSP PREG 抽头有效位门控 | **工具与用户实板均通过** |
 | Stage1 顺序抽头正式版 | **258** | **0** | **376** | **4** | **2** | 系数展开进原 BRAM 空闲区，单地址 52 拍直接 MAC | **工具与用户实板均通过** |
 | CIC DSP角色交换正式版 | **249** | **0** | **377** | **4** | **2** | comb进DSP、第一级积分器进CARRY4、对齐状态复用 | **工具与用户实板均通过** |
-| Stage1 延迟寄存器使能候选 | **239** | **0** | **377** | **4** | **2** | 利用中心抽头有效性单调不变量，删除24-bit数据/零mux | **完整工具签核通过，待用户物理板复测** |
+| Stage1 延迟寄存器使能正式版 | **239** | **0** | **377** | **4** | **2** | 利用中心抽头有效性单调不变量，删除24-bit数据/零mux | **工具与用户实板均通过** |
+| Stage1索引合并+共享phase+原子切档候选 | **234** | **0** | **369** | **4** | **2** | 合并Stage1索引、复用Stage2/3权威phase、force_mute内负边沿原子提交模式 | **完整工具签核通过，待用户物理板验证** |
 
 Stage2/3 原实现根据历史有效位，在 Fabric 中将 22-bit/20-bit 样本选择为真实值或零，再送入
 共享 DSP。当前实现让 BRAM 原始样本直接进入 DSP，并用任务启动时锁存的
@@ -308,6 +335,10 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
 
 脚本会先检查 Vivado GUI 是否关闭和提交内存余量，然后把所有 `.log/.jou/.rpt/.dcp/.bit`
 集中放入带时间戳的 `tools/vivado_2025_2/results` 子目录，不污染工程主目录。
+2026-08-10 已把该入口改为单 Vivado 进程的 in-memory 综合/实现流：仍从正式 `.xpr` 读取
+源文件集、顶层和约束，但不再调用本机曾经卡在 `.vivado.begin.rst` 的命令行
+`launch_runs`/VRS 调度器。生产入口已从空结果目录复跑并出现
+`VIVADO_2025_2_FULL_BUILD_PASS`，精确复现 234 LUT、369 FF 和正式 bitstream。
 
 若 Tcl Store 错误再次出现，请先关闭 Vivado，再执行：
 
