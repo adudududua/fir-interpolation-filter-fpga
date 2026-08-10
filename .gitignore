@@ -140,6 +140,7 @@ matlab_fir/national_finals/**/_work/
 # of the reproducible release payload. Selected reports/DCPs are force-added.
 /XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/evidence/
 /XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/core_ooc/results/
+/XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/_work/
 
 # The copied project contains legacy 2018.3 screenshots/reports and an old
 # bitstream. Keep the authoritative 2025.2 result set under tools instead.

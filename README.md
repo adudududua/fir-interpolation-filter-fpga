@@ -45,6 +45,37 @@ DRC Error=0；CDC 双位模式总线 bus-skew 实际 0.433 ns、约束 50.000 ns
 原因和复现命令见
 [221-LUT routed 网表不变量优化执行反馈](matlab_fir/national_finals/results/vivado2025_2_post234_221lut_execution_feedback.md)。
 
+### 221-LUT 板测版后的结构重构试验（No-Go，2026-08-10）
+
+以 221-LUT board-pass 标签为不可变回退点，本轮在独立分支
+`national-finals-v2025.2-global-fir-scheduler` 试验了 256× 双采样率族计算时钟、全局单 DSP
+三级 FIR 调度、固定时隙 Stage2/3，以及把两级 bridge 量化搬入共享 DSP48 空闲拍。正式板级
+RTL 和 `.xpr` 未接入这些 No-Go 候选。
+
+时钟可行性候选已完成布局布线：两个 MMCM 产生 11.2896/12.288 MHz，经
+`BUFGMUX_CTRL` 选择 256× 计算时钟，再由 `BUFR /2` 恢复 128× 音频时钟；DRC Error=0，
+WNS/WHS=`+79.928/+0.248 ns`。这证明时钟结构能在 XC7A35T 上实现，但并不代表调度器面积更低。
+
+结构 A/B 使用同一 FIR 前三节点 OOC 边界；它不含 CIC、PCM ROM、按键、CDC、DAC、IO 和
+MMCM，不能与 221-LUT 整板数字直接相减：
+
+| FIR 前端候选 | LUT | FF | DSP48E1 | RAMB18E1 | RTL 等价 | 结论 |
+|---|---:|---:|---:|---:|---|---|
+| **221-LUT 正式版 FIR 前端参考** | **187** | **159** | **2** | **3** | 正式核心来源 | 基线 |
+| 全局单 DSP FIR 调度 | 316 | 276 | 1 | 3 | 64k 周期，三节点逐拍一致 | 少1 DSP但多129 LUT，No-Go |
+| 固定时隙 Stage2/3 | **186** | 165 | 2 | 3 | 64k 周期，三节点逐拍一致 | 仅少1 LUT、多6 FF，无法覆盖新增时钟集成 |
+| DSP 内折叠两级量化 | 197 | 159 | 2 | 3 | 26k 周期，三节点逐拍一致 | 多10 LUT，No-Go |
+| 固定时隙并折叠两级量化 | 254 | 211 | 2 | 3 | 64k 周期，三节点逐拍一致 | 多67 LUT，No-Go |
+
+固定时隙方案对 `AreaOptimized_high/medium`、`FewerCarryChains` 和 `Default` 的 LUT/FF 扫描为
+`186/165、186/165、188/165、188/165`；删除返回流水 FF 后变成 `194/159`，同样恶化。所有
+候选均带 pending 覆盖、历史写冲突和截止期断言。量化折叠还专门修复并复验了正满量程舍入
+边界。由于没有候选形成可信的整板净收益，本轮按停止线不生成候选 bitstream、不运行完整
+Release 17/17，也不改变 221-LUT 正式推荐。
+
+完整调度思路、资源矩阵、失败原因、验证数量和一键复现入口见
+[221-LUT 后结构重构试验执行反馈](matlab_fir/national_finals/results/vivado2025_2_post221_structure_redesign_execution_feedback.md)。
+
 ## 当前正式实板安全回退：Vivado 2025.2 234 LUT / 4 DSP（2026-08-10 板测确认）
 
 在已经完成用户物理板验证并创建 board-pass 标签的 239-LUT 版本上，分支
@@ -1106,6 +1137,7 @@ Route 1相对573-LUT基线减少149 LUT和150 FF，WNS减少 **0.983 ns**，WHS�
 综合结论：
 
 - **当前最低 LUT 且正式实板通过版为 Vivado 2025.2 routed不变量复用版：221 LUT / 367 FF / 4 DSP / 2 BRAM Tile**；Smoke/Release 17/17、正式综合/实现/DRC/时序/功耗/bitstream、默认与 routed 六档门禁及用户物理板六档采样率/DAC波形全部通过；
+- **221-LUT 后结构重构试验未形成新正式候选**：256× 全局单 DSP、固定时隙 Stage2/3、DSP 内折叠量化均完成定向逐拍等价和同口径 OOC；最佳候选只在 FIR 前端减少 1 LUT、增加 6 FF，且需要新增 256× 时钟集成，无法形成可信的整板净收益，因此正式版和 board-pass 标签保持不变；
 - **前一实板安全回退为 Vivado 2025.2 共享phase与原子切档版：234 LUT / 369 FF / 4 DSP / 2 BRAM Tile**；其 board-pass 标签继续保留；
 - **前一实板安全回退为 Vivado 2025.2 Stage1 延迟使能版：239 LUT / 377 FF / 4 DSP / 2 BRAM Tile**；工具闭环与用户物理板均通过，board-pass 标签继续保留；
 - **前一 Vivado 2025.2 实板安全回退为249 LUT / 377 FF / 4 DSP / 2 BRAM Tile**；258、276、292 LUT版本继续作为更早实板回退；
