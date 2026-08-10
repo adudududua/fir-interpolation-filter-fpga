@@ -1,6 +1,6 @@
 # Vivado 2025.2 迁移、修复与验证记录
 
-## 当前状态：221-LUT 工具签核候选，234-LUT 正式板测回退
+## 当前状态：221-LUT 正式板测版，234-LUT 前一安全回退
 
 分支 `national-finals-v2025.2-post234-lut-optimization` 在已板测 234-LUT 版本上完成 routed
 网表不变量优化：CDC `ack_toggle` 兼任本地 seen token；Stage2/3 删除重复补偿模式 job 快照；
@@ -20,9 +20,10 @@ Smoke/Release 均为 17/17 PASS；正式 routed DCP 默认模式得到 11290 个
 数据变化，六模式后仿真为 44.1 kHz `177/353/5645 edges/ms`、48 kHz
 `192/384/6144 edges/ms`，六档 DAC 数据均持续变化且无 X。bitstream SHA-256 为
 `08B2DE6DB8DF1FBC9E59EA78808C57BD007E414243B5F6FF9C7FF1B2797D91A7`，routed DCP SHA-256 为
-`BFE4A9A25958C232E24091A08EE7A2F0E564AB3DF8C45EEFEB9CCA3CF1DC943F`。当前为
-**tool-verified，待用户物理板验证**；正式安全回退标签仍为
-`nf-vivado2025.2-234lut-369ff-4dsp-2bram-board-pass`。
+`BFE4A9A25958C232E24091A08EE7A2F0E564AB3DF8C45EEFEB9CCA3CF1DC943F`。2026-08-10 用户完成
+物理板验证，确认 44.1/48 kHz 两个输入采样率族下所有档位的实际输出采样率均正确，DAC 波形
+均正常，因此当前状态升级为 **board-verified**。正式标签为
+`nf-vivado2025.2-221lut-367ff-4dsp-2bram-board-pass`；234-LUT 标签保留为前一安全回退。
 
 独立核心 OOC 从空结果目录复跑并通过精确门禁：
 **193 LUT / 0 LUTRAM / 281 FF / 4 DSP / 3 RAMB18E1（1.5 Tile）/ 0 MMCM**，内部

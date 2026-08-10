@@ -1,6 +1,6 @@
 # 全国总决赛：双采样率可配置插值滤波器
 
-## Vivado 2025.2 当前最低 LUT 工具签核候选：routed 不变量复用版（221 LUT / 4 DSP）
+## Vivado 2025.2 当前最低 LUT 正式实板版：routed 不变量复用版（221 LUT / 4 DSP）
 
 本轮从已板测 234-LUT 版本继续审计 routed 网表，删除三组功能重复状态/门控：模式 CDC 复用
 `ack_toggle` 作为本地已接收 token；Stage2/3 直接使用在 Stage3 任务期间稳定的 pending 补偿
@@ -14,8 +14,9 @@
 内部 WNS/WHS=`+151.232/+0.166 ns`。
 
 Smoke/Release 均为 **17/17 PASS**；正式 bitstream 已生成，默认 routed DAC 活性与 44.1/48 kHz
-六模式 routed 回归全部通过。当前为 **tool-verified，等待物理板验证**；234-LUT board-pass 标签
-仍是正式安全回退。详见
+六模式 routed 回归全部通过。2026-08-10 用户完成物理板验证，确认 44.1/48 kHz 两个输入
+采样率族下各倍率档位输出采样率均正确，DAC 波形均正常，因此当前升级为 **board-verified**；
+221-LUT board-pass 为正式发布，234-LUT board-pass 降为前一安全回退。详见
 [221-LUT 执行反馈](results/vivado2025_2_post234_221lut_execution_feedback.md)。
 
 ## Vivado 2025.2 当前最低 LUT 工具签核候选：Stage1 顺序抽头版（258 LUT / 4 DSP）

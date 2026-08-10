@@ -11,12 +11,15 @@
 
 相对 234-LUT 板测基线减少 **13 LUT（5.56%）和 2 FF（0.54%）**，DSP、BRAM、IO、MMCM
 和 vectorless 功耗不变。该版本已经通过 RTL、实现、bitstream 与 routed-DCP 工具闭环，当前
-状态为 **tool-verified**；用户完成物理板验证前不标记为 board-pass。正式安全回退仍是
+状态已由 **tool-verified** 升级为 **board-verified**：2026-08-10 用户完成物理板验证，确认
+44.1/48 kHz 两个采样率族下各倍率档位输出采样率均正确，DAC 波形均正常。正式安全回退为
 `nf-vivado2025.2-234lut-369ff-4dsp-2bram-board-pass`。
 
 ## 2. Git 与回退路线
 
 - 234-LUT 板测标签：`nf-vivado2025.2-234lut-369ff-4dsp-2bram-board-pass`；
+- 221-LUT 工具签核标签：`nf-vivado2025.2-221lut-367ff-4dsp-2bram-toolverified`；
+- 221-LUT 正式板测标签：`nf-vivado2025.2-221lut-367ff-4dsp-2bram-board-pass`；
 - 本轮分支：`national-finals-v2025.2-post234-lut-optimization`；
 - 分支、提交和标签均不使用 `codex` 字样；
 - 候选综合、网表审计和仿真临时文件全部位于被忽略的
@@ -177,11 +180,11 @@ Generate Bitstream 手动运行；必须 reset 旧 run，并确认查看的是�
 ## 12. 稳定性边界与下一步
 
 工具侧稳定性证据已经覆盖 RTL、复位、CDC、切档、BRAM 原语、正式实现、bitstream、时序、
-DRC、bus-skew 和 routed DAC 活性；当前没有发现功能或时序不稳定因素。仍无法由软件替代的唯一
-环节是物理板上的 DAC 波形、电气完整性和真实六档采样率。用户板测通过后才能创建 board-pass
-标签。
+DRC、bus-skew 和 routed DAC 活性。2026-08-10 用户进一步完成物理板六档采样率与 DAC 波形
+验证，所有档位均正常，当前没有发现功能、时序或板级输出不稳定因素。
 
 在固定 4 DSP / 2 BRAM Tile、现有系数和定点语义下，221 LUT 已接近当前微架构的局部最优。
 继续依靠单寄存器、单比较器或策略扫描，预期收益通常为 0～2 LUT，且可能被布局打包波动抵消。
 若要显著继续下降，需要重新设计 Stage1/Stage2/3/CIC 的统一调度或存储边界，验证成本和板级
-风险会明显上升；因此应以 234-LUT board-pass 为回退点，并在 221-LUT 实板通过后再开始下一轮。
+风险会明显上升；因此后续继续优化时应以 221-LUT board-pass 为当前基线，并保留 234-LUT
+board-pass 作为前一安全回退点。
