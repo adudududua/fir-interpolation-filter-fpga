@@ -213,15 +213,24 @@ module demo_interp_dac8_audio_pcm_common #(
     // signed 音频采样序列。
     //=========================================================
     wire signed [23:0] x_in;
-    reg                x_in_valid;
+    reg                x_in_valid_legacy;
+    wire               x_in_valid;
 
     assign x_in = audio_sample_w;
+    // In the national-finals path the ROM and every downstream history port
+    // are synchronously reset to zero. The first post-reset CE therefore
+    // accepts the same zero sample whether valid rises one clock later or is
+    // tied high. Making that signed-off invariant explicit lets Vivado remove
+    // the 24-bit input-zeroing mux in front of the Stage1 RAM. Keep the legacy
+    // one-cycle valid behavior for the regional fallback.
+    assign x_in_valid = (USE_NATIONAL_FINALS_DATAPATH != 0) ?
+                        1'b1 : x_in_valid_legacy;
 
     always @(posedge clk_audio_128x) begin
         if (!rst_n)
-            x_in_valid <= 1'b0;
+            x_in_valid_legacy <= 1'b0;
         else
-            x_in_valid <= 1'b1;
+            x_in_valid_legacy <= 1'b1;
     end
 
     //=========================================================

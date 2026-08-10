@@ -29,7 +29,6 @@ module nf_mode_cdc_handshake #(
     reg       ack_toggle = 1'b0;
     (* ASYNC_REG = "TRUE" *) reg req_meta = 1'b0;
     (* ASYNC_REG = "TRUE" *) reg req_sync = 1'b0;
-    reg       req_seen = 1'b0;
     // A one-hot token replaces the pending flag plus binary down-counter.
     // With SETTLE_CYCLES=3 the request follows
     // 0001 -> 0010 -> 0100 -> 1000 -> capture, which is cycle-identical to
@@ -64,7 +63,6 @@ module nf_mode_cdc_handshake #(
         if (!audio_rst_n) begin
             req_meta     <= 1'b0;
             req_sync     <= 1'b0;
-            req_seen     <= 1'b0;
             ack_toggle   <= 1'b0;
             audio_mode   <= 2'b11;
             audio_mute   <= 1'b1;
@@ -78,14 +76,16 @@ module nf_mode_cdc_handshake #(
                 audio_mute <= 1'b1;
                 if (transfer_pipe[SETTLE_CYCLES]) begin
                     audio_mode <= mode_shadow;
-                    req_seen <= req_sync;
                     ack_toggle <= req_sync;
                     transfer_pipe <= {(SETTLE_CYCLES + 1){1'b0}};
                 end
                 else
                     transfer_pipe <= transfer_pipe << 1;
             end
-            else if (req_sync != req_seen) begin
+            // ack_toggle is also the locally observed request token. It is
+            // reset and updated on exactly the same edges as the former
+            // duplicate req_seen register, so one state bit is sufficient.
+            else if (req_sync != ack_toggle) begin
                 audio_mute <= 1'b1;
                 transfer_pipe <= {{SETTLE_CYCLES{1'b0}}, 1'b1};
             end

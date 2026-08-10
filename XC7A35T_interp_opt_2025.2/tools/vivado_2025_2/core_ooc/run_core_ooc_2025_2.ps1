@@ -27,6 +27,17 @@ if ([string]::IsNullOrWhiteSpace($VivadoBat) -or -not (Test-Path -LiteralPath $V
     throw 'Vivado 2025.2 was not found. Pass -VivadoBat with the full path to vivado.bat.'
 }
 
+# Pin Tcl app discovery to the Vivado installation.  This keeps the OOC flow
+# reproducible even when the per-user Tcl Store cache is incomplete or corrupt.
+$vivadoBin = Split-Path -Parent $VivadoBat
+$vivadoRoot = Split-Path -Parent $vivadoBin
+$tclStore = Join-Path $vivadoRoot 'data\XilinxTclStore'
+if (Test-Path -LiteralPath $tclStore) {
+    $tclStoreTclPath = $tclStore.Replace('\', '/')
+    $env:XILINX_TCLAPP_REPO = $tclStoreTclPath
+    $env:TCLLIBPATH = $tclStoreTclPath
+}
+
 $runningVivado = @(Get-Process -Name 'vivado' -ErrorAction SilentlyContinue)
 if ($runningVivado.Count -gt 0) {
     $ids = ($runningVivado.Id | Sort-Object) -join ', '

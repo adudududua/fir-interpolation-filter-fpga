@@ -13,10 +13,22 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $projectDir = (Resolve-Path (Join-Path $scriptDir '..\..')).Path
 $vivadoBat = 'E:\app\Xilinx20252\2025.2\Vivado\bin\vivado.bat'
 $buildScript = Join-Path $scriptDir 'build_project_2025_2.tcl'
+$vivadoRoot = Split-Path -Parent (Split-Path -Parent $vivadoBat)
+$tclStore = Join-Path $vivadoRoot 'data\XilinxTclStore'
 
 if (-not (Test-Path -LiteralPath $vivadoBat)) {
     throw "Vivado 2025.2 was not found at $vivadoBat"
 }
+
+# A stale per-user Tcl Store can prevent open_project before synthesis starts.
+# Pin both lookup variables to the known-good installation copy so command-line
+# builds are reproducible and do not depend on AppData cache health.
+$env:XILINX_TCLAPP_REPO = $tclStore
+$env:TCLLIBPATH = (@(
+    (Join-Path $tclStore 'support\appinit'),
+    (Join-Path $tclStore 'support'),
+    (Join-Path $tclStore 'tclapp')
+) | ForEach-Object { $_.Replace('\', '/') }) -join ' '
 
 $runningVivado = @(Get-Process -Name 'vivado' -ErrorAction SilentlyContinue)
 if ($runningVivado.Count -gt 0) {

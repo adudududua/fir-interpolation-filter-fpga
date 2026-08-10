@@ -30,7 +30,7 @@ set_property STEPS.SYNTH_DESIGN.ARGS.SHREG_MIN_SIZE 5 $synth_run
 # register unchanged while invalid startup reads are expressed as a register
 # enable, removing the 24-bit BRAM-data/zero mux.  Together with the CIC DSP
 # role exchange, shared Stage2/3 phase state, and atomic mode commit, the
-# release target is no more than 234 LUT while keeping
+# release target is no more than 221 LUT while keeping
 # 4 DSP / 4 RAMB18E1; the hard gates below prevent stale or wrong-run results.
 set_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE ExploreArea $impl_run
 set_property STEPS.PLACE_DESIGN.ARGS.DIRECTIVE Explore $impl_run
@@ -95,8 +95,8 @@ puts "V2025_2_DRC_ERRORS=[llength $drc_errors]"
 require_condition [expr {$dsp_count == 4}] "Expected exactly 4 DSP48E1 cells."
 require_condition [expr {$bram18_count == 4}] "Expected exactly 4 RAMB18E1 cells."
 require_condition [expr {$mmcm_count == 2}] "Expected exactly 2 MMCME2_ADV cells."
-require_condition [expr {$lut_count <= 234}] \
-    "LUT regression: expected no more than 234, got $lut_count."
+require_condition [expr {$lut_count <= 221}] \
+    "LUT regression: expected no more than 221, got $lut_count."
 require_condition [expr {$ff_count <= 390}] \
     "FF regression: expected no more than 390, got $ff_count."
 require_condition [expr {$wns >= 0.0}] "Setup timing failed: WNS=$wns ns."

@@ -126,7 +126,6 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     reg job_active;
     reg job_stage3;
     reg job_phase;
-    reg job_stage3_compensated;
     reg [3:0] job_mac_index;
     reg [MEM_ADDR_W-1:0] job_history_head;
     reg job_history_full;
@@ -267,8 +266,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         (stage2_pending ? ~stage2_phase : ~stage3_phase);
     assign coeff_bram_stage3_compensated =
         (USE_P3_JOINT_STAGE3 != 0) && coeff_bram_stage3 &&
-        (job_active ? job_stage3_compensated :
-                      stage3_pending_compensated);
+        stage3_pending_compensated;
     assign coeff_bram_next_index = job_active ?
         job_mac_index + 4'd1 : 4'd0;
     assign coeff_bram_read_addr = {coeff_bram_stage3,
@@ -756,7 +754,6 @@ module interp2_stage23_lutram_cic_dsp_ce #(
             job_active <= 1'b0;
             job_stage3 <= 1'b0;
             job_phase <= 1'b0;
-            job_stage3_compensated <= 1'b0;
             job_mac_index <= 4'd0;
             job_history_head <= {MEM_ADDR_W{1'b0}};
             job_history_full <= 1'b0;
@@ -836,8 +833,6 @@ module interp2_stage23_lutram_cic_dsp_ce #(
                 job_active <= 1'b1;
                 job_stage3 <= 1'b1;
                 job_phase <= ~stage3_phase;
-                job_stage3_compensated <=
-                    stage3_pending_compensated;
                 job_mac_index <= 4'd0;
                 job_history_head <= stage3_head;
                 job_history_full <= stage3_history_full;

@@ -128,7 +128,7 @@ create_clock -name core_clk_6m144 -period 162.760 \
 set_property HD.CLK_SRC BUFGCTRL_X0Y16 [get_ports clk]
 set_false_path -from [get_ports rst_n]
 
-# Keep zero-delay OOC boundaries for the signed-off 194-LUT placement result.
+# Keep zero-delay OOC boundaries for the signed-off 193-LUT placement result.
 # Those artificial boundary paths are reported, but the pass/fail timing gate
 # below is calculated separately over internal register-to-register paths.
 set core_data_inputs [get_ports {ce2 ce4 ce8 ce16 ce32 ce64 ce128 \
@@ -218,10 +218,10 @@ puts "CORE_OOC_INTERNAL_WNS=$internal_wns"
 puts "CORE_OOC_INTERNAL_WHS=$internal_whs"
 puts "CORE_OOC_DRC_ERRORS=[llength $drc_errors]"
 
-require_condition [expr {$lut_count == 194}] \
-    "Expected exactly 194 LUT for the signed-off Vivado 2025.2 OOC flow; got $lut_count."
+require_condition [expr {$lut_count == 193}] \
+    "Expected exactly 193 LUT for the signed-off Vivado 2025.2 OOC flow; got $lut_count."
 require_condition [expr {$lutram_count == 0}] "Expected 0 LUTRAM; got $lutram_count."
-require_condition [expr {$ff_count == 282}] "Expected exactly 282 FF; got $ff_count."
+require_condition [expr {$ff_count == 281}] "Expected exactly 281 FF; got $ff_count."
 require_condition [expr {$dsp_count == 4}] "Expected exactly 4 DSP48E1; got $dsp_count."
 require_condition [expr {$bram18_count == 3 && $bram36_count == 0}] \
     "Expected 3 RAMB18E1 and 0 RAMB36E1."

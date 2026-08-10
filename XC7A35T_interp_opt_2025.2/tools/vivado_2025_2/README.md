@@ -1,6 +1,37 @@
 # Vivado 2025.2 迁移、修复与验证记录
 
-## 当前状态：234-LUT 正式板测版，239-LUT 前一安全回退
+## 当前状态：221-LUT 工具签核候选，234-LUT 正式板测回退
+
+分支 `national-finals-v2025.2-post234-lut-optimization` 在已板测 234-LUT 版本上完成 routed
+网表不变量优化：CDC `ack_toggle` 兼任本地 seen token；Stage2/3 删除重复补偿模式 job 快照；
+全国赛同步复位为零的数据路径把输入 valid 明确为常量 1，从而删除 Stage1 RAM 前 24-bit
+输入/零门控。区域赛兼容 generate 路径仍保留原一拍 valid 行为，系数、位宽、舍入/饱和、
+采样率和输出相位不变。
+
+正式归档目录为 `tools/vivado_2025_2/results/20260810_181833`：
+
+**221 LUT / 0 LUTRAM / 367 FF / 4 DSP / 4 RAMB18E1（2 BRAM Tile）/
+17 IO / 2 MMCM**；综合为 **285 LUT / 375 FF**，WNS/WHS=`+44.556/+0.079 ns`，
+TNS/THS=0，DRC Error=0，路由错误=0，bus-skew 余量 `+49.567 ns (MET)`，
+总/动态/静态功耗=`0.271/0.199/0.072 W`。相对 234-LUT 板测版减少 13 LUT、2 FF，
+其他列举资源不变。
+
+Smoke/Release 均为 17/17 PASS；正式 routed DCP 默认模式得到 11290 个 DAC 边沿、7462 次
+数据变化，六模式后仿真为 44.1 kHz `177/353/5645 edges/ms`、48 kHz
+`192/384/6144 edges/ms`，六档 DAC 数据均持续变化且无 X。bitstream SHA-256 为
+`08B2DE6DB8DF1FBC9E59EA78808C57BD007E414243B5F6FF9C7FF1B2797D91A7`，routed DCP SHA-256 为
+`BFE4A9A25958C232E24091A08EE7A2F0E564AB3DF8C45EEFEB9CCA3CF1DC943F`。当前为
+**tool-verified，待用户物理板验证**；正式安全回退标签仍为
+`nf-vivado2025.2-234lut-369ff-4dsp-2bram-board-pass`。
+
+独立核心 OOC 从空结果目录复跑并通过精确门禁：
+**193 LUT / 0 LUTRAM / 281 FF / 4 DSP / 3 RAMB18E1（1.5 Tile）/ 0 MMCM**，内部
+WNS/WHS=`+151.232/+0.166 ns`，DRC Error=0。现场复现见 [`core_ooc/README.md`](core_ooc/README.md)。
+
+批处理入口会把 `XILINX_TCLAPP_REPO` 与 `TCLLIBPATH` 固定到 Vivado 安装目录自带 Tcl Store，
+因此用户目录中损坏的 Tcl Store 缓存不会再让 `open_project` 或 post-route 导出在综合前失败。
+
+## 当前正式板测回退：234 LUT，239 LUT 为前一安全回退
 
 分支 `national-finals-v2025.2-230to234-lut-challenge` 在 239-LUT board-pass 版本上完成三项
 等价控制优化：Stage1 合并调度/发射索引，Stage2/3 bridge 复用滤波核权威 phase 状态，以及
@@ -343,7 +374,8 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
 2026-08-10 已把该入口改为单 Vivado 进程的 in-memory 综合/实现流：仍从正式 `.xpr` 读取
 源文件集、顶层和约束，但不再调用本机曾经卡在 `.vivado.begin.rst` 的命令行
 `launch_runs`/VRS 调度器。生产入口已从空结果目录复跑并出现
-`VIVADO_2025_2_FULL_BUILD_PASS`，精确复现 234 LUT、369 FF 和正式 bitstream。
+`VIVADO_2025_2_FULL_BUILD_PASS`，精确复现 221 LUT、367 FF 和正式 bitstream。入口同时固定使用
+Vivado 安装目录中的 Tcl Store；用户缓存损坏时会出现警告，但不会阻止构建。
 
 若 Tcl Store 错误再次出现，请先关闭 Vivado，再执行：
 

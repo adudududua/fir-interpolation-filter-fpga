@@ -1,5 +1,23 @@
 # 全国总决赛：双采样率可配置插值滤波器
 
+## Vivado 2025.2 当前最低 LUT 工具签核候选：routed 不变量复用版（221 LUT / 4 DSP）
+
+本轮从已板测 234-LUT 版本继续审计 routed 网表，删除三组功能重复状态/门控：模式 CDC 复用
+`ack_toggle` 作为本地已接收 token；Stage2/3 直接使用在 Stage3 任务期间稳定的 pending 补偿
+模式；全国赛同步复位零路径把输入 valid 固定为 1，删除 Stage1 RAM 前 24-bit 输入/零门控，
+而区域赛兼容路径仍保留原 valid 行为。滤波系数、位宽、舍入/饱和、4x/8x/128x 接口、
+双采样率时钟、4 DSP 与 2 BRAM Tile 均不变。
+
+正式 Vivado 2025.2 实现为 **221 LUT / 367 FF / 4 DSP / 4 RAMB18E1（2 Tile）/
+2 MMCM**，综合为 285 LUT / 375 FF，WNS/WHS=`+44.556/+0.079 ns`，DRC Error=0，
+功耗 0.271 W。独立插值核心 OOC 为 **193 LUT / 281 FF / 4 DSP / 3 RAMB18E1（1.5 Tile）**，
+内部 WNS/WHS=`+151.232/+0.166 ns`。
+
+Smoke/Release 均为 **17/17 PASS**；正式 bitstream 已生成，默认 routed DAC 活性与 44.1/48 kHz
+六模式 routed 回归全部通过。当前为 **tool-verified，等待物理板验证**；234-LUT board-pass 标签
+仍是正式安全回退。详见
+[221-LUT 执行反馈](results/vivado2025_2_post234_221lut_execution_feedback.md)。
+
 ## Vivado 2025.2 当前最低 LUT 工具签核候选：Stage1 顺序抽头版（258 LUT / 4 DSP）
 
 从已板测 276-LUT 基线建立独立分支后，Stage1 改为单地址顺序抽头微引擎：把 26 个对称系数

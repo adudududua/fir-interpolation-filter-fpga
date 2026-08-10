@@ -17,6 +17,15 @@ $testbenchSource = Join-Path $PSScriptRoot 'tb_board_postroute_dac_activity.v'
 $testbench = Join-Path $runRoot 'tb_board_postroute_dac_activity.v'
 $exportTcl = Join-Path $nfRoot 'vivado\export_postroute_funcsim.tcl'
 
+$vivadoRoot = Split-Path -Parent $VivadoBin
+$tclStore = Join-Path $vivadoRoot 'data\XilinxTclStore'
+$env:XILINX_TCLAPP_REPO = $tclStore
+$env:TCLLIBPATH = (@(
+    (Join-Path $tclStore 'support\appinit'),
+    (Join-Path $tclStore 'support'),
+    (Join-Path $tclStore 'tclapp')
+) | ForEach-Object { $_.Replace('\', '/') }) -join ' '
+
 $vivado = Join-Path $VivadoBin 'vivado.bat'
 $xvlog = Join-Path $VivadoBin 'xvlog.bat'
 $xelab = Join-Path $VivadoBin 'xelab.bat'
