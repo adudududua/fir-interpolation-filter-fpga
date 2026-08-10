@@ -10,19 +10,26 @@
 17 IO / 2 MMCM**。
 
 相对 239-LUT 板测基线减少 **5 LUT（2.09%）和 8 FF（2.12%）**，DSP、BRAM、IO、MMCM
-与 vectorless 功耗不变。当前版本已经完成完整工具闭环，状态为 **tool-verified、等待用户物理板
-验证**；在用户确认各档采样率与 DAC 波形前，239-LUT board-pass 标签仍是正式安全回退点。
+与 vectorless 功耗不变。当前版本已经完成完整工具闭环；用户随后完成物理板验证，确认两个
+输入采样率族下各档输出采样率均正确、DAC 输出波形均正常，因此状态正式升级为
+**board-verified**。239-LUT board-pass 标签继续作为前一安全回退点。
 
 ## 2. Git 与回退路线
 
 - 239-LUT 板测标签：`nf-vivado2025.2-239lut-377ff-4dsp-2bram-board-pass`；
+- 234-LUT 工具签核标签：`nf-vivado2025.2-234lut-369ff-4dsp-2bram-toolverified`；
+- 234-LUT 正式板测标签：`nf-vivado2025.2-234lut-369ff-4dsp-2bram-board-pass`；
 - 本轮分支：`national-finals-v2025.2-230to234-lut-challenge`；
 - 分支、提交和标签均不使用 `codex` 字样；
 - 临时综合、候选网表和仿真输出全部位于 `matlab_fir/national_finals/_work`；
 - 正式 234-LUT bitstream、DCP 与报告归档在
   `XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/results/20260810_160858`。
+- 用户实际下载并通过板测的 bitstream 与对应 routed DCP 归档在
+  `XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/results/20260810_170616_board_pass`；bitstream
+  SHA-256 为 `F9DB8E33C3959C448FDE316A51BA9A13ABC83D5AE1F69655CD5D0B698A871E85`，DCP
+  SHA-256 为 `47CDCA8E43C2DA817D028828564862EC56C64F0E791C6F845DE05A3E03DA3162`。
 
-若物理板复测异常，应先回到上述 239-LUT board-pass 标签，不在故障版本上继续叠加修改。
+若后续板级环境或工程状态异常，可先回到上述 239-LUT board-pass 标签进行 A/B 排查。
 
 ## 3. 最终采用的三项优化
 
@@ -136,8 +143,9 @@ shreg_min_size=5`，实现使用 `opt_design ExploreArea + place_design Explore 
 `0.005709/0.006192/0.005848 dB`，阻带衰减为 `78.568/78.609/72.371 dB`，严格线性相位。
 
 工具验证能够排除 RTL、定点、时序、DRC、路由和门级六档中的已覆盖问题，但不能替代 AD9708、
-探头、供电、板级连线和真实模拟波形检查。最终仍需用户下载本轮 bitstream，确认两采样率族下
-各档输出频率和 DAC 波形；通过后才能创建 234-LUT `board-pass` 标签。
+探头、供电、板级连线和真实模拟波形检查。2026-08-10 用户已下载本轮 bitstream 并完成物理板
+验证，确认 44.1/48 kHz 两个输入采样率族下所有档位的实际输出采样率均正确，DAC 输出波形均
+正常。因此 234-LUT 版本已满足 `board-pass` 条件。
 
 ## 9. 执行中遇到的问题与处理
 
@@ -151,3 +159,7 @@ shreg_min_size=5`，实现使用 `opt_design ExploreArea + place_design Explore 
    六模式结论，而是对最终正式归档 DCP 重新导出门级网表并再次运行六模式回归。
 4. Vivado 临时日志、`.Xil`、候选 DCP 和仿真工作目录均放在时间戳结果目录或 `_work`，没有
    在仓库主目录新增 `vivado.log/.jou`、`xsim.dir`、`-p` 等散落文件；重复正式归档也已清除。
+5. 用户在 GUI 中生成 bitstream 时曾遇到 `[Designutils 20-1700] bad allocation`。实现、路由、
+   时序和 DRC 均已通过，失败仅发生在 Bitgen 载入数据阶段。复用当前 routed DCP、仅打开该
+   checkpoint 并把 `general.maxThreads` 设为 1 后，Bitgen 以约 1.88 GB 峰值内存成功完成；
+   该恢复过程不修改 RTL 或布局布线。用户随后使用生成的 bitstream 完成上述板级验证。

@@ -1,6 +1,6 @@
 # Vivado 2025.2 迁移、修复与验证记录
 
-## 当前状态：234-LUT 工具签核候选，239-LUT 正式板测安全回退
+## 当前状态：234-LUT 正式板测版，239-LUT 前一安全回退
 
 分支 `national-finals-v2025.2-230to234-lut-challenge` 在 239-LUT board-pass 版本上完成三项
 等价控制优化：Stage1 合并调度/发射索引，Stage2/3 bridge 复用滤波核权威 phase 状态，以及
@@ -17,9 +17,14 @@ TNS/THS=0，DRC Error=0，路由错误=0，bus-skew 余量 `+49.467 ns (MET)`，
 
 Smoke/Release 均为 17/17 PASS；正式 routed DCP 六模式后仿真为 44.1 kHz
 `177/353/5645 edges/ms`、48 kHz `192/384/6144 edges/ms`，六档 DAC 数据均持续变化且无 X。
-bitstream SHA-256 为
-`3076AB46767D4BA6DB058DA73662E074053A4E5E694FF0E6417DE1D7ABDF7025`。当前状态为
-**tool-verified，待用户物理板验证**。
+工具签核 bitstream SHA-256 为
+`3076AB46767D4BA6DB058DA73662E074053A4E5E694FF0E6417DE1D7ABDF7025`。用户随后使用标准 GUI
+工程重新综合、实现并完成物理板验证，确认 44.1/48 kHz 两个输入采样率族下所有档位的实际
+输出采样率均正确，DAC 输出波形均正常。实际板测归档为
+`tools/vivado_2025_2/results/20260810_170616_board_pass`，bitstream SHA-256 为
+`F9DB8E33C3959C448FDE316A51BA9A13ABC83D5AE1F69655CD5D0B698A871E85`，routed DCP SHA-256 为
+`47CDCA8E43C2DA817D028828564862EC56C64F0E791C6F845DE05A3E03DA3162`；当前状态为
+**board-verified**，正式标签为 `nf-vivado2025.2-234lut-369ff-4dsp-2bram-board-pass`。
 
 独立核心 OOC 从空结果目录复跑并通过精确门禁：
 **194 LUT / 0 LUTRAM / 282 FF / 4 DSP / 3 RAMB18E1（1.5 Tile）/ 0 MMCM**，内部
@@ -122,7 +127,7 @@ GUI 完整构建结果目录：`tools/vivado_2025_2/results/20260808_161249`；b
 | Stage1 顺序抽头正式版 | **258** | **0** | **376** | **4** | **2** | 系数展开进原 BRAM 空闲区，单地址 52 拍直接 MAC | **工具与用户实板均通过** |
 | CIC DSP角色交换正式版 | **249** | **0** | **377** | **4** | **2** | comb进DSP、第一级积分器进CARRY4、对齐状态复用 | **工具与用户实板均通过** |
 | Stage1 延迟寄存器使能正式版 | **239** | **0** | **377** | **4** | **2** | 利用中心抽头有效性单调不变量，删除24-bit数据/零mux | **工具与用户实板均通过** |
-| Stage1索引合并+共享phase+原子切档候选 | **234** | **0** | **369** | **4** | **2** | 合并Stage1索引、复用Stage2/3权威phase、force_mute内负边沿原子提交模式 | **完整工具签核通过，待用户物理板验证** |
+| Stage1索引合并+共享phase+原子切档正式版 | **234** | **0** | **369** | **4** | **2** | 合并Stage1索引、复用Stage2/3权威phase、force_mute内负边沿原子提交模式 | **工具与用户实板均通过** |
 
 Stage2/3 原实现根据历史有效位，在 Fabric 中将 22-bit/20-bit 样本选择为真实值或零，再送入
 共享 DSP。当前实现让 BRAM 原始样本直接进入 DSP，并用任务启动时锁存的
