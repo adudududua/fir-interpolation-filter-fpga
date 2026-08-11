@@ -1,0 +1,9 @@
+VERSION_ID,PRIMARY_CHANGE,LUT,FF,DSP,BRAM_TILE,WNS_NS,NUMERIC_RELATION,BOARD_STATUS
+292,Vivado 2025.2 migration baseline,292,376,4,2,NaN,baseline,archive
+276,DSP tap-valid gating,276,379,4,2,NaN,equivalent,archive
+258,Stage1 sequential taps,258,376,4,2,NaN,equivalent,archive
+249,CIC DSP role exchange,249,377,4,2,NaN,equivalent,board-verified
+239,Stage1 center-delay CE,239,377,4,2,NaN,equivalent,board-verified
+234,control-state merge,234,369,4,2,NaN,equivalent,board-verified
+221,routed invariant reuse,221,367,4,2,44.556,equivalent,board-verified
+218,Stage2 word length 22 to 20,218,365,4,2,45.279,word-length Pareto,board-verified

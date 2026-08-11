@@ -20,3 +20,10 @@ matlab_fir/national_finals/vivado_results/p3j_final_430lut_431ff_176slice_4dsp_2
 
 # Preserve the signed-off 424-LUT Packed-ROM evidence and its manifest hashes.
 matlab_fir/national_finals/vivado_results/p3j_final_424lut_431ff_169slice_4dsp_2bram_packedrom/* -text
+
+# Preserve supplementary experiment inputs and hashed evidence byte-for-byte.
+matlab_fir/national_finals/report_experiments/run_technical_report_experiments.m -text
+matlab_fir/national_finals/report_experiments/technical_report_218/processed/* -text
+matlab_fir/national_finals/report_experiments/technical_report_218/logs/* -text
+matlab_fir/national_finals/report_experiments/technical_report_218/raw/* -text
+submit/finally/reports/test_report.md -text

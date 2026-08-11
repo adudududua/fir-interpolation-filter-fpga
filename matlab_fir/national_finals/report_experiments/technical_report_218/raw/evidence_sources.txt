@@ -1,0 +1,30 @@
+TECHNICAL REPORT SUPPLEMENTARY TEST EVIDENCE SOURCES
+====================================================
+
+Guide:
+guide/01_guidance_and_feedback/technical_report_supplementary_experiment_guide.md
+
+Configuration and stable vectors:
+matlab_fir/national_finals/nf_release_218_config.m
+matlab_fir/national_finals/wordlength_experiments/nf_p3_build_bittrue_case_24_20_20.m
+matlab_fir/national_finals/vectors/release_218_smoke/
+
+Current full-board post-route evidence:
+XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/results/20260811_231722/release_config.txt
+XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/results/20260811_231722/utilization_routed.rpt
+XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/results/20260811_231722/timing_summary_routed.rpt
+XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/results/20260811_231722/drc_routed.rpt
+XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/results/20260811_231722/power_routed.rpt
+XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/results/20260811_231722/board_routed_2025_2.dcp
+XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/results/20260811_231722/board_demo_competition_dac8_top_2025_2.bit
+
+New RTL regression:
+matlab_fir/national_finals/_work/rtl_regression/20260812_000159/
+Result: NATIONAL FINALS RTL REGRESSION PASS (17/17)
+Stage word length: 24/20/20
+CIC integrator DSP mode: 2 (4 DSP full-board implementation)
+
+Board evidence boundary:
+The 218-LUT bitstream has user-confirmed functional board success dated
+2026-08-11. No instrument model, calibrated frequency, THD+N, dynamic-range,
+IMD, or analog-spectrum raw reading was supplied, so none is inferred here.
