@@ -156,3 +156,11 @@ out of memory allocating 8388640 bytes
 后者bitstream SHA-256为
 `5B326E358DC1DDDCDC1241691C498C4D8FC1A3232385FA1CA50411AC031DF46F`。bitstream包含构建时间等
 元数据，因此重新生成文件的SHA-256不要求与前一正式构建相同；资源、时序、DRC和功能RTL均未变化。
+
+## 9. 物理板验证结论
+
+2026-08-11，用户明确确认 218-LUT 24/20/20 版本物理板测成功。本记录仅归档
+该明确反馈，未提供的逐档仪器原始读数不作推测。当前版本正式升级为
+**board-verified**，标签为
+`nf-vivado2025.2-218lut-365ff-4dsp-2bram-24-20-20-board-pass`；
+`nf-vivado2025.2-221lut-367ff-4dsp-2bram-board-pass` 保留为前一安全回退。

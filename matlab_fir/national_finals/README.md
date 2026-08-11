@@ -1,6 +1,18 @@
 # 全国总决赛：双采样率可配置插值滤波器
 
-## Vivado 2025.2 当前最低 LUT 正式实板版：routed 不变量复用版（221 LUT / 4 DSP）
+## Vivado 2025.2 当前最低 LUT 正式实板版：24/20/20 字长版（218 LUT / 4 DSP）
+
+在已板测 221-LUT 安全基线上，Stage1/Stage2/Stage3 有效数据宽度优化为
+`24/20/20 bit`。六模式 MATLAB 频响全部通过，最差 128x 阻带衰减为 72.355 dB；
+Smoke/Release 均为 17/17 PASS，14 组全链向 24/20/20 金标准逐样本 0 LSB。
+
+正式 Vivado 2025.2 实现为 **218 LUT / 365 FF / 4 DSP / 4 RAMB18E1（2 Tile）/
+2 MMCM**，WNS/WHS=`+45.279/+0.079 ns`，DRC Error=0。2026-08-11 用户明确确认
+218-LUT 版本物理板测成功，因此升级为 **board-verified**；正式标签为
+`nf-vivado2025.2-218lut-365ff-4dsp-2bram-24-20-20-board-pass`，221-LUT board-pass 保留为
+前一安全回退。详见 [218-LUT 执行反馈](results/vivado2025_2_stage123_24_20_20_218lut_execution_feedback.md)。
+
+## Vivado 2025.2 前一最低 LUT 正式实板版：routed 不变量复用版（221 LUT / 4 DSP）
 
 本轮从已板测 234-LUT 版本继续审计 routed 网表，删除三组功能重复状态/门控：模式 CDC 复用
 `ack_toggle` 作为本地已接收 token；Stage2/3 直接使用在 Stage3 任务期间稳定的 pending 补偿

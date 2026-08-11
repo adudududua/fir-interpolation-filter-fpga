@@ -1,6 +1,15 @@
 # Vivado 2025.2 迁移、修复与验证记录
 
-## 当前状态：221-LUT 正式板测版，234-LUT 前一安全回退
+## 当前状态：218-LUT 24/20/20 正式板测版，221-LUT 前一安全回退
+
+`tools/vivado_2025_2/results/20260811_190839` 已从空结果目录完成 Vivado 2025.2
+综合、实现和 bitstream，得到 **218 LUT / 365 FF / 4 DSP / 4 RAMB18E1（2 BRAM Tile）/
+2 MMCM**，WNS/WHS=`+45.279/+0.079 ns`，DRC Error=0。2026-08-11 用户明确确认
+218-LUT 版本物理板测成功，正式标签为
+`nf-vivado2025.2-218lut-365ff-4dsp-2bram-24-20-20-board-pass`。未提供的逐档仪器原始读数
+不作推测；221-LUT board-pass 保留为前一安全回退。
+
+## 前一状态：221-LUT 正式板测版，234-LUT 前一安全回退
 
 分支 `national-finals-v2025.2-post234-lut-optimization` 在已板测 234-LUT 版本上完成 routed
 网表不变量优化：CDC `ack_toggle` 兼任本地 seen token；Stage2/3 删除重复补偿模式 job 快照；

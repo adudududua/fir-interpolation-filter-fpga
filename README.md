@@ -21,7 +21,7 @@ DRC Error=0。修复证据分别位于
 `tools/vivado_2025_2/results/gui_impl_verify_20260811_200228`。该修复只改变Vivado运行并发，
 没有修改滤波RTL、字长、系数、量化、时序或DAC接口。
 
-## 当前最低 LUT 工具签核候选：Vivado 2025.2 218 LUT / 4 DSP（24/20/20，待板测）
+## 当前最低 LUT 正式实板版：Vivado 2025.2 218 LUT / 4 DSP（24/20/20，2026-08-11 板测成功）
 
 在已板测 221-LUT 安全基线上，本轮按建议把 Stage1/Stage2/Stage3 的有效数据宽度从
 `24/22/20 bit` 改为 `24/20/20 bit`。Stage1 输出直接右移4 bit并饱和到20 bit送入 Stage2；
@@ -66,12 +66,13 @@ seed、正负满幅和 −1 dBFS 强音频共14组输入，4x/8x/128x 对24/20/2
 正式工具产物位于
 `XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/results/20260811_190839`；bitstream SHA-256 为
 `1834675AB971FFA8BD6C03BF1B596D6F5D65C8A36A6B8D0182EEA6C5D408D110`，routed DCP SHA-256 为
-`FC26756258EF14A60872D55CBDDAC928D536727937876788D180E2D3BE35A462`。当前状态是
-**tool-verified，等待用户物理板验证**；在采样率和 DAC 波形实测通过前，221-LUT board-pass
-标签仍是正式安全回退。完整设计、验证、No-Go和复现记录见
+`FC26756258EF14A60872D55CBDDAC928D536727937876788D180E2D3BE35A462`。2026-08-11 用户明确确认
+218-LUT 版本物理板测成功，当前状态正式升级为 **board-verified**；正式标签为
+`nf-vivado2025.2-218lut-365ff-4dsp-2bram-24-20-20-board-pass`，221-LUT board-pass 保留为前一
+安全回退。未提供的逐档仪器原始读数不作推测。完整设计、验证、No-Go和复现记录见
 [218-LUT 24/20/20 字长优化执行反馈](matlab_fir/national_finals/results/vivado2025_2_stage123_24_20_20_218lut_execution_feedback.md)。
 
-## 当前最低 LUT 正式实板版：Vivado 2025.2 221 LUT / 4 DSP（2026-08-10 板测确认）
+## 前一最低 LUT 正式实板版：Vivado 2025.2 221 LUT / 4 DSP（2026-08-10 板测确认）
 
 本轮从已由用户物理板验证的 234-LUT 安全基线建立分支
 `national-finals-v2025.2-post234-lut-optimization`，对 routed 网表逐个 LUT 审计后保留三项可证明
