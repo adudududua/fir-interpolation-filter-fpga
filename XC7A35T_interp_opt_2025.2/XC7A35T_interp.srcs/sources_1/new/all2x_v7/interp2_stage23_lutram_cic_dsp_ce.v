@@ -90,7 +90,14 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     localparam integer STAGE2_UPPER_W = SHIFT_W - STAGE2_DATA_W;
     localparam integer STAGE3_UPPER_W = SHIFT_W - STAGE3_OUTPUT_W;
     localparam integer PATTERN_SAT_SUPPORTED =
-        (STAGE2_DATA_W == 22 && STAGE3_OUTPUT_W == 21);
+        ((STAGE2_DATA_W == 22 || STAGE2_DATA_W == 20) &&
+         STAGE3_OUTPUT_W == 21);
+    // DSP48 MASK bit 1 means "ignore".  The 22/21 profile checks P[47:36];
+    // the 20/21 profile checks P[47:35], which simultaneously covers the
+    // Stage2 signed-20 sign extension and the Stage3 signed-21 extension.
+    localparam [47:0] SATURATION_PATTERN_MASK =
+        (STAGE2_DATA_W == 20) ? 48'h0007FFFFFFFF :
+                               48'h000FFFFFFFFF;
     localparam signed [STAGE2_DATA_W-1:0] STAGE2_OUT_MAX =
         {1'b0, {(STAGE2_DATA_W-1){1'b1}}};
     localparam signed [STAGE2_DATA_W-1:0] STAGE2_OUT_MIN =
@@ -397,7 +404,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         .USE_PATTERN_DETECT("PATDET"),
         .SEL_MASK("MASK"),
         .SEL_PATTERN("PATTERN"),
-        .MASK(48'h000FFFFFFFFF),
+        .MASK(SATURATION_PATTERN_MASK),
         .PATTERN(48'h000000000000),
         .USE_SIMD("ONE48"),
         .AREG(0),
@@ -471,10 +478,9 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     assign mac_sum_comb = dsp_mac_full[ACC_W-1:0];
 
     // The PREG value has already received the exact signed rounding bias.
-    // For the signed-22/signed-21 national-finals profile, PATTERNDETECT checks
-    // P[47:36] and serves both widths exactly: Stage2 includes sign P[36],
-    // while Stage3 compares those bits against sign P[35].  Other legal
-    // parameterizations retain the generic Fabric comparison fallback.
+    // PATTERNDETECT serves both signed-22/signed-21 and the candidate
+    // signed-20/signed-21 profiles exactly.  Other legal parameterizations
+    // retain the generic Fabric comparison fallback.
     assign truncated_value = mac_sum_comb >>> FRAC_W;
 
     assign stage2_upper_is_sign_extension =

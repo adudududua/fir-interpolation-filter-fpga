@@ -27,6 +27,12 @@
 
 module tb_phase7_full_chain_bittrue;
 
+`ifdef NF_WORDLENGTH_24_20_20
+    localparam integer DUT_STAGE2_DATA_W = 20;
+`else
+    localparam integer DUT_STAGE2_DATA_W = 22;
+`endif
+
 `ifdef NF_RELEASE_REGRESSION
     localparam integer MAX_INPUT_COUNT = 4096;
     localparam integer MAX_Y4_COUNT = 16605;
@@ -108,7 +114,9 @@ module tb_phase7_full_chain_bittrue;
     wire signed [23:0] dbg_y8;
     wire dbg_y8_valid;
 
-    nf_signedoff_filter_core u_dut (
+    nf_signedoff_filter_core #(
+        .STAGE2_DATA_W(DUT_STAGE2_DATA_W)
+    ) u_dut (
         .clk(clk), .rst_n(rst_n),
         .ce2_out(ce2_out), .ce4_out(ce4_out),
         .ce8_out(ce8_out), .ce16_out(ce16_out),

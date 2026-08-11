@@ -5,6 +5,7 @@
 .agents/
 .codex_xvlog_check/
 /-p/
+/dfx_runtime.txt
 
 .Xil/
 **/.Xil/

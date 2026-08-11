@@ -33,6 +33,12 @@
 
 module tb_phase7_mode_switch_dynamic;
 
+`ifdef NF_WORDLENGTH_24_20_20
+    localparam integer DUT_STAGE2_DATA_W = 20;
+`else
+    localparam integer DUT_STAGE2_DATA_W = 22;
+`endif
+
     localparam [1:0] MODE_1X = 2'b00;
     localparam [1:0] MODE_4X = 2'b01;
     localparam [1:0] MODE_8X = 2'b10;
@@ -87,7 +93,8 @@ module tb_phase7_mode_switch_dynamic;
         .USE_NATIONAL_FINALS_NARROW_STAGE23(1),
         .USE_NATIONAL_FINALS_P3_JOINT_STAGE3(1),
         .USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE(
-            `NF_CIC_INTEGRATOR_DSP_MODE)
+            `NF_CIC_INTEGRATOR_DSP_MODE),
+        .USE_NATIONAL_FINALS_STAGE2_DATA_W(DUT_STAGE2_DATA_W)
     ) u_dut (
         .clk_audio_128x(clk),
         .rst_n(rst_n),

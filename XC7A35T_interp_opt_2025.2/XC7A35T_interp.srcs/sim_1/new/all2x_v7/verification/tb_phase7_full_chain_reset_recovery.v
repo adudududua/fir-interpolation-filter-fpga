@@ -34,6 +34,12 @@
 
 module tb_phase7_full_chain_reset_recovery;
 
+`ifdef NF_WORDLENGTH_24_20_20
+    localparam integer DUT_STAGE2_DATA_W = 20;
+`else
+    localparam integer DUT_STAGE2_DATA_W = 22;
+`endif
+
 `ifdef PHASE7_USE_LUTRAM_STAGE23
 `define DUT_STAGE23 u_dut.gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce
 `else
@@ -92,6 +98,7 @@ module tb_phase7_full_chain_reset_recovery;
 
     interp128_all2x_v7_folded_fir_cic_top_ce #(
         .STAGE1_ACC_W(41), .STAGE23_ACC_W(38),
+        .STAGE2_DATA_W(DUT_STAGE2_DATA_W),
         .CIC_ORDER(3), .FINAL_PRUNE_LSB(0),
 `ifdef PHASE7_USE_LUTRAM_STAGE23
         .USE_LUTRAM_STAGE23(1),
@@ -176,6 +183,7 @@ module tb_phase7_full_chain_reset_recovery;
 
     interp128_all2x_v7_folded_fir_cic_top_ce #(
         .STAGE1_ACC_W(41), .STAGE23_ACC_W(38),
+        .STAGE2_DATA_W(DUT_STAGE2_DATA_W),
         .CIC_ORDER(3), .FINAL_PRUNE_LSB(0),
 `ifdef PHASE7_USE_LUTRAM_STAGE23
         .USE_LUTRAM_STAGE23(1),

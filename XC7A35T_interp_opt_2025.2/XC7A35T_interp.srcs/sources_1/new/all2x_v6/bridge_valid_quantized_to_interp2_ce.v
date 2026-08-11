@@ -42,14 +42,24 @@ module bridge_valid_quantized_to_interp2_ce #(
     wire consume_now;
     wire phase_for_consume;
 
-    round_sat_shift_compact #(
-        .IN_W    (IN_W),
-        .OUT_W   (OUT_W),
-        .SHIFT_N (SHIFT_N)
-    ) u_round_sat_shift_compact (
-        .din  (in_data),
-        .dout (out_data)
-    );
+    generate
+        if (SHIFT_N == 0) begin : gen_identity_quantizer
+            // A same-Q-format boundary still needs the pending/phase
+            // handshake below, but it must not instantiate a degenerate
+            // rounder with an invalid negative part-select.
+            assign out_data = in_data[OUT_W-1:0];
+        end
+        else begin : gen_rounding_quantizer
+            round_sat_shift_compact #(
+                .IN_W    (IN_W),
+                .OUT_W   (OUT_W),
+                .SHIFT_N (SHIFT_N)
+            ) u_round_sat_shift_compact (
+                .din  (in_data),
+                .dout (out_data)
+            );
+        end
+    endgenerate
 
     assign out_valid = pending;
     // The folded Stage2/3 core already owns phase registers clocked by the
@@ -77,6 +87,13 @@ module bridge_valid_quantized_to_interp2_ce #(
     end
 
 `ifndef SYNTHESIS
+    initial begin
+        if (SHIFT_N == 0 && IN_W != OUT_W)
+            $fatal(1, "identity quantized bridge requires IN_W == OUT_W");
+        if (SHIFT_N < 0)
+            $fatal(1, "quantized bridge SHIFT_N must not be negative");
+    end
+
     always @(posedge clk) begin
         if (rst_n && pending && !consume_now && in_valid)
             $fatal(1, "quantized valid-only bridge input overwrite");

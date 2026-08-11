@@ -3,6 +3,7 @@ set project_dir [file normalize [file join $script_dir ../../..]]
 set source_root [file join $project_dir XC7A35T_interp.srcs sources_1 new]
 set result_dir [expr {$argc > 0 ? [file normalize [lindex $argv 0]] : [file join $script_dir results latest]}]
 set jobs [expr {$argc > 1 ? [lindex $argv 1] : 1}]
+set core_variant [expr {$argc > 2 ? [lindex $argv 2] : "baseline"}]
 set top_name interp128_all2x_v7_folded_fir_cic_top_ce
 set part_name xc7a35tfgg484-2
 file mkdir $result_dir
@@ -12,6 +13,12 @@ proc require_condition {condition message} {
         error $message
     }
 }
+
+require_condition [expr {$core_variant eq "baseline" ||
+                         $core_variant eq "sequential_pair" ||
+                         $core_variant eq "wordlength_24_20_20"}] \
+    "core variant must be baseline, sequential_pair, or wordlength_24_20_20"
+set stage2_data_w [expr {$core_variant eq "wordlength_24_20_20" ? 20 : 22}]
 
 # A damaged user Tcl Store must not stop the competition report. Vivado sets
 # XILINX_VIVADO to its own installation root, so this fallback is portable
@@ -78,15 +85,26 @@ set relative_sources [list \
 
 set sources {}
 foreach relative_source $relative_sources {
+    if {$core_variant eq "sequential_pair" &&
+        $relative_source eq "national_finals/cic_interp16_n3_hold2_dsp_ce.v"} {
+        continue
+    }
     set source_file [file join $source_root $relative_source]
     require_condition [file exists $source_file] "Missing RTL source: $source_file"
     lappend sources $source_file
+}
+if {$core_variant eq "sequential_pair"} {
+    set experiment_dir [file normalize [file join $script_dir .. structure_experiments]]
+    lappend sources \
+        [file join $experiment_dir cic_interp16_n3_hold2_two24_sequential_pair_ce.v] \
+        [file join $experiment_dir cic_sequential_pair_dropin_adapter.v]
 }
 read_verilog $sources
 
 set core_generics [list \
     STAGE1_ACC_W=41 \
     STAGE23_ACC_W=38 \
+    STAGE2_DATA_W=$stage2_data_w \
     CIC_ORDER=3 \
     FINAL_PRUNE_LSB=0 \
     USE_LUTRAM_STAGE23=1 \
@@ -193,6 +211,8 @@ set drc_errors [get_drc_violations -quiet -filter {SEVERITY == Error}]
 
 set summary_fid [open [file join $result_dir core_ooc_summary.txt] w]
 puts $summary_fid "TOOL=Vivado 2025.2"
+puts $summary_fid "VARIANT=$core_variant"
+puts $summary_fid "STAGE2_DATA_W=$stage2_data_w"
 puts $summary_fid "TOP=$top_name"
 puts $summary_fid "PART=$part_name"
 puts $summary_fid "CLOCK_MHZ=6.144"
@@ -218,10 +238,15 @@ puts "CORE_OOC_INTERNAL_WNS=$internal_wns"
 puts "CORE_OOC_INTERNAL_WHS=$internal_whs"
 puts "CORE_OOC_DRC_ERRORS=[llength $drc_errors]"
 
-require_condition [expr {$lut_count == 193}] \
-    "Expected exactly 193 LUT for the signed-off Vivado 2025.2 OOC flow; got $lut_count."
+if {$core_variant eq "baseline"} {
+    require_condition [expr {$lut_count == 193}] \
+        "Expected exactly 193 LUT for the signed-off Vivado 2025.2 OOC flow; got $lut_count."
+    require_condition [expr {$ff_count == 281}] "Expected exactly 281 FF; got $ff_count."
+} else {
+    require_condition [expr {$lut_count < 193}] \
+        "Experimental core did not improve the 193-LUT baseline; got $lut_count."
+}
 require_condition [expr {$lutram_count == 0}] "Expected 0 LUTRAM; got $lutram_count."
-require_condition [expr {$ff_count == 281}] "Expected exactly 281 FF; got $ff_count."
 require_condition [expr {$dsp_count == 4}] "Expected exactly 4 DSP48E1; got $dsp_count."
 require_condition [expr {$bram18_count == 3 && $bram36_count == 0}] \
     "Expected 3 RAMB18E1 and 0 RAMB36E1."

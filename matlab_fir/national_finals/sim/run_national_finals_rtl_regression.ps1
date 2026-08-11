@@ -6,6 +6,8 @@ param(
     [string]$RegressionScale = 'Smoke',
     [ValidateSet(0, 1, 2)]
     [int]$CicIntegratorDspMode = 2,
+    [ValidateSet('24_22_20', '24_20_20')]
+    [string]$StageWordLength = '24_22_20',
     [string]$VectorDir = '',
     [switch]$PublishImpulseOutputs
 )
@@ -129,6 +131,10 @@ $signedOffFullChainXvlogOptions = @(
     '-d', 'NATIONAL_FINALS_SINGLE_BRAM_STAGE1',
     '-d', 'PHASE7_USE_BRAM_STAGE23_COEFF'
 )
+if ($StageWordLength -eq '24_20_20') {
+    $signedOffFullChainXvlogOptions += @(
+        '-d', 'NF_WORDLENGTH_24_20_20')
+}
 if ($CicIntegratorDspMode -lt 2) {
     $signedOffFullChainXvlogOptions += @(
         '-d', "NF_CIC_INTEGRATOR_DSP_MODE_$CicIntegratorDspMode")
@@ -154,11 +160,17 @@ if (-not (Test-Path -LiteralPath $vectorManifestPath)) {
     throw "P3-J vector manifest is missing: $vectorManifestPath"
 }
 $vectorManifestRows = @(Import-Csv -LiteralPath $vectorManifestPath)
+$expectedConfigId = if ($StageWordLength -eq '24_20_20') {
+    'NF-P3-STAGE123-24-20-20-CANDIDATE-R1'
+}
+else {
+    'NF-P3-RTL-JOINT-STAGE3-EQ-R1'
+}
 if ($vectorManifestRows.Count -eq 0 -or
     @($vectorManifestRows | Where-Object {
-        $_.CONFIG_ID -ne 'NF-P3-RTL-JOINT-STAGE3-EQ-R1'
+        $_.CONFIG_ID -ne $expectedConfigId
     }).Count -ne 0) {
-    throw "Vector directory is not the signed-off P3-J configuration: $VectorDir"
+    throw "Vector directory does not match $StageWordLength ($expectedConfigId): $VectorDir"
 }
 $expectedSeedCount = if ($RegressionScale -eq 'Release') { 10 } else { 1 }
 $requiredVectorNames = @(
@@ -215,7 +227,7 @@ if ($CicIntegratorDspMode -lt 2) {
     $candidateModuleName = "nf_p3j_cic_mode${CicIntegratorDspMode}_filter_core"
 
     $wrapperText = [System.IO.File]::ReadAllText($signedOffWrapperPath)
-    $moduleNeedle = 'module nf_signedoff_filter_core ('
+    $moduleNeedle = 'module nf_signedoff_filter_core #('
     if (([regex]::Matches($wrapperText,
             [regex]::Escape($moduleNeedle))).Count -ne 1) {
         throw 'Could not uniquely rewrite the P3-J signed-off wrapper module name.'
@@ -226,7 +238,7 @@ if ($CicIntegratorDspMode -lt 2) {
         throw 'Could not find both signed-off CIC DSP mode literals.'
     }
     $wrapperText = $wrapperText.Replace(
-        $moduleNeedle, "module $candidateModuleName (")
+        $moduleNeedle, "module $candidateModuleName #(")
     $wrapperText = $wrapperText.Replace(
         $dspNeedle, ".CIC_INTEGRATOR_DSP_MODE($CicIntegratorDspMode),")
     $candidateWrapperPath = Join-Path $generatedCandidateDir "${candidateModuleName}.v"
@@ -235,13 +247,13 @@ if ($CicIntegratorDspMode -lt 2) {
         [System.Text.UTF8Encoding]::new($false))
 
     $tbText = [System.IO.File]::ReadAllText($fullChainTbPath)
-    $tbNeedle = 'nf_signedoff_filter_core u_dut ('
+    $tbNeedle = 'nf_signedoff_filter_core #('
     if (([regex]::Matches($tbText,
             [regex]::Escape($tbNeedle))).Count -ne 1) {
         throw 'Could not uniquely bind the generated P3-J candidate wrapper.'
     }
     $tbText = $tbText.Replace(
-        $tbNeedle, "$candidateModuleName u_dut (")
+        $tbNeedle, "$candidateModuleName #(")
     $candidateFullChainTbPath = Join-Path $generatedCandidateDir 'tb_phase7_full_chain_bittrue.v'
     [System.IO.File]::WriteAllText(
         $candidateFullChainTbPath, $tbText,
@@ -486,6 +498,9 @@ $dynamicXvlogOptions = @(
     '-d', 'PHASE7_USE_BRAM_STAGE23_HISTORY',
     '-d', 'PHASE7_USE_BRAM_STAGE23_COEFF'
 )
+if ($StageWordLength -eq '24_20_20') {
+    $dynamicXvlogOptions += @('-d', 'NF_WORDLENGTH_24_20_20')
+}
 if ($CicIntegratorDspMode -lt 2) {
     $dynamicXvlogOptions += @(
         '-d', "NF_CIC_INTEGRATOR_DSP_MODE_$CicIntegratorDspMode")

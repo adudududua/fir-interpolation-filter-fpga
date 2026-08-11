@@ -1,0 +1,29 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2025.2 (win64) Build 6299465 Fri Nov 14 19:35:11 GMT 2025
+| Date         : Tue Aug 11 18:07:40 2026
+| Host         : LAPTOP-476JT8H0 running 64-bit major release  (build 9200)
+| Command      : report_utilization -hierarchical -hierarchical_min_primitive_count 0 -file D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/_work/post221_4dsp_2bram/wordlength_24_20_20/core_ooc/utilization_post_route_hierarchical.rpt
+| Design       : interp128_all2x_v7_folded_fir_cic_top_ce
+| Device       : xc7a35tfgg484-2
+| Speed File   : -2
+| Design State : Routed
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++------------------------------------------+--------+------------+------------+---------+------+-----+--------+--------+------------+
+|                 Instance                 | Module | Total LUTs | Logic LUTs | LUTRAMs | SRLs | FFs | RAMB36 | RAMB18 | DSP Blocks |
++------------------------------------------+--------+------------+------------+---------+------+-----+--------+--------+------------+
+| interp128_all2x_v7_folded_fir_cic_top_ce |  (top) |        190 |        190 |       0 |    0 | 279 |      0 |      3 |          4 |
++------------------------------------------+--------+------------+------------+---------+------+-----+--------+--------+------------+
+* Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
+
+

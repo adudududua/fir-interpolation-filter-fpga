@@ -38,6 +38,7 @@
 module interp128_all2x_v7_folded_fir_cic_top_ce #(
     parameter integer STAGE1_ACC_W = 42,
     parameter integer STAGE23_ACC_W = 38,
+    parameter integer STAGE2_DATA_W = 22,
     parameter integer CIC_ORDER = 3,
     parameter integer FINAL_PRUNE_LSB = 3,
     parameter integer USE_LUTRAM_STAGE23 = 0,
@@ -90,9 +91,9 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
 
     wire signed [23:0] y2_w;
     wire y2_valid_w;
-    wire signed [21:0] y2_to_4_data;
+    wire signed [STAGE2_DATA_W-1:0] y2_to_4_data;
     wire y2_to_4_valid;
-    wire signed [21:0] y4_w;
+    wire signed [STAGE2_DATA_W-1:0] y4_w;
     wire y4_valid_w;
     wire signed [19:0] y4_to_8_data;
     wire y4_to_8_valid;
@@ -168,7 +169,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     endgenerate
 
     bridge_valid_quantized_to_interp2_ce #(
-        .IN_W(24), .OUT_W(22), .SHIFT_N(2),
+        .IN_W(24), .OUT_W(STAGE2_DATA_W),
+        .SHIFT_N(24-STAGE2_DATA_W),
         .USE_EXTERNAL_PHASE(1)
     ) u_bridge_2_to_4_quantized (
         .clk(clk), .rst_n(rst_n),
@@ -179,7 +181,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     );
 
     bridge_valid_quantized_to_interp2_ce #(
-        .IN_W(22), .OUT_W(20), .SHIFT_N(2),
+        .IN_W(STAGE2_DATA_W), .OUT_W(20),
+        .SHIFT_N(STAGE2_DATA_W-20),
         .USE_EXTERNAL_PHASE(1)
     ) u_bridge_4_to_8_quantized (
         .clk(clk), .rst_n(rst_n),
@@ -193,7 +196,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
         if (USE_LUTRAM_STAGE23 != 0) begin : gen_lutram_stage23
             interp2_stage23_lutram_cic_dsp_ce #(
                 .DATA_W(24),
-                .STAGE2_DATA_W(22),
+                .STAGE2_DATA_W(STAGE2_DATA_W),
                 .STAGE3_DATA_W(20),
                 .STAGE3_OUTPUT_W(STAGE3_RESULT_W),
                 .COEFF_W((USE_P3_JOINT_STAGE3 != 0) ? 18 :
@@ -235,7 +238,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
             assign stage23_coeff_addr_w = 6'd0;
             interp2_stage23_folded_cic_dsp_ce #(
                 .DATA_W(24),
-                .STAGE2_DATA_W(22),
+                .STAGE2_DATA_W(STAGE2_DATA_W),
                 .STAGE3_DATA_W(20),
                 .COEFF_W(16),
                 .ACC_W(STAGE23_ACC_W),
@@ -355,7 +358,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     assign y_out_valid = y128_valid_w;
     assign dbg_y2 = y2_w;
     assign dbg_y2_valid = y2_valid_w;
-    assign dbg_y4 = {y4_w, 2'b0};
+    assign dbg_y4 = {y4_w, {(24-STAGE2_DATA_W){1'b0}}};
     assign dbg_y4_valid = y4_valid_w;
     // P3-J keeps a signed-21 Stage3 result for the compensated 128x path,
     // but the visible 8x node retains the original saturating signed-20 PCM
@@ -379,6 +382,8 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
 
 `ifndef SYNTHESIS
     initial begin
+        if (STAGE2_DATA_W != 22 && STAGE2_DATA_W != 20)
+            $fatal(1, "STAGE2_DATA_W must be the signed-off 22 or candidate 20");
         if (STAGE3_FLAT != 0 && USE_LUTRAM_STAGE23 == 0)
             $fatal(1, "STAGE3_FLAT currently requires LUTRAM/BRAM Stage23");
         if (USE_CIC3_SHIFTADD_COMPENSATOR != 0 && STAGE3_FLAT == 0)

@@ -3,7 +3,9 @@
 // P3 verification-only pair.  One flat-bank instance supplies the official
 // 4x/8x nodes while one compensated-bank instance supplies 128x.  The board
 // build does not synthesize this wrapper; it uses one mode-selected core.
-module nf_signedoff_filter_core (
+module nf_signedoff_filter_core #(
+    parameter integer STAGE2_DATA_W = 22
+)(
     input  wire               clk,
     input  wire               rst_n,
     input  wire               ce2_out,
@@ -41,6 +43,7 @@ module nf_signedoff_filter_core (
     interp128_all2x_v7_folded_fir_cic_top_ce #(
         .STAGE1_ACC_W(41),
         .STAGE23_ACC_W(38),
+        .STAGE2_DATA_W(STAGE2_DATA_W),
         .CIC_ORDER(3),
         .FINAL_PRUNE_LSB(0),
         .USE_LUTRAM_STAGE23(1),
@@ -93,6 +96,7 @@ module nf_signedoff_filter_core (
     interp128_all2x_v7_folded_fir_cic_top_ce #(
         .STAGE1_ACC_W(41),
         .STAGE23_ACC_W(38),
+        .STAGE2_DATA_W(STAGE2_DATA_W),
         .CIC_ORDER(3),
         .FINAL_PRUNE_LSB(0),
         .USE_LUTRAM_STAGE23(1),

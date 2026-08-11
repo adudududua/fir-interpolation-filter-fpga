@@ -3,7 +3,9 @@
 // Isolated measurement wrapper.  Only the three FIR nodes are observable, so
 // synthesis removes the downstream CIC and reports the signed-off FIR front
 // end on the same RTL/configuration used by the board project.
-module formal_fir_front_ooc_wrapper (
+module formal_fir_front_ooc_wrapper #(
+    parameter integer STAGE2_DATA_W = 22
+)(
     input  wire                    clk,
     input  wire                    rst_n,
     input  wire                    ce2_out,
@@ -23,6 +25,7 @@ module formal_fir_front_ooc_wrapper (
     interp128_all2x_v7_folded_fir_cic_top_ce #(
         .STAGE1_ACC_W(41),
         .STAGE23_ACC_W(38),
+        .STAGE2_DATA_W(STAGE2_DATA_W),
         .CIC_ORDER(3),
         .FINAL_PRUNE_LSB(0),
         .USE_LUTRAM_STAGE23(1),

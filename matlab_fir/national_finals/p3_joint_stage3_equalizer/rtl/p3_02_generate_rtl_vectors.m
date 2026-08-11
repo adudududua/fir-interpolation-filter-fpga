@@ -28,6 +28,19 @@ if ~isempty(vector_dir_override)
 end
 if ~exist(vector_dir, 'dir'); mkdir(vector_dir); end
 addpath(script_dir);
+wordlength_profile = upper(strtrim(getenv('NF_P3_WORDLENGTH_PROFILE')));
+if isempty(wordlength_profile); wordlength_profile = '24_22_20'; end
+switch wordlength_profile
+    case '24_22_20'
+        build_case = @nf_p3_build_bittrue_case;
+    case '24_20_20'
+        wordlength_dir = fullfile(fileparts(fileparts(p3_dir)), ...
+            'national_finals', 'wordlength_experiments');
+        addpath(wordlength_dir);
+        build_case = @nf_p3_build_bittrue_case_24_20_20;
+    otherwise
+        error('Unknown NF_P3_WORDLENGTH_PROFILE=%s.', wordlength_profile);
+end
 
 seed_values = [294753618, 104729, 130363, 155921, 181081, ...
     206369, 231761, 257053, 282407, 307817];
@@ -69,7 +82,7 @@ p3_stage3_peak = zeros(numel(case_names), 1);
 cic_sat = zeros(numel(case_names), 1);
 
 for case_index = 1:numel(case_names)
-    result = nf_p3_build_bittrue_case(input_data{case_index});
+    result = build_case(input_data{case_index});
     write_case(vector_dir, case_names{case_index}, result);
     config_id{case_index} = result.config_id;
     input_count(case_index) = numel(result.input);

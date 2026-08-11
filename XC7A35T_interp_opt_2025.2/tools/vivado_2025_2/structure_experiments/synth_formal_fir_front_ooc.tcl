@@ -2,7 +2,11 @@ set script_dir [file normalize [file dirname [info script]]]
 set project_dir [file normalize [file join $script_dir ../../..]]
 set source_root [file join $project_dir XC7A35T_interp.srcs sources_1 new]
 set flatten_mode [expr {$argc > 0 ? [lindex $argv 0] : "full"}]
-set work_dir [file normalize [file join $script_dir .. _work structure_redesign formal_fir_front_ooc_$flatten_mode]]
+set stage2_data_w [expr {$argc > 1 ? [lindex $argv 1] : 22}]
+if {$stage2_data_w != 22 && $stage2_data_w != 20} {
+    error "Stage2 data width must be 22 or 20"
+}
+set work_dir [file normalize [file join $script_dir .. _work post221_4dsp_2bram wordlength_24_${stage2_data_w}_20 fir_front_ooc_$flatten_mode]]
 file mkdir $work_dir
 
 set include_dirs [list \
@@ -28,6 +32,7 @@ set sources [list \
 read_verilog $sources
 synth_design -top formal_fir_front_ooc_wrapper \
     -part xc7a35tfgg484-2 -mode out_of_context \
+    -generic STAGE2_DATA_W=$stage2_data_w \
     -include_dirs $include_dirs -flatten_hierarchy $flatten_mode \
     -directive AreaOptimized_high -resource_sharing on -shreg_min_size 5
 create_clock -name fir_clk_6m144 -period 162.760 [get_ports clk]
@@ -44,12 +49,14 @@ set dsp_count [llength [get_cells -hier -filter {REF_NAME == DSP48E1}]]
 set bram18_count [llength [get_cells -hier -filter {REF_NAME == RAMB18E1}]]
 set fid [open [file join $work_dir result.txt] w]
 puts $fid "STAGE=POST_SYNTH"
+puts $fid "STAGE2_DATA_W=$stage2_data_w"
 puts $fid "LUT=$lut_count"
 puts $fid "FF=$ff_count"
 puts $fid "DSP48E1=$dsp_count"
 puts $fid "RAMB18E1=$bram18_count"
 close $fid
 puts "FORMAL_FIR_FRONT_LUT=$lut_count"
+puts "FORMAL_FIR_FRONT_STAGE2_DATA_W=$stage2_data_w"
 puts "FORMAL_FIR_FRONT_FF=$ff_count"
 puts "FORMAL_FIR_FRONT_DSP=$dsp_count"
 puts "FORMAL_FIR_FRONT_RAMB18=$bram18_count"
