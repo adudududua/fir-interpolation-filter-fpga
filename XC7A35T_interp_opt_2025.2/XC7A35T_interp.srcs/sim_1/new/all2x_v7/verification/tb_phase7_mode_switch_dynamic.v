@@ -33,10 +33,10 @@
 
 module tb_phase7_mode_switch_dynamic;
 
-`ifdef NF_WORDLENGTH_24_20_20
-    localparam integer DUT_STAGE2_DATA_W = 20;
-`else
+`ifdef NF_WORDLENGTH_24_22_20
     localparam integer DUT_STAGE2_DATA_W = 22;
+`else
+    localparam integer DUT_STAGE2_DATA_W = 20;
 `endif
 
     localparam [1:0] MODE_1X = 2'b00;

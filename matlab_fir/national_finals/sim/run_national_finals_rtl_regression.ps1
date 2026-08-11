@@ -1,13 +1,13 @@
 [CmdletBinding()]
 param(
-    [string]$VivadoBin = 'E:\app\Xilinx2018.3\Vivado\2018.3\bin',
+    [string]$VivadoBin = 'E:\app\Xilinx20252\2025.2\Vivado\bin',
     [string]$ProjectDirectory = '',
     [ValidateSet('Smoke', 'Release')]
     [string]$RegressionScale = 'Smoke',
     [ValidateSet(0, 1, 2)]
     [int]$CicIntegratorDspMode = 2,
     [ValidateSet('24_22_20', '24_20_20')]
-    [string]$StageWordLength = '24_22_20',
+    [string]$StageWordLength = '24_20_20',
     [string]$VectorDir = '',
     [switch]$PublishImpulseOutputs
 )
@@ -135,6 +135,10 @@ if ($StageWordLength -eq '24_20_20') {
     $signedOffFullChainXvlogOptions += @(
         '-d', 'NF_WORDLENGTH_24_20_20')
 }
+else {
+    $signedOffFullChainXvlogOptions += @(
+        '-d', 'NF_WORDLENGTH_24_22_20')
+}
 if ($CicIntegratorDspMode -lt 2) {
     $signedOffFullChainXvlogOptions += @(
         '-d', "NF_CIC_INTEGRATOR_DSP_MODE_$CicIntegratorDspMode")
@@ -144,11 +148,21 @@ $v7Sim = Join-Path $simRoot 'all2x_v7\verification'
 $coeffHeader = Join-Path $sourceRoot 'all2x_v2\all2x_v2_coeff_pkg.vh'
 
 if ([string]::IsNullOrWhiteSpace($VectorDir)) {
-    if ($RegressionScale -eq 'Release') {
-        $VectorDir = Join-Path $p3Root '_work\rtl_vectors'
+    if ($StageWordLength -eq '24_20_20') {
+        if ($RegressionScale -eq 'Release') {
+            $VectorDir = Join-Path $nfRoot '_work\wordlength_24_20_20\rtl_vectors_release'
+        }
+        else {
+            $VectorDir = Join-Path $nfRoot 'vectors\release_218_smoke'
+        }
     }
     else {
-        $VectorDir = Join-Path $nfRoot 'vectors\p3j_daily'
+        if ($RegressionScale -eq 'Release') {
+            $VectorDir = Join-Path $p3Root '_work\rtl_vectors'
+        }
+        else {
+            $VectorDir = Join-Path $nfRoot 'vectors\p3j_daily'
+        }
     }
 }
 if (-not (Test-Path -LiteralPath $VectorDir)) {
@@ -157,7 +171,7 @@ if (-not (Test-Path -LiteralPath $VectorDir)) {
 $VectorDir = (Resolve-Path -LiteralPath $VectorDir).Path
 $vectorManifestPath = Join-Path $VectorDir 'p3_rtl_vector_manifest.csv'
 if (-not (Test-Path -LiteralPath $vectorManifestPath)) {
-    throw "P3-J vector manifest is missing: $vectorManifestPath"
+    throw "RTL vector manifest is missing: $vectorManifestPath"
 }
 $vectorManifestRows = @(Import-Csv -LiteralPath $vectorManifestPath)
 $expectedConfigId = if ($StageWordLength -eq '24_20_20') {
@@ -500,6 +514,9 @@ $dynamicXvlogOptions = @(
 )
 if ($StageWordLength -eq '24_20_20') {
     $dynamicXvlogOptions += @('-d', 'NF_WORDLENGTH_24_20_20')
+}
+else {
+    $dynamicXvlogOptions += @('-d', 'NF_WORDLENGTH_24_22_20')
 }
 if ($CicIntegratorDspMode -lt 2) {
     $dynamicXvlogOptions += @(

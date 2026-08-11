@@ -34,10 +34,10 @@
 
 module tb_phase7_full_chain_reset_recovery;
 
-`ifdef NF_WORDLENGTH_24_20_20
-    localparam integer DUT_STAGE2_DATA_W = 20;
-`else
+`ifdef NF_WORDLENGTH_24_22_20
     localparam integer DUT_STAGE2_DATA_W = 22;
+`else
+    localparam integer DUT_STAGE2_DATA_W = 20;
 `endif
 
 `ifdef PHASE7_USE_LUTRAM_STAGE23

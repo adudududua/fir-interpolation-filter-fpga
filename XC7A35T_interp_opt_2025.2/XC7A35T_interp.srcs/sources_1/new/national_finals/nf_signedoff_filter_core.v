@@ -4,7 +4,7 @@
 // 4x/8x nodes while one compensated-bank instance supplies 128x.  The board
 // build does not synthesize this wrapper; it uses one mode-selected core.
 module nf_signedoff_filter_core #(
-    parameter integer STAGE2_DATA_W = 22
+    parameter integer STAGE2_DATA_W = 20
 )(
     input  wire               clk,
     input  wire               rst_n,

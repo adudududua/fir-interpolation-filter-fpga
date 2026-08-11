@@ -536,6 +536,7 @@
         <Generic Name="USE_NATIONAL_FINALS_P3_JOINT_STAGE3" Val="1"/>
         <Generic Name="USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE" Val="2"/>
         <Generic Name="USE_ULTRACOMPACT_KEYPAD" Val="1"/>
+        <Generic Name="USE_NATIONAL_FINALS_STAGE2_DATA_W" Val="20"/>
       </Config>
     </FileSet>
     <FileSet Name="constrs_1" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1" RelGenDir="$PGENDIR/constrs_1">
@@ -637,49 +638,49 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../matlab_fir/national_finals/vectors/p3j_daily/impulse_input_24bit.mem">
+      <File Path="$PPRDIR/../matlab_fir/national_finals/vectors/release_218_smoke/impulse_input_24bit.mem">
         <FileInfo SFType="MIF">
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../matlab_fir/national_finals/vectors/p3j_daily/impulse_y4_golden_24bit.mem">
+      <File Path="$PPRDIR/../matlab_fir/national_finals/vectors/release_218_smoke/impulse_y4_golden_24bit.mem">
         <FileInfo SFType="MIF">
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../matlab_fir/national_finals/vectors/p3j_daily/impulse_y8_golden_24bit.mem">
+      <File Path="$PPRDIR/../matlab_fir/national_finals/vectors/release_218_smoke/impulse_y8_golden_24bit.mem">
         <FileInfo SFType="MIF">
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../matlab_fir/national_finals/vectors/p3j_daily/impulse_y128_golden_24bit.mem">
+      <File Path="$PPRDIR/../matlab_fir/national_finals/vectors/release_218_smoke/impulse_y128_golden_24bit.mem">
         <FileInfo SFType="MIF">
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../matlab_fir/national_finals/vectors/p3j_daily/random_seed01_input_24bit.mem">
+      <File Path="$PPRDIR/../matlab_fir/national_finals/vectors/release_218_smoke/random_seed01_input_24bit.mem">
         <FileInfo SFType="MIF">
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../matlab_fir/national_finals/vectors/p3j_daily/random_seed01_y4_golden_24bit.mem">
+      <File Path="$PPRDIR/../matlab_fir/national_finals/vectors/release_218_smoke/random_seed01_y4_golden_24bit.mem">
         <FileInfo SFType="MIF">
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../matlab_fir/national_finals/vectors/p3j_daily/random_seed01_y8_golden_24bit.mem">
+      <File Path="$PPRDIR/../matlab_fir/national_finals/vectors/release_218_smoke/random_seed01_y8_golden_24bit.mem">
         <FileInfo SFType="MIF">
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../matlab_fir/national_finals/vectors/p3j_daily/random_seed01_y128_golden_24bit.mem">
+      <File Path="$PPRDIR/../matlab_fir/national_finals/vectors/release_218_smoke/random_seed01_y128_golden_24bit.mem">
         <FileInfo SFType="MIF">
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
