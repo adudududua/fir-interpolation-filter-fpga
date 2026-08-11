@@ -119,3 +119,40 @@ SHA-256=`1834675AB971FFA8BD6C03BF1B596D6F5D65C8A36A6B8D0182EEA6C5D408D110`。
 自动验证不能代替物理 DAC、模拟波形和实测采样率；只有用户确认六档采样率和 DAC 波形正常后，
 才能创建 board-pass 标签。若板测异常，立即回退到
 `nf-vivado2025.2-221lut-367ff-4dsp-2bram-board-pass`。
+
+## 8. GUI综合OOM故障与修复复验
+
+用户在提交工具签核候选后手动运行正式 `.xpr`，`synth_1` 弹出失败。实际日志证明该故障发生在
+Technology Mapping阶段，前面的RTL展开、DSP推断和XDC读取均已完成，且没有RTL `ERROR`：
+
+```text
+out of memory allocating 8388640 bytes
+```
+
+故障时机器具有15.73 GB物理内存，但只剩约2.71 GB；总提交/虚拟内存余量约3.37 GB，分页文件
+不是系统自动管理，Vivado默认又启动两个内部综合worker。失败run的主进程日志峰值约1.64 GB，
+因此该现象属于Windows提交内存耗尽，不是24/20/20位宽、DSP映射或FPGA器件资源不足。
+
+修复措施如下：
+
+1. 新增 `tools/vivado_2025_2/synth_low_memory_pre.tcl`，固定 `general.maxThreads=1`；
+2. 把该文件持久登记为正式 `synth_1` 的Tcl pre-hook，普通GUI Reset/Run后仍然有效；
+3. `run_full_build_2025_2.ps1` 默认jobs从2降为1；
+4. 新增 `repair_gui_synth_2025_2.tcl`，用Vivado原生 `reset_run`修复失败状态并对综合资源设门禁；
+5. 新增 `verify_gui_impl_after_synth_2025_2.tcl`，从GUI综合网表继续验证实现、时序、DRC和bitstream。
+
+受控复验在提交余量3.86 GB时开始。新的 `runme.log`明确打印
+`NF_SYNTH_LOW_MEMORY_PRE: general.maxThreads=1` 和 `maximum of 1 processes`；综合峰值约
+1.92 GB，以0 Error/0 Critical Warning完成：
+
+| 流程 | LUT | FF | DSP | RAMB18E1 | MMCM | WNS/WHS | DRC Error |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| GUI `synth_1` | 280 | 373 | 4 | 4 | 2 | — | — |
+| GUI `impl_1 + bitstream` | **218** | **365** | **4** | **4** | **2** | **+45.279/+0.079 ns** | **0** |
+
+修复综合证据目录为
+`XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/results/synth_repair_20260811_195841`；GUI实现复验证据
+目录为 `XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/results/gui_impl_verify_20260811_200228`。
+后者bitstream SHA-256为
+`5B326E358DC1DDDCDC1241691C498C4D8FC1A3232385FA1CA50411AC031DF46F`。bitstream包含构建时间等
+元数据，因此重新生成文件的SHA-256不要求与前一正式构建相同；资源、时序、DRC和功能RTL均未变化。

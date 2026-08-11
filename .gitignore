@@ -6,6 +6,8 @@
 .codex_xvlog_check/
 /-p/
 /dfx_runtime.txt
+/XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/results/synth_repair_*/
+/XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/results/gui_impl_verify_*/
 
 .Xil/
 **/.Xil/

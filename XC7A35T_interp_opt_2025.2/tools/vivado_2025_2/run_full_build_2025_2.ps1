@@ -1,6 +1,6 @@
 param(
     [ValidateRange(1, 4)]
-    [int]$Jobs = 2,
+    [int]$Jobs = 1,
 
     [ValidateRange(1.0, 32.0)]
     [double]$MinimumCommitHeadroomGB = 4.0,

@@ -361,6 +361,25 @@ bitstream 替代该板测版本。完整审计见
 4. 如果可用提交内存不足 4 GB，先关闭浏览器、办公软件等大内存程序，再重试。
 5. 比较资源时必须打开本次最新 `impl_1` 的 Utilization Report，不能拿旧 run 或综合报告比较。
 
+2026-08-11 的一次GUI综合失败已确认不是RTL错误：`synth_1/runme.log`在Technology Mapping
+阶段记录 `out of memory allocating 8388640 bytes`，当时Windows提交余量约3.37 GB，Vivado
+默认启用了两个内部综合进程。工程现在通过 `synth_low_memory_pre.tcl` 持久固定
+`general.maxThreads=1`，普通GUI重新综合时会在日志中打印
+`NF_SYNTH_LOW_MEMORY_PRE` 和 `maximum of 1 processes`。修复后GUI工程从零得到
+280 LUT / 373 FF的综合结果，并继续完成218 LUT / 365 FF、4 DSP、4 RAMB18E1、2 MMCM、
+WNS/WHS=`+45.279/+0.079 ns`、0 DRC Error和bitstream。
+
+如果失败run需要自动修复，可在关闭Vivado GUI后运行：
+
+```powershell
+& 'E:\app\Xilinx20252\2025.2\Vivado\bin\vivado.bat' -mode batch -notrace `
+  -source '.\tools\vivado_2025_2\repair_gui_synth_2025_2.tcl'
+```
+
+脚本只通过Vivado `reset_run`重置 `synth_1/impl_1`，不会删除RTL或约束。修复成功后若要对
+GUI实现与bitstream执行资源、时序和DRC硬门禁，可运行同目录的
+`verify_gui_impl_after_synth_2025_2.tcl`。
+
 ### 一键低内存完整构建
 
 在 PowerShell 中执行：
@@ -375,7 +394,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
 2026-08-10 已把该入口改为单 Vivado 进程的 in-memory 综合/实现流：仍从正式 `.xpr` 读取
 源文件集、顶层和约束，但不再调用本机曾经卡在 `.vivado.begin.rst` 的命令行
 `launch_runs`/VRS 调度器。生产入口已从空结果目录复跑并出现
-`VIVADO_2025_2_FULL_BUILD_PASS`，精确复现 221 LUT、367 FF 和正式 bitstream。入口同时固定使用
+`VIVADO_2025_2_FULL_BUILD_PASS`，当前24/20/20源码精确复现 218 LUT、365 FF 和正式 bitstream。入口同时固定使用
 Vivado 安装目录中的 Tcl Store；用户缓存损坏时会出现警告，但不会阻止构建。
 
 若 Tcl Store 错误再次出现，请先关闭 Vivado，再执行：

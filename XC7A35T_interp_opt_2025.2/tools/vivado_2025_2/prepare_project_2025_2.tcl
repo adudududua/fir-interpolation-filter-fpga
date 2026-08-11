@@ -2,13 +2,16 @@ set script_dir [file dirname [file normalize [info script]]]
 set project_dir [file normalize [file join $script_dir ../..]]
 set project_file [file join $project_dir XC7A35T_interp.xpr]
 set report_dir [file join $script_dir evidence preparation]
+set synth_pre_hook [file join $script_dir synth_low_memory_pre.tcl]
 file mkdir $report_dir
 
 puts "PREPARE_PROJECT=$project_file"
 open_project $project_file
 
-# Keep memory and process pressure predictable on this 16 GB host.
-set_param general.maxThreads 4
+# Keep memory and process pressure predictable on this 16 GB host.  The same
+# limit is installed below as a synth_1 pre-hook so ordinary GUI reruns do not
+# silently return to two internal synthesis workers.
+set_param general.maxThreads 1
 
 set ips [get_ips -quiet *]
 report_ip_status -file [file join $report_dir ip_status_before_upgrade.rpt]
@@ -31,6 +34,7 @@ set_property STEPS.SYNTH_DESIGN.ARGS.DIRECTIVE AreaOptimized_high $synth_run
 set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY full $synth_run
 set_property STEPS.SYNTH_DESIGN.ARGS.RESOURCE_SHARING on $synth_run
 set_property STEPS.SYNTH_DESIGN.ARGS.SHREG_MIN_SIZE 5 $synth_run
+set_property STEPS.SYNTH_DESIGN.TCL.PRE $synth_pre_hook $synth_run
 set_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE ExploreArea $impl_run
 set_property STEPS.PLACE_DESIGN.ARGS.DIRECTIVE Explore $impl_run
 
@@ -42,6 +46,7 @@ puts "PREPARE_SYNTH_DIRECTIVE=[get_property STEPS.SYNTH_DESIGN.ARGS.DIRECTIVE $s
 puts "PREPARE_FLATTEN=[get_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY $synth_run]"
 puts "PREPARE_RESOURCE_SHARING=[get_property STEPS.SYNTH_DESIGN.ARGS.RESOURCE_SHARING $synth_run]"
 puts "PREPARE_SHREG_MIN_SIZE=[get_property STEPS.SYNTH_DESIGN.ARGS.SHREG_MIN_SIZE $synth_run]"
+puts "PREPARE_SYNTH_PRE=[get_property STEPS.SYNTH_DESIGN.TCL.PRE $synth_run]"
 puts "PREPARE_OPT_DIRECTIVE=[get_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE $impl_run]"
 puts "PREPARE_PLACE_DIRECTIVE=[get_property STEPS.PLACE_DESIGN.ARGS.DIRECTIVE $impl_run]"
 puts "PREPARE_PROJECT_2025_2_PASS"

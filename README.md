@@ -1,5 +1,26 @@
 # 高阶数字插值滤波器设计与 FPGA 验证
 
+### 2026-08-11：24/20/20 GUI 综合内存失败修复
+
+用户手动运行正式 Vivado 2025.2 工程时，`synth_1` 在 `Start Technology Mapping` 阶段失败。
+实际 `runme.log` 没有 RTL、约束或器件资源错误，而是明确记录
+`out of memory allocating 8388640 bytes`：当时 15.73 GB 物理内存仅余约 2.71 GB，Windows
+提交内存余量约 3.37 GB，Vivado 又默认启动两个内部综合 worker；综合主进程峰值约1.64 GB后，
+系统已无法再承诺约8 MB内存。D盘当时也只余约1.24 GB，虽不是本次第一故障点，但已是后续
+实现和报告保存的风险项。
+
+正式工程现已为 `synth_1` 持久安装
+`tools/vivado_2025_2/synth_low_memory_pre.tcl`，把内部综合线程固定为1；GUI run和完整构建均使用
+单job。通过 `repair_gui_synth_2025_2.tcl` 原生 `reset_run` 后重新运行，日志确认
+`maximum of 1 processes`，综合以0 Error/0 Critical Warning完成，资源为
+**280 LUT / 373 FF / 4 DSP / 4 RAMB18E1 / 2 MMCM**，峰值约1.92 GB。随后从同一个GUI
+`synth_1` 继续完成 `impl_1 -> write_bitstream`，再次得到
+**218 LUT / 365 FF / 4 DSP / 4 RAMB18E1 / 2 MMCM**，WNS/WHS=`+45.279/+0.079 ns`，
+DRC Error=0。修复证据分别位于
+`tools/vivado_2025_2/results/synth_repair_20260811_195841` 和
+`tools/vivado_2025_2/results/gui_impl_verify_20260811_200228`。该修复只改变Vivado运行并发，
+没有修改滤波RTL、字长、系数、量化、时序或DAC接口。
+
 ## 当前最低 LUT 工具签核候选：Vivado 2025.2 218 LUT / 4 DSP（24/20/20，待板测）
 
 在已板测 221-LUT 安全基线上，本轮按建议把 Stage1/Stage2/Stage3 的有效数据宽度从
