@@ -1,5 +1,35 @@
 # 高阶数字插值滤波器设计与 FPGA 验证
 
+### 2026-08-11：218 板测基线后的 4/3/2-DSP Pareto 复验
+
+218-LUT 24/20/20 版本已由用户确认物理板测成功，并归档为不可变标签
+`nf-vivado2025.2-218lut-365ff-4dsp-2bram-24-20-20-board-pass`。随后先完成发布
+配置闭环：MATLAB 模型、稳定 Smoke 金标准、默认 RTL 回归、GUI 仿真文件集、
+Stage2=20 显式泛型和 Vivado 构建指纹现在指向同一数值配置。默认 Smoke
+**17/17 PASS**，完整 Vivado 2025.2 再次得到 **218 LUT / 365 FF / 4 DSP**、
+WNS/WHS=`+45.279/+0.079 ns`、0 DRC Error 和正式 bitstream。
+
+在不改动正式 `.xpr` 和 board-pass 基线的前提下，用只读工程和综合命令行泛型覆盖
+重新实测 CIC 积分器 DSP 模式 2/1/0：
+
+| CIC DSP 模式 | 综合 LUT / FF | 布局布线 LUT / FF | DSP | RAMB18E1 | MMCM | WNS/WHS | RTL Smoke | 状态 |
+|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| 2 | 280 / 373 | **218 / 365** | **4** | 4 | 2 | +45.279/+0.079 ns | 17/17 PASS | **正式板测版** |
+| 1 | 301 / 396 | **239 / 388** | **3** | 4 | 2 | +44.703/+0.079 ns | 17/17 PASS | 工具验证 Pareto，待板测 |
+| 0 | 329 / 425 | **268 / 417** | **2** | 4 | 2 | +44.389/+0.078 ns | 17/17 PASS | 工具验证 Pareto，待板测 |
+
+3-DSP 点相对正式基线节省 1 DSP，代价是 `+21 LUT / +23 FF`；2-DSP 点再节省
+1 DSP，相对 3-DSP 再增加 `+29 LUT / +29 FF`。因此，若评分中一个 DSP 的权重高于
+`21×LUT权重 + 23×FF权重`，3-DSP 点优于 4-DSP；2-DSP 相对 3-DSP 的对应临界为
+`29×LUT权重 + 29×FF权重`。在未明确评分公式前，正式工程继续使用已板测
+218/4-DSP 版，239/3-DSP 和 268/2-DSP 只作为可切换 Pareto。三点无 SAIF 功耗估算均为
+`0.271 W`，该结果被两颗 MMCM 主导，不用于宣称实测功耗改善。
+
+3-DSP/2-DSP 实现证据分别位于
+`tools/vivado_2025_2/structure_experiments/results/cic_dsp_mode1_20260811_232637` 和
+`cic_dsp_mode0_20260811_232845`；完整执行记录见
+[218 基线 CIC DSP Pareto 执行反馈](matlab_fir/national_finals/results/vivado2025_2_218_cic_dsp_pareto_execution_feedback.md)。
+
 ### 2026-08-11：24/20/20 GUI 综合内存失败修复
 
 用户手动运行正式 Vivado 2025.2 工程时，`synth_1` 在 `Start Technology Mapping` 阶段失败。

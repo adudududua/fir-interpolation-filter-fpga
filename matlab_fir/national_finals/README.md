@@ -12,6 +12,21 @@ Smoke/Release 均为 17/17 PASS，14 组全链向 24/20/20 金标准逐样本 0 
 `nf-vivado2025.2-218lut-365ff-4dsp-2bram-24-20-20-board-pass`，221-LUT board-pass 保留为
 前一安全回退。详见 [218-LUT 执行反馈](results/vivado2025_2_stage123_24_20_20_218lut_execution_feedback.md)。
 
+### 218 板测基线后的 CIC DSP Pareto
+
+当前 24/20/20 RTL 对 CIC 积分器 DSP 模式 2/1/0 执行了同版本 Vivado 2025.2
+post-route 复验，并对三个模式分别完成默认 Smoke **17/17 PASS**：
+
+| DSP | Routed LUT | Routed FF | WNS/WHS | 相对前一点 | 验证等级 |
+|---:|---:|---:|---:|---:|---|
+| 4 | **218** | **365** | +45.279/+0.079 ns | — | board-verified |
+| 3 | **239** | **388** | +44.703/+0.079 ns | −1 DSP，+21 LUT/+23 FF | RTL 17/17 + routed，待板测 |
+| 2 | **268** | **417** | +44.389/+0.078 ns | −1 DSP，+29 LUT/+29 FF | RTL 17/17 + routed，待板测 |
+
+两个新 Pareto 点都保持 4 RAMB18E1、2 MMCM、正时序和 0 DRC Error，但没有替换
+正式 218/4-DSP 工程。评分公式明确前，3-DSP 是更平衡的备选，2-DSP 只在 DSP 权重
+很高时更有吸引力。详见 [CIC DSP Pareto 执行反馈](results/vivado2025_2_218_cic_dsp_pareto_execution_feedback.md)。
+
 ## Vivado 2025.2 前一最低 LUT 正式实板版：routed 不变量复用版（221 LUT / 4 DSP）
 
 本轮从已板测 234-LUT 版本继续审计 routed 网表，删除三组功能重复状态/门控：模式 CDC 复用

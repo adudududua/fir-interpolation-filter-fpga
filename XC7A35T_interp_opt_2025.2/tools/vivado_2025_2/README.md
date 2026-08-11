@@ -9,6 +9,30 @@
 `nf-vivado2025.2-218lut-365ff-4dsp-2bram-24-20-20-board-pass`。未提供的逐档仪器原始读数
 不作推测；221-LUT board-pass 保留为前一安全回退。
 
+## 218 基线 CIC DSP 4/3/2 档 post-route Pareto
+
+`structure_experiments/run_cic_dsp_pareto_2025_2.ps1` 以只读方式打开正式工程，
+通过 `synth_design -generic` 只覆盖 `USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE`，
+不保存 `.xpr`，不改动 218 board-pass 泛型。当前结果为：
+
+| 模式 | 路由后资源 | WNS/WHS | DRC | RTL Smoke | 结果目录 |
+|---:|---:|---:|---:|---:|---|
+| 2 | 218 LUT / 365 FF / 4 DSP | +45.279/+0.079 ns | 0 | 17/17 | `results/20260811_231722` |
+| 1 | 239 LUT / 388 FF / 3 DSP | +44.703/+0.079 ns | 0 | 17/17 | `structure_experiments/results/cic_dsp_mode1_20260811_232637` |
+| 0 | 268 LUT / 417 FF / 2 DSP | +44.389/+0.078 ns | 0 | 17/17 | `structure_experiments/results/cic_dsp_mode0_20260811_232845` |
+
+实验入口：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
+  ".\tools\vivado_2025_2\structure_experiments\run_cic_dsp_pareto_2025_2.ps1" `
+  -IntegratorDspMode 1 -Jobs 1
+```
+
+将 `-IntegratorDspMode` 改为 `0` 可复现 2-DSP 点。脚本会对目标 DSP 数、4 RAMB18E1、
+2 MMCM、正 WNS/WHS 和 0 DRC Error 进行硬门禁；它只生成实验 DCP/报告，不生成
+可误当作正式发布的 bitstream。
+
 ## 前一状态：221-LUT 正式板测版，234-LUT 前一安全回退
 
 分支 `national-finals-v2025.2-post234-lut-optimization` 在已板测 234-LUT 版本上完成 routed
