@@ -88,7 +88,8 @@ Default/FewerCarryChains 均为 263 LUT。由此可知 239 不是一次偶然的
 
 - `build_3dsp_two24_candidate.ps1`：comb + 一级积分器 TWO24 候选；
 - `build_3dsp_integrator_pair_candidate.ps1`：TWO24 双积分器候选；
-- `scan_3dsp_implementation_strategies.ps1`：从 239-LUT 综合 DCP 扫描实现策略；
+- `scan_3dsp_implementation_strategies.ps1`：从最近重建的 mode=1 综合 DCP 扫描实现策略，
+  也可用 `-SynthDcp` 显式指定检查点；
 - `scan_3dsp_synthesis_directive.ps1`：从正式 RTL 扫描综合面积指令；
 - `tb_cic_two24_mode1_equiv.v`、`tb_cic_integrator_pair_mode1_equiv.v`：逐样点等价验证；
 - `analyze_3dsp_lut_hotspots.tcl`：导出 routed LUT cell 清单。
@@ -96,6 +97,11 @@ Default/FewerCarryChains 均为 263 LUT。由此可知 239 不是一次偶然的
 长路径下 Vivado 2025.2 的增量综合临时文件可能触发 `Synth 8-787`，综合策略扫描应把
 结果目录放在仓库根部的短临时目录。该失败不产生资源结论，短目录复跑后的 241/263 数字
 才是表中正式结果。
+
+为保持工程目录整洁，本轮生成的短路径临时工程、仿真工作目录和时间戳 Vivado 原始结果
+已在结论归档后清理；这些目录均可由上述脚本重新生成。仓库保留
+`structure_experiments/results/3dsp_lut_optimization_20260812/summary.txt` 作为精简机器可读汇总，
+并以本文记录候选矩阵、等价样点数、时序、DRC 和 No-Go 原因。
 
 ## 7. 建议
 

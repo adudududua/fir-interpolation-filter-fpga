@@ -26,8 +26,8 @@ Stage3 联合补偿、CIC 模运算、采样率、RAM 和板级接口保持不�
 实现目录：
 
 - 4-DSP 基线：`tools/vivado_2025_2/results/20260811_231722`；
-- 3-DSP：`tools/vivado_2025_2/structure_experiments/results/cic_dsp_mode1_20260811_232637`；
-- 2-DSP：`tools/vivado_2025_2/structure_experiments/results/cic_dsp_mode0_20260811_232845`。
+- 3-DSP：原始时间戳目录已在结论归档后清理，可通过下述命令以 mode=1 重建；
+- 2-DSP：原始时间戳目录已在结论归档后清理，可通过下述命令以 mode=0 重建。
 
 ## 3. 功能回归
 

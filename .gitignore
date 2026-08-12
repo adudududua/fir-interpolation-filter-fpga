@@ -148,6 +148,18 @@ matlab_fir/national_finals/**/_work/
 /XC7A35T_interp_opt_2025.2/.three_dsp_*_sim/
 /.v25_3dsp_*/
 
+# Fixed-resource scans keep only their checked-in compact summary. Timestamped
+# Vivado run directories, background-process markers and crash diagnostics are
+# reproducible local artifacts.
+/XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/structure_experiments/results/3dsp_pair_*/
+/XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/structure_experiments/results/3dsp_synth_*/
+/XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/structure_experiments/results/cic_dsp_mode[01]_*/
+/XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/structure_experiments/results/three_dsp_strategy_*/
+/XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/structure_experiments/results/three_dsp_two24_*/
+/XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/structure_experiments/*.pid
+**/hs_err_pid*.dmp
+**/vivado_pid*.zip
+
 # The copied project contains legacy 2018.3 screenshots/reports and an old
 # bitstream. Keep the authoritative 2025.2 result set under tools instead.
 /XC7A35T_interp_opt_2025.2/reports_*/

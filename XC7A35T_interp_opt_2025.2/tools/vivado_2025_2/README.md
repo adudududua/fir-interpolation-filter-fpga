@@ -12,6 +12,9 @@ RTL 已扫描策略中的最优组合。
 共享 Fabric CARRY 的候选因 comb 与一级积分器在连续帧下没有空闲拍而触发覆盖保护，
 不满足原吞吐，不进入综合。当前 239-LUT 点保持不变，仍是 3-DSP 下一板测候选；详细记录见
 `matlab_fir/national_finals/results/vivado2025_2_3dsp_lut_optimization_execution_feedback.md`。
+时间戳 Vivado 运行目录、短路径临时工程和仿真工作目录均为可重复生成的本地中间产物，
+清理后不纳入版本管理；仓库保留 `structure_experiments/results/3dsp_lut_optimization_20260812/summary.txt`
+作为本轮固定资源复测的精简机器可读证据。
 
 复现脚本位于 `structure_experiments`：
 
@@ -38,8 +41,8 @@ RTL 已扫描策略中的最优组合。
 | 模式 | 路由后资源 | WNS/WHS | DRC | RTL Smoke | 结果目录 |
 |---:|---:|---:|---:|---:|---|
 | 2 | 218 LUT / 365 FF / 4 DSP | +45.279/+0.079 ns | 0 | 17/17 | `results/20260811_231722` |
-| 1 | 239 LUT / 388 FF / 3 DSP | +44.703/+0.079 ns | 0 | 17/17 | `structure_experiments/results/cic_dsp_mode1_20260811_232637` |
-| 0 | 268 LUT / 417 FF / 2 DSP | +44.389/+0.078 ns | 0 | 17/17 | `structure_experiments/results/cic_dsp_mode0_20260811_232845` |
+| 1 | 239 LUT / 388 FF / 3 DSP | +44.703/+0.079 ns | 0 | 17/17 | 结论已归档，原始目录可复现 |
+| 0 | 268 LUT / 417 FF / 2 DSP | +44.389/+0.078 ns | 0 | 17/17 | 结论已归档，原始目录可复现 |
 
 实验入口：
 

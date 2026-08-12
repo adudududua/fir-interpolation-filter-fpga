@@ -12,6 +12,9 @@ TWO24 的 comb+一级积分器候选为 **260/417**，双积分器候选为 **26
 因此当前仍推荐 **239 LUT / 388 FF / 3 DSP / 4 RAMB18E1** 作为下一板测候选；本轮未改动
 正式 RTL/工程泛型，也未生成新的板测 bitstream。完整资源矩阵、失败原因和复现入口见
 [3-DSP LUT 压缩执行反馈](matlab_fir/national_finals/results/vivado2025_2_3dsp_lut_optimization_execution_feedback.md)。
+本轮生成的 Vivado 临时工程、仿真目录和时间戳原始运行目录已清理；仓库仅保留
+[固定资源复测精简汇总](XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/structure_experiments/results/3dsp_lut_optimization_20260812/summary.txt)、
+分析报告及复现脚本，原始运行目录需要时由脚本重新生成。
 
 ### 2026-08-12：技术报告补充实验 E0～E4
 
@@ -50,9 +53,8 @@ WNS/WHS=`+45.279/+0.079 ns`、0 DRC Error 和正式 bitstream。
 218/4-DSP 版，239/3-DSP 和 268/2-DSP 只作为可切换 Pareto。三点无 SAIF 功耗估算均为
 `0.271 W`，该结果被两颗 MMCM 主导，不用于宣称实测功耗改善。
 
-3-DSP/2-DSP 实现证据分别位于
-`tools/vivado_2025_2/structure_experiments/results/cic_dsp_mode1_20260811_232637` 和
-`cic_dsp_mode0_20260811_232845`；完整执行记录见
+3-DSP/2-DSP 的资源、时序、DRC 和回归结论已固化在完整执行记录中；对应的时间戳
+Vivado 原始运行目录属于可重复生成的本地中间产物，清理后可通过记录中的命令重建。详见
 [218 基线 CIC DSP Pareto 执行反馈](matlab_fir/national_finals/results/vivado2025_2_218_cic_dsp_pareto_execution_feedback.md)。
 
 ### 2026-08-11：24/20/20 GUI 综合内存失败修复
