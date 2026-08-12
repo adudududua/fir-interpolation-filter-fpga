@@ -1,5 +1,10 @@
 # Vivado 2025.2 218 基线 CIC DSP 4/3/2 档 Pareto 执行反馈
 
+> 状态更新（2026-08-12）：239 LUT / 388 FF / 3 DSP 的 mode=1 配置已转入正式工程、
+> 生成 bitstream，并由用户确认物理板验证通过；218 LUT / 365 FF / 4 DSP 版本保留为
+> LUT 优先的独立实板回退。下文关于“实验候选”和“未生成 bitstream”的表述仅对应本次
+> 只读 Pareto 扫描当时的执行边界。
+
 ## 1. 目标与不变量
 
 在已板测 218 LUT / 365 FF / 4 DSP / 4 RAMB18E1 / 2 MMCM 的 24/20/20 基线上，
@@ -61,8 +66,8 @@ DAC 映射、RAMB18 原语、Stage1、Stage2/3、CIC 连续/停顿/边界、双�
 
 ## 5. Stop/Go 结论
 
-- **218/4-DSP：Go，继续作为正式 board-pass 与 LUT-first 版本。**
-- **239/3-DSP：Go as Pareto，是当前更平衡的低 DSP 候选，待评分公式确认和物理板测。**
+- **218/4-DSP：Go，作为 board-pass 与 LUT-first 回退版本。**
+- **239/3-DSP：Go，已完成正式构建和物理板验证，作为当前低 DSP board-pass Pareto 版本。**
 - **268/2-DSP：Keep as Pareto，只在 DSP 权重足够高时推进 bitstream/板测。**
 
 两个实验候选只输出 routed DCP 和报告，没有生成会被误当作正式发布的

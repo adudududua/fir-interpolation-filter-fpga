@@ -534,7 +534,7 @@
         <Generic Name="USE_NATIONAL_FINALS_STAGE1_DSP48_PREADDER" Val="1"/>
         <Generic Name="USE_NATIONAL_FINALS_NARROW_STAGE23" Val="1"/>
         <Generic Name="USE_NATIONAL_FINALS_P3_JOINT_STAGE3" Val="1"/>
-        <Generic Name="USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE" Val="2"/>
+        <Generic Name="USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE" Val="1"/>
         <Generic Name="USE_ULTRACOMPACT_KEYPAD" Val="1"/>
         <Generic Name="USE_NATIONAL_FINALS_STAGE2_DATA_W" Val="20"/>
       </Config>
@@ -760,7 +760,7 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="impl_1" Type="Ft2:EntireDesign" Part="xc7a35tfgg484-2" ConstrsSet="constrs_1" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" State="current" Dir="$PRUNDIR/impl_1" SynthRun="synth_1" IncludeInArchive="true" IsChild="false" GenFullBitstream="true" AutoIncrementalDir="$PSRCDIR/utils_1/imports/impl_1" LaunchOptions="-jobs 1 " AutoRQSDir="$PSRCDIR/utils_1/imports/impl_1" ParallelReportGen="true">
+    <Run Id="impl_1" Type="Ft2:EntireDesign" Part="xc7a35tfgg484-2" ConstrsSet="constrs_1" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" State="current" Dir="$PRUNDIR/impl_1" SynthRun="synth_1" IncludeInArchive="true" IsChild="false" GenFullBitstream="true" AutoIncrementalDir="$PSRCDIR/utils_1/imports/impl_1" LaunchOptions="-jobs 16 " AutoRQSDir="$PSRCDIR/utils_1/imports/impl_1" ParallelReportGen="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018"/>
         <Step Id="init_design"/>

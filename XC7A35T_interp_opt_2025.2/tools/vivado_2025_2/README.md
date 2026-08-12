@@ -1,5 +1,23 @@
 # Vivado 2025.2 迁移、修复与验证记录
 
+## 当前工程配置：239 LUT / 388 FF / 3 DSP
+
+`XC7A35T_interp.xpr` 当前固定
+`USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE=1`，板级顶层的默认参数同步为 1。
+该配置保持 24/20/20 定点字长、4 RAMB18E1（2 BRAM Tile）和 2 MMCM，既有
+Vivado 2025.2 验证结果为 **239 LUT / 388 FF / 3 DSP**、
+WNS/WHS=`+44.703/+0.079 ns`、DRC Error=0、RTL Smoke 17/17 PASS。
+2026-08-12 用户已确认该 3-DSP Pareto 配置物理板验证通过，当前状态为
+**board-verified**；原 218-LUT / 4-DSP 实板版本已由用户另存为
+`XC7A35T_interp_LUTmin_2025.2`，不在本目录中继续作为默认构建目标。
+
+2026-08-12 已基于当前磁盘源码重建标准 `synth_1/impl_1`，布局后资源为
+**239 LUT / 388 FF / 3 DSP / 4 RAMB18E1 / 2 MMCM**，bitstream 生成成功，
+实现过程为 0 Error。独立硬门限归档位于 `results/active_239lut_3dsp`，其
+WNS/WHS=`+44.703/+0.079 ns`、DRC Error=0；mode=1、24/20/20 RTL Smoke
+同步复跑为 **17/17 PASS**。对应板测记录为 `results/active_239lut_3dsp/BOARD_PASS.md`；可用
+`source tools/vivado_2025_2/activate_239lut_3dsp_2025_2.tcl` 重新生成同类归档。
+
 ## 3-DSP / 4-RAMB18E1 固定资源 LUT 压缩复测
 
 以 mode=1 的 **239 LUT / 388 FF / 3 DSP / 4 RAMB18E1** 为硬基线，已完成综合/实现
@@ -10,7 +28,7 @@ WNS/WHS、DRC Error=0、逐样点 0 LSB，但未降低 LUT。`ExploreArea/Explor
 RTL 已扫描策略中的最优组合。
 
 共享 Fabric CARRY 的候选因 comb 与一级积分器在连续帧下没有空闲拍而触发覆盖保护，
-不满足原吞吐，不进入综合。当前 239-LUT 点保持不变，仍是 3-DSP 下一板测候选；详细记录见
+不满足原吞吐，不进入综合。当前 239-LUT 点保持不变，且已完成物理板验证；详细记录见
 `matlab_fir/national_finals/results/vivado2025_2_3dsp_lut_optimization_execution_feedback.md`。
 时间戳 Vivado 运行目录、短路径临时工程和仿真工作目录均为可重复生成的本地中间产物，
 清理后不纳入版本管理；仓库保留 `structure_experiments/results/3dsp_lut_optimization_20260812/summary.txt`
@@ -23,7 +41,7 @@ RTL 已扫描策略中的最优组合。
 - `scan_3dsp_implementation_strategies.ps1`；
 - `scan_3dsp_synthesis_directive.ps1`。
 
-## 当前状态：218-LUT 24/20/20 正式板测版，221-LUT 前一安全回退
+## LUT 优先回退：218-LUT 24/20/20 正式板测版
 
 `tools/vivado_2025_2/results/20260811_190839` 已从空结果目录完成 Vivado 2025.2
 综合、实现和 bitstream，得到 **218 LUT / 365 FF / 4 DSP / 4 RAMB18E1（2 BRAM Tile）/
@@ -41,7 +59,7 @@ RTL 已扫描策略中的最优组合。
 | 模式 | 路由后资源 | WNS/WHS | DRC | RTL Smoke | 结果目录 |
 |---:|---:|---:|---:|---:|---|
 | 2 | 218 LUT / 365 FF / 4 DSP | +45.279/+0.079 ns | 0 | 17/17 | `results/20260811_231722` |
-| 1 | 239 LUT / 388 FF / 3 DSP | +44.703/+0.079 ns | 0 | 17/17 | 结论已归档，原始目录可复现 |
+| 1 | 239 LUT / 388 FF / 3 DSP | +44.703/+0.079 ns | 0 | 17/17 | `results/active_239lut_3dsp`；正式板测通过 |
 | 0 | 268 LUT / 417 FF / 2 DSP | +44.389/+0.078 ns | 0 | 17/17 | 结论已归档，原始目录可复现 |
 
 实验入口：
