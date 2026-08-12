@@ -6,11 +6,18 @@
 `USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE=0`，板级顶层的默认参数同步为 0。
 该配置保持 24/20/20 定点字长、4 RAMB18E1（2 BRAM Tile）和 2 MMCM。Vivado 2025.2
 完整重建结果为 **268 LUT / 417 FF / 2 DSP**、WNS/WHS=`+44.389/+0.078 ns`、
-DRC Error=0，mode=0 RTL Smoke 为 **17/17 PASS**，bitstream 已生成。独立硬门限归档位于
+DRC Error=0，mode=0 RTL Smoke 与 Release 均为 **17/17 PASS**，bitstream 已生成。独立硬门限归档位于
 `results/active_268lut_2dsp`，构建入口为 `activate_268lut_2dsp_2025_2.tcl`。当前状态为
-**tool-verified，待物理板验证**。标准 GUI 的 `synth_1/impl_1` 也已从零重建并复现
+**tool-verified**。标准 GUI 的 `synth_1/impl_1` 也已从零重建并复现
 **268 LUT / 417 FF / 2 DSP**、WNS/WHS=`+44.389/+0.078 ns`、DRC Error=0；GUI bitstream
 SHA-256 为 `7A8542EA469EB9312B0AD87F4832455337C0616575C12A4860A3D9A26C6DF92A`。
+
+2026-08-12 的固定资源复验继续保持 2 DSP/4 RAMB18E1/2 MMCM：实现策略扫描最低仍为
+268 LUT；`AreaOptimized_medium` 为269 LUT。pending/burst状态合并、舍入状态表示和共享
+Fabric加法器分别实现为271/417、288/419和295/418 LUT/FF，均为正时序且0 DRC Error，
+但没有资源净收益；共享加法器还不满足正式连续输出吞吐。完整结论见
+`matlab_fir/national_finals/results/vivado2025_2_2dsp_fixed_resource_lut_optimization_execution_feedback.md`，
+精简机器可读结果见 `structure_experiments/results/2dsp_lut_optimization_20260812/summary.txt`。
 
 ## 前一实板发布：239 LUT / 388 FF / 3 DSP
 
@@ -20,7 +27,8 @@ SHA-256 为 `7A8542EA469EB9312B0AD87F4832455337C0616575C12A4860A3D9A26C6DF92A`�
 RTL Smoke 17/17 PASS。
 2026-08-12 用户已确认该 3-DSP Pareto 配置物理板验证通过，当前状态为
 **board-verified**；原 218-LUT / 4-DSP 实板版本已由用户另存为
-`XC7A35T_interp_LUTmin_2025.2`，不在本目录中继续作为默认构建目标。
+`XC7A35T_interp_LUTmin218_DSP4_2025.2`，239-LUT / 3-DSP版归档为
+`XC7A35T_interp_DSP3_LUT239_2025.2`，二者均不在本目录中继续作为默认构建目标。
 
 2026-08-12 已基于当前磁盘源码重建标准 `synth_1/impl_1`，布局后资源为
 **239 LUT / 388 FF / 3 DSP / 4 RAMB18E1 / 2 MMCM**，bitstream 生成成功，
@@ -72,7 +80,7 @@ RTL 已扫描策略中的最优组合。
 |---:|---:|---:|---:|---:|---|
 | 2 | 218 LUT / 365 FF / 4 DSP | +45.279/+0.079 ns | 0 | 17/17 | `results/20260811_231722` |
 | 1 | 239 LUT / 388 FF / 3 DSP | +44.703/+0.079 ns | 0 | 17/17 | `results/active_239lut_3dsp`；正式板测通过 |
-| 0 | 268 LUT / 417 FF / 2 DSP | +44.389/+0.078 ns | 0 | 17/17 | `results/active_268lut_2dsp`；当前工具候选 |
+| 0 | 268 LUT / 417 FF / 2 DSP | +44.389/+0.078 ns | 0 | Smoke/Release 17/17 | `results/20260812_205122`；当前生产配置 |
 
 实验入口：
 

@@ -4,12 +4,9 @@
 
 .agents/
 .codex_xvlog_check/
-/-p/
-/dfx_runtime.txt
 /XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/results/synth_repair_*/
 /XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/results/gui_impl_verify_*/
 
-.Xil/
 **/.Xil/
 
 *.cache/
@@ -159,6 +156,28 @@ matlab_fir/national_finals/**/_work/
 /XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/structure_experiments/*.pid
 **/hs_err_pid*.dmp
 **/vivado_pid*.zip
+
+# Repository-root launcher debris must never be kept beside the project
+# directories.  Vivado/XSim commands are run from timestamped result or
+# _work directories; these anchored rules are a final containment guard.
+/.Xil/
+/-p/
+/clockInfo.txt
+/dfx_runtime.txt
+/vivado*.jou
+/vivado*.log
+/tmp/
+
+# Fixed-2-DSP experiments must keep generated sandboxes and raw Vivado runs
+# below their dedicated work areas, never as source-tree or repository-root
+# deliverables.  Reproducible scripts and the compact summary remain visible.
+/XC7A35T_interp_opt_2025.2/.*2dsp_sandbox/
+/XC7A35T_interp_opt_2025.2/.vivado_appdata/
+/XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/structure_experiments/.Xil/
+/XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/structure_experiments/-p/
+/XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/structure_experiments/*_equiv_work/
+/XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/structure_experiments/results/two_dsp_*/
+/XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/results/20260812_205122/
 
 # The copied project contains legacy 2018.3 screenshots/reports and an old
 # bitstream. Keep the authoritative 2025.2 result set under tools instead.

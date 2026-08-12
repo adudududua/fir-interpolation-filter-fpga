@@ -8,6 +8,18 @@ E1 固定模型/稳定 RTL 向量 6/6、0 LSB，新 RTL Smoke 17/17；E2 六工�
 E3 三频点×六工况 18/18，最差镜像抑制 74.546 dBc。E5/E6/E7/E9 和完整 E8 的未完成
 边界已在报告中明确保留。详见 [补充测试报告](../../submit/finally/reports/test_report.md)。
 
+### 固定2 DSP / 4 RAMB18E1的LUT优化边界
+
+当前生产工程已切换为CIC DSP模式0，并重新完成Smoke/Release **17/17 PASS**以及
+Vivado 2025.2完整构建：**268 LUT / 417 FF / 2 DSP / 4 RAMB18E1 / 2 MMCM**，
+WNS/WHS=`+44.389/+0.078 ns`，DRC Error=0，bitstream生成成功。综合/实现策略扫描的最低结果
+仍为268 LUT；三个通过受控RTL检查并进入完整实现的状态/调度候选分别为271、288和295 LUT，
+均未形成资源净收益，其中295-LUT共享加法器不满足板级连续输出吞吐。
+
+因此，正式RTL保持268-LUT基线。本轮结论只覆盖已经实测的策略、状态表示和调度候选，不将
+268 LUT表述为所有潜在架构上的数学全局最优。详见
+[2-DSP固定资源优化复验](results/vivado2025_2_2dsp_fixed_resource_lut_optimization_execution_feedback.md)。
+
 ## Vivado 2025.2 当前最低 LUT 正式实板版：24/20/20 字长版（218 LUT / 4 DSP）
 
 在已板测 221-LUT 安全基线上，Stage1/Stage2/Stage3 有效数据宽度优化为
@@ -28,12 +40,14 @@ post-route 复验，并对三个模式分别完成默认 Smoke **17/17 PASS**：
 | DSP | Routed LUT | Routed FF | WNS/WHS | 相对前一点 | 验证等级 |
 |---:|---:|---:|---:|---:|---|
 | 4 | **218** | **365** | +45.279/+0.079 ns | — | board-verified |
-| 3 | **239** | **388** | +44.703/+0.079 ns | −1 DSP，+21 LUT/+23 FF | RTL 17/17 + routed，待板测 |
-| 2 | **268** | **417** | +44.389/+0.078 ns | −1 DSP，+29 LUT/+29 FF | RTL 17/17 + routed，待板测 |
+| 3 | **239** | **388** | +44.703/+0.079 ns | −1 DSP，+21 LUT/+23 FF | RTL 17/17 + routed + board-verified |
+| 2 | **268** | **417** | +44.389/+0.078 ns | −1 DSP，+29 LUT/+29 FF | Smoke/Release 17/17 + routed |
 
-两个新 Pareto 点都保持 4 RAMB18E1、2 MMCM、正时序和 0 DRC Error，但没有替换
-正式 218/4-DSP 工程。评分公式明确前，3-DSP 是更平衡的备选，2-DSP 只在 DSP 权重
-很高时更有吸引力。详见 [CIC DSP Pareto 执行反馈](results/vivado2025_2_218_cic_dsp_pareto_execution_feedback.md)。
+两个新 Pareto 点都保持 4 RAMB18E1、2 MMCM、正时序和 0 DRC Error。此表生成时218/4-DSP
+曾为正式工程；随后用户保留218-LUT和239-LUT的独立归档，并将当前生产工程切换为
+268-LUT/2-DSP模式0。239-LUT/3-DSP仍是更平衡且已板测的回退点，218-LUT/4-DSP仍是
+最低LUT且已板测的回退点。详见
+[CIC DSP Pareto 执行反馈](results/vivado2025_2_218_cic_dsp_pareto_execution_feedback.md)。
 
 ## Vivado 2025.2 前一最低 LUT 正式实板版：routed 不变量复用版（221 LUT / 4 DSP）
 

@@ -28,3 +28,12 @@ C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe `
 
 2026-08-12 实测结果：MATLAB 软件门禁通过；E1 固定模型/稳定 RTL 向量 6/6、0 LSB；
 E2 六工况 6/6；E3 三频点×六工况 18/18；RTL Smoke 17/17。
+
+## 2-DSP 固定资源补充复验
+
+该补充项不改变本目录的218-LUT/4-DSP实验对象，而是用于说明同一24/20/20数值配置在
+DSP模式0下的资源边界。当前2-DSP生产配置重新完成Smoke/Release 17/17与Vivado 2025.2
+完整构建，结果为268 LUT/417 FF/2 DSP/4 RAMB18E1，WNS/WHS为+44.389/+0.078 ns，
+DRC Error为0。实现策略和三项状态/调度候选均未低于268 LUT；相关结论已补入技术报告
+第9章和附录C。完整记录见
+`../../results/vivado2025_2_2dsp_fixed_resource_lut_optimization_execution_feedback.md`。

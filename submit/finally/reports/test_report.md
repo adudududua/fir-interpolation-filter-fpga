@@ -94,7 +94,7 @@
 | -90 dBFS，双 Fs×三节点 | 6 | **27.316 dB** | 8.051 | 22.306 | 0 | 0 |
 | 10 seed 随机 PCM×三节点 | 30 | **96.925 dB** | 8.354 | 32.385 | 0 | 0 |
 
-![E1 浮点与定点 SQNR](test_report_assets/e1_float_fixed_sqnr.png)
+![E1 浮点与定点 SQNR](../images/generated/test_report_assets/e1_float_fixed_sqnr.png)
 
 结果说明：
 
@@ -136,7 +136,7 @@
 六工况全部满足 `±0.05 dB` 和 `≥70 dB`。最差通带余量约为 `0.05-0.007844=0.042156 dB`，
 最差阻带余量为 `72.355-70=2.355 dB`。
 
-![六工况全带频响](test_report_assets/e2_six_mode_fullband_response.png)
+![六工况全带频响](../images/generated/test_report_assets/e2_six_mode_fullband_response.png)
 
 ### 5.2 严格线性相位证据
 
@@ -145,7 +145,7 @@
 - 数值微分得到的最大群延迟波动不超过约 `2.66e-9` 输出样点；
 - 4x/8x/128x 的群延迟分别固定为 112、229、3686.5 个输出样点。
 
-![六工况相位残差](test_report_assets/e2_six_mode_phase_residual.png)
+![六工况相位残差](../images/generated/test_report_assets/e2_six_mode_phase_residual.png)
 
 因此“严格线性相位”由整数冲激完全对称和数值相位残差共同支持。完整结果见
 [E2 六工况指标](../../../matlab_fir/national_finals/report_experiments/technical_report_218/processed/e2_mode_metrics.csv)。
@@ -173,9 +173,9 @@
 **74.546 dBc**。它高于 70 dB，但不能替代 E2 的全频率最坏阻带搜索；单音没有正好落在
 E2 找到的最坏阻带峰值频率。
 
-![997 Hz 六工况频谱](test_report_assets/e3_997hz_six_mode_spectrum.png)
+![997 Hz 六工况频谱](../images/generated/test_report_assets/e3_997hz_six_mode_spectrum.png)
 
-![19 kHz 六工况频谱](test_report_assets/e3_19khz_six_mode_spectrum.png)
+![19 kHz 六工况频谱](../images/generated/test_report_assets/e3_19khz_six_mode_spectrum.png)
 
 第一轮门禁曾得到 17/18：48 kHz/128x 的 997 Hz 用例在整个有限序列中记录到 8 次启动瞬态
 内部饱和。按指导把统一启动区与稳态区分开后，稳态输出触顶为 0，镜像抑制 88.232 dBc，故正式
@@ -194,7 +194,7 @@ E2 找到的最坏阻带峰值频率。
 221→218 则把 Stage2 有效宽度从 22 bit 降到 20 bit，资源变化为 `-3 LUT/-2 FF`，约为
 `1.36% LUT` 和 `0.54% FF`；该步骤属于有限字长 Pareto，不能写入逐样本等价结构表。
 
-![结构消融与字长 Pareto](test_report_assets/e4_architecture_wordlength_pareto.png)
+![结构消融与字长 Pareto](../images/generated/test_report_assets/e4_architecture_wordlength_pareto.png)
 
 由于本轮没有完成 E9 的 3～5 组配对 seed，实现层面只能确认“221 和 218 都是同工具链下的正式
 签核点且均已板测”，不能把 3-LUT 差异表述为已完成统计显著性证明。
@@ -240,3 +240,41 @@ vectorless 功耗报告为 Total/Dynamic/Static=`0.271/0.199/0.072 W`，置信�
 
 MATLAB 在受限账户下启动时提示无法读取用户偏好和工具箱缓存，但进程退出码为 0，CSV、PNG 和
 最终门禁均成功生成；该环境告警不涉及实验输入、计算结果或 Vivado/XSim 回归。
+
+## 10. 固定 2 DSP / 4 RAMB18E1 条件下的 LUT 优化补充试验
+
+### 10.1 约束与基线复验
+
+本项试验保持24/20/20 bit数值配置、2个DSP48E1、4个RAMB18E1、2个MMCM、完整板级
+接口和128倍连续输出吞吐不变。当前CIC DSP模式0重新执行Smoke和Release，两者均为
+**17/17 PASS**；Release的14组全链输入在4×、8×和128×三个节点均实现精确点数、valid
+一致和0 LSB。Vivado 2025.2完整板级实现为：
+
+| LUT | FF | DSP48E1 | RAMB18E1 | WNS/WHS | TNS/THS | DRC Error | Bitstream |
+|---:|---:|---:|---:|---:|---:|---:|---|
+| **268** | **417** | **2** | **4** | +44.389/+0.078 ns | 0/0 ns | 0 | 成功 |
+
+### 10.2 候选结构与采纳判据
+
+| 候选 | 位精确/协议证据 | Routed LUT/FF | 物理实现 | 结论 |
+|---|---|---:|---|---|
+| 正式基线 | Smoke/Release 17/17；三节点0 LSB | **268/417** | 正时序，0 DRC Error | 保留 |
+| pending/burst状态合并 | 15,984个输出，0 LSB，控制状态一致 | 271/417 | 正时序，0 DRC Error | 未形成LUT收益 |
+| 舍入状态表示 | 15,984个输出，覆盖随机CE和中途复位，0 LSB | 288/419 | 正时序，0 DRC Error | LUT/FF均增加 |
+| 共享Fabric加法器 | 受限节拍9,584个输出，0 LSB | 295/418 | 正时序，0 DRC Error | 正式连续输出时无空闲拍，不满足吞吐 |
+
+实现策略扫描中，`ExploreArea + Default`保持268 LUT；其余实测组合为296～298 LUT。
+综合指令扫描的次优结果为`AreaOptimized_medium`的269 LUT。所有资源结论均取自完整板级
+routed报告，不以综合估计或局部仿真替代。
+
+### 10.3 优化边界
+
+3-DSP工作点为239 LUT/388 FF，2-DSP基线为268 LUT/417 FF；减少末级CIC积分DSP后，
+LUT和FF均增加29。网表审计表明该增量对应29 bit最终积分状态及其Fabric加法路径。
+在保持完整21 bit输入域、补码模运算、逐拍输出和复位语义时，状态宽度不能直接删除；状态编码
+候选的routed资源反而增加，跨拍共享则与正式连续输出吞吐冲突。
+
+因此，本轮仅作有限结论：在已覆盖的综合/实现策略、状态表示与受控调度候选范围内，没有得到
+低于268 LUT且同时保持2 DSP、4 RAMB18E1、原吞吐和位精确行为的有效完整板级实现。
+该结论不外推为所有可能RTL结构的数学全局最优证明。完整过程见
+[固定2-DSP资源LUT优化复验](../../../matlab_fir/national_finals/results/vivado2025_2_2dsp_fixed_resource_lut_optimization_execution_feedback.md)。
