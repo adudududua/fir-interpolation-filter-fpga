@@ -77,13 +77,13 @@ puts "REPAIR_SYNTH_DSP=$dsp_count"
 puts "REPAIR_SYNTH_BRAM18=$bram18_count"
 puts "REPAIR_SYNTH_MMCM=$mmcm_count"
 
-require_condition [expr {$dsp_count == 4}] "Expected exactly 4 DSP48E1 cells."
+require_condition [expr {$dsp_count == 2}] "Expected exactly 2 DSP48E1 cells."
 require_condition [expr {$bram18_count == 4}] "Expected exactly 4 RAMB18E1 cells."
 require_condition [expr {$mmcm_count == 2}] "Expected exactly 2 MMCME2_ADV cells."
-require_condition [expr {$lut_count <= 285}] \
-    "Synthesis LUT regression: expected no more than 285, got $lut_count."
-require_condition [expr {$ff_count <= 390}] \
-    "Synthesis FF regression: expected no more than 390, got $ff_count."
+require_condition [expr {$lut_count <= 329}] \
+    "Synthesis LUT regression: expected no more than 329, got $lut_count."
+require_condition [expr {$ff_count <= 425}] \
+    "Synthesis FF regression: expected no more than 425, got $ff_count."
 
 puts "REPAIR_GUI_SYNTH_2025_2_PASS"
 close_design

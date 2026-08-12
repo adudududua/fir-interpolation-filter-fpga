@@ -1,12 +1,23 @@
 # Vivado 2025.2 迁移、修复与验证记录
 
-## 当前工程配置：239 LUT / 388 FF / 3 DSP
+## 当前工程配置：268 LUT / 417 FF / 2 DSP
 
 `XC7A35T_interp.xpr` 当前固定
-`USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE=1`，板级顶层的默认参数同步为 1。
-该配置保持 24/20/20 定点字长、4 RAMB18E1（2 BRAM Tile）和 2 MMCM，既有
-Vivado 2025.2 验证结果为 **239 LUT / 388 FF / 3 DSP**、
-WNS/WHS=`+44.703/+0.079 ns`、DRC Error=0、RTL Smoke 17/17 PASS。
+`USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE=0`，板级顶层的默认参数同步为 0。
+该配置保持 24/20/20 定点字长、4 RAMB18E1（2 BRAM Tile）和 2 MMCM。Vivado 2025.2
+完整重建结果为 **268 LUT / 417 FF / 2 DSP**、WNS/WHS=`+44.389/+0.078 ns`、
+DRC Error=0，mode=0 RTL Smoke 为 **17/17 PASS**，bitstream 已生成。独立硬门限归档位于
+`results/active_268lut_2dsp`，构建入口为 `activate_268lut_2dsp_2025_2.tcl`。当前状态为
+**tool-verified，待物理板验证**。标准 GUI 的 `synth_1/impl_1` 也已从零重建并复现
+**268 LUT / 417 FF / 2 DSP**、WNS/WHS=`+44.389/+0.078 ns`、DRC Error=0；GUI bitstream
+SHA-256 为 `7A8542EA469EB9312B0AD87F4832455337C0616575C12A4860A3D9A26C6DF92A`。
+
+## 前一实板发布：239 LUT / 388 FF / 3 DSP
+
+该配置固定 `USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE=1`，保持 24/20/20 定点字长、
+4 RAMB18E1（2 BRAM Tile）和 2 MMCM，Vivado 2025.2 验证结果为
+**239 LUT / 388 FF / 3 DSP**、WNS/WHS=`+44.703/+0.079 ns`、DRC Error=0、
+RTL Smoke 17/17 PASS。
 2026-08-12 用户已确认该 3-DSP Pareto 配置物理板验证通过，当前状态为
 **board-verified**；原 218-LUT / 4-DSP 实板版本已由用户另存为
 `XC7A35T_interp_LUTmin_2025.2`，不在本目录中继续作为默认构建目标。
@@ -16,7 +27,8 @@ WNS/WHS=`+44.703/+0.079 ns`、DRC Error=0、RTL Smoke 17/17 PASS。
 实现过程为 0 Error。独立硬门限归档位于 `results/active_239lut_3dsp`，其
 WNS/WHS=`+44.703/+0.079 ns`、DRC Error=0；mode=1、24/20/20 RTL Smoke
 同步复跑为 **17/17 PASS**。对应板测记录为 `results/active_239lut_3dsp/BOARD_PASS.md`；可用
-`source tools/vivado_2025_2/activate_239lut_3dsp_2025_2.tcl` 重新生成同类归档。
+`source tools/vivado_2025_2/activate_239lut_3dsp_2025_2.tcl` 重新生成同类归档。正式标签为
+`nf-vivado2025.2-239lut-388ff-3dsp-2bram-24-20-20-board-pass`。
 
 ## 3-DSP / 4-RAMB18E1 固定资源 LUT 压缩复测
 
@@ -60,7 +72,7 @@ RTL 已扫描策略中的最优组合。
 |---:|---:|---:|---:|---:|---|
 | 2 | 218 LUT / 365 FF / 4 DSP | +45.279/+0.079 ns | 0 | 17/17 | `results/20260811_231722` |
 | 1 | 239 LUT / 388 FF / 3 DSP | +44.703/+0.079 ns | 0 | 17/17 | `results/active_239lut_3dsp`；正式板测通过 |
-| 0 | 268 LUT / 417 FF / 2 DSP | +44.389/+0.078 ns | 0 | 17/17 | 结论已归档，原始目录可复现 |
+| 0 | 268 LUT / 417 FF / 2 DSP | +44.389/+0.078 ns | 0 | 17/17 | `results/active_268lut_2dsp`；当前工具候选 |
 
 实验入口：
 

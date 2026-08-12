@@ -1,18 +1,35 @@
 # 高阶数字插值滤波器设计与 FPGA 验证
 
+### 2026-08-12：当前工程切换至 268 LUT / 2 DSP 候选
+
+在为 239 LUT / 388 FF / 3 DSP 实板通过版创建归档提交和标签后，当前工程
+`XC7A35T_interp_opt_2025.2` 已切换为 CIC 积分器 DSP 模式 0。新配置的完整板级实现为
+**268 LUT / 417 FF / 2 DSP48E1 / 4 RAMB18E1（2 BRAM Tile）/ 2 MMCM**，定点规格仍为
+Stage1/Stage2/Stage3=`24/20/20 bit`。RTL Smoke **17/17 PASS**；Vivado 2025.2 完整
+综合、实现和 bitstream 均通过，WNS/WHS=`+44.389/+0.078 ns`，DRC Error=0。
+
+独立构建归档位于
+[active_268lut_2dsp](XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/results/active_268lut_2dsp)，
+独立构建 bitstream SHA-256 为
+`1F6DCF4A9CD81D4301AA18E6789B751873E9CA367739346F4E7E8F70E301E50B`；标准 GUI
+`synth_1/impl_1` 也已从零重建为相同资源、时序和 DRC 结果，其 bitstream SHA-256 为
+`7A8542EA469EB9312B0AD87F4832455337C0616575C12A4860A3D9A26C6DF92A`。该版本当前状态为
+**tool-verified，待物理板验证**。
+
 ### 2026-08-12：239 LUT / 3 DSP 版本物理板验证通过
 
 用户已确认当前 Vivado 2025.2、CIC 积分器 DSP 模式 1 的版本完成物理板验证，板级结果为
 **239 LUT / 388 FF / 3 DSP48E1 / 4 RAMB18E1（2 BRAM Tile）/ 2 MMCM**，定点规格保持
 Stage1/Stage2/Stage3=`24/20/20 bit`。该版本已通过 RTL Smoke **17/17**、完整综合与实现、
-正时序和 0 DRC Error，并已生成可追溯 bitstream；当前工程
-`XC7A35T_interp_opt_2025.2` 已固定为该配置。原 218 LUT / 365 FF / 4 DSP 实板版本保留在
+正时序和 0 DRC Error，并已生成可追溯 bitstream；该状态已用下述标签归档，随后当前工程
+已切换至 2-DSP 候选。原 218 LUT / 365 FF / 4 DSP 实板版本保留在
 `XC7A35T_interp_LUTmin_2025.2`，作为 LUT 优先的独立回退。
 
 板测对应 bitstream 的 SHA-256 为
 `796844A59E439744082A11CDBD75C4BBAA4538D598B2793310E24E6B2F0401EA`，routed DCP 的
 SHA-256 为 `89F075A53ADCEC418F9E25531F6C9CE9ED12409436E4599D35666A5EF0E9E188`。归档与板测记录见
 [active_239lut_3dsp](XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/results/active_239lut_3dsp/BOARD_PASS.md)。
+正式标签为 `nf-vivado2025.2-239lut-388ff-3dsp-2bram-24-20-20-board-pass`。
 本记录仅陈述用户明确确认的“239-LUT 版本板测成功”，不推定未提供的逐档仪器读数。
 
 ### 2026-08-12：3-DSP / 4-RAMB18E1 固定资源下的 LUT 压缩复测
