@@ -1,5 +1,25 @@
 # Vivado 2025.2 迁移、修复与验证记录
 
+## 3-DSP / 4-RAMB18E1 固定资源 LUT 压缩复测
+
+以 mode=1 的 **239 LUT / 388 FF / 3 DSP / 4 RAMB18E1** 为硬基线，已完成综合/实现
+策略扫描和两种 TWO24 结构复测。最接近的综合策略是 `AreaOptimized_medium`：
+241 LUT / 388 FF；Default 和 FewerCarryChains 均为 263 LUT。固定 3 DSP、4 RAMB18E1
+后，comb+一级积分器 TWO24 为 260/417，双积分器 TWO24 为 262/393；它们均为正
+WNS/WHS、DRC Error=0、逐样点 0 LSB，但未降低 LUT。`ExploreArea/Explore` 仍是当前
+RTL 已扫描策略中的最优组合。
+
+共享 Fabric CARRY 的候选因 comb 与一级积分器在连续帧下没有空闲拍而触发覆盖保护，
+不满足原吞吐，不进入综合。当前 239-LUT 点保持不变，仍是 3-DSP 下一板测候选；详细记录见
+`matlab_fir/national_finals/results/vivado2025_2_3dsp_lut_optimization_execution_feedback.md`。
+
+复现脚本位于 `structure_experiments`：
+
+- `build_3dsp_two24_candidate.ps1`；
+- `build_3dsp_integrator_pair_candidate.ps1`；
+- `scan_3dsp_implementation_strategies.ps1`；
+- `scan_3dsp_synthesis_directive.ps1`。
+
 ## 当前状态：218-LUT 24/20/20 正式板测版，221-LUT 前一安全回退
 
 `tools/vivado_2025_2/results/20260811_190839` 已从空结果目录完成 Vivado 2025.2

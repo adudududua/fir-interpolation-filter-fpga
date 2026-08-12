@@ -1,5 +1,18 @@
 # 高阶数字插值滤波器设计与 FPGA 验证
 
+### 2026-08-12：3-DSP / 4-RAMB18E1 固定资源下的 LUT 压缩复测
+
+针对 239 LUT / 388 FF / 3 DSP / 4 RAMB18E1 候选继续做了公平 A/B。综合/实现策略扫描、
+两种 DSP48E1 TWO24 结构和一项共享 CARRY 结构均已实际验证；没有候选低于 239 LUT。
+最接近的 `AreaOptimized_medium` 为 **241 LUT / 388 FF / 3 DSP / 4 RAMB18E1**；
+TWO24 的 comb+一级积分器候选为 **260/417**，双积分器候选为 **262/393**，二者均
+时序通过、DRC Error=0 且数值 0 LSB，但 LUT 更高。共享 CARRY 会在连续帧下发生吞吐冲突，
+不满足每 16 个 `ce_out` 接收一帧的接口语义。
+
+因此当前仍推荐 **239 LUT / 388 FF / 3 DSP / 4 RAMB18E1** 作为下一板测候选；本轮未改动
+正式 RTL/工程泛型，也未生成新的板测 bitstream。完整资源矩阵、失败原因和复现入口见
+[3-DSP LUT 压缩执行反馈](matlab_fir/national_finals/results/vivado2025_2_3dsp_lut_optimization_execution_feedback.md)。
+
 ### 2026-08-12：技术报告补充实验 E0～E4
 
 依据技术报告补充实验指导，对 218-LUT、24/20/20、4-DSP 板测基线补跑数字域证据链。
