@@ -12,5 +12,6 @@
 - Stage2/Stage3图完整标注$hist\_valid=full\lor(i<fill)$与$CEP=(MAC\land hist\_valid)\lor ROUND\lor(CLAMP\land overflow)$，避免将启动期无效历史抽头、无条件ROUND写回和条件CLAMP写回混为同一使能语义。
 - Stage2/Stage3最终图自然宽约161 mm，按16 cm论文版心插入时缩放系数约0.994；最小辅助字号约8 pt，未发现文字遮挡、节点重叠、箭头反向或边缘裁切。
 - Stage2/Stage3局部复核进一步将模式锁存接入系数地址选择，将PATDET检测线改为由PREG高位正交引入，分离求和器的P/C反馈端口，并独立布置`R_job.stage`到结果DEMUX的控制箭头；OPMODE三态明确为`M+P`、`P+C+carry`或`C`。
+- Stage2/Stage3最终几何整理将“任务仲裁/S2优先”合入同一节点，使FSM与求和器严格纵向共轴，将C输入与P反馈布置为左右分离的正交通道，并以镜像端口连接DEMUX与两路输出寄存器；全图在16 cm版心下复核无重叠、裁切或方向歧义。
 - 技术内容已按当前268-LUT/2-DSP RTL逐项复核；四图缩入16 cm论文版心后的文字与连线另行完成视觉检查。
 - 中间编译文件仅保存在`images/work/thesis_signal_flow_diagrams/build`，工程主目录未生成LaTeX临时文件。
