@@ -1,0 +1,71 @@
+\documentclass[11pt,tikz,border=4pt]{standalone}
+\input{signal-flow-style.tex}
+\begin{document}
+\begin{tikzpicture}[x=1cm,y=1cm,font=\sffamily\small,
+ label/.append style={font=\small},note/.append style={font=\small},resource/.append style={font=\sffamily\small,fill=white}]
+
+\node[title] at (8.0,9.35) {第二级/第三级FIR共享DSP48E1的时分信流图};
+\node[subtitle] at (8.0,8.92) {独立状态，共享同步存储端口与DSP乘加通道};
+
+% (a)
+\node[anchor=west] at (0.10,8.05) {(a) 任务选择与同步存储读取};
+\node[opblock,minimum width=17mm] (s2) at (0.55,6.85) {S2 pending\\$P_0$:9，$P_1$:8};
+\node[opblock,minimum width=17mm] (s3) at (0.55,4.45) {S3 pending\\$P_0$:6，$P_1$:5};
+\node[mux,minimum height=14mm] (jmux) at (3.05,5.65) {S2优先};
+\draw[wire] (s2.east) -- ++(0.80,0) |- (jmux.north west);
+\draw[wire] (s3.east) -- ++(0.80,0) |- (jmux.south west);
+\node[reg,minimum width=23mm] (job) at (5.50,5.65) {$R_{job}$\\$\{stage,\phi,head,i\}$};
+\draw[wire] (jmux) -- (job);
+
+\node[wideblock,minimum width=27mm] (hram) at (9.15,6.85) {历史RAMB18E1\\同步读，S2/S3分区};
+\node[reg,minimum width=14mm] (rx) at (11.85,6.85) {$R_X=z^{-1}$\\20 bit};
+\draw[wire] (job.north east) -- ++(0.70,0.80) -| (hram.west);
+\node[label,above] at (6.80,7.55) {历史地址};
+\draw[wire] (hram) -- (rx);
+\node[wideblock,minimum width=27mm] (bram) at (9.15,4.30) {系数RAMB18E1 Port B\\S2/S3-flat/P3};
+\node[reg,minimum width=14mm] (rb) at (11.85,4.30) {$R_B=z^{-1}$\\18 bit};
+\draw[wire] (job.south east) -- ++(0.70,-0.80) -| (bram.west);
+\node[label,below] at (6.80,3.92) {系数地址};
+\draw[wire] (bram) -- (rb);
+\node[opblock,minimum width=12mm] (Xout) at (13.70,6.85) {X\\$x[i]$};
+\node[opblock,minimum width=12mm] (Bout) at (13.70,4.30) {B\\$c[i]$};
+\draw[wire] (rx) -- (Xout); \draw[wire] (rb) -- (Bout);
+\node[note,anchor=west] at (14.70,5.95) {Stage3模式锁存后\\选择flat/P3系数库。};
+
+% (b) M/P/C -> ALU -> PREG.
+\node[anchor=west] at (0.10,3.15) {(b) DSP内MAC、ROUND与CLAMP};
+\node[opblock,minimum width=11mm] (Xin) at (0.50,1.10) {X\\$x[i]$};
+\node[opblock,minimum width=11mm] (Bin) at (0.50,-0.25) {B\\$c[i]$};
+\node[gain,minimum height=10mm] (mul) at (2.00,1.10) {$\times$};
+\draw[wire] (Xin) -- (mul); \draw[wire] (Bin) -| (mul.south);
+\sumnode{alu}{(4.10,1.10)}
+\draw[wire] (mul) -- node[label,above] {$M$} (alu);
+\node[reg,minimum width=14mm] (preg) at (5.85,1.10) {$PREG$\\ACC38};
+\draw[wire] (alu) -- (preg);
+\draw[state] (preg.south) -- ++(0,-0.56) -| node[label,pos=0.50,below] {$P$} (alu.south west);
+\node[sign] at ($(alu.south)+(-0.18,-0.23)$) {$+$};
+
+\node[resource,minimum width=22mm] (opmode) at (3.55,2.35) {OPMODE\\MAC/ROUND/CLAMP};
+\draw[control] (opmode.south) -- (alu.north);
+\node[resource,minimum width=21mm] (pat) at (6.85,2.35) {PATTERNDETECT\\溢出请求CLAMP};
+\draw[control] (preg.north) -- (pat.south west); \draw[control] (pat.west) -- (opmode.east);
+
+\node[mux,minimum height=13mm] (ctmux) at (4.10,-0.70) {$C_{tail}$};
+\node[opblock,minimum width=16mm] (bias) at (2.30,-1.95) {ROUND\\16383+carry};
+\node[opblock,minimum width=16mm] (limit) at (5.90,-1.95) {CLAMP\\signed极限};
+\draw[wire] (bias) -| (ctmux.south west); \draw[wire] (limit) -| (ctmux.south east);
+\draw[wire] (ctmux.north) -- node[label,right] {$C$} (alu.south east);
+
+\node[wideblock,minimum width=20mm] (slice) at (8.35,1.10) {$>>>15$取位\\S2:20 / S3:21 bit};
+\draw[wire] (preg) -- (slice);
+\node[mux,minimum height=13mm] (demux) at (11.20,1.10) {结果\\DEMUX}; \draw[wire] (slice) -- (demux);
+\node[reg,minimum width=13mm] (y4) at (13.35,1.80) {$R_{y4}$\\20 bit};
+\node[reg,minimum width=13mm] (y8) at (13.35,0.40) {$R_{y8,int}$\\21 bit};
+\draw[wire] (demux.north east) -| (y4.west); \draw[wire] (demux.south east) -| (y8.west);
+
+\node[note,anchor=west] at (14.45,1.70)
+ {MAC：$M+P\rightarrow PREG$\\ROUND：$P+C+carry\rightarrow PREG$\\CLAMP：$C_{tail}\rightarrow PREG$};
+\node[note,anchor=west] at (14.45,-0.30) {Fabric：调度、地址、\\位段选择和结果寄存。};
+
+\end{tikzpicture}
+\end{document}
