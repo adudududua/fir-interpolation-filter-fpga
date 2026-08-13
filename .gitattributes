@@ -27,3 +27,10 @@ matlab_fir/national_finals/report_experiments/technical_report_218/processed/* -
 matlab_fir/national_finals/report_experiments/technical_report_218/logs/* -text
 matlab_fir/national_finals/report_experiments/technical_report_218/raw/* -text
 submit/finally/reports/test_report.md -text
+
+# Preserve matched-OOC evidence byte-for-byte so archived SHA-256 values stay valid.
+submit/finally/images/work/resource_compare_218_239/matched_ooc/*_source_sha256.txt -text
+submit/finally/images/work/resource_compare_218_239/matched_ooc/evidence/* -text
+submit/finally/images/work/resource_compare_218_239/matched_ooc/analysis/* -text
+submit/finally/images/work/resource_compare_218_239/matched_ooc/raw/*/* -text
+submit/finally/images/work/resource_compare_218_239/matched_ooc/results/**/* -text

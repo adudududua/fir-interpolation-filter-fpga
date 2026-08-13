@@ -279,42 +279,34 @@ LUT和FF均增加29。网表审计表明该增量对应29 bit最终积分状态�
 该结论不外推为所有可能RTL结构的数学全局最优证明。完整过程见
 [固定2-DSP资源LUT优化复验](../../../matlab_fir/national_finals/results/vivado2025_2_2dsp_fixed_resource_lut_optimization_execution_feedback.md)。
 
-## 11. 218-LUT与239-LUT板测检查点的模块级资源对比
+## 11. 218-LUT与239-LUT板测版本的同口径核心OOC与整板资源对比
 
 ### 11.1 方法与统计边界
 
-本项分析依次检出218-LUT/4-DSP和239-LUT/3-DSP两个board-pass标签，并以Vivado 2025.2
-routed DCP为唯一资源数据源。由于工程采用全层次扁平化，层次报告仅保留顶层总计；因此，
-LUT按物理BEL计数，FF仅统计Slice Register，DSP48E1和RAMB18E1按原语计数。扁平化LUT
-依据RTL源位置与寄存器/DSP/BRAM连通端点归属；跨模块单元保留为共享逻辑，不任意拆分。
-统计总数严格回归218/365/4/4与239/388/3/4。
+本项分析依次检出218-LUT/4-DSP和239-LUT/3-DSP两个board-pass标签。完整系统资源取自
+对应板级routed DCP；滤波器核心资源取自两标签不可变RTL快照的同流程OOC post-route。
+两次OOC采用相同的Vivado 2025.2、XC7A35T-FGG484-2、顶层、源清单、6.144 MHz时钟约束和
+实现指令，仅将`CIC_INTEGRATOR_DSP_MODE`精确设为板测版本所需的2和1。整板扁平化网表的
+物理归属只用于辅助定位，不作为模块独立面积，也不与OOC相减推导外围资源。
 
-### 11.2 主要模块结果
+### 11.2 同口径正式结果
 
-| 模块/类别 | 218版 LUT/FF | 239版 LUT/FF | DSP 218/239 | RAMB18E1 218/239 |
-|---|---:|---:|---:|---:|
-| FIR1级 | 11/83 | 10/83 | 1/1 | 1/1 |
-| FIR2/3级 | 20/73 | 20/73 | 1/1 | 1/1 |
-| FIR共享系数存储 | 0/0 | 0/0 | 0/0 | 1/1 |
-| 2→4倍桥接量化 | 51/2 | 52/2 | 0/0 | 0/0 |
-| **16倍CIC插值** | **34/109** | **57/132** | **2/1** | **0/0** |
-| 核心跨级/共享逻辑 | 7/0 | 7/0 | 0/0 | 0/0 |
-| 核心—外围接口共享逻辑 | 59/0 | 57/0 | 0/0 | 0/0 |
-| 测试音频ROM | 0/15 | 0/15 | 0/0 | 1/1 |
-| 外围及外围共享逻辑 | 36/83 | 36/83 | 0/0 | 0/0 |
-| **完整板级** | **218/365** | **239/388** | **4/3** | **4/4** |
+| 统计边界 | 218-LUT/4-DSP版 | 239-LUT/3-DSP版 | 差分（239−218） |
+|---|---:|---:|---:|
+| **独立滤波器核心OOC** | **190 LUT / 279 FF / 4 DSP / 3 RAMB18E1** | **212 LUT / 302 FF / 3 DSP / 3 RAMB18E1** | **+22 LUT / +23 FF / −1 DSP / 0 RAMB18E1** |
+| **完整板级post-route** | **218 LUT / 365 FF / 4 DSP / 4 RAMB18E1** | **239 LUT / 388 FF / 3 DSP / 4 RAMB18E1** | **+21 LUT / +23 FF / −1 DSP / 0 RAMB18E1** |
 
-![218/239模块资源对比](../images/generated/resource_compare_218_239/figure_218_239_module_resource_distribution.png)
+![218/239同口径核心OOC与整板资源对比](../images/generated/resource_compare_218_239/figure_218_239_matched_ooc_board_comparison.png)
 
 ### 11.3 差分结论
 
-资源变化集中于16倍CIC。239版采用`CIC_INTEGRATOR_DSP_MODE=1`，218版采用模式2；
-新增`u_cic_comb_dsp48e1`后，CIC从57 LUT/132 FF/1 DSP变为34 LUT/109 FF/2 DSP，
-即增加1个DSP并减少23 LUT和23 FF。由239版切换至218版时，FIR1级、
-2→4倍桥接量化和核心—外围接口共享逻辑的物理LUT分别变化+1、−1和+2，
-共产生+2 LUT偏移，形成整板
-−21 LUT/−23 FF/+1 DSP；4个RAMB18E1保持不变。两版WNS分别为+45.279 ns和+44.703 ns，
-WHS均为+0.079 ns，DRC Error均为0，且均已完成物理板功能验证。
+两个核心OOC结果均在第二个空目录中精确复现。218版内部寄存器路径WNS/WHS为
++150.943/+0.069 ns，239版为+151.611/+0.099 ns，DRC Error均为0。零I/O延迟的OOC边界
+模型在两版中各有1条相同的端口到寄存器hold违例（−0.845 ns），故上述内部裕量不用于宣称
+OOC整体时序收敛；完整接口时序采用对应板级post-route签核。因此，从218版切换至239版时，独立核心以
++22 LUT和+23 FF换取1个DSP，3个RAMB18E1不变；完整系统对应变化为+21 LUT、+23 FF和−1 DSP。
+路由后物理归属审计显示差异主要与16倍CIC映射相关，但该归属依赖扁平化、综合及布局布线结果，
+只作结构定位证据，不表述为CIC或其他子模块的独立面积。
 
 完整物理LUT归属与模块差分见
 [218/239模块资源对比执行反馈](../../../matlab_fir/national_finals/results/vivado2025_2_218_239_module_resource_comparison_execution_feedback.md)。

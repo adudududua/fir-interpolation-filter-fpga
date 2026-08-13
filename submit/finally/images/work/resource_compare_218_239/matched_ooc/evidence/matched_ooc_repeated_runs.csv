@@ -1,0 +1,5 @@
+﻿variant,run,cic_dsp_mode,LUT,FF,DSP48E1,RAMB18E1,internal_WNS_ns,internal_WHS_ns,DRC_errors,boundary_WNS_ns,boundary_TNS_ns,boundary_setup_failing_endpoints,boundary_WHS_ns,boundary_THS_ns,boundary_hold_failing_endpoints
+LUT218,1,2,190,279,4,3,150.943,0.069,0,150.943,0.0,0,-0.845,-0.845,1
+LUT218,2,2,190,279,4,3,150.943,0.069,0,150.943,0.0,0,-0.845,-0.845,1
+LUT239,1,1,212,302,3,3,151.611,0.099,0,151.611,0.0,0,-0.845,-0.845,1
+LUT239,2,1,212,302,3,3,151.611,0.099,0,151.611,0.0,0,-0.845,-0.845,1

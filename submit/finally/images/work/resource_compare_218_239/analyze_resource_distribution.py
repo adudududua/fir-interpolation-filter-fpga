@@ -113,7 +113,11 @@ def lut_site_key(row: dict[str, str]) -> str:
     return f"{row['LOC']}/{match.group(1)}LUT"
 
 
-def resource_distribution(variant: str, raw_dir: Path) -> tuple[list[dict[str, int | str]], list[dict[str, str]], dict[str, int]]:
+def resource_distribution(
+    variant: str,
+    raw_dir: Path,
+    expected: dict[str, int],
+) -> tuple[list[dict[str, int | str]], list[dict[str, str]], dict[str, int]]:
     primitives = read_tsv(raw_dir / "primitive_cells.tsv")
     connectivity = {row["CELL"]: row for row in read_tsv(raw_dir / "lut_connectivity.tsv")}
 
@@ -186,10 +190,6 @@ def resource_distribution(variant: str, raw_dir: Path) -> tuple[list[dict[str, i
         resource: sum(int(row[resource]) for row in rows_out)
         for resource in ("LUT", "FF", "DSP48E1", "RAMB18E1")
     }
-    expected = {
-        "LUT218": {"LUT": 218, "FF": 365, "DSP48E1": 4, "RAMB18E1": 4},
-        "LUT239": {"LUT": 239, "FF": 388, "DSP48E1": 3, "RAMB18E1": 4},
-    }[variant]
     if totals != expected:
         raise RuntimeError(f"{variant} totals mismatch: {totals} != {expected}")
     return rows_out, lut_details, totals
@@ -204,14 +204,34 @@ def write_csv(path: Path, rows: list[dict], fieldnames: list[str]) -> None:
 
 
 def main() -> None:
-    if len(sys.argv) != 4:
-        raise SystemExit("usage: analyze_resource_distribution.py <lut218_raw> <lut239_raw> <output_dir>")
+    if len(sys.argv) not in (4, 5):
+        raise SystemExit(
+            "usage: analyze_resource_distribution.py <lut218_raw> <lut239_raw> "
+            "<output_dir> [board|ooc]"
+        )
     raw_218 = Path(sys.argv[1])
     raw_239 = Path(sys.argv[2])
     output_dir = Path(sys.argv[3])
+    scope = sys.argv[4] if len(sys.argv) == 5 else "board"
+    expected_by_scope = {
+        "board": {
+            "LUT218": {"LUT": 218, "FF": 365, "DSP48E1": 4, "RAMB18E1": 4},
+            "LUT239": {"LUT": 239, "FF": 388, "DSP48E1": 3, "RAMB18E1": 4},
+        },
+        "ooc": {
+            "LUT218": {"LUT": 190, "FF": 279, "DSP48E1": 4, "RAMB18E1": 3},
+            "LUT239": {"LUT": 212, "FF": 302, "DSP48E1": 3, "RAMB18E1": 3},
+        },
+    }
+    if scope not in expected_by_scope:
+        raise SystemExit("scope must be board or ooc")
 
-    dist_218, details_218, totals_218 = resource_distribution("LUT218", raw_218)
-    dist_239, details_239, totals_239 = resource_distribution("LUT239", raw_239)
+    dist_218, details_218, totals_218 = resource_distribution(
+        "LUT218", raw_218, expected_by_scope[scope]["LUT218"]
+    )
+    dist_239, details_239, totals_239 = resource_distribution(
+        "LUT239", raw_239, expected_by_scope[scope]["LUT239"]
+    )
     write_csv(
         output_dir / "module_resource_distribution.csv",
         dist_218 + dist_239,
@@ -257,6 +277,7 @@ def main() -> None:
     summary = {
         "method": {
             "tool": "Vivado 2025.2 routed checkpoint",
+            "scope": scope,
             "lut_unit": "unique physical LUT BEL (A/B/C/D LUT per slice); O5/O6 primitives merged",
             "ff_unit": "Slice Register only; OLOGIC output registers excluded to match report_utilization",
             "attribution": "RTL source location, then register/DSP/BRAM connectivity for flattened LUTs",
