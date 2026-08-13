@@ -1,71 +1,121 @@
-\documentclass[11pt,tikz,border=4pt]{standalone}
+\documentclass[11pt,tikz,border=5pt]{standalone}
 \input{signal-flow-style.tex}
 \begin{document}
-\begin{tikzpicture}[x=1cm,y=1cm,font=\sffamily\small,
- label/.append style={font=\small},note/.append style={font=\small},resource/.append style={font=\sffamily\small,fill=white}]
+\begin{tikzpicture}[x=1cm,y=1cm,font=\sffamily\small]
 
-\node[title] at (8.0,9.35) {第二级/第三级FIR共享DSP48E1的时分信流图};
-\node[subtitle] at (8.0,8.92) {独立状态，共享同步存储端口与DSP乘加通道};
+\node[title] at (7.75,9.25) {第二级/第三级FIR共享DSP48E1时分信流图};
+\node[subtitle] at (7.75,8.84) {独立状态与同步存储，共享一条乘加通道};
 
-% (a)
-\node[anchor=west] at (0.10,8.05) {(a) 任务选择与同步存储读取};
-\node[opblock,minimum width=17mm] (s2) at (0.55,6.85) {S2 pending\\$P_0$:9，$P_1$:8};
-\node[opblock,minimum width=17mm] (s3) at (0.55,4.45) {S3 pending\\$P_0$:6，$P_1$:5};
-\node[mux,minimum height=14mm] (jmux) at (3.05,5.65) {S2优先};
-\draw[wire] (s2.east) -- ++(0.80,0) |- (jmux.north west);
-\draw[wire] (s3.east) -- ++(0.80,0) |- (jmux.south west);
-\node[reg,minimum width=23mm] (job) at (5.50,5.65) {$R_{job}$\\$\{stage,\phi,head,i\}$};
-\draw[wire] (jmux) -- (job);
+% =============================================================================
+% (a) Task scheduling and synchronous RAM reads
+% =============================================================================
+\node[anchor=west] at (0.10,8.08) {(a) 任务调度与同步存储读取};
 
-\node[wideblock,minimum width=27mm] (hram) at (9.15,6.85) {历史RAMB18E1\\同步读，S2/S3分区};
-\node[reg,minimum width=14mm] (rx) at (11.85,6.85) {$R_X=z^{-1}$\\20 bit};
-\draw[wire] (job.north east) -- ++(0.70,0.80) -| (hram.west);
-\node[label,above] at (6.80,7.55) {历史地址};
+\node[opblock,minimum width=16mm] (s2) at (0.85,7.00)
+  {S2 pending\\9 / 8 MAC};
+\node[opblock,minimum width=16mm] (s3) at (0.85,5.60)
+  {S3 pending\\6 / 5 MAC};
+\node[opblock,minimum width=15mm] (arb) at (2.90,6.30)
+  {S2优先};
+\node[note] at (2.90,6.82) {任务仲裁};
+\coordinate (arb2) at ($(arb.west)+(0,0.18)$);
+\coordinate (arb3) at ($(arb.west)+(0,-0.18)$);
+\draw[wire] (s2.east) -- (1.95,7.00) |- (arb2);
+\draw[wire] (s3.east) -- (1.95,5.60) |- (arb3);
+
+\node[reg,minimum width=23mm] (job) at (5.35,6.30)
+  {$R_{job}$\\$\{stage,\phi,head,$\\$i,full\}$};
+\draw[wire] (arb) -- (job);
+
+\node[opblock,minimum width=15mm] (addr) at (7.90,6.30)
+  {地址\\$a_X,a_B$};
+\draw[control] (job) -- (addr);
+
+\node[wideblock,minimum width=29mm] (hram) at (10.85,7.00)
+  {历史RAMB18E1\\S2/S3分区};
+\node[reg,minimum width=13mm] (rx) at (13.55,7.00)
+  {$R_X=z^{-1}$\\20 bit};
+\draw[control] (addr.east) -- (9.10,6.30) -- (9.10,7.00) -- (hram.west);
 \draw[wire] (hram) -- (rx);
-\node[wideblock,minimum width=27mm] (bram) at (9.15,4.30) {系数RAMB18E1 Port B\\S2/S3-flat/P3};
-\node[reg,minimum width=14mm] (rb) at (11.85,4.30) {$R_B=z^{-1}$\\18 bit};
-\draw[wire] (job.south east) -- ++(0.70,-0.80) -| (bram.west);
-\node[label,below] at (6.80,3.92) {系数地址};
+\draw[wire] (rx.east) -- ++(1.20,0)
+  node[label,midway,above] {$X=x[i]$};
+
+\node[wideblock,minimum width=29mm] (bram) at (10.85,5.60)
+  {系数RAMB18E1-B\\S2 / S3-flat / P3};
+\node[reg,minimum width=13mm] (rb) at (13.55,5.60)
+  {$R_B=z^{-1}$\\18 bit};
+\draw[control] (addr.east) -- (9.10,6.30) -- (9.10,5.60) -- (bram.west);
 \draw[wire] (bram) -- (rb);
-\node[opblock,minimum width=12mm] (Xout) at (13.70,6.85) {X\\$x[i]$};
-\node[opblock,minimum width=12mm] (Bout) at (13.70,4.30) {B\\$c[i]$};
-\draw[wire] (rx) -- (Xout); \draw[wire] (rb) -- (Bout);
-\node[note,anchor=west] at (14.70,5.95) {Stage3模式锁存后\\选择flat/P3系数库。};
+\draw[wire] (rb.east) -- ++(1.20,0)
+  node[label,midway,above] {$B=c[i]$};
 
-% (b) M/P/C -> ALU -> PREG.
-\node[anchor=west] at (0.10,3.15) {(b) DSP内MAC、ROUND与CLAMP};
-\node[opblock,minimum width=11mm] (Xin) at (0.50,1.10) {X\\$x[i]$};
-\node[opblock,minimum width=11mm] (Bin) at (0.50,-0.25) {B\\$c[i]$};
-\node[gain,minimum height=10mm] (mul) at (2.00,1.10) {$\times$};
-\draw[wire] (Xin) -- (mul); \draw[wire] (Bin) -| (mul.south);
-\sumnode{alu}{(4.10,1.10)}
+\node[resource,minimum width=18mm,minimum height=7mm] (mode) at (10.85,4.56)
+  {$R_{mode,P3}$\\S3 CE锁存};
+\draw[control] (mode.north) -- (bram.south);
+
+% =============================================================================
+% (b) Shared DSP datapath
+% =============================================================================
+\node[anchor=west] at (0.10,4.12) {(b) DSP内乘加、舍入与饱和};
+
+\node[opblock,minimum width=11mm] (Xin) at (0.62,2.10) {X\\$x[i]$};
+\node[opblock,minimum width=11mm] (Bin) at (0.62,0.88) {B\\$c[i]$};
+\node[gain,minimum height=10mm] (mul) at (2.00,2.10) {$\times$};
+\draw[wire] (Xin) -- (mul);
+\draw[wire] (Bin) -| (mul.south);
+
+\sumnode{alu}{(3.70,2.10)}
 \draw[wire] (mul) -- node[label,above] {$M$} (alu);
-\node[reg,minimum width=14mm] (preg) at (5.85,1.10) {$PREG$\\ACC38};
+\node[reg,minimum width=14mm] (preg) at (5.28,2.10)
+  {$PREG$\\ACC38};
 \draw[wire] (alu) -- (preg);
-\draw[state] (preg.south) -- ++(0,-0.56) -| node[label,pos=0.50,below] {$P$} (alu.south west);
-\node[sign] at ($(alu.south)+(-0.18,-0.23)$) {$+$};
 
-\node[resource,minimum width=22mm] (opmode) at (3.55,2.35) {OPMODE\\MAC/ROUND/CLAMP};
-\draw[control] (opmode.south) -- (alu.north);
-\node[resource,minimum width=21mm] (pat) at (6.85,2.35) {PATTERNDETECT\\溢出请求CLAMP};
-\draw[control] (preg.north) -- (pat.south west); \draw[control] (pat.west) -- (opmode.east);
-
-\node[mux,minimum height=13mm] (ctmux) at (4.10,-0.70) {$C_{tail}$};
-\node[opblock,minimum width=16mm] (bias) at (2.30,-1.95) {ROUND\\16383+carry};
-\node[opblock,minimum width=16mm] (limit) at (5.90,-1.95) {CLAMP\\signed极限};
-\draw[wire] (bias) -| (ctmux.south west); \draw[wire] (limit) -| (ctmux.south east);
-\draw[wire] (ctmux.north) -- node[label,right] {$C$} (alu.south east);
-
-\node[wideblock,minimum width=20mm] (slice) at (8.35,1.10) {$>>>15$取位\\S2:20 / S3:21 bit};
+\node[wideblock,minimum width=20mm] (slice) at (7.45,2.10)
+  {$>>>15$\\20 / 21 bit};
 \draw[wire] (preg) -- (slice);
-\node[mux,minimum height=13mm] (demux) at (11.20,1.10) {结果\\DEMUX}; \draw[wire] (slice) -- (demux);
-\node[reg,minimum width=13mm] (y4) at (13.35,1.80) {$R_{y4}$\\20 bit};
-\node[reg,minimum width=13mm] (y8) at (13.35,0.40) {$R_{y8,int}$\\21 bit};
-\draw[wire] (demux.north east) -| (y4.west); \draw[wire] (demux.south east) -| (y8.west);
 
-\node[note,anchor=west] at (14.45,1.70)
- {MAC：$M+P\rightarrow PREG$\\ROUND：$P+C+carry\rightarrow PREG$\\CLAMP：$C_{tail}\rightarrow PREG$};
-\node[note,anchor=west] at (14.45,-0.30) {Fabric：调度、地址、\\位段选择和结果寄存。};
+\node[opblock,minimum width=15mm,minimum height=12mm] (demux) at (9.60,2.10)
+  {1:2\\DEMUX};
+\draw[wire] (slice) -- (demux);
+\node[note] at (9.60,3.03) {$R_{job}.stage$};
+\draw[control] (9.60,2.82) -- (demux.north);
+
+\node[reg,minimum width=13mm] (y4) at (11.70,2.78)
+  {$R_{y4}$\\20 bit};
+\node[reg,minimum width=13mm] (y8) at (11.70,1.42)
+  {$R_{y8,int}$\\21 bit};
+\draw[wire] (demux.north east) |- (y4.west);
+\draw[wire] (demux.south east) |- (y8.west);
+
+% Control layer: full PREG update equation with explicit history validity and
+% overflow inputs.  This avoids implying that hist_valid gates ROUND/CLAMP.
+\node[resource,minimum width=20mm] (hist) at (1.15,3.35)
+  {$hist\_valid$\\$full\lor(i<fill)$};
+\node[resource,minimum width=23mm] (ctrl) at (4.08,3.35)
+  {控制FSM\\OPMODE / CEP};
+\node[resource,minimum width=19mm] (pat) at (6.85,3.35)
+  {PATDET\\$overflow$};
+\draw[control] (hist.east) -- (ctrl.west);
+\draw[control] (pat.west) -- (ctrl.east);
+\draw[control] (ctrl.south) -- (alu.north);
+\draw[control] (preg.north east) -- (pat.south west);
+
+% State and C input occupy two separate, unobstructed return lanes.
+\draw[state] (preg.south) -- ++(0,-0.42) -|
+  node[label,pos=0.52,above] {$P$} (alu.south east);
+\node[sign] at ($(alu.south east)+(-0.08,-0.16)$) {$+$};
+
+\node[wideblock,minimum width=25mm] (ctail) at (3.25,-0.52)
+  {$C_{tail}$/CarryIN MUX（FSM）\\ROUND bias / CLAMP limit};
+\draw[wire] (ctail.north east) -- ++(0,0.52) -|
+  node[label,pos=0.73,below] {$C$} (alu.south west);
+\node[sign] at ($(alu.south west)+(0.08,-0.16)$) {$+$};
+
+\node[note,anchor=west,align=left] at (6.55,0.18)
+  {$CEP=(MAC\land hist\_valid)\lor ROUND$\\
+   $\phantom{CEP={}}\lor(CLAMP\land overflow)$};
+\node[note,anchor=west,align=left] at (6.55,-0.45)
+  {同一PREG依次执行MAC、ROUND与条件CLAMP。};
 
 \end{tikzpicture}
 \end{document}
