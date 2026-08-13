@@ -1,0 +1,99 @@
+﻿\documentclass[tikz,border=6pt]{standalone}
+\input{thesis-diagram-style.tex}
+
+\begin{document}
+\begin{tikzpicture}[x=1cm,y=1cm]
+
+\node[title] at (12.5,8.45) {24/20/20 bit三级FIR--CIC插值链及有效事件率演化};
+\node[subtitle] at (12.5,8.00)
+  {当前2-DSP目标实现配置；补偿并入第三级FIR系数；全链采用单一$128F_s$音频主时钟};
+
+% Main data path.
+\node[data block,minimum width=21mm,minimum height=15mm] (xin) at (0.95,5.20)
+  {$x[n]$\\[-1pt]\bitrate{24}{$F_s$}};
+\node[dsp,minimum width=35mm,minimum height=25mm] (s1) at (4.00,5.20)
+  {第一级半带FIR $\times2$\\[-1pt]
+   {\scriptsize 105抽头（104阶）}\\[-1pt]
+   {\scriptsize 52历史字顺序MAC}\\[-1pt]
+   {\scriptsize ACC41 / Q15}\\[-1pt]
+   {\scriptsize DSP48E1\#0；$y_2$:24 bit@$2F_s$}};
+\node[fabric,minimum width=26mm,minimum height=20mm] (b12) at (7.25,5.20)
+  {量化/相位桥接\\[-1pt]
+   {\scriptsize 24$\rightarrow$20 bit}\\[-1pt]
+   {\scriptsize $\gg4$舍入饱和}\\[-1pt]
+   {\scriptsize pending/phase}};
+\node[data block,minimum width=31mm,minimum height=22mm] (s2) at (10.55,5.20)
+  {第二级多相FIR $\times2$\\[-1pt]
+   {\scriptsize $P_0/P_1$: 9/8 MAC}\\[-1pt]
+   {\scriptsize 20$\rightarrow$20 bit，ACC38}\\[-1pt]
+   {\scriptsize $y_4$@$4F_s$；板级$4\times$抽头}};
+\node[fabric,minimum width=23mm,minimum height=18mm] (b23) at (13.45,5.20)
+  {相位桥接\\[-1pt]{\scriptsize 20$\rightarrow$20 bit}\\[-1pt]{\scriptsize 无再量化}};
+\node[data block,minimum width=36mm,minimum height=27mm] (s3) at (16.65,5.20)
+  {第三级多相FIR $\times2$\\[-1pt]
+   {\scriptsize $P_0/P_1$: 6/5 MAC}\\[-1pt]
+   {\scriptsize flat / P3补偿系数库}\\[-1pt]
+   {\scriptsize $y_{8,int}$:21 bit@$8F_s$}\\[-1pt]
+   {\scriptsize 板级$8\times$: sat20$\rightarrow\ll4$}};
+\node[fabric,minimum width=34mm,minimum height=27mm] (cic) at (20.70,5.20)
+  {等价CIC $\times16$\\[-1pt]
+   {\scriptsize $C^2\rightarrow\mathrm{Hold}_{16}\rightarrow I^2$}\\[-1pt]
+   {\scriptsize 21$\rightarrow$23$\rightarrow$26$\rightarrow$29 bit}\\[-1pt]
+   {\scriptsize $\gg8$舍入饱和；0 DSP}\\[-1pt]
+   {\scriptsize $y_{128}$:20 bit@$128F_s$}};
+\node[data block,minimum width=24mm,minimum height=18mm] (restore) at (24.00,5.20)
+  {$Q$格式恢复\\[-1pt]{\scriptsize 20$\rightarrow$24 bit}\\[-1pt]{\scriptsize 左移4位}};
+
+\draw[data] (xin) -- (s1);
+\draw[data] (s1) -- (b12);
+\draw[data] (b12) -- (s2);
+\draw[data] (s2) -- (b23);
+\draw[data] (b23) -- (s3);
+\draw[data] (s3) -- (cic);
+\draw[data] (cic) -- (restore);
+
+% Shared Stage2/3 physical engine.
+\node[dsp,minimum width=54mm,minimum height=13mm] (sharedDsp) at (13.65,2.65)
+  {DSP48E1\#1：Stage2/Stage3时分共享MAC、Q15舍入与饱和};
+\draw[address] (s2.south) -- node[signal,left] {job $S_2$} (sharedDsp.north west);
+\draw[address] (s3.south) -- node[signal,right] {job $S_3$} (sharedDsp.north east);
+\node[ram,minimum width=37mm,minimum height=13mm] (hist1) at (4.00,2.65)
+  {RAMB18E1\#1\\[-1pt]{\scriptsize Stage1历史}};
+\node[ram,minimum width=37mm,minimum height=13mm] (hist23) at (9.30,1.15)
+  {RAMB18E1\#2\\[-1pt]{\scriptsize Stage2/3统一历史}};
+\node[ram,minimum width=43mm,minimum height=13mm] (coeff) at (17.15,1.15)
+  {RAMB18E1\#3\\[-1pt]{\scriptsize 三级FIR统一系数}};
+\draw[address] (hist1) -- (s1.south);
+\draw[address] (hist23.north) -- (sharedDsp.south west);
+\draw[address] (coeff.north) -- (sharedDsp.south east);
+
+% CE and valid plane.
+\node[control block,minimum width=30mm] (ce) at (1.55,7.15) {CE/phase发生器\\[-1pt]{\scriptsize 单一$128F_s$时钟}};
+\draw[control] (ce.east) -- ++(1.0,0) -| (s1.north);
+\draw[control] (ce.east) -- ++(2.0,0) -| (s2.north);
+\draw[control] (ce.east) -- ++(3.0,0) -| (s3.north);
+\draw[control] (ce.east) -- ++(4.0,0) -| (cic.north);
+
+% Output taps and innovation statements.
+\draw[feedback] (xin.south) -- ++(0,-0.92) node[note,below] {$1\times$原始PCM抽头};
+\draw[feedback] (restore.south) -- ++(0,-0.92) node[note,below] {$128\times$可见抽头};
+
+\node[innovation] at (18.75,7.62) {I1};
+\node[note,anchor=west,align=left] at (19.15,7.62) {CIC通带补偿折叠至\\Stage3系数库};
+\node[innovation] at (22.20,7.62) {I2};
+\node[note,anchor=west,align=left] at (22.60,7.62) {保持型CIC等价变换\\消除一级积分/梳状状态};
+
+\begin{scope}[on background layer]
+  \node[boundary,fill=DataFill!35,fit=(s2)(b23)(s3)(sharedDsp)(hist23)(coeff)] (sharedGroup) {};
+\end{scope}
+\node[group title] at ($(sharedGroup.north west)+(0.20,-0.25)$) {Stage2/Stage3共享FIR引擎};
+
+\node[note,anchor=west] at (0.35,0.15)
+  {核心资源：2 DSP48E1 + 3 RAMB18E1；CIC的差分器和两级积分器均映射至Fabric/CARRY。};
+\node[note,anchor=east] at (24.85,0.15)
+  {粗实线：样值数据；青色虚线：CE/phase；橙色点划线：任务与存储器访问。};
+
+\end{tikzpicture}
+\end{document}
+
+

@@ -1,0 +1,98 @@
+﻿\documentclass[tikz,border=6pt]{standalone}
+\input{thesis-diagram-style.tex}
+
+\begin{document}
+\begin{tikzpicture}[x=1cm,y=1cm]
+
+\node[title] at (12.5,11.75) {从数值模型到物理板的分层验证证据链};
+\node[subtitle] at (12.5,11.30)
+  {每一级证据回答不同问题；后级验证不替代前级数值一致性，数字域结论不外推为模拟仪器指标};
+
+% Five evidence columns.
+\node[control block,minimum width=42mm,minimum height=55mm,anchor=north] (spec) at (2.45,10.35)
+  {\bfseries ① 规格与参考行为\\[4pt]
+   {\scriptsize 双采样率族：44.1/48 kHz}\\[2pt]
+   {\scriptsize 输出倍率：4/8/128$\times$}\\[2pt]
+   {\scriptsize 通带偏差$\le0.05$ dB}\\[2pt]
+   {\scriptsize 阻带衰减$\ge70$ dB}\\[2pt]
+   {\scriptsize 线性相位与有限字长边界}\\[4pt]
+   {\scriptsize 输出：可执行判据与测试向量}};
+
+\node[result,minimum width=42mm,minimum height=55mm,anchor=north] (model) at (7.45,10.35)
+  {\bfseries ② MATLAB/定点模型\\[4pt]
+   {\scriptsize E1 定点模型/稳定RTL向量：}\\[-1pt]
+   {\scriptsize 6/6，最大误差0 LSB}\\[2pt]
+   {\scriptsize E2：六工况6/6}\\[-1pt]
+   {\scriptsize $|\Delta PB|_{max}=0.007844$ dB}\\[-1pt]
+   {\scriptsize $A_s^{min}=72.355$ dB}\\[-1pt]
+   {\scriptsize 对称误差0 LSB；相位残差}\\[-1pt]
+   {\scriptsize $\le9.95\times10^{-14}$ rad}\\[2pt]
+   {\scriptsize E3：18/18；$IR_{min}=74.546$ dBc}};
+
+\node[result,minimum width=42mm,minimum height=55mm,anchor=north] (rtl) at (12.45,10.35)
+  {\bfseries ③ 当前268版RTL位真\\[4pt]
+   {\scriptsize 快速回归17/17}\\[2pt]
+   {\scriptsize 完整回归17/17}\\[2pt]
+   {\scriptsize 14组全链输入}\\[-1pt]
+   {\scriptsize $y_4/y_8/y_{128}$逐样本0 LSB}\\[2pt]
+   {\scriptsize 复位8场景；动态切档10次}\\[-1pt]
+   {\scriptsize 双时钟族100次；CDC 1200次}\\[4pt]
+   {\scriptsize 输出：数据、valid与点数一致性}};
+
+\node[data block,minimum width=42mm,minimum height=55mm,anchor=north] (impl) at (17.45,10.35)
+  {\bfseries ④ 完整板级实现\\[4pt]
+   {\scriptsize 268 LUT / 417 FF / 2 DSP}\\[-1pt]
+   {\scriptsize 4 RAMB18E1 / 2 MMCM}\\[2pt]
+   {\scriptsize WNS/WHS=+44.389/+0.078 ns}\\[-1pt]
+   {\scriptsize TNS/THS=0/0}\\[2pt]
+   {\scriptsize DRC Error=0；routing error=0}\\[-1pt]
+   {\scriptsize 配置位流生成完成}\\[4pt]
+   {\scriptsize 状态：工具验证完成}};
+
+\node[pending,minimum width=42mm,minimum height=55mm,anchor=north] (board) at (22.45,10.35)
+  {\bfseries ⑤ 物理板与归档\\[4pt]
+   {\scriptsize 218-LUT/4-DSP：}\\[-1pt]
+   {\scriptsize 2026-08-11用户确认功能板测}\\[2pt]
+   {\scriptsize 239-LUT/3-DSP：}\\[-1pt]
+   {\scriptsize 2026-08-12用户确认功能板测}\\[2pt]
+   {\scriptsize 268-LUT/2-DSP：物理板待验证}\\[4pt]
+   {\scriptsize DCP/bitstream/hash/Git标签归档}};
+
+% Forward evidence flow.
+\draw[data] (spec.east) -- node[signal,above] {阈值与激励} (model.west);
+\draw[data] (model.east) -- node[signal,above] {定点参考输出} (rtl.west);
+\draw[data] (rtl.east) -- node[signal,above] {验收判据} (impl.west);
+\draw[data] (impl.east) -- node[signal,above] {bitstream/tag} (board.west);
+
+% Equivalence bridge between archived numerical evidence and the current implementation.
+\node[warning,minimum width=82mm,minimum height=12mm] (bridge) at (6.25,3.80)
+  {证据衔接：E1--E3为218-LUT归档的24/20/20数值基线；\\
+   CIC mode 2/1/0定向等价验证与268版完整RTL逐样本0 LSB共同支持数值行为继承};
+\draw[control] (model.south) -- (bridge.north west);
+\draw[control] (bridge.north east) -- (rtl.south);
+
+% Feedback and archive loop.
+\node[control block,minimum width=53mm,minimum height=12mm] (feedback) at (16.20,3.80)
+  {不满足判据时回溯：模型/字长$\rightarrow$RTL$\rightarrow$实现约束};
+\draw[control] (impl.south) -- (feedback.north);
+\draw[control] (feedback.west) -- (bridge.east);
+\node[pending badge] at (22.45,3.80) {268标签：tool-verified\\不得标记board-pass};
+
+% Evidence boundary band.
+\node[warning,minimum width=75mm,minimum height=15mm] (bound1) at (4.35,1.75)
+  {数字域FFT/定点频响\\[1pt]{\bfseries $\ne$ 模拟DAC仪器测量}\\[-1pt]
+   {\scriptsize 尚无经校准的THD+N、动态范围与IMD数据}};
+\node[warning,minimum width=75mm,minimum height=15mm] (bound2) at (12.50,1.75)
+  {核心同口径OOC资源A/B\\[1pt]{\bfseries $\ne$ 完整板级接口时序签核}\\[-1pt]
+   {\scriptsize 两种统计边界不得相减推导外围面积}};
+\node[warning,minimum width=75mm,minimum height=15mm] (bound3) at (20.65,1.75)
+  {用户确认的功能板测\\[1pt]{\bfseries $\ne$ 校准仪器级音频测试}\\[-1pt]
+   {\scriptsize 218/239仅声明用户确认的功能现象，不外推频响或音频仪器指标}};
+
+\node[note] at (12.50,0.40)
+  {绿色为数字域判据满足，蓝色为工具域实现证据，灰色为尚未闭合的物理验证；同一状态词不跨证据层级复用。};
+
+\end{tikzpicture}
+\end{document}
+
+

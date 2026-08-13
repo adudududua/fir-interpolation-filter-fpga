@@ -1,0 +1,94 @@
+﻿\documentclass[tikz,border=6pt]{standalone}
+\input{thesis-diagram-style.tex}
+
+\begin{document}
+\begin{tikzpicture}[x=1cm,y=1cm]
+
+\node[title] at (12.5,13.65) {双采样率六工况测试矩阵与分层结果};
+\node[subtitle] at (12.5,13.20)
+  {E2/E3为218-LUT归档的24/20/20数值证据；268-LUT版本由定向等价与独立RTL/实现复验衔接};
+
+% Matrix headers.
+\node[font=\sffamily\bfseries\footnotesize] at (7.95,12.45) {输出倍率};
+\node[font=\sffamily\bfseries\footnotesize] at (3.00,11.95) {$4\times$};
+\node[font=\sffamily\bfseries\footnotesize] at (8.25,11.95) {$8\times$};
+\node[font=\sffamily\bfseries\footnotesize] at (13.50,11.95) {$128\times$};
+\node[font=\sffamily\bfseries\footnotesize,rotate=90] at (-0.75,9.15) {输入采样率族};
+\node[font=\sffamily\bfseries\footnotesize,anchor=east] at (0.45,10.45) {44.1 kHz};
+\node[font=\sffamily\bfseries\footnotesize,anchor=east] at (0.45,7.70) {48 kHz};
+
+% Six operating-condition cells.
+\node[result,minimum width=48mm,minimum height=23mm] (c4414) at (3.00,10.35)
+  {\bfseries $F_{out}=176.4$ kHz\\[-1pt]
+   {\scriptsize E2：$|\Delta PB|=0.003022$ dB}\\[-1pt]
+   {\scriptsize $A_s=78.277$ dB}\\[-1pt]
+   {\scriptsize E3：三单音 $IR_{min}=80.848$ dBc}};
+\node[result,minimum width=48mm,minimum height=23mm] (c4418) at (8.25,10.35)
+  {\bfseries $F_{out}=352.8$ kHz\\[-1pt]
+   {\scriptsize E2：$|\Delta PB|=0.003474$ dB}\\[-1pt]
+   {\scriptsize $A_s=78.359$ dB}\\[-1pt]
+   {\scriptsize E3：三单音 $IR_{min}=81.216$ dBc}};
+\node[warning,minimum width=48mm,minimum height=23mm] (c441128) at (13.50,10.35)
+  {\bfseries $F_{out}=5.6448$ MHz\\[-1pt]
+   {\scriptsize E2：$|\Delta PB|=0.007844$ dB}\\[-1pt]
+   {\scriptsize $A_s=72.355$ dB}\\[-1pt]
+   {\scriptsize E3：三单音 $IR_{min}=74.546$ dBc}};
+\node[result,minimum width=48mm,minimum height=23mm] (c484) at (3.00,7.60)
+  {\bfseries $F_{out}=192$ kHz\\[-1pt]
+   {\scriptsize E2：$|\Delta PB|=0.003022$ dB}\\[-1pt]
+   {\scriptsize $A_s=78.277$ dB}\\[-1pt]
+   {\scriptsize E3：三单音 $IR_{min}=80.508$ dBc}};
+\node[result,minimum width=48mm,minimum height=23mm] (c488) at (8.25,7.60)
+  {\bfseries $F_{out}=384$ kHz\\[-1pt]
+   {\scriptsize E2：$|\Delta PB|=0.003028$ dB}\\[-1pt]
+   {\scriptsize $A_s=78.359$ dB}\\[-1pt]
+   {\scriptsize E3：三单音 $IR_{min}=81.008$ dBc}};
+\node[result,minimum width=48mm,minimum height=23mm] (c48128) at (13.50,7.60)
+  {\bfseries $F_{out}=6.144$ MHz\\[-1pt]
+   {\scriptsize E2：$|\Delta PB|=0.007605$ dB}\\[-1pt]
+   {\scriptsize $A_s=72.355$ dB}\\[-1pt]
+   {\scriptsize E3：三单音 $IR_{min}=76.850$ dBc}};
+
+% Summary cards on the right.
+\node[result,minimum width=37mm,minimum height=15mm] (e1) at (19.10,11.20)
+  {E1 定点模型/稳定RTL向量\\[-1pt]{\bfseries 6/6；最大0 LSB}};
+\node[result,minimum width=37mm,minimum height=15mm] (e2) at (23.05,11.20)
+  {E2 六工况\\[-1pt]{\bfseries 6/6满足判据}};
+\node[result,minimum width=37mm,minimum height=15mm] (e3) at (19.10,9.20)
+  {E3 三单音\\[-1pt]{\bfseries 18/18满足判据}};
+\node[result,minimum width=37mm,minimum height=15mm] (ertl) at (23.05,9.20)
+  {当前268版RTL\\[-1pt]{\bfseries 17/17 + 17/17}};
+\node[warning,minimum width=77mm,minimum height=17mm] (minmargin) at (21.10,7.25)
+  {琥珀色单元为已观测的最小裕量，而非失败：\\[-1pt]
+   {\scriptsize 全局最大通带偏差0.007844 dB；最小阻带72.355 dB；最小镜像抑制74.546 dBc}};
+
+% Verification swimlane.
+\node[font=\sffamily\bfseries\footnotesize] at (12.50,5.70) {证据层级与版本归属};
+\node[result,minimum width=51mm,minimum height=18mm] (laneM) at (3.15,4.45)
+  {MATLAB/定点/位真\\[-1pt]{\scriptsize 218归档数值与位真基线}\\[-1pt]{\scriptsize E1/E2/E3：6/6、6/6、18/18}};
+\node[result,minimum width=51mm,minimum height=18mm] (laneR) at (9.45,4.45)
+  {当前268版RTL独立复验\\[-1pt]{\scriptsize 快速/完整回归各17/17}\\[-1pt]{\scriptsize 全链14组输入逐样本0 LSB}};
+\node[data block,minimum width=51mm,minimum height=18mm] (laneI) at (15.75,4.45)
+  {完整板级布局布线后\\[-1pt]{\scriptsize 218：218/365/4DSP，板测}\\[-1pt]{\scriptsize 239：239/388/3DSP，板测}\\[-1pt]{\scriptsize 268：268/417/2DSP，工具验证}};
+\node[pending,minimum width=43mm,minimum height=18mm] (laneB) at (22.10,4.45)
+  {物理板\\[-1pt]{\scriptsize 218/239用户确认功能板测}\\[-1pt]{\scriptsize 268待验证}};
+\draw[data] (laneM) -- node[signal,above] {等价+0 LSB} (laneR);
+\draw[data] (laneR) -- node[signal,above] {准入判据} (laneI);
+\draw[data] (laneI) -- node[signal,above] {bitstream} (laneB);
+
+% Honest notes and open items.
+\node[warning,minimum width=106mm,minimum height=12mm] (startup) at (6.10,2.65)
+  {48 kHz/$128\times$/997 Hz曾记录启动瞬态内部饱和8次；\\统一丢弃启动区后，六工况稳态触顶计数均为0。};
+\node[pending,minimum width=132mm,minimum height=12mm] (open) at (18.20,2.65)
+  {尚未闭合：OOC多频点/多seed Fmax；SAIF功耗；校准仪器音频E7；\\
+   $10^6$样点/1000次全链长期压力；历史节点配对seed复验};
+
+\node[note,anchor=west] at (0.35,1.15)
+  {判据：$|\Delta PB|\le0.05$ dB，$A_s\ge70$ dB；E3每个工况覆盖997 Hz、10 kHz与19 kHz。};
+\node[note,anchor=east] at (24.80,1.15)
+  {现有0.271 W仅为无活动向量、中等置信度的工具估计，且由MMCM主导，故不作为已闭合功耗结论。};
+
+\end{tikzpicture}
+\end{document}
+
+

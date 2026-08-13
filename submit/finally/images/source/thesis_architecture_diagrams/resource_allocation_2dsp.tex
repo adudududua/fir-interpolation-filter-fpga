@@ -1,0 +1,88 @@
+﻿\documentclass[tikz,border=6pt]{standalone}
+\input{thesis-diagram-style.tex}
+
+\begin{document}
+\begin{tikzpicture}[x=1cm,y=1cm]
+
+\node[title] at (12.5,12.15) {当前2-DSP目标配置的资源角色、器件占用与Pareto位置};
+\node[subtitle] at (12.5,11.70)
+  {Vivado 2025.2，XC7A35T-FGG484-2，完整板级布局布线后，24/20/20 bit，CIC mode 0};
+
+% Exact board total card.
+\node[result,minimum width=220mm,minimum height=15mm] (totals) at (12.50,10.65)
+  {\bfseries 268 LUT \quad 417 FF \quad 2 DSP48E1 \quad 4 RAMB18E1（2 BRAM Tile）\quad 2 MMCM\qquad
+   WNS/WHS=+44.389/+0.078 ns，TNS/THS=0/0，DRC Error=0，配置位流生成完成};
+\node[pending badge] at (23.45,11.43) {工具验证完成\\物理板待验证};
+
+% Structural resource roles.
+\node[dsp,minimum width=34mm,minimum height=17mm] (dsp0) at (2.35,8.05)
+  {DSP48E1\#0\\[-1pt]{\scriptsize Stage1串行MAC}};
+\node[dsp,minimum width=37mm,minimum height=17mm] (dsp1) at (6.55,8.05)
+  {DSP48E1\#1\\[-1pt]{\scriptsize Stage2/3时分MAC}};
+\node[fabric,minimum width=42mm,minimum height=17mm] (cic) at (11.25,8.05)
+  {Fabric/CARRY + FF\\[-1pt]{\scriptsize CIC差分、Hold、26/29 bit积分}\\[-1pt]{\scriptsize CIC占用DSP=0}};
+\node[ram,minimum width=30mm,minimum height=17mm] (rh1) at (2.15,5.95)
+  {RAMB18E1\#1\\[-1pt]{\scriptsize Stage1历史}};
+\node[ram,minimum width=34mm,minimum height=17mm] (rh23) at (5.85,5.95)
+  {RAMB18E1\#2\\[-1pt]{\scriptsize Stage2/3历史}};
+\node[ram,minimum width=33mm,minimum height=17mm] (rc) at (9.75,5.95)
+  {RAMB18E1\#3\\[-1pt]{\scriptsize 统一FIR系数}};
+\node[pending,minimum width=31mm,minimum height=17mm] (rrom) at (13.45,5.95)
+  {RAMB18E1\#4\\[-1pt]{\scriptsize 板级测试音ROM}};
+\node[clock block,minimum width=35mm,minimum height=17mm] (rclk) at (6.90,3.95)
+  {2$\times$MMCME2\_ADV\\[-1pt]{\scriptsize 44.1/48 kHz双时钟族}};
+\node[pending,minimum width=47mm,minimum height=17mm] (rest) at (12.10,3.95)
+  {其余板级逻辑\\[-1pt]{\scriptsize 键盘、CDC、CE、输出MUX与DAC接口}};
+\draw[data] (rh1.north) -- (dsp0.south);
+\draw[data] (rh23.north) -- (dsp1.south);
+\draw[data] (rc.north) -- ++(0,0.40) -| (dsp0.south east);
+\draw[data] (rc.north) -- ++(0,0.40) -| (dsp1.south east);
+
+\begin{scope}[on background layer]
+  \node[boundary,fill=DataFill!28,fit=(dsp0)(dsp1)(cic)(rh1)(rh23)(rc)] (coregrp) {};
+\end{scope}
+\node[group title] at ($(coregrp.north west)+(0.20,-0.25)$) {滤波器核心的明确资源角色：2 DSP + 3 RAMB18};
+\node[font=\sffamily\bfseries\footnotesize] at (10.20,4.95) {核心外板级资源};
+
+% Utilization bars: two explicit scales to preserve readability.
+\node[font=\sffamily\bfseries\footnotesize,anchor=west] at (16.20,9.25) {器件占用率（完整板级）};
+\node[tiny note,anchor=west] at (16.20,8.88) {逻辑/DSP/BRAM/IO横条量程0--10\%};
+\newcommand{\utilbar}[5]{%
+  \node[tiny note,anchor=east,text=Ink] at (19.10,#1) {#2};%
+  \draw[LineSoft,rounded corners=1pt,line width=0.45pt] (19.28,#1-0.12) rectangle ++(4.80,0.24);%
+  \fill[#5,rounded corners=1pt] (19.28,#1-0.12) rectangle ++(#4,0.24);%
+  \node[tiny note,anchor=west,text=Ink] at (24.22,#1) {#3};%
+}
+\utilbar{8.38}{LUT 268/20800}{1.29\%}{0.6192}{DataBlue}
+\utilbar{7.78}{FF 417/41600}{1.00\%}{0.4800}{ControlTeal}
+\utilbar{7.18}{DSP 2/90}{2.22\%}{1.0656}{DspPurple}
+\utilbar{6.58}{BRAM Tile 2/50}{4.00\%}{1.9200}{RamGreen}
+\utilbar{5.98}{IOB 17/250}{6.80\%}{3.2640}{FabricOrange}
+\node[tiny note,anchor=west] at (16.20,5.35) {MMCM横条量程0--50\%};
+\node[tiny note,anchor=east,text=Ink] at (19.10,4.88) {MMCM 2/5};
+\draw[LineSoft,rounded corners=1pt,line width=0.45pt] (19.28,4.76) rectangle ++(4.80,0.24);
+\fill[ClockPurple,rounded corners=1pt] (19.28,4.76) rectangle ++(3.84,0.24);
+\node[tiny note,anchor=west,text=Ink] at (24.22,4.88) {40.00\%};
+\node[note,anchor=west,align=left] at (16.20,4.15)
+  {MMCM占用率较高源于器件仅含5个MMCM，\\其绝对用量为2，并非数据通路的主要算术成本。};
+
+% Pareto staircase.
+\node[font=\sffamily\bfseries\footnotesize] at (12.50,2.95) {DSP--LUT Pareto端点（RAMB18E1均为4个）};
+\node[result,minimum width=48mm,minimum height=18mm] (p218) at (4.10,1.70)
+  {LUT优先端点\\[-1pt]{\bfseries 218 LUT / 365 FF / 4 DSP}\\[-1pt]{\scriptsize 已完成物理板功能验证}};
+\node[result,minimum width=48mm,minimum height=18mm] (p239) at (12.50,1.70)
+  {资源折中端点\\[-1pt]{\bfseries 239 LUT / 388 FF / 3 DSP}\\[-1pt]{\scriptsize 已完成物理板功能验证}};
+\node[pending,minimum width=48mm,minimum height=18mm] (p268) at (20.90,1.70)
+  {DSP受限目标配置\\[-1pt]{\bfseries 268 LUT / 417 FF / 2 DSP}\\[-1pt]{\scriptsize 工具验证完成，物理板待验证}};
+\draw[data] (p218) -- node[signal,above] {$+21$ LUT，$+23$ FF，$-1$ DSP} (p239);
+\draw[data] (p239) -- node[signal,above] {$+29$ LUT，$+29$ FF，$-1$ DSP} (p268);
+
+\node[note,anchor=west] at (0.35,0.18)
+  {注：模块框仅表示可由RTL/原语实例明确确定的资源角色；布局布线后扁平网表中的LUT与FF不按模块人为分摊。};
+\node[note,anchor=east] at (24.80,-0.18)
+  {268版相对239版以29 LUT和29 FF替代1个DSP，差异与末级积分器由DSP改映射为Fabric一致。};
+
+\end{tikzpicture}
+\end{document}
+
+

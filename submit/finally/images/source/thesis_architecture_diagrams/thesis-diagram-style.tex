@@ -1,0 +1,72 @@
+% Shared visual language for the thesis architecture figures.
+% Compile each standalone source with XeLaTeX from this directory.
+\usepackage[UTF8,scheme=plain,fontset=none]{ctex}
+\usepackage{amsmath,amssymb}
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Termes}
+\setsansfont{TeX Gyre Heros}
+\setmonofont{DejaVu Sans Mono}
+\setCJKmainfont{Noto Serif SC}
+\setCJKsansfont[BoldFont=SimHei]{Noto Sans SC}
+\usetikzlibrary{arrows.meta,positioning,calc,fit,backgrounds,shapes.geometric,matrix,decorations.pathreplacing}
+
+\definecolor{Ink}{HTML}{203040}
+\definecolor{Muted}{HTML}{66788A}
+\definecolor{LineSoft}{HTML}{AAB7C4}
+\definecolor{DataBlue}{HTML}{2563A6}
+\definecolor{DataFill}{HTML}{EAF3FB}
+\definecolor{ClockPurple}{HTML}{7450A5}
+\definecolor{ClockFill}{HTML}{F1ECF8}
+\definecolor{ControlTeal}{HTML}{16827B}
+\definecolor{ControlFill}{HTML}{E9F6F4}
+\definecolor{DspPurple}{HTML}{6A4C93}
+\definecolor{DspFill}{HTML}{F0EAF7}
+\definecolor{RamGreen}{HTML}{367C59}
+\definecolor{RamFill}{HTML}{ECF6F0}
+\definecolor{FabricOrange}{HTML}{C56A1A}
+\definecolor{FabricFill}{HTML}{FFF1E5}
+\definecolor{EvidenceGreen}{HTML}{2F7D4B}
+\definecolor{EvidenceFill}{HTML}{EAF6EE}
+\definecolor{Amber}{HTML}{B07A16}
+\definecolor{AmberFill}{HTML}{FFF6DD}
+\definecolor{PendingGray}{HTML}{7C8792}
+\definecolor{PendingFill}{HTML}{F1F3F5}
+\definecolor{Danger}{HTML}{A04444}
+\definecolor{DangerFill}{HTML}{FFF0F0}
+
+\tikzset{
+  >={Stealth[length=2.2mm,width=1.45mm]},
+  every node/.style={font=\sffamily\footnotesize,text=Ink},
+  data/.style={-{Stealth[length=2.2mm,width=1.45mm]},draw=DataBlue,line width=0.92pt},
+  data bi/.style={{Stealth[length=1.9mm,width=1.3mm]}-{Stealth[length=1.9mm,width=1.3mm]},draw=DataBlue,line width=0.82pt},
+  control/.style={-{Stealth[length=2.0mm,width=1.35mm]},draw=ControlTeal,dashed,line width=0.78pt},
+  clock/.style={-{Stealth[length=2.0mm,width=1.35mm]},draw=ClockPurple,densely dotted,line width=0.9pt},
+  address/.style={-{Stealth[length=2.0mm,width=1.35mm]},draw=FabricOrange,dash dot,line width=0.76pt},
+  feedback/.style={-{Stealth[length=1.8mm,width=1.25mm]},draw=Muted,line width=0.66pt},
+  block/.style={draw=Ink,fill=white,rounded corners=1.5pt,line width=0.68pt,minimum height=10mm,minimum width=23mm,align=center,inner sep=3pt},
+  data block/.style={block,draw=DataBlue,fill=DataFill},
+  control block/.style={block,draw=ControlTeal,fill=ControlFill},
+  clock block/.style={block,draw=ClockPurple,fill=ClockFill},
+  dsp/.style={block,draw=DspPurple,fill=DspFill,line width=0.9pt},
+  ram/.style={block,draw=RamGreen,fill=RamFill,line width=0.9pt},
+  fabric/.style={block,draw=FabricOrange,fill=FabricFill,line width=0.9pt},
+  result/.style={block,draw=EvidenceGreen,fill=EvidenceFill,line width=0.9pt},
+  pending/.style={block,draw=PendingGray,fill=PendingFill,line width=0.8pt},
+  warning/.style={block,draw=Amber,fill=AmberFill,line width=0.9pt},
+  boundary/.style={draw=Muted!75,rounded corners=2.2mm,dashed,line width=0.55pt,inner sep=3mm},
+  title/.style={font=\sffamily\bfseries\large,text=Ink,align=center},
+  subtitle/.style={font=\sffamily\scriptsize,text=Muted,align=center},
+  group title/.style={font=\sffamily\bfseries\footnotesize,text=Ink,anchor=west},
+  signal/.style={font=\sffamily\scriptsize,text=Ink,fill=white,inner sep=1.2pt,align=center},
+  note/.style={font=\sffamily\scriptsize,text=Muted,align=center},
+  tiny note/.style={font=\sffamily\tiny,text=Muted,align=center},
+  badge/.style={draw=EvidenceGreen,fill=EvidenceFill,rounded corners=1.8mm,line width=0.65pt,font=\sffamily\bfseries\scriptsize,text=EvidenceGreen,inner xsep=4pt,inner ysep=2pt,align=center},
+  pending badge/.style={draw=PendingGray,fill=PendingFill,rounded corners=1.8mm,line width=0.65pt,font=\sffamily\bfseries\scriptsize,text=PendingGray,inner xsep=4pt,inner ysep=2pt,align=center},
+  innovation/.style={circle,draw=Amber,fill=AmberFill,line width=0.8pt,minimum size=6.5mm,font=\sffamily\bfseries\scriptsize,text=Amber,inner sep=0pt},
+  sum/.style={circle,draw=Ink,fill=white,line width=0.75pt,minimum size=6mm,inner sep=0pt},
+  mux/.style={trapezium,trapezium left angle=72,trapezium right angle=108,draw=Ink,fill=white,line width=0.68pt,minimum height=11mm,minimum width=12mm,align=center,inner sep=2pt}
+}
+
+\newcommand{\bitrate}[2]{{\scriptsize #1 bit，#2}}
+\newcommand{\passmark}{\textcolor{EvidenceGreen}{\bfseries 满足判据}}
+\newcommand{\pendingmark}{\textcolor{PendingGray}{\bfseries 待验证}}
