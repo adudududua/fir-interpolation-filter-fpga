@@ -11,16 +11,16 @@
 % =============================================================================
 \node[anchor=west] at (0.10,8.08) {(a) 任务调度与同步存储读取};
 
-\node[opblock,minimum width=16mm] (s2) at (0.85,7.00)
+\node[opblock,font=\sffamily\footnotesize,minimum width=15mm] (s2) at (0.85,7.00)
   {S2 pending\\9 / 8 MAC};
-\node[opblock,minimum width=16mm] (s3) at (0.85,5.60)
+\node[opblock,font=\sffamily\footnotesize,minimum width=15mm] (s3) at (0.85,5.60)
   {S3 pending\\6 / 5 MAC};
 \node[opblock,minimum width=18mm,minimum height=10mm] (arb) at (2.90,6.30)
   {任务仲裁\\S2优先};
 \coordinate (arb2) at ($(arb.west)+(0,0.20)$);
 \coordinate (arb3) at ($(arb.west)+(0,-0.20)$);
-\draw[wire] (s2.east) -- (1.95,7.00) |- (arb2);
-\draw[wire] (s3.east) -- (1.95,5.60) |- (arb3);
+\draw[wire] (s2.east) -- (arb2);
+\draw[wire] (s3.east) -- (arb3);
 
 \node[reg,minimum width=23mm] (job) at (5.35,6.30)
   {$R_{job}$\\$\{stage,\phi,head,$\\$i,full\}$};
@@ -97,12 +97,12 @@
   {$hist\_valid$\\$full\lor(i<fill)$};
 \node[resource,minimum width=23mm] (ctrl) at (3.70,3.35)
   {控制FSM\\OPMODE / CEP};
-\node[resource,minimum width=19mm] (pat) at (6.85,3.35)
+\node[resource,minimum width=18mm] (pat) at (6.05,3.35)
   {PATDET\\$P$高位溢出};
 \draw[control] (hist.east) -- (ctrl.west);
 \draw[control] (pat.west) -- (ctrl.east);
 \draw[control] (ctrl.south) -- (alu.north);
-\draw[control] (preg.north east) -- ++(0,0.20) -| (pat.south);
+\draw[control] (preg.north east) -- (pat.south);
 
 % State and C input occupy two separate, unobstructed return lanes.
 \draw[state] (preg.south) -- ++(0,-0.42) -| (alu.south east);
