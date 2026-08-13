@@ -1,0 +1,142 @@
+\documentclass[tikz,border=6pt]{standalone}
+\usepackage[UTF8,scheme=plain,fontset=none]{ctex}
+\usepackage{amsmath,amssymb}
+\setmainfont{TeX Gyre Termes}
+\setsansfont{TeX Gyre Heros}
+\setCJKmainfont{Noto Serif SC}
+\setCJKsansfont[BoldFont=SimHei]{Noto Sans SC}
+\usetikzlibrary{arrows.meta,positioning,calc,fit,backgrounds}
+
+\definecolor{Ink}{HTML}{203040}
+\definecolor{Muted}{HTML}{627181}
+\definecolor{CombFill}{HTML}{EDF4F9}
+\definecolor{RateFill}{HTML}{F3F6F8}
+\definecolor{IntFill}{HTML}{EEF7F2}
+\definecolor{QuantFill}{HTML}{FFF5E4}
+
+\begin{document}
+\begin{tikzpicture}[
+  scale=0.94,
+  transform shape,
+  x=1cm,
+  y=1cm,
+  font=\sffamily\footnotesize,
+  data/.style={-{Stealth[length=2.1mm,width=1.45mm]},draw=Ink,line width=0.82pt},
+  feedback/.style={-{Stealth[length=1.8mm,width=1.25mm]},draw=Muted,line width=0.68pt},
+  block/.style={draw=Ink,fill=white,rounded corners=1.4pt,line width=0.68pt,
+                minimum height=9mm,minimum width=16mm,align=center,inner sep=2.5pt},
+  input/.style={block,minimum width=22mm,minimum height=14mm},
+  hold/.style={block,minimum width=33mm,minimum height=18mm},
+  quant/.style={block,minimum width=33mm,minimum height=18mm},
+  output/.style={block,minimum width=22mm,minimum height=14mm},
+  delay/.style={block,minimum width=14mm,minimum height=9mm},
+  sum/.style={circle,draw=Ink,fill=white,line width=0.78pt,minimum size=6.4mm,inner sep=0pt},
+  group/.style={draw=Muted!66,rounded corners=2.4mm,dashed,line width=0.5pt,inner sep=4mm},
+  grouptitle/.style={font=\sffamily\bfseries\footnotesize,text=Ink,anchor=west},
+  signal/.style={font=\sffamily\scriptsize,align=center,text=Ink,fill=white,inner sep=1.2pt},
+  note/.style={font=\sffamily\scriptsize,align=center,text=Muted},
+  sign/.style={font=\sffamily\bfseries\scriptsize,text=Ink,inner sep=0pt}
+]
+
+% Title and abstraction boundary.
+\node[font=\sffamily\bfseries\small,text=Ink] at (12.5,7.45)
+  {16倍三级CIC插值器的算法级等效信流图};
+\node[note] at (12.5,6.95)
+  {$C^3\rightarrow\uparrow16\rightarrow I^3\;\equiv\;
+   C^2\rightarrow\mathrm{Hold}_{16}\rightarrow I^2$};
+
+% Low-rate input and two differentiators.
+\node[input] (xin) at (1.10,4.35)
+  {$x_8[n]$\\[-1pt]{\scriptsize signed 21 bit}\\[-1pt]{\scriptsize $8F_s$有效事件率}};
+
+\node[sum] (comb1) at (3.15,4.35) {$\Sigma$};
+\draw[data] (xin.east) -- (comb1.west);
+\node[delay] (ld1) at (2.20,2.55) {$z_{\ell}^{-1}$\\[-1pt]{\scriptsize 低速事件延时}};
+\coordinate (xTap) at (2.18,4.35);
+\fill[Ink] (xTap) circle (1.1pt);
+\draw[feedback] (xTap) -- (2.18,3.35) -- (ld1.north);
+\draw[feedback] (ld1.east) -| (comb1.south);
+\node[sign] at ($(comb1.west)+(-0.20,0.23)$) {$+$};
+\node[sign] at ($(comb1.south)+(-0.20,-0.25)$) {$-$};
+
+\node[sum] (comb2) at (5.85,4.35) {$\Sigma$};
+\draw[data] (comb1.east) -- node[signal,above=2pt] {$d_1[n]$\\22 bit} (comb2.west);
+\node[delay] (ld2) at (4.75,2.55) {$z_{\ell}^{-1}$\\[-1pt]{\scriptsize 低速事件延时}};
+\coordinate (d1Tap) at (4.50,4.35);
+\fill[Ink] (d1Tap) circle (1.1pt);
+\draw[feedback] (d1Tap) -- (4.50,3.35) -- (ld2.north);
+\draw[feedback] (ld2.east) -| (comb2.south);
+\node[sign] at ($(comb2.west)+(-0.20,0.23)$) {$+$};
+\node[sign] at ($(comb2.south)+(-0.20,-0.25)$) {$-$};
+
+% Hold-by-16 rate conversion.
+\node[hold] (hold16) at (8.70,4.35)
+  {\textbf{零阶保持 $\mathrm{Hold}_{16}$}\\[-1pt]
+   $h[16n+r]=d_2[n]$\\[-1pt]
+   {\scriptsize $r=0,\ldots,15$；23 bit}};
+\draw[data] (comb2.east) -- node[signal,above=2pt] {$d_2[n]$\\23 bit} (hold16.west);
+
+% High-rate integrators.  Current s1[k] is used by I2; delays are feedback only.
+\node[sum] (int1) at (12.05,4.35) {$\Sigma$};
+\draw[data] (hold16.east) -- node[signal,above=2pt] {$h[k]$\\23 bit} (int1.west);
+\node[delay] (hd1) at (13.05,2.55) {$z_h^{-1}$\\[-1pt]{\scriptsize 高速事件延时}};
+\coordinate (s1Tap) at (13.05,4.35);
+\fill[Ink] (s1Tap) circle (1.1pt);
+\draw[feedback] (s1Tap) -- (13.05,3.35) -- (hd1.north);
+\draw[feedback] (hd1.west) -| (int1.south);
+\node[sign] at ($(int1.west)+(-0.20,0.23)$) {$+$};
+\node[sign] at ($(int1.south)+(-0.20,-0.25)$) {$+$};
+
+\node[sum] (int2) at (15.80,4.35) {$\Sigma$};
+\draw[data] (int1.east) -- node[signal,above=2pt] {$s_1[k]$\\26 bit} (int2.west);
+\node[delay] (hd2) at (16.80,2.55) {$z_h^{-1}$\\[-1pt]{\scriptsize 高速事件延时}};
+\coordinate (s2Tap) at (16.80,4.35);
+\fill[Ink] (s2Tap) circle (1.1pt);
+\draw[feedback] (s2Tap) -- (16.80,3.35) -- (hd2.north);
+\draw[feedback] (hd2.west) -| (int2.south);
+\node[sign] at ($(int2.west)+(-0.20,0.23)$) {$+$};
+\node[sign] at ($(int2.south)+(-0.20,-0.25)$) {$+$};
+
+% Output normalization and saturation.
+\node[quant] (quantize) at (20.05,4.35)
+  {\textbf{增益归一化}\\[-1pt]
+   {\scriptsize 中点远离零舍入}\\[-1pt]
+   {\scriptsize 算术右移8位并饱和}\\[-1pt]
+   {\scriptsize 29$\rightarrow$20 bit}};
+\draw[data] (s2Tap) -- node[signal,above=2pt] {$s_2[k]$\\29 bit} (quantize.west);
+
+\node[output] (yout) at (23.75,4.35)
+  {$y_{128}[k]$\\[-1pt]{\scriptsize signed 20 bit}\\[-1pt]{\scriptsize $128F_s$有效事件率}};
+\draw[data] (quantize.east) -- (yout.west);
+
+% Domain groupings on the background layer.
+\coordinate (intTop) at (11.20,5.30);
+\begin{scope}[on background layer]
+  \node[group,fill=CombFill,fit=(xin)(comb1)(comb2)(ld1)(ld2)] (combGroup) {};
+  \node[group,fill=RateFill,fit=(hold16)] (rateGroup) {};
+  \node[group,fill=IntFill,fit=(int1)(int2)(hd1)(hd2)(intTop)] (intGroup) {};
+  \node[group,fill=QuantFill,fit=(quantize)(yout)] (quantGroup) {};
+\end{scope}
+
+\node[grouptitle] at ($(combGroup.north west)+(0.18,-0.28)$)
+  {低速二阶差分域（$8F_s$有效事件）};
+\node[grouptitle] at ($(rateGroup.north west)+(0.18,-0.28)$)
+  {16倍保持接口};
+\node[grouptitle] at ($(intGroup.north west)+(0.18,-0.28)$)
+  {高速二阶积分域（$128F_s$有效事件）};
+\node[grouptitle] at ($(quantGroup.north west)+(0.18,-0.28)$)
+  {定点输出级};
+
+% Theoretical equations and notation note.
+\node[note,anchor=west] at (0.45,0.55)
+  {$d_1[n]=x_8[n]-x_8[n-1],\quad d_2[n]=d_1[n]-d_1[n-1]$};
+\node[note] at (12.50,0.55)
+  {$s_1[k]=s_1[k-1]+h[k],\quad s_2[k]=s_2[k-1]+s_1[k]$};
+\node[note,anchor=east] at (24.55,0.55)
+  {$y_{128}[k]=\operatorname{sat}_{20}\!\left\{
+    \operatorname{round}_{\mathrm{away}}\!\left(s_2[k]/2^8\right)\right\}$};
+\node[note] at (12.50,0.05)
+  {$z_{\ell}^{-1}$与$z_h^{-1}$分别表示一次低速与高速数据有效事件延时；全链处于同一$128F_s$主时钟域。};
+
+\end{tikzpicture}
+\end{document}
