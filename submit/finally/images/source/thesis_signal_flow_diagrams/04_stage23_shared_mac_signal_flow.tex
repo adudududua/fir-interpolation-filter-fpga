@@ -49,9 +49,11 @@
 \draw[wire] (rb.east) -- ++(1.20,0)
   node[label,midway,above] {$B=c[i]$};
 
-\node[resource,minimum width=18mm,minimum height=7mm] (mode) at (10.85,4.56)
+\node[resource,minimum width=18mm,minimum height=7mm] (mode) at (7.90,4.98)
   {$R_{mode,P3}$\\S3 CE锁存};
-\draw[control] (mode.north) -- (bram.south);
+% The latched Stage3 mode participates in the flat/P3 coefficient-bank address;
+% it is not a coefficient-data input to the RAM.
+\draw[control] (mode.north) -- (addr.south);
 
 % =============================================================================
 % (b) Shared DSP datapath
@@ -77,8 +79,9 @@
 \node[opblock,minimum width=15mm,minimum height=12mm] (demux) at (9.60,2.10)
   {1:2\\DEMUX};
 \draw[wire] (slice) -- (demux);
-\node[note] at (9.60,3.03) {$R_{job}.stage$};
-\draw[control] (9.60,2.82) -- (demux.north);
+\coordinate (stageCtl) at ($(demux.north)+(0,0.44)$);
+\node[note,anchor=south] at ($(demux.north)+(0,0.50)$) {$R_{job}.stage$};
+\draw[control] (stageCtl) -- (demux.north);
 
 \node[reg,minimum width=13mm] (y4) at (11.70,2.78)
   {$R_{y4}$\\20 bit};
@@ -94,28 +97,26 @@
 \node[resource,minimum width=23mm] (ctrl) at (4.08,3.35)
   {控制FSM\\OPMODE / CEP};
 \node[resource,minimum width=19mm] (pat) at (6.85,3.35)
-  {PATDET\\$overflow$};
+  {PATDET\\$P$高位溢出};
 \draw[control] (hist.east) -- (ctrl.west);
 \draw[control] (pat.west) -- (ctrl.east);
 \draw[control] (ctrl.south) -- (alu.north);
-\draw[control] (preg.north east) -- (pat.south west);
+\draw[control] (preg.north east) -- ++(0,0.20) -| (pat.south);
 
 % State and C input occupy two separate, unobstructed return lanes.
-\draw[state] (preg.south) -- ++(0,-0.42) -|
-  node[label,pos=0.52,above] {$P$} (alu.south east);
-\node[sign] at ($(alu.south east)+(-0.08,-0.16)$) {$+$};
+\draw[state] (preg.south) -- ++(0,-0.42) -| (alu.south east);
+\node[label,anchor=west] at ($(alu.south east)+(0.11,-0.26)$) {$P$};
 
 \node[wideblock,minimum width=25mm] (ctail) at (3.25,-0.52)
   {$C_{tail}$/CarryIN MUX（FSM）\\ROUND bias / CLAMP limit};
-\draw[wire] (ctail.north east) -- ++(0,0.52) -|
-  node[label,pos=0.73,below] {$C$} (alu.south west);
-\node[sign] at ($(alu.south west)+(0.08,-0.16)$) {$+$};
+\draw[wire] (ctail.north east) -- ++(0,0.52) -| (alu.south west);
+\node[label,anchor=east] at ($(alu.south west)+(-0.11,-0.26)$) {$C$};
 
 \node[note,anchor=west,align=left] at (6.55,0.18)
   {$CEP=(MAC\land hist\_valid)\lor ROUND$\\
    $\phantom{CEP={}}\lor(CLAMP\land overflow)$};
 \node[note,anchor=west,align=left] at (6.55,-0.45)
-  {同一PREG依次执行MAC、ROUND与条件CLAMP。};
+  {OPMODE选择$M+P$、$P+C+carry$或$C$；结果写回同一PREG。};
 
 \end{tikzpicture}
 \end{document}
