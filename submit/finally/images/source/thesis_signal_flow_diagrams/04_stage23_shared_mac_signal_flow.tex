@@ -61,12 +61,12 @@
 
 \node[opblock,minimum width=11mm] (Xin) at (0.62,2.10) {X\\$x[i]$};
 \node[opblock,minimum width=11mm] (Bin) at (0.62,0.88) {B\\$c[i]$};
-\node[gain,minimum height=10mm] (mul) at (2.00,2.10) {$\times$};
-\draw[wire] (Xin) -- (mul);
-\draw[wire] (Bin) -| (mul.south);
+\node[sum,minimum size=7.2mm] (mul) at (2.00,2.10) {$\times$};
+\draw[wire] (Xin.east) -- (mul.west);
+\draw[wire] (Bin.east) -| (mul.south);
 
 \sumnode{alu}{(3.70,2.10)}
-\draw[wire] (mul) -- node[label,above] {$M$} (alu);
+\draw[wire] (mul.east) -- node[label,above] {$M$} (alu.west);
 \node[reg,minimum width=14mm] (preg) at (5.28,2.10)
   {$PREG$\\ACC38};
 \draw[wire] (alu) -- (preg);
