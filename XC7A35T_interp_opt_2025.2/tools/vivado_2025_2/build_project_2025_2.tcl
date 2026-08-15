@@ -3,7 +3,7 @@ set project_dir [file normalize [file join $script_dir ../..]]
 set project_file [file join $project_dir XC7A35T_interp.xpr]
 set result_dir [expr {$argc > 0 ? [file normalize [lindex $argv 0]] : [file join $script_dir results latest]}]
 set jobs [expr {$argc > 1 ? [lindex $argv 1] : 1}]
-set release_config_id "NF-P3-STAGE123-24-20-20-2DSP-PARETO-R1"
+set release_config_id "NF-P3-STAGE123-24-20-20-3DSP-PARETO-R1"
 file mkdir $result_dir
 
 proc require_condition {condition message} {
@@ -28,8 +28,8 @@ require_condition \
     "The source fileset does not explicitly select Stage2 signed-20 data."
 require_condition \
     [expr {[lsearch -exact $source_generics \
-        "USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE=0"] >= 0}] \
-    "The source fileset does not select the 268-LUT / 2-DSP CIC mapping."
+        "USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE=1"] >= 0}] \
+    "The source fileset does not select the 239-LUT / 3-DSP CIC mapping."
 
 set config_file [open [file join $result_dir release_config.txt] w]
 puts $config_file "CONFIG_ID=$release_config_id"
@@ -52,8 +52,8 @@ set_property STEPS.SYNTH_DESIGN.ARGS.SHREG_MIN_SIZE 5 $synth_run
 # register unchanged while invalid startup reads are expressed as a register
 # enable, removing the 24-bit BRAM-data/zero mux.  Together with the CIC DSP
 # role exchange, shared Stage2/3 phase state, and atomic mode commit, the
-# release target is no more than 268 LUT while keeping
-# 2 DSP / 4 RAMB18E1; the hard gates below prevent stale or wrong-run results.
+# release target is no more than 239 LUT while keeping
+# 3 DSP / 4 RAMB18E1; the hard gates below prevent stale or wrong-run results.
 set_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE ExploreArea $impl_run
 set_property STEPS.PLACE_DESIGN.ARGS.DIRECTIVE Explore $impl_run
 
@@ -115,13 +115,13 @@ puts "V2025_2_WNS=$wns"
 puts "V2025_2_WHS=$whs"
 puts "V2025_2_DRC_ERRORS=[llength $drc_errors]"
 
-require_condition [expr {$dsp_count == 2}] "Expected exactly 2 DSP48E1 cells."
+require_condition [expr {$dsp_count == 3}] "Expected exactly 3 DSP48E1 cells."
 require_condition [expr {$bram18_count == 4}] "Expected exactly 4 RAMB18E1 cells."
 require_condition [expr {$mmcm_count == 2}] "Expected exactly 2 MMCME2_ADV cells."
-require_condition [expr {$lut_count <= 268}] \
-    "LUT regression: expected no more than 268, got $lut_count."
-require_condition [expr {$ff_count <= 417}] \
-    "FF regression: expected no more than 417, got $ff_count."
+require_condition [expr {$lut_count <= 239}] \
+    "LUT regression: expected no more than 239, got $lut_count."
+require_condition [expr {$ff_count <= 388}] \
+    "FF regression: expected no more than 388, got $ff_count."
 require_condition [expr {$wns >= 0.0}] "Setup timing failed: WNS=$wns ns."
 require_condition [expr {$whs >= 0.0}] "Hold timing failed: WHS=$whs ns."
 require_condition [expr {[llength $drc_errors] == 0}] \

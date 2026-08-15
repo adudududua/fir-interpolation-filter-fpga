@@ -1,5 +1,22 @@
 # 高阶数字插值滤波器设计与 FPGA 验证
 
+### 2026-08-15：正式工程回退并固定为239 LUT / 3 DSP板测均衡版
+
+应当前全国总决赛提交口径，正式 Vivado 2025.2 工程已从268 LUT / 2 DSP工具验证候选回退到
+已完成物理板验证的 **239 LUT / 388 FF / 3 DSP48E1 / 4 RAMB18E1（2 BRAM Tile）/
+2 MMCM** 版本。当前分支为 `national-finals-v2025.2-239lut-3dsp-final`，工程顶层和`.xpr`
+中的 `USE_NATIONAL_FINALS_CIC_INTEGRATOR_DSP_MODE` 均固定为1；对应不可变板测标签为
+`nf-vivado2025.2-239lut-388ff-3dsp-2bram-24-20-20-board-pass`。
+
+该版本采用24/20/20 bit数值规格，整板Post-Route WNS/WHS为`+44.703/+0.079 ns`、
+DRC Error=0；用户已确认44.1/48 kHz两族各倍率档位采样率正确且DAC输出波形正常。
+独立滤波器核心同口径OOC资源为 **212 LUT / 302 FF / 3 DSP / 3 RAMB18E1**；完整板级资源
+与核心OOC为两个独立统计边界，不能相减推导精确外围面积。218 LUT / 365 FF / 4 DSP版本
+仍保留为LUT优先板测回退点，268 LUT / 417 FF / 2 DSP版本保留为工具验证历史候选。
+
+面向评委的创新点定义、机制、量化收益、证据边界和答辩推荐口径见
+[项目创新点说明报告](submit/finally/reports/项目创新点说明报告.md)。
+
 ### 2026-08-12：218-LUT与239-LUT板测版本的同口径核心OOC与整板资源复核
 
 已在隔离 Git 工作树中依次检出

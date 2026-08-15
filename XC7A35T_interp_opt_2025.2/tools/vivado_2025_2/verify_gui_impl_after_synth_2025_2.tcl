@@ -73,11 +73,11 @@ puts "GUI_VERIFY_WNS=$wns"
 puts "GUI_VERIFY_WHS=$whs"
 puts "GUI_VERIFY_DRC_ERRORS=[llength $drc_errors]"
 
-require_condition [expr {$lut_count <= 268}] \
-    "Routed LUT regression: expected no more than 268, got $lut_count."
-require_condition [expr {$ff_count <= 417}] \
-    "Routed FF regression: expected no more than 417, got $ff_count."
-require_condition [expr {$dsp_count == 2}] "Expected exactly 2 DSP48E1 cells."
+require_condition [expr {$lut_count <= 218}] \
+    "Routed LUT regression: expected no more than 218, got $lut_count."
+require_condition [expr {$ff_count <= 365}] \
+    "Routed FF regression: expected no more than 365, got $ff_count."
+require_condition [expr {$dsp_count == 4}] "Expected exactly 4 DSP48E1 cells."
 require_condition [expr {$bram18_count == 4}] "Expected exactly 4 RAMB18E1 cells."
 require_condition [expr {$mmcm_count == 2}] "Expected exactly 2 MMCME2_ADV cells."
 require_condition [expr {$wns >= 0.0}] "Setup timing failed: WNS=$wns ns."
