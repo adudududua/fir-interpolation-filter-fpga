@@ -4,6 +4,10 @@ set source_root [file join $project_dir XC7A35T_interp.srcs sources_1 new]
 set result_dir [expr {$argc > 0 ? [file normalize [lindex $argv 0]] : [file join $script_dir results latest]}]
 set jobs [expr {$argc > 1 ? [lindex $argv 1] : 1}]
 set core_variant [expr {$argc > 2 ? [lindex $argv 2] : "baseline"}]
+set cic_integrator_dsp_mode [expr {$argc > 3 ? [lindex $argv 3] : 2}]
+set clock_period_ns [expr {$argc > 4 ? [lindex $argv 4] : 162.760}]
+set place_recipe [expr {$argc > 5 ? [lindex $argv 5] : "explore"}]
+set use_n3_hold_equiv [expr {$argc > 6 ? [lindex $argv 6] : 1}]
 set top_name interp128_all2x_v7_folded_fir_cic_top_ce
 set part_name xc7a35tfgg484-2
 file mkdir $result_dir
@@ -18,6 +22,18 @@ require_condition [expr {$core_variant eq "baseline" ||
                          $core_variant eq "sequential_pair" ||
                          $core_variant eq "wordlength_24_20_20"}] \
     "core variant must be baseline, sequential_pair, or wordlength_24_20_20"
+require_condition [expr {$cic_integrator_dsp_mode >= 0 &&
+                         $cic_integrator_dsp_mode <= 2}] \
+    "CIC integrator DSP mode must be 0, 1, or 2"
+require_condition [expr {$clock_period_ns > 0.0}] "Clock period must be positive"
+require_condition [expr {$place_recipe in {explore default wld}}] \
+    "place recipe must be explore, default, or wld"
+require_condition [expr {$use_n3_hold_equiv == 0 ||
+                         $use_n3_hold_equiv == 1}] \
+    "N3 Hold equivalence selector must be 0 or 1"
+require_condition [expr {$use_n3_hold_equiv == 1 ||
+                         $core_variant ne "sequential_pair"}] \
+    "sequential_pair only supports the N3 Hold data path"
 set stage2_data_w [expr {$core_variant eq "wordlength_24_20_20" ? 20 : 22}]
 
 # A damaged user Tcl Store must not stop the competition report. Vivado sets
@@ -118,12 +134,12 @@ set core_generics [list \
     CIC_BURST_COUNTER_USE_DSP=0 \
     CIC_COMB_USE_DSP=0 \
     USE_SERIAL_CIC_COMB=1 \
-    USE_N3_HOLD_EQUIV=1 \
+    USE_N3_HOLD_EQUIV=$use_n3_hold_equiv \
     USE_STAGE1_DSP48_PREADDER=1 \
     USE_NATIONAL_FINALS_NARROW_STAGE23=1 \
     USE_P3_JOINT_STAGE3=1 \
     ASSUME_ALIGNED_POW2_CE=1 \
-    CIC_INTEGRATOR_DSP_MODE=2 \
+    CIC_INTEGRATOR_DSP_MODE=$cic_integrator_dsp_mode \
     USE_UNIFIED_FIR_COEFF_BRAM=1]
 
 set_param general.maxThreads $jobs
@@ -141,18 +157,19 @@ foreach generic_value $core_generics {
 }
 {*}$synth_command
 
-create_clock -name core_clk_6m144 -period 162.760 \
-    -waveform {0.000 81.380} [get_ports clk]
+set half_period_ns [expr {$clock_period_ns / 2.0}]
+create_clock -name core_clk_scan -period $clock_period_ns \
+    -waveform [list 0.000 $half_period_ns] [get_ports clk]
 set_property HD.CLK_SRC BUFGCTRL_X0Y16 [get_ports clk]
 set_false_path -from [get_ports rst_n]
 
 # Keep zero-delay OOC boundaries for the signed-off 193-LUT placement result.
 # Those artificial boundary paths are reported, but the pass/fail timing gate
 # below is calculated separately over internal register-to-register paths.
-set core_data_inputs [get_ports {ce2 ce4 ce8 ce16 ce32 ce64 ce128 \
+set core_data_inputs [get_ports {ce2_out ce4_out ce8_out ce16_out ce32_out ce64_out ce128_out \
     x_in x_in_valid stage3_compensated_mode}]
-set_input_delay -clock [get_clocks core_clk_6m144] 0.000 $core_data_inputs
-set_output_delay -clock [get_clocks core_clk_6m144] 0.000 [all_outputs]
+set_input_delay -clock [get_clocks core_clk_scan] 0.000 $core_data_inputs
+set_output_delay -clock [get_clocks core_clk_scan] 0.000 [all_outputs]
 
 report_utilization -file [file join $result_dir utilization_post_synth.rpt]
 report_timing_summary -delay_type min_max -max_paths 20 \
@@ -160,7 +177,13 @@ report_timing_summary -delay_type min_max -max_paths 20 \
 write_checkpoint -force [file join $result_dir core_post_synth.dcp]
 
 opt_design -directive ExploreArea
-place_design -directive Explore
+if {$place_recipe eq "explore"} {
+    place_design -directive Explore
+} elseif {$place_recipe eq "default"} {
+    place_design -directive Default
+} else {
+    place_design -subdirective Floorplan.WLDrivenBlockPlacement
+}
 route_design
 
 set utilization_report [report_utilization -return_string]
@@ -191,7 +214,7 @@ set dsp_count [llength [get_cells -hierarchical -filter {REF_NAME == DSP48E1}]]
 set bram18_count [llength [get_cells -hierarchical -filter {REF_NAME == RAMB18E1}]]
 set bram36_count [llength [get_cells -hierarchical -filter {REF_NAME == RAMB36E1}]]
 set mmcm_count [llength [get_cells -hierarchical -filter {REF_NAME == MMCME2_ADV}]]
-set internal_registers [all_registers -clock [get_clocks core_clk_6m144]]
+set internal_registers [all_registers -clock [get_clocks core_clk_scan]]
 require_condition [expr {[llength $internal_registers] > 0}] "No internal registers found."
 set internal_setup_path [get_timing_paths -delay_type max -max_paths 1 -nworst 1 \
     -from $internal_registers -to $internal_registers]
@@ -215,7 +238,11 @@ puts $summary_fid "VARIANT=$core_variant"
 puts $summary_fid "STAGE2_DATA_W=$stage2_data_w"
 puts $summary_fid "TOP=$top_name"
 puts $summary_fid "PART=$part_name"
-puts $summary_fid "CLOCK_MHZ=6.144"
+puts $summary_fid "CLOCK_PERIOD_NS=$clock_period_ns"
+puts $summary_fid "CLOCK_MHZ=[expr {1000.0 / $clock_period_ns}]"
+puts $summary_fid "PLACE_RECIPE=$place_recipe"
+puts $summary_fid "CIC_INTEGRATOR_DSP_MODE=$cic_integrator_dsp_mode"
+puts $summary_fid "USE_N3_HOLD_EQUIV=$use_n3_hold_equiv"
 puts $summary_fid "TIMING_SCOPE=INTERNAL_REGISTER_TO_REGISTER"
 puts $summary_fid "POST_ROUTE_LUT=$lut_count"
 puts $summary_fid "POST_ROUTE_LUTRAM=$lutram_count"
@@ -238,16 +265,21 @@ puts "CORE_OOC_INTERNAL_WNS=$internal_wns"
 puts "CORE_OOC_INTERNAL_WHS=$internal_whs"
 puts "CORE_OOC_DRC_ERRORS=[llength $drc_errors]"
 
-if {$core_variant eq "baseline"} {
+if {$core_variant eq "baseline" && $cic_integrator_dsp_mode == 2 &&
+    $use_n3_hold_equiv == 1 &&
+    abs($clock_period_ns - 162.760) < 0.0001 && $place_recipe eq "explore"} {
     require_condition [expr {$lut_count == 193}] \
         "Expected exactly 193 LUT for the signed-off Vivado 2025.2 OOC flow; got $lut_count."
     require_condition [expr {$ff_count == 281}] "Expected exactly 281 FF; got $ff_count."
-} else {
+} elseif {$core_variant eq "sequential_pair"} {
     require_condition [expr {$lut_count < 193}] \
         "Experimental core did not improve the 193-LUT baseline; got $lut_count."
 }
 require_condition [expr {$lutram_count == 0}] "Expected 0 LUTRAM; got $lutram_count."
-require_condition [expr {$dsp_count == 4}] "Expected exactly 4 DSP48E1; got $dsp_count."
+set expected_dsp_count [expr {$use_n3_hold_equiv ?
+                              2 + $cic_integrator_dsp_mode : 5}]
+require_condition [expr {$dsp_count == $expected_dsp_count}] \
+    "Expected exactly $expected_dsp_count DSP48E1; got $dsp_count."
 require_condition [expr {$bram18_count == 3 && $bram36_count == 0}] \
     "Expected 3 RAMB18E1 and 0 RAMB36E1."
 require_condition [expr {$mmcm_count == 0}] "OOC core must contain 0 MMCM."
