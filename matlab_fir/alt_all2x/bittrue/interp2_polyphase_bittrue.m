@@ -21,6 +21,10 @@ function [y, stat] = interp2_polyphase_bittrue(x, coeff_int, frac_w, data_w, acc
 % 修订记录     :
 %                2026-07-10：新增单级 2 相 bit-true 插值模型。
 %=============================================================
+% 1）主函数模块：interp2_polyphase_bittrue
+% 功能说明：模拟 2 倍多相 FIR 的偶相、奇相数据路径及定点量化过程。
+% 输入、输出、定点规则和结果文件由下方参数及代码段具体定义。
+
 
     x = int64(x(:).');
     coeff_int = int64(coeff_int(:).');

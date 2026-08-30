@@ -1,7 +1,0 @@
-VARIANT,TEST,BEST_SHIFT,MAX_ABS_ERROR_LSB,RMS_ERROR_LSB,MISMATCH_COUNT,PASS
-poly_stage3,random,321,0,0,0,1
-poly_stage2,random,321,0,0,0,1
-lightbridge,random,319,0,0,0,1
-poly_stage3,impulse,321,0,0,0,1
-poly_stage2,impulse,321,0,0,0,1
-lightbridge,impulse,319,0,0,0,1

@@ -19,6 +19,10 @@ function result = phase7_build_bittrue_case(x, CFG)
 % 修订记录     :
 %                2026-07-14：新增完整 Phase 7 位真用例函数。
 %=============================================================
+% 1）主函数模块：phase7_build_bittrue_case
+% 功能说明：按 RTL 舍入、饱和和流水规则建立逐位一致的定点行为模型。
+% 输入、输出、定点规则和结果文件由下方参数及代码段具体定义。
+
 
     verify_dir = fileparts(mfilename('fullpath'));
     v7_dir = fileparts(verify_dir);

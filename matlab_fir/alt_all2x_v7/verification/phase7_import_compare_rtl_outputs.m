@@ -13,6 +13,10 @@ function phase7_import_compare_rtl_outputs()
 %                reports/phase7_rtl_matlab_pointwise.mat
 %                figures/phase7_rtl_matlab_pointwise.png
 %=============================================================
+% 1）主函数模块：phase7_import_compare_rtl_outputs
+% 功能说明：在相同输入下对齐 MATLAB 黄金模型与 RTL 输出，执行逐样本 bit-true 判定。
+% 输入、输出、定点规则和结果文件由下方参数及代码段具体定义。
+
 
     verify_dir = fileparts(mfilename('fullpath'));
     display_dir = fileparts(fileparts(fileparts(verify_dir)));
@@ -119,6 +123,10 @@ function phase7_import_compare_rtl_outputs()
 end
 
 
+% 2）局部函数模块：read_signed_hex_mem
+
+
+% 功能说明：读取外部配置、RTL结果或数据文件，并转换为主流程使用的统一数据格式。
 function data = read_signed_hex_mem(filename, data_w)
     if ~exist(filename, 'file')
         error('缺少MATLAB黄金向量：%s', filename);
@@ -135,6 +143,10 @@ function data = read_signed_hex_mem(filename, data_w)
 end
 
 
+% 3）局部函数模块：write_summary
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_summary(filename, xsim_dir, result_table)
     fid = fopen(filename, 'w');
     if fid < 0; error('无法创建逐点总结：%s', filename); end
@@ -155,6 +167,10 @@ function write_summary(filename, xsim_dir, result_table)
 end
 
 
+% 4）局部函数模块：plot_pointwise
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function plot_pointwise(filename, rtl_data, golden_data, error_data, table_data)
     color_blue = [0.20 0.39 0.63];
     color_purple = [0.28 0.15 0.49];
@@ -202,6 +218,10 @@ function plot_pointwise(filename, rtl_data, golden_data, error_data, table_data)
 end
 
 
+% 5）局部函数模块：plot_overlay
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function plot_overlay(tile_index, rtl, golden, title_text, ...
         color_rtl, color_golden, max_count)
     if nargin < 7

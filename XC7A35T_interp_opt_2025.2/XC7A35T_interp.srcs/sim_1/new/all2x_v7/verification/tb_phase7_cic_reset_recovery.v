@@ -16,10 +16,15 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-14
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-14：新增 CIC burst 中途复位恢复测试。
+//=============================================================
+//=============================================================
+// 1）模块名称：tb_phase7_cic_reset_recovery
+// 功能说明：仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module tb_phase7_cic_reset_recovery;
@@ -46,6 +51,7 @@ module tb_phase7_cic_reset_recovery;
     integer scenario_index;
     integer drive_index;
 
+    // 例化说明：调用 cic_interp16_core_ce CIC/补偿子模块，完成高倍率插值或通带下垂校正。
     cic_interp16_core_ce #(
         .DATA_W(20), .CIC_ORDER(3), .FINAL_PRUNE_LSB(0)
     ) u_dut (
@@ -56,6 +62,7 @@ module tb_phase7_cic_reset_recovery;
         .pending_dbg(dut_pending)
     );
 
+    // 例化说明：调用 cic_interp16_core_ce CIC/补偿子模块，完成高倍率插值或通带下垂校正。
     cic_interp16_core_ce #(
         .DATA_W(20), .CIC_ORDER(3), .FINAL_PRUNE_LSB(0)
     ) u_cold_reference (

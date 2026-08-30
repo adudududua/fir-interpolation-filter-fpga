@@ -1,3 +1,6 @@
+%% 1）主流程：v3_01_select_stage1_pareto
+% 功能说明：执行参数搜索和 Pareto 筛选，在满足指标的前提下降低字长或资源开销。
+
 clc; clear; close all;
 
 %=============================================================
@@ -208,6 +211,10 @@ close(fig);
 disp(selected_table);
 
 
+% 2）局部函数模块：apply_stage1_record
+
+
+% 功能说明：封装 apply_stage1_record 对应的局部计算，供主流程复用并保持代码层次清晰。
 function cfg = apply_stage1_record(base_config, record)
     cfg = base_config;
     coeff_int = record.coeff_int;
@@ -229,6 +236,10 @@ function cfg = apply_stage1_record(base_config, record)
 end
 
 
+% 3）局部函数模块：quick_response
+
+
+% 功能说明：计算局部幅频、相位、纹波或阻带指标，并返回结构化验收结果。
 function res = quick_response(h, Fs, f_pass_low, f_pass_high, ...
                               f_stop_begin, expected_gain, nfft)
     [H, f] = freqz(h, 1, nfft, Fs);

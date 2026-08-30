@@ -1,0 +1,6 @@
+TOP=cic_baseline_ooc_wrapper
+SLICE_LUTS=105
+FFS=119
+CARRY4=12
+DSP48E1=2
+RAMB18E1=0

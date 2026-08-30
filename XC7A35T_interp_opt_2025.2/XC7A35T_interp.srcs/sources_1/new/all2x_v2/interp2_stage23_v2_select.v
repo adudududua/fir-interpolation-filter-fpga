@@ -9,10 +9,15 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-11
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-11：新增 Stage 2/3 Phase 2 选择封装。
+//=============================================================
+//=============================================================
+// 1）模块名称：interp2_stage23_v2_select
+// 功能说明：第二、三级 2 倍插值滤波器：复用或折叠运算资源完成连续插值。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module interp2_stage23_v2_select #(
@@ -38,6 +43,7 @@ module interp2_stage23_v2_select #(
 
     generate
         if (USE_POLYPHASE != 0) begin : gen_polyphase
+            // 例化说明：调用 interp2_stage23_polyphase_ce 插值子模块，完成对应级的数据展开、滤波或模式选择。
             interp2_stage23_polyphase_ce #(
                 .STAGE_ID (STAGE_ID),
                 .DATA_W   (DATA_W),
@@ -59,6 +65,7 @@ module interp2_stage23_v2_select #(
             assign fir_in_valid_dbg = ce_out;
         end
         else begin : gen_stable
+            // 例化说明：调用 interp2_top_symm_ce_all2x 插值子模块，完成对应级的数据展开、滤波或模式选择。
             interp2_top_symm_ce_all2x #(
                 .STAGE_ID (STAGE_ID),
                 .DATA_W   (DATA_W),

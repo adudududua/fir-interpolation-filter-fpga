@@ -1,11 +1,36 @@
 `timescale 1ns / 1ps
 
-// Four-column, two-row national-finals keypad scanner.
+//=============================================================
+// 文件名       : matrix_keypad_mode_ctrl_ultracompact.v
+// 模块名       : matrix_keypad_mode_ctrl_ultracompact
+// 功能简述     : 全国赛板卡四列、两行有效按键的超紧凑扫描器。
+//                扫描过程中把按键编码为 {valid,family,mode}，其中
+//                family 选择 44.1/48 kHz，mode 选择 1x/4x/8x/128x。
 //
-// The selected key is encoded as {valid,family,mode} while a scan is in
-// progress.  A later row-0 hit replaces a row-1 hit, preserving the original
-// SW1..SW4 priority, while the first column found within a row is retained.
-// This replaces two independent found/mode contexts with one priority code.
+//                同一轮扫描若先发现 SW5～SW8、后发现 SW1～SW4，
+//                行 0 结果会覆盖行 1，以保持原板卡 SW1～SW4 的
+//                优先级；同一行只保留最先扫描到的列。模块还包含
+//                两级输入同步和按整轮扫描计数的消抖逻辑。
+//
+// 当前默认配置：
+//                  SCAN_DIV=20000
+//                  DEBOUNCE_SCANS=5
+//                  支持上层提供共享 scan_tick
+//
+// 设计作者     : kafeizizi
+// 创建日期     : 2026-07-18
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
+// 修订记录     :
+//                2026-07-18：合并双行扫描状态，形成优先级编码。
+//                2026-08-16：完善中文接口、消抖和优先级说明。
+//=============================================================
+//=============================================================
+// 1）模块名称：matrix_keypad_mode_ctrl_ultracompact
+// 功能说明：矩阵键盘控制器：完成行列扫描、消抖、按键译码与模式更新。
+// 工程版本：Vivado 2025.2。
+//=============================================================
+
 module matrix_keypad_mode_ctrl_ultracompact #(
     parameter integer SCAN_DIV = 20000,
     parameter integer DEBOUNCE_SCANS = 5,
@@ -57,10 +82,9 @@ module matrix_keypad_mode_ctrl_ultracompact #(
     wire scan_advance = (USE_EXTERNAL_SCAN_TICK != 0) ? scan_tick :
                         (scan_cnt == SCAN_DIV - 1);
 
-    // The signed-off DEBOUNCE_SCANS=5 profile needs six consecutive matching
-    // completed scans before committing a key.  A 3-bit Johnson sequence
-    // 000,001,011,111,110,100 reaches the same terminal point without a
-    // 3-bit incrementer.  Other parameter values retain the generic counter.
+    // 签核配置DEBOUNCE_SCANS=5要求连续6轮完整扫描结果一致才提交按键。
+    // 3位Johnson序列000→001→011→111→110→100无需3位加法器即可到终点；
+    // 若使用其它参数值，则自动保留通用二进制计数器分支。
     generate
         if (DEBOUNCE_SCANS == 5) begin : gen_johnson_debounce
             assign stable_next = {stable_cnt[1:0], ~stable_cnt[2]};

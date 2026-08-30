@@ -1,0 +1,8 @@
+{
+    "captured_utc":  "2026-08-03T15:08:03.8806547Z",
+    "branch":  "national-finals-p3l-safe-packedrom-395target",
+    "commit":  "70ad6e71ee929b2bb7124f2ae518d0f346cc6aa4",
+    "source_worktree_dirty":  false,
+    "source_status_porcelain":  "",
+    "status_porcelain_all":  "?? matlab_fir/national_finals/vivado_results/p3l_safe_packedrom_dac8mux/build_manifest.txt\n?? matlab_fir/national_finals/vivado_results/p3l_safe_packedrom_dac8mux/national_finals_dual_rate_4x8x128x_areaopt.bit\n?? matlab_fir/national_finals/vivado_results/p3l_safe_packedrom_dac8mux/source_state_at_build_start.json\n?? matlab_fir/national_finals/vivado_results/p3l_safe_packedrom_dac8mux/synthesis_sources.txt\n?? matlab_fir/national_finals/vivado_results/p3l_safe_packedrom_default/build_manifest.txt\n?? matlab_fir/national_finals/vivado_results/p3l_safe_packedrom_default/national_finals_dual_rate_4x8x128x_areaopt.bit\n?? matlab_fir/national_finals/vivado_results/p3l_safe_packedrom_default/source_state_at_build_start.json\n?? matlab_fir/national_finals/vivado_results/p3l_safe_packedrom_default/synthesis_sources.txt\n?? matlab_fir/national_finals/vivado_results/p3l_safe_packedrom_familyphase/source_state_at_build_start.json\n?? matlab_fir/national_finals/vivado_results/p3l_safe_packedrom_familyphase/synthesis_sources.txt"
+}

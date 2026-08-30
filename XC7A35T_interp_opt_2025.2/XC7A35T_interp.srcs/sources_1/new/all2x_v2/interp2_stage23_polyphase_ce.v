@@ -19,13 +19,18 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-11
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-11：新增 Stage 2/3 true-polyphase FIR 核。
 //=============================================================
 
 (* use_dsp = "no" *)
+//=============================================================
+// 1）模块名称：interp2_stage23_polyphase_ce
+// 功能说明：第二、三级 2 倍插值滤波器：复用或折叠运算资源完成连续插值。
+// 工程版本：Vivado 2025.2。
+//=============================================================
 module interp2_stage23_polyphase_ce #(
     parameter integer STAGE_ID = 3,
     parameter integer DATA_W   = 24,
@@ -155,6 +160,7 @@ module interp2_stage23_polyphase_ce #(
         end
     end
 
+    // 例化说明：调用 round_sat_q16_to24 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     round_sat_q16_to24 #(
         .IN_W   (ACC_W),
         .OUT_W  (DATA_W),

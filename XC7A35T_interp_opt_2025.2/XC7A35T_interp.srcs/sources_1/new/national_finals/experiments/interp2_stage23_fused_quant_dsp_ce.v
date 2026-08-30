@@ -1,6 +1,19 @@
 `timescale 1ns / 1ps
 
 //=============================================================
+// 文件名       : interp2_stage23_fused_quant_dsp_ce.v
+// 模块名       : interp2_stage23_fused_quant_dsp_ce
+// 功能简述     : 第二、三级 2 倍插值滤波器：复用或折叠运算资源完成连续插值。
+// 设计说明     : 本文件采用同步时序设计；复位、时钟使能、
+//                有效信号和定点位宽关系均在对应代码段说明。
+//                注释仅用于阐明实现，不参与综合结果。
+// 设计作者     : kafeizizi
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
+// 修订记录     : 2026-08-30：统一中文文件头、模块编号与结构说明。
+//=============================================================
+
+//=============================================================
 // 鏂囦欢鍚?      : interp2_stage23_lutram_cic_dsp_ce.v
 // 妯″潡鍚?      : interp2_stage23_lutram_cic_dsp_ce
 // 鍔熻兘绠€杩?    : Stage 2/3 鍏变韩 DSP 鐨勪綆 LUT true-polyphase FIR銆?
@@ -39,6 +52,11 @@
 //=============================================================
 
 `include "all2x_v2_coeff_pkg.vh"
+//=============================================================
+// 1）模块名称：interp2_stage23_fused_quant_dsp_ce
+// 功能说明：第二、三级 2 倍插值滤波器：复用或折叠运算资源完成连续插值。
+// 工程版本：Vivado 2025.2。
+//=============================================================
 
 module interp2_stage23_fused_quant_dsp_ce #(
     parameter integer DATA_W = 24,
@@ -427,6 +445,7 @@ module interp2_stage23_fused_quant_dsp_ce #(
 
     // 鏄惧紡浣跨敤涓€棰?DSP48E1锛岄伩鍏嶇患鍚堝櫒鎶婁箻娉曞拰绱姞鎷嗘垚澶氶 DSP銆?
     // MAC 鍛ㄦ湡鐢?M+P锛屾彁浜ゅ懆鏈熺敤 P+C 鍔犲叆绗﹀彿鐩稿叧鑸嶅叆鍋忕疆銆?
+    // 例化说明：调用 DSP48E1 算术原语，完成乘法、加减或累加；各控制字定义当前流水拍的运算功能。
     DSP48E1 #(
         .A_INPUT("DIRECT"),
         .B_INPUT("DIRECT"),
@@ -699,6 +718,7 @@ module interp2_stage23_fused_quant_dsp_ce #(
             assign stage3_mem_raw =
                 stage23_unified_bram_raw[STAGE3_INPUT_W-1:0];
 
+            // 例化说明：调用 nf_stage23_history_ramb18_sdp 全国赛签核子模块，完成正式数据通路中的存储、运算或控制任务。
             nf_stage23_history_ramb18_sdp #(
                 .DATA_W(HISTORY_DATA_W),
                 .ADDR_W(MEM_ADDR_W+1)

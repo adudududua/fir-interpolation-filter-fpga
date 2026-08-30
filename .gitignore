@@ -1,4 +1,27 @@
 #============================================================
+# Repository-root publication allowlist
+#============================================================
+
+# Keep local archives, submission material, backups and scratch folders on
+# disk, but publish only the user-selected project directories below.
+/*
+!/.gitignore
+!/.gitattributes
+!/README.md
+!/audio_data/
+!/images/
+!/matlab_fir/
+!/need/
+!/XC7A35T_interp_DSP3_LUT239_2025.2/
+!/XC7A35T_interp_LUTmin_df/
+!/XC7A35T_interp_LUTmin218_DSP4_2025.2/
+!/XC7A35T_interp_opt_2025.2/
+
+# Large MATLAB archive copies stay local; their extracted source trees are
+# already included by the allowlist and are the reproducible Git content.
+/matlab_fir/*.zip
+
+#============================================================
 # Vivado generated folders
 #============================================================
 
@@ -119,12 +142,15 @@ matlab_fir/alt_all2x_v7/verification/rtl_outputs/
 #============================================================
 
 /submit/
+/guide/
 
 #============================================================
 # Local preferences, backups, and review scratch data
 #============================================================
 
 /.matlab_prefs/
+/_matlab_pref_temp/
+/--out
 /matlab_fir_save/
 /tmp/
 matlab_fir/national_finals/_work/
@@ -182,6 +208,10 @@ matlab_fir/national_finals/**/_work/
 # The copied project contains legacy 2018.3 screenshots/reports and an old
 # bitstream. Keep the authoritative 2025.2 result set under tools instead.
 /XC7A35T_interp_opt_2025.2/reports_*/
+/XC7A35T_interp_DSP3_LUT239_2025.2/deliverables/
+/XC7A35T_interp_DSP3_LUT239_2025.2/reports_*/
+/XC7A35T_interp_LUTmin218_DSP4_2025.2/deliverables/
+/XC7A35T_interp_LUTmin218_DSP4_2025.2/reports_*/
 
 # National-finals P3 intermediate implementation experiments.  The selected
 # v5 signoff directory remains visible and is committed separately.

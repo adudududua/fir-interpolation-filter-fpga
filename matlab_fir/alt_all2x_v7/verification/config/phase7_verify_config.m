@@ -19,6 +19,10 @@ function CFG = phase7_verify_config(profile_name)
 % 修订记录     :
 %                2026-07-14：新增 Phase 7 补充验证集中配置。
 %=============================================================
+% 1）主函数模块：phase7_verify_config
+% 功能说明：集中定义并返回正式配置、定点字长、滤波系数或验证门槛。
+% 输入、输出、定点规则和结果文件由下方参数及代码段具体定义。
+
 
     if nargin < 1 || isempty(profile_name)
         profile_name = 'daily';

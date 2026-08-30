@@ -1,0 +1,18 @@
+正式配置名称：218-LUT / 4-DSP / 24-20-20 板测版本
+Vivado版本：2025.2
+目标器件：xc7a35tfgg484-2
+综合顶层：board_demo_competition_dac8_top
+核心顶层：interp128_all2x_v7_folded_fir_cic_top_ce
+定点字长：Stage1/Stage2/Stage3 = 24/20/20 bit
+CIC积分器DSP模式：CIC_INTEGRATOR_DSP_MODE=2
+完整系统资源：218 LUT / 365 FF / 4 DSP48E1 / 4 RAMB18E1 / 2 MMCM
+布局布线时序：WNS=+45.279 ns，WHS=+0.079 ns
+实板标签：nf-vivado2025.2-218lut-365ff-4dsp-2bram-24-20-20-board-pass
+
+板测位流：board_demo_competition_dac8_top_218lut_4dsp.bit
+板测位流SHA-256：1834675AB971FFA8BD6C03BF1B596D6F5D65C8A36A6B8D0182EEA6C5D408D110
+板测routed DCP：board_routed_218lut_4dsp.dcp
+板测routed DCP SHA-256：FC26756258EF14A60872D55CBDDAC928D536727937876788D180E2D3BE35A462
+
+带rebuild_20260811_231722后缀的文件属于同配置后续可复现构建，不冒充用户确认板测时使用的文件。
+

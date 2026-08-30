@@ -24,6 +24,10 @@ function result = phase7_analyze_cic_wrap()
 % 修订记录     :
 %                2026-07-14：新增逐级 wrap 与直流16相统计。
 %=============================================================
+% 1）主函数模块：phase7_analyze_cic_wrap
+% 功能说明：计算 CIC 插值器的幅频响应、通带下垂、镜像抑制和字长特性。
+% 输入、输出、定点规则和结果文件由下方参数及代码段具体定义。
+
 
     verify_dir = fileparts(mfilename('fullpath'));
     alt_dir = fileparts(verify_dir);

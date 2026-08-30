@@ -1,3 +1,6 @@
+%% 1）主流程：phase6_03_plot_resource_comparison
+% 功能说明：读取指标数据并生成带中文标注的报告或答辩展示图。
+
 clc; clear; close all;
 
 %=============================================================
@@ -76,6 +79,10 @@ exportgraphics(fig, output_path, 'Resolution', 180);
 fprintf('已导出：%s\n', output_path);
 
 
+% 2）局部函数模块：style_axes
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function style_axes(ax)
     set(ax, 'FontName', 'Microsoft YaHei', 'FontSize', 11, ...
         'FontWeight', 'bold', 'LineWidth', 1.2, ...
@@ -88,6 +95,10 @@ function style_axes(ax)
 end
 
 
+% 3）局部函数模块：add_bar_labels
+
+
+% 功能说明：封装 add_bar_labels 对应的局部计算，供主流程复用并保持代码层次清晰。
 function add_bar_labels(ax, bar_handle)
     for bar_idx = 1:numel(bar_handle)
         text(ax, bar_handle(bar_idx).XEndPoints, ...

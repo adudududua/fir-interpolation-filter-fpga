@@ -1,12 +1,16 @@
-# 全国总决赛：双采样率可配置插值滤波器
+# 🛠️ 全国总决赛双采样率可配置插值滤波器：MATLAB/RTL 技术档案
 
-## 技术报告补充实验（2026-08-12）
+本文件按时间记录 MATLAB 建模、RTL 演进、Vivado 实现、回归测试和历史 Pareto 结果。文中的
+“当前”“前一”等名称保留各实验发生时的版本语境；正式提交基准与板测状态以仓库根目录
+[`README.md`](../../README.md)为准。
 
-218-LUT、24/20/20 正式基线已按补充实验指导完成 E0～E3 核心数字域测试和 E4 归档复核：
+## 📊 技术报告补充实验（2026-08-12）
+
+218-LUT、24/20/20 实验基线已完成 E0～E3 核心数字域测试和 E4 归档复核：
 E1 固定模型/稳定 RTL 向量 6/6、0 LSB，新 RTL Smoke 17/17；E2 六工况最差通带绝对偏差
 0.007844 dB、最差阻带 72.355 dB，冲激对称误差 0 LSB、相位残差小于 `1e-13 rad`；
 E3 三频点×六工况 18/18，最差镜像抑制 74.546 dBc。E5/E6/E7/E9 和完整 E8 的未完成
-边界已在报告中明确保留。详见 [补充测试报告](../../submit/finally/reports/test_report.md)。
+边界已在本文件的验证记录中明确保留。
 
 ### 固定2 DSP / 4 RAMB18E1的LUT优化边界
 
@@ -398,7 +402,7 @@ USE_NATIONAL_FINALS_CIC_COMB_DSP   = 0
 
 本轮之前还实际实现了“Stage1/2/3 三段 FIR 共用一颗 DSP”的原型。总超周期估算曾给出 117/128 拍，但 XSim 和局部截止期复核表明 Stage1 必须在相邻 2x 相位之间的 64 拍内完成；同一窗口最低需要 `Stage1 27 + Stage2 19 + Stage3 26 = 72` 拍，确定超出 8 拍。该路线已作为 No-Go 保留在提交 `354b890`，不能作为板级候选；详情见 [共享 FIR MAC No-Go 记录](results/shared_fir_mac_v1_nogo.md)。
 
-## 1. 完成状态
+## ✅ 1. 完成状态
 
 - [x] 44.1 kHz / 48 kHz、signed 24 bit 输入数据通路
 - [x] 4x / 8x / 128x 三档正式输出
@@ -409,7 +413,7 @@ USE_NATIONAL_FINALS_CIC_COMB_DSP   = 0
 - [x] Vivado 2018.3 综合、布局布线、时序、DRC、功耗与 bitstream
 - [ ] 实物 FPGA 下载、DA_CLK 示波器测量和 DAC 频谱验收
 
-## 2. 低资源共享架构
+## 🧩 2. 低资源共享架构
 
 ```text
 24 bit PCM
@@ -488,7 +492,7 @@ Vivado routed checkpoint 的 DSP48 属性核查表明，新增状态实际进入
 
 本轮 9/9 RTL 回归、六工况 MATLAB 频响、完整实现、时序、DRC 与 bitstream 均通过。`ExploreArea` 可降到 177 Slice，但会增加到 468 LUT，因此最低 LUT 正式流程继续使用 `Default`。
 
-## 3. 正式 RTL 冲激指标
+## 📈 3. 正式 RTL 冲激指标
 
 以下数据直接来自 XSim 导出的最终 RTL 冲激响应，不是只分析浮点系数。
 
@@ -507,7 +511,7 @@ Vivado routed checkpoint 的 DSP48 属性核查表明，新增状态实际进入
 
 详细数值见 [nf_rtl_impulse_summary.txt](results/nf_rtl_impulse_summary.txt)。
 
-## 4. RTL 回归结果
+## 🧪 4. RTL 回归结果
 
 | 测试 | 覆盖内容 | 结果 |
 |---|---|---|
@@ -538,7 +542,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
 
 脚本每次使用新的 `matlab_fir/national_finals/_work/rtl_regression/<时间戳>` 空编译目录，任一 PASS 标志缺失或工具退出码非零都会终止。Vivado/XSim 的 `.Xil`、`xsim.dir`、journal 和 log 均留在 `_work` 内，不会写入项目根目录。
 
-## 5. Vivado 实现签核
+## ⚙️ 5. Vivado 实现签核
 
 器件：`XC7A35T-FGG484-2`，顶层：`board_demo_competition_dac8_top`。
 
@@ -681,7 +685,7 @@ vivado.bat -mode batch -source `
   -tclargs rebuild
 ```
 
-## 6. MATLAB 与 Vivado 复现
+## 🔁 6. MATLAB 与 Vivado 复现
 
 MATLAB：
 
@@ -704,14 +708,15 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
 
 包装脚本先执行 `AreaOptimized_high/full/on` 综合，再以低内存单进程完成布局布线、报告和 bitstream，默认实现指令为 `Default`。综合 DCP 旁保存配置指纹，实施阶段拒绝复用参数不一致的旧 DCP。最终目录为 `vivado_results/p3j_final_430lut_431ff_176slice_4dsp_2bram_reproducible`，P4-D、P4-C、P4-B、P4-A、P3、Route 1及此前回退结果仍保留。日志与 `.Xil` 均写入 `matlab_fir/national_finals/_work/<tool>/<时间戳>`，不会污染项目根目录。
 
-需要使用 Vivado GUI 时，不要从仓库根目录直接运行 `vivado.bat`，也不要依赖双击 `.xpr` 的当前工作目录。使用以下入口可把 GUI 的 `.Xil`、journal 和 log 隔离到 `national_finals/_work/vivado_gui/<时间戳>`：
+Vivado GUI 的隔离启动入口如下。该入口把 `.Xil`、journal 和 log 写入
+`national_finals/_work/vivado_gui/<时间戳>`，避免在仓库根目录生成临时文件：
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
   .\matlab_fir\national_finals\vivado\open_national_finals_gui_clean.ps1
 ```
 
-## 7. SW1～SW8 与预期 DA_CLK
+## 🎛️ 7. SW1～SW8 与预期 DA_CLK
 
 板载 15 kHz、0.5FS、signed 24 bit 测试音用于直观验收。1x 是保留的诊断档，正式赛题输出为 4x/8x/128x。
 
@@ -726,14 +731,16 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
 | SW7 | 48 kHz | 8x | 384,004.237 Hz |
 | SW8 | 48 kHz | 128x | 6,144,067.797 Hz |
 
-## 8. 实板验收清单
+## ✅ 8. 物理板验证项目与判据
 
-1. 用 Vivado Hardware Manager 下载上述 `.bit`，记录器件 ID、下载时间和 DONE 状态。
-2. 上电默认应为 44.1 kHz / 128x；确认 DAC 静态中点正常，无持续满量程。
-3. 依次按 SW2、SW3、SW4、SW6、SW7、SW8，用频率计或示波器测 `DA_CLK`，与上表比较；建议允许 ±0.02%。
-4. 在 44.1↔48 kHz 家族切换时同时观察 `DA_CLK` 和 DAC 输出。允许受控静音/复位窗口，不允许持续毛刺时钟、锁死或满量程直流。
-5. 用示波器确认 `dac_data` 在 `DA_CLK` 上升沿前稳定；当前 RTL 在音频主时钟下降沿更新 DAC 数据。
-6. 用频谱仪检查六个正式档均有约 15 kHz 主音；记录主音幅度、首镜像频带和噪声底。重点验证 128x 首镜像抑制不低于 70 dB。
-7. 每档至少切换 20 次并进行 10 分钟连续运行，检查无失锁、无异常啸叫、无输出冻结。
-8. 如需 ILA，优先观察 `family_active`、`rst_audio_n`、`mode_state`、`selected_valid`、`dac_clk`；ILA 会改变资源与布局，最终提交仍应使用无 ILA bitstream。
-9. 将六档 DA_CLK 实测值、频谱截图、板卡照片和供电电流回填到本文；全部满足后再把“实物 FPGA 验证”复选框改为 `[x]`。
+| 验证项目 | 方法与判据 |
+|---|---|
+| 配置下载 | Vivado Hardware Manager 下载正式 `.bit`；记录器件 ID、下载时间和 DONE 状态 |
+| 默认状态 | 上电进入 44.1 kHz / 128×；DAC 静态中点正常，无持续满量程 |
+| 六档采样率 | SW2、SW3、SW4、SW6、SW7、SW8 对应 `DA_CLK` 与理论值一致，测量容差为 ±0.02% |
+| 时钟族切换 | 44.1↔48 kHz 切换期间允许受控静音/复位窗口；无持续毛刺、锁死或满量程直流 |
+| DAC 建立时间 | `dac_data` 在 `DA_CLK` 上升沿前稳定；当前 RTL 在音频主时钟下降沿更新 DAC 数据 |
+| 频谱 | 六个正式档包含约 15 kHz 主音；记录主音幅度、首镜像频带和噪声底，128× 首镜像抑制不低于 70 dB |
+| 切档与稳定性 | 每档完成至少 20 次切换及 10 分钟连续运行；无失锁、异常啸叫或输出冻结 |
+| ILA 边界 | 调试节点为 `family_active`、`rst_audio_n`、`mode_state`、`selected_valid`、`dac_clk`；正式提交使用无 ILA bitstream |
+| 板测证据 | 六档 `DA_CLK` 实测值、频谱截图、板卡照片和供电电流共同构成物理板验证记录 |

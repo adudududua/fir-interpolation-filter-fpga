@@ -1,3 +1,6 @@
+%% 1）主流程：phase6_01_search_stage_data_wordlength
+% 功能说明：执行参数搜索和 Pareto 筛选，在满足指标的前提下降低字长或资源开销。
+
 clc; clear; close all;
 
 %=============================================================
@@ -245,6 +248,10 @@ else
 end
 
 
+% 2）局部函数模块：make_profile_list
+
+
+% 功能说明：封装 make_profile_list 对应的局部计算，供主流程复用并保持代码层次清晰。
 function profile_list = make_profile_list()
     stage2_list = [24 22];
     stage3_list = [24 22 20];
@@ -264,6 +271,10 @@ function profile_list = make_profile_list()
 end
 
 
+% 3）局部函数模块：simulate_wordlength_profile
+
+
+% 功能说明：封装 simulate_wordlength_profile 对应的局部计算，供主流程复用并保持代码层次清晰。
 function [y_24, chain_stat] = simulate_wordlength_profile( ...
         x, stage_config, width_profile, final_data_w)
     y = int64(x(:).');
@@ -299,6 +310,10 @@ function [y_24, chain_stat] = simulate_wordlength_profile( ...
 end
 
 
+% 4）局部函数模块：measure_output
+
+
+% 功能说明：封装 measure_output 对应的局部计算，供主流程复用并保持代码层次清晰。
 function metric = measure_output(candidate, reference, tone_hz, Fs)
     candidate = double(candidate(:));
     reference = double(reference(:));
@@ -338,6 +353,10 @@ function metric = measure_output(candidate, reference, tone_hz, Fs)
 end
 
 
+% 5）局部函数模块：measure_sinad_thd
+
+
+% 功能说明：封装 measure_sinad_thd 对应的局部计算，供主流程复用并保持代码层次清晰。
 function [sinad_db, thd_db] = measure_sinad_thd(y, tone_hz, Fs)
     y = double(y(:));
     sample_index = (0:numel(y)-1).';
@@ -369,6 +388,10 @@ function [sinad_db, thd_db] = measure_sinad_thd(y, tone_hz, Fs)
 end
 
 
+% 6）局部函数模块：history_bit_cost
+
+
+% 功能说明：封装 history_bit_cost 对应的局部计算，供主流程复用并保持代码层次清晰。
 function cost = history_bit_cost(width_profile)
     % Stage2/3 历史深度分别为 9/6，四个 canonical 级各 4 点。
     cost = 9*width_profile(2) + 6*width_profile(3) + ...
@@ -376,6 +399,10 @@ function cost = history_bit_cost(width_profile)
 end
 
 
+% 7）局部函数模块：empty_metric
+
+
+% 功能说明：计算局部幅频、相位、纹波或阻带指标，并返回结构化验收结果。
 function metric = empty_metric()
     metric.gain_error_db = 0;
     metric.delta_snr_db = inf;
@@ -384,6 +411,10 @@ function metric = empty_metric()
 end
 
 
+% 8）局部函数模块：make_sine
+
+
+% 功能说明：封装 make_sine 对应的局部计算，供主流程复用并保持代码层次清晰。
 function x = make_sine(freq_hz, dbfs, sample_count, Fs, data_w)
     amplitude = (2^(data_w-1)-1) * 10^(dbfs/20);
     n = 0:sample_count-1;

@@ -1,0 +1,70 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "DAC24 板级测量台（GUI）",
+      "type": "debugpy",
+      "request": "launch",
+      "python": "C:/Users/Lenovo/miniconda3/python.exe",
+      "program": "${workspaceFolder}/network_capture/host/gui_app.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/network_capture/host",
+      "justMyCode": true,
+      "env": {
+        "PYTHONFAULTHANDLER": "1"
+      }
+    },
+    {
+      "name": "板载 ROM 逐位比较（高级/旧流程）",
+      "type": "debugpy",
+      "request": "launch",
+      "python": "C:/Users/Lenovo/miniconda3/python.exe",
+      "program": "${workspaceFolder}/network_capture/host/dac24_capture.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "--bind",
+        "0.0.0.0",
+        "--port",
+        "4000",
+        "--timeout",
+        "300",
+        "--expected-family",
+        "44100",
+        "--expected-mode",
+        "128x",
+        "--reference",
+        "${workspaceFolder}/network_capture/results/rtl_reference_44100_128x.txt",
+        "--output",
+        "${workspaceFolder}/network_capture/results/board_capture"
+      ],
+      "justMyCode": true,
+      "env": {
+        "PYTHONFAULTHANDLER": "1"
+      }
+    },
+    {
+      "name": "仅接收 FPGA DAC24（不比较参考）",
+      "type": "debugpy",
+      "request": "launch",
+      "python": "C:/Users/Lenovo/miniconda3/python.exe",
+      "program": "${workspaceFolder}/network_capture/host/dac24_capture.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "--bind",
+        "0.0.0.0",
+        "--port",
+        "4000",
+        "--timeout",
+        "300",
+        "--output",
+        "${workspaceFolder}/network_capture/results/board_capture"
+      ],
+      "justMyCode": true,
+      "env": {
+        "PYTHONFAULTHANDLER": "1"
+      }
+    }
+  ]
+}

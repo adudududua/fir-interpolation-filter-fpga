@@ -17,10 +17,15 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-13
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-13：新增 Phase 7 低速补偿 FIR。
+//=============================================================
+//=============================================================
+// 1）模块名称：cic_compensation_fir_ce
+// 功能说明：CIC 幅频补偿滤波器：校正通带下垂并保持定点输出范围。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module cic_compensation_fir_ce #(
@@ -64,6 +69,7 @@ module cic_compensation_fir_ce #(
                           (acc_reg + product_ext);
     assign busy_dbg = job_active;
 
+    // 例化说明：调用 round_sat_shift_compact 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     round_sat_shift_compact #(
         .IN_W    (ACC_W),
         .OUT_W   (DATA_W),

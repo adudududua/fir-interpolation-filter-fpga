@@ -1,6 +1,16 @@
+%=============================================================
+% 文件名       : check_interp128_chain_common.m
+% 脚本名       : check_interp128_chain_common
+% 功能简述     : 构造完整插值链并计算关键频响、相位或定点误差指标。
+% 处理说明     : 本文件按“参数准备—核心计算—指标判定—结果导出”
+%                的顺序组织；各功能段和局部函数均有独立编号。
+% 开发工具     : MATLAB R2023a
+% 修订记录     : 2026-08-30：统一中文文件头、功能段编号和函数说明。
+%=============================================================
+
 clc; clear; close all;
 
-%% ============================================================
+%=============================================================
 %  check_interp128_chain_common.m
 %
 %  作用：
@@ -20,9 +30,9 @@ clc; clear; close all;
 %  说明：
 %  - 这里做的是“总系统指标验证”
 %  - 不是检查某一级单独 FIR，而是检查整条 128x 链路
-%% ============================================================
+%=============================================================
 
-%% 1) 基本参数
+%% 1）基本参数
 FRAC_W4 = 16;                    % 4x FIR 系数小数位数（Q16）
 FRAC_W2 = 12;                    % 2x FIR 系数小数位数（Q12）
 f_pass_low  = 10;                % 通带下限
@@ -55,7 +65,7 @@ axis_font_size = 11;
 label_font_size = 13;
 title_font_size = 12;
 
-%% 2) 读取 4x / 2x 系数
+%% 2）读取 4x / 2x 系数
 % ------------------------------------------------------------
 % 4x 公共 FIR：
 %   acc_opt/interp4_fixed155_sparse_coeff_decimal.txt
@@ -78,7 +88,7 @@ b2 = coeff2_int(:).' / 2^FRAC_W2;  % 2x FIR，转成行向量
 fprintf('4x FIR 长度 = %d tap\n', length(b4));
 fprintf('2x FIR 长度 = %d tap\n', length(b2));
 
-%% 3) 构造总 128x 链路冲激响应
+%% 3）构造总 128x 链路冲激响应
 % ------------------------------------------------------------
 % 当前已有：
 %   第1级：4x
@@ -114,7 +124,7 @@ for stage = 1:5
     fprintf('Stage %d : 再接 1 个 2x -> 总长度 = %d tap\n', stage+1, length(h_total));
 end
 
-%% 4) 先检查总冲激响应是否严格对称
+%% 4）先检查总冲激响应是否严格对称
 sym_err = max(abs(h_total - fliplr(h_total)));
 fprintf('\n总 128x 链路冲激响应长度 = %d tap\n', length(h_total));
 fprintf('总冲激响应最大对称误差   = %.12g\n', sym_err);
@@ -125,7 +135,7 @@ else
     fprintf('警告：总 128x 链路冲激响应不完全对称，请检查级联逻辑。\n');
 end
 
-%% 5) 检查两种最终模式
+%% 5）检查两种最终模式
 % ------------------------------------------------------------
 % 模式 A：
 %   44.1k -> 5.6448M
@@ -203,7 +213,7 @@ for i = 1:size(modes,1)
                          stop_attn_db, gd_mean, pass_ripple, pass_stop];
 end
 
-%% 6) 打印汇总表
+%% 6）打印汇总表
 fprintf('\n\n===================== 整体 128x 汇总结果 =====================\n');
 fprintf('   Fs_in        Fs_out        Ripple_pp      Ripple_±      StopAttn       GD_mean      Pass   Stop\n');
 
@@ -214,7 +224,7 @@ for i = 1:size(result_table,1)
 end
 fprintf('==============================================================\n');
 
-%% 7) 画两种最终模式下的总频响，并保存 PNG
+%% 7）画两种最终模式下的总频响，并保存 PNG
 for i = 1:size(modes,1)
     Fs_in  = modes(i,1);
     Fs_out = modes(i,2);
@@ -321,6 +331,10 @@ for i = 1:size(modes,1)
 end
 
 
+% 8）局部函数模块：set_mid_minor_ticks
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function set_mid_minor_ticks(ax)
     try
         ax.XMinorTick = 'on';
@@ -340,6 +354,10 @@ function set_mid_minor_ticks(ax)
 end
 
 
+% 9）局部函数模块：midpoint_ticks
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function ticks_minor = midpoint_ticks(ticks_major, axis_lim)
     ticks_major = ticks_major(:).';
     ticks_major = ticks_major(ticks_major >= axis_lim(1) & ticks_major <= axis_lim(2));

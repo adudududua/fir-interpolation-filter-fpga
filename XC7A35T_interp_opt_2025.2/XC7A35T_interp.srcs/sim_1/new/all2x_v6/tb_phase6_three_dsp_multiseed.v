@@ -21,10 +21,15 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-13
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-13：新增 Phase 6 三 DSP 多种子测试。
+//=============================================================
+//=============================================================
+// 1）模块名称：tb_phase6_three_dsp_multiseed
+// 功能说明：仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module tb_phase6_three_dsp_multiseed;
@@ -116,6 +121,7 @@ module tb_phase6_three_dsp_multiseed;
         end
     endfunction
 
+    // 例化说明：调用 interp128_all2x_v4_shared_dsp_top_ce 插值链顶层，完成所选倍率的数据率提升与有效信号传递。
     interp128_all2x_v4_shared_dsp_top_ce #(
         .STAGE23_ACC_W (40)
     ) u_reference (
@@ -133,6 +139,7 @@ module tb_phase6_three_dsp_multiseed;
         .dbg_y64(), .dbg_y64_valid()
     );
 
+    // 例化说明：调用 interp128_all2x_v6_three_dsp_top_ce 插值链顶层，完成所选倍率的数据率提升与有效信号传递。
     interp128_all2x_v6_three_dsp_top_ce #(
         .STAGE23_ACC_W (40)
     ) u_candidate (

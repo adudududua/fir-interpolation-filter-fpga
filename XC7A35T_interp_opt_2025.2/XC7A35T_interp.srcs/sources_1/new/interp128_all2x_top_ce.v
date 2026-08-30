@@ -28,12 +28,17 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-10
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-10：新增全 2x 结构 128 倍插值顶层模块。
 //                2026-07-10：同步含 2 倍插值增益的新系数参数，并按
 //                            bit-true 结果收紧系数与累加器位宽。
+//=============================================================
+//=============================================================
+// 1）模块名称：interp128_all2x_top_ce
+// 功能说明：128 倍插值顶层：级联多级 2 倍插值、CIC 与补偿级并管理模式旁路。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module interp128_all2x_top_ce #(
@@ -106,6 +111,7 @@ module interp128_all2x_top_ce #(
     //=========================================================
     // Stage 1: 44.1 kHz -> 88.2 kHz
     //=========================================================
+    // 例化说明：调用 interp2_top_symm_ce_all2x 插值子模块，完成对应级的数据展开、滤波或模式选择。
     interp2_top_symm_ce_all2x #(
         .STAGE_ID (1),
         .DATA_W   (DATA_W),
@@ -126,6 +132,7 @@ module interp128_all2x_top_ce #(
         .fir_in_valid_dbg ()
     );
 
+    // 例化说明：调用 bridge_to_interp2_ce 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     bridge_to_interp2_ce #(
         .DATA_W (24)
     ) u_bridge_2_to_4 (
@@ -141,6 +148,7 @@ module interp128_all2x_top_ce #(
     //=========================================================
     // Stage 2: 88.2 kHz -> 176.4 kHz
     //=========================================================
+    // 例化说明：调用 interp2_top_symm_ce_all2x 插值子模块，完成对应级的数据展开、滤波或模式选择。
     interp2_top_symm_ce_all2x #(
         .STAGE_ID (2),
         .DATA_W   (DATA_W),
@@ -161,6 +169,7 @@ module interp128_all2x_top_ce #(
         .fir_in_valid_dbg ()
     );
 
+    // 例化说明：调用 bridge_to_interp2_ce 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     bridge_to_interp2_ce #(
         .DATA_W (24)
     ) u_bridge_4_to_8 (
@@ -176,6 +185,7 @@ module interp128_all2x_top_ce #(
     //=========================================================
     // Stage 3: 176.4 kHz -> 352.8 kHz
     //=========================================================
+    // 例化说明：调用 interp2_top_symm_ce_all2x 插值子模块，完成对应级的数据展开、滤波或模式选择。
     interp2_top_symm_ce_all2x #(
         .STAGE_ID (3),
         .DATA_W   (DATA_W),
@@ -196,6 +206,7 @@ module interp128_all2x_top_ce #(
         .fir_in_valid_dbg ()
     );
 
+    // 例化说明：调用 bridge_to_interp2_ce 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     bridge_to_interp2_ce #(
         .DATA_W (24)
     ) u_bridge_8_to_16 (
@@ -211,6 +222,7 @@ module interp128_all2x_top_ce #(
     //=========================================================
     // Stage 4: 352.8 kHz -> 705.6 kHz
     //=========================================================
+    // 例化说明：调用 interp2_top_symm_ce_all2x 插值子模块，完成对应级的数据展开、滤波或模式选择。
     interp2_top_symm_ce_all2x #(
         .STAGE_ID (4),
         .DATA_W   (DATA_W),
@@ -231,6 +243,7 @@ module interp128_all2x_top_ce #(
         .fir_in_valid_dbg ()
     );
 
+    // 例化说明：调用 bridge_to_interp2_ce 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     bridge_to_interp2_ce #(
         .DATA_W (24)
     ) u_bridge_16_to_32 (
@@ -246,6 +259,7 @@ module interp128_all2x_top_ce #(
     //=========================================================
     // Stage 5: 705.6 kHz -> 1.4112 MHz
     //=========================================================
+    // 例化说明：调用 interp2_top_symm_ce_all2x 插值子模块，完成对应级的数据展开、滤波或模式选择。
     interp2_top_symm_ce_all2x #(
         .STAGE_ID (5),
         .DATA_W   (DATA_W),
@@ -266,6 +280,7 @@ module interp128_all2x_top_ce #(
         .fir_in_valid_dbg ()
     );
 
+    // 例化说明：调用 bridge_to_interp2_ce 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     bridge_to_interp2_ce #(
         .DATA_W (24)
     ) u_bridge_32_to_64 (
@@ -281,6 +296,7 @@ module interp128_all2x_top_ce #(
     //=========================================================
     // Stage 6: 1.4112 MHz -> 2.8224 MHz
     //=========================================================
+    // 例化说明：调用 interp2_top_symm_ce_all2x 插值子模块，完成对应级的数据展开、滤波或模式选择。
     interp2_top_symm_ce_all2x #(
         .STAGE_ID (6),
         .DATA_W   (DATA_W),
@@ -301,6 +317,7 @@ module interp128_all2x_top_ce #(
         .fir_in_valid_dbg ()
     );
 
+    // 例化说明：调用 bridge_to_interp2_ce 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     bridge_to_interp2_ce #(
         .DATA_W (24)
     ) u_bridge_64_to_128 (
@@ -316,6 +333,7 @@ module interp128_all2x_top_ce #(
     //=========================================================
     // Stage 7: 2.8224 MHz -> 5.6448 MHz
     //=========================================================
+    // 例化说明：调用 interp2_top_symm_ce_all2x 插值子模块，完成对应级的数据展开、滤波或模式选择。
     interp2_top_symm_ce_all2x #(
         .STAGE_ID (7),
         .DATA_W   (DATA_W),

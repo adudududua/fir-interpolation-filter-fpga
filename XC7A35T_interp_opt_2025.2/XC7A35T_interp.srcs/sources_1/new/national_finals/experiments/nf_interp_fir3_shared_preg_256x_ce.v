@@ -1,5 +1,18 @@
 `timescale 1ns / 1ps
 
+//=============================================================
+// 文件名       : nf_interp_fir3_shared_preg_256x_ce.v
+// 模块名       : nf_interp_fir3_shared_preg_256x_ce
+// 功能简述     : 三级共享 FIR 运算单元：复用 DSP 乘加通路完成插值滤波。
+// 设计说明     : 本文件采用同步时序设计；复位、时钟使能、
+//                有效信号和定点位宽关系均在对应代码段说明。
+//                注释仅用于阐明实现，不参与综合结果。
+// 设计作者     : kafeizizi
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
+// 修订记录     : 2026-08-30：统一中文文件头、模块编号与结构说明。
+//=============================================================
+
 // Isolated 256x shared-FIR redesign seed; not part of the formal project.
 //
 // One DSP48E1 multiplier is shared by Stage1, Stage2 and Stage3.  The running
@@ -12,6 +25,11 @@
 // This module is deliberately fixed to the verified national-finals word
 // lengths and flat Stage3 coefficients.  The original dual-DSP path remains
 // available in the parent top-level as the rollback implementation.
+//=============================================================
+// 1）模块名称：nf_interp_fir3_shared_preg_256x_ce
+// 功能说明：三级共享 FIR 运算单元：复用 DSP 乘加通路完成插值滤波。
+// 工程版本：Vivado 2025.2。
+//=============================================================
 module nf_interp_fir3_shared_preg_256x_ce (
     input  wire                         clk,
     input  wire                         rst_n,
@@ -163,6 +181,7 @@ module nf_interp_fir3_shared_preg_256x_ce (
     wire signed [21:0] short_history_sample;
     wire signed [15:0] short_coeff;
 
+    // 例化说明：调用 bridge_valid_quantized_to_interp2_ce 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     bridge_valid_quantized_to_interp2_ce #(
         .IN_W(24), .OUT_W(22), .SHIFT_N(2)
     ) u_bridge_s1_to_s2 (
@@ -172,6 +191,7 @@ module nf_interp_fir3_shared_preg_256x_ce (
         .out_data(y2_to_s2_data), .out_valid(y2_to_s2_valid)
     );
 
+    // 例化说明：调用 bridge_valid_quantized_to_interp2_ce 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     bridge_valid_quantized_to_interp2_ce #(
         .IN_W(22), .OUT_W(20), .SHIFT_N(2)
     ) u_bridge_s2_to_s3 (
@@ -379,6 +399,7 @@ module nf_interp_fir3_shared_preg_256x_ce (
                  (s1_mask_b ? s1_read_b : 24'sd0)});
     assign s1_coeff_addr = s1_read_index;
 
+    // 例化说明：调用 nf_unified_fir_coeff_bram 全国赛签核子模块，完成正式数据通路中的存储、运算或控制任务。
     nf_unified_fir_coeff_bram u_shared_coeff_bram (
         .clk(clk),
         .stage1_addr(s1_coeff_addr),
@@ -394,6 +415,7 @@ module nf_interp_fir3_shared_preg_256x_ce (
         {{2{short_coeff[15]}}, short_coeff} :
         {{2{s1_coeff_data[15]}}, s1_coeff_data};
 
+    // 例化说明：调用 DSP48E1 算术原语，完成乘法、加减或累加；各控制字定义当前流水拍的运算功能。
     DSP48E1 #(
         .A_INPUT("DIRECT"),
         .B_INPUT("DIRECT"),

@@ -23,8 +23,8 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-13
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-13：新增 Stage3 折叠补偿 FIR-CIC 顶层。
 //                2026-07-18：CIC 宽位加减法改用 DSP48 优先映射候选。
@@ -33,6 +33,11 @@
 //                2026-07-18：增加 Stage 2/3 BRAM 历史缓存候选参数。
 //                2026-07-18：增加 CIC burst 计数器 DSP/LUT 选择参数。
 //                2026-07-18：增加 Stage2/3 交叉系数 BRAM 打包参数。
+//=============================================================
+//=============================================================
+// 1）模块名称：interp128_all2x_v7_folded_fir_cic_top_ce
+// 功能说明：128 倍插值顶层：级联多级 2 倍插值、CIC 与补偿级并管理模式旁路。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module interp128_all2x_v7_folded_fir_cic_top_ce #(
@@ -121,6 +126,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     generate
         if (USE_UNIFIED_FIR_COEFF_BRAM != 0) begin :
                 gen_unified_fir_coeff_bram
+            // 例化说明：调用 nf_unified_fir_coeff_bram 全国赛签核子模块，完成正式数据通路中的存储、运算或控制任务。
             nf_unified_fir_coeff_bram u_nf_unified_fir_coeff_bram (
                 .clk(clk),
                 .stage1_addr(stage1_coeff_addr_w),
@@ -137,6 +143,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
 
     generate
         if (USE_SINGLE_BRAM_STAGE1 != 0) begin : gen_single_bram_stage1
+            // 例化说明：调用 interp2_stage1_single_bram_serial_ce 插值子模块，完成对应级的数据展开、滤波或模式选择。
             interp2_stage1_single_bram_serial_ce #(
                 .DATA_W(24),
                 .ACC_W(STAGE1_ACC_W),
@@ -152,6 +159,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
             );
         end
         else begin : gen_dual_bram_stage1
+            // 例化说明：调用 interp2_stage1_strict_halfband_bram_ce 插值子模块，完成对应级的数据展开、滤波或模式选择。
             interp2_stage1_strict_halfband_bram_ce #(
                 .DATA_W(24),
                 .ACC_W(STAGE1_ACC_W),
@@ -168,6 +176,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
         end
     endgenerate
 
+    // 例化说明：调用 bridge_valid_quantized_to_interp2_ce 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     bridge_valid_quantized_to_interp2_ce #(
         .IN_W(24), .OUT_W(STAGE2_DATA_W),
         .SHIFT_N(24-STAGE2_DATA_W),
@@ -180,6 +189,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
         .out_data(y2_to_4_data), .out_valid(y2_to_4_valid)
     );
 
+    // 例化说明：调用 bridge_valid_quantized_to_interp2_ce 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     bridge_valid_quantized_to_interp2_ce #(
         .IN_W(STAGE2_DATA_W), .OUT_W(20),
         .SHIFT_N(STAGE2_DATA_W-20),
@@ -194,6 +204,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
 
     generate
         if (USE_LUTRAM_STAGE23 != 0) begin : gen_lutram_stage23
+            // 例化说明：调用 interp2_stage23_lutram_cic_dsp_ce 插值子模块，完成对应级的数据展开、滤波或模式选择。
             interp2_stage23_lutram_cic_dsp_ce #(
                 .DATA_W(24),
                 .STAGE2_DATA_W(STAGE2_DATA_W),
@@ -236,6 +247,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
         end
         else begin : gen_register_stage23
             assign stage23_coeff_addr_w = 6'd0;
+            // 例化说明：调用 interp2_stage23_folded_cic_dsp_ce 插值子模块，完成对应级的数据展开、滤波或模式选择。
             interp2_stage23_folded_cic_dsp_ce #(
                 .DATA_W(24),
                 .STAGE2_DATA_W(STAGE2_DATA_W),
@@ -272,6 +284,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
         end
         else if (USE_CIC3_SHIFTADD_COMPENSATOR != 0) begin :
                 gen_cic3_shiftadd_compensator
+            // 例化说明：调用 cic3_compensator_shiftadd_ce 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
             cic3_compensator_shiftadd_ce #(
                 .DATA_W(20),
                 .OUTPUT_W(21),
@@ -294,6 +307,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
 
     generate
         if (USE_N3_HOLD_EQUIV != 0) begin : gen_serial_cic_comb
+            // 例化说明：调用 cic_interp16_n3_hold2_dsp_ce CIC/补偿子模块，完成高倍率插值或通带下垂校正。
             cic_interp16_n3_hold2_dsp_ce #(
                 .DATA_W          (21),
                 .OUTPUT_W        (20),
@@ -314,6 +328,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
             );
         end
         else if (USE_SERIAL_CIC_COMB != 0) begin : gen_serial_cic_comb_legacy
+            // 例化说明：调用 cic_interp16_serial_comb_dsp_ce CIC/补偿子模块，完成高倍率插值或通带下垂校正。
             cic_interp16_serial_comb_dsp_ce #(
                 .DATA_W          (21),
                 .OUTPUT_W        (20),
@@ -334,6 +349,7 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
             );
         end
         else begin : gen_parallel_cic_comb
+            // 例化说明：调用 cic_interp16_core_dsp_ce CIC/补偿子模块，完成高倍率插值或通带下垂校正。
             cic_interp16_core_dsp_ce #(
                 .DATA_W          (21),
                 .OUTPUT_W        (20),
@@ -360,10 +376,9 @@ module interp128_all2x_v7_folded_fir_cic_top_ce #(
     assign dbg_y2_valid = y2_valid_w;
     assign dbg_y4 = {y4_w, {(24-STAGE2_DATA_W){1'b0}}};
     assign dbg_y4_valid = y4_valid_w;
-    // P3-J keeps a signed-21 Stage3 result for the compensated 128x path,
-    // but the visible 8x node retains the original saturating signed-20 PCM
-    // format.  Saturate the one extra bit here; direct truncation would turn
-    // a positive near-full-scale sample into a negative output.
+    // P3-J为补偿128x路径保留有符号21位Stage3结果，但可见8x节点仍采用
+    // 原有饱和有符号20位PCM格式。这里对多出的1位做饱和；若直接截断，
+    // 接近正满量程的样本可能翻转为负输出。
     assign y8_extended_w =
         {{(21-STAGE3_RESULT_W){y8_w[STAGE3_RESULT_W-1]}}, y8_w};
     assign y8_debug_overflow_w =

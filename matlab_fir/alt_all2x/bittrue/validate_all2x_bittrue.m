@@ -31,7 +31,7 @@ clc; clear; close all;
 %                2026-07-10：新增全 2x bit-true 综合测试脚本。
 %=============================================================
 
-%% 1) 路径与配置
+%% 1）路径与配置
 %=============================================================
 
 script_dir = fileparts(mfilename('fullpath'));
@@ -65,7 +65,7 @@ fprintf('全 2x 级联 128 倍插值 bit-true 验证开始\n');
 fprintf('总等效冲激响应长度 = %d tap\n', total_taps);
 fprintf('====================================================\n\n');
 
-%% 2) 构造测试集合
+%% 2）构造测试集合
 %=============================================================
 
 test_case = make_case('impulse_2p22', 'impulse', ...
@@ -112,7 +112,7 @@ alternating_x = repmat([int64(2^23 - 1) int64(-2^23)], 1, 512);
 test_case(case_idx) = make_case('fullscale_alternating', 'limit', ...
     alternating_x, 0, 2^23, 0);
 
-%% 3) 逐项运行 bit-true 验证
+%% 3）逐项运行 bit-true 验证
 %=============================================================
 
 test_result = struct([]);
@@ -180,7 +180,7 @@ for idx = 1:numel(test_case)
              overflow_count, sat_count, pass_case);
 end
 
-%% 4) 导出结果
+%% 4）导出结果
 %=============================================================
 
 export_test_result(result_csv_path, test_result);
@@ -236,9 +236,11 @@ if ~pass_all
 end
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：构造通用测试项
 % ============================================================
+% 5）局部函数模块：make_case
+% 功能说明：封装 make_case 对应的局部计算，供主流程复用并保持代码层次清晰。
 function tc = make_case(name, kind, x, freq_hz, expected_amp, gain_tolerance_db)
     tc.name = name;
     tc.kind = kind;
@@ -249,9 +251,11 @@ function tc = make_case(name, kind, x, freq_hz, expected_amp, gain_tolerance_db)
 end
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：构造正弦测试项
 % ============================================================
+% 6）局部函数模块：make_sine_case
+% 功能说明：封装 make_sine_case 对应的局部计算，供主流程复用并保持代码层次清晰。
 function tc = make_sine_case(name, freq_hz, dbfs, sample_count, Fs, data_w, tolerance_db)
     full_scale = 2^(data_w - 1) - 1;
     amplitude = round(full_scale * 10^(dbfs / 20));
@@ -268,9 +272,11 @@ function tc = make_sine_case(name, freq_hz, dbfs, sample_count, Fs, data_w, tole
 end
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：分析稳态幅度与拟合 SNR
 % ============================================================
+% 7）局部函数模块：analyze_case
+% 功能说明：计算局部幅频、相位、纹波或阻带指标，并返回结构化验收结果。
 function metric = analyze_case(tc, y, Fs_out, total_taps)
     metric.gain_error_db = NaN;
     metric.snr_db = NaN;
@@ -303,9 +309,11 @@ function metric = analyze_case(tc, y, Fs_out, total_taps)
 end
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：直接插零参考模型
 % ============================================================
+% 8）局部函数模块：simulate_direct_insert_zero
+% 功能说明：封装 simulate_direct_insert_zero 对应的局部计算，供主流程复用并保持代码层次清晰。
 function y = simulate_direct_insert_zero(x, stage_config)
     y = int64(x(:).');
 
@@ -324,9 +332,11 @@ function y = simulate_direct_insert_zero(x, stage_config)
 end
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：导出 RTL 逐级配置
 % ============================================================
+% 9）局部函数模块：export_stage_config
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function export_stage_config(filename, stage_config)
     fid = fopen(filename, 'w');
     fprintf(fid, ['STAGE,FS_IN,FS_OUT,TAPS,COEFF_W_DESIGN,COEFF_W_MIN,' ...
@@ -348,9 +358,11 @@ function export_stage_config(filename, stage_config)
 end
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：导出测试结果 CSV
 % ============================================================
+% 10）局部函数模块：export_test_result
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function export_test_result(filename, test_result)
     fid = fopen(filename, 'w');
     fprintf(fid, ['NAME,KIND,INPUT_PEAK,OUTPUT_PEAK,GAIN_ERROR_DB,SNR_DB,' ...

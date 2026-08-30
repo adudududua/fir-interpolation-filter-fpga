@@ -9,8 +9,8 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-06-20
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-06-20：恢复原已验证的双频率家族时钟结构。
 //                2026-06-20：去掉外部 rst_n 端口，改为内部上电复位。
@@ -35,6 +35,11 @@
 //                1. SW1/SW2/SW3/SW4：1x/4x/8x/128x。
 //                2. SW5/SW6/SW7/SW8：重复映射 1x/4x/8x/128x。
 //=============================================================
+//=============================================================
+// 1）模块名称：board_demo_competition_dac8_top
+// 功能说明：板级演示顶层：连接时钟、按键、插值滤波链与 DAC 输出接口。
+// 工程版本：Vivado 2025.2。
+//=============================================================
 
 module board_demo_competition_dac8_top #(
     parameter integer USE_PHASE7_LUTRAM_STAGE23 = 1,
@@ -49,8 +54,8 @@ module board_demo_competition_dac8_top #(
     parameter integer USE_PHASE8_PACKED_BRAM_STAGE23 = 0,
     parameter integer USE_PHASE7_CIC_BURST_COUNTER_DSP = 0,
     parameter integer USE_NATIONAL_FINALS_DATAPATH = 1,
-    // The board GUI default must match the signed-off national-finals build.
-    // Legacy/regional wrappers continue to select their own parameter values.
+    // 板级GUI的默认结构必须与全国赛签核配置一致；历史或区域赛包装层
+    // 仍可通过自身参数选择其它候选结构，不影响本顶层的正式发布默认值。
     parameter integer USE_NATIONAL_FINALS_SERIAL_CIC_COMB = 1,
     parameter integer USE_NATIONAL_FINALS_N3_HOLD_EQUIV = 1,
     parameter integer USE_NATIONAL_FINALS_CIC_COMB_DSP = 0,
@@ -85,11 +90,13 @@ module board_demo_competition_dac8_top #(
     wire clk_ibuf;
     wire clk_sys_bufg;
 
+    // 例化说明：调用输入缓冲原语，把板级引脚信号可靠接入 FPGA 内部逻辑。
     IBUF u_ibuf_sys_clk (
         .I(clk),
         .O(clk_ibuf)
     );
 
+    // 例化说明：调用全局时钟缓冲原语，把选定时钟接入 FPGA 低偏斜全局时钟网络。
     BUFG u_bufg_sys_clk (
         .I(clk_ibuf),
         .O(clk_sys_bufg)
@@ -157,6 +164,7 @@ module board_demo_competition_dac8_top #(
     generate
         if (USE_COMPACT_KEYPAD != 0) begin : gen_compact_keypad
             if (USE_ULTRACOMPACT_KEYPAD != 0) begin : gen_ultracompact
+                // 例化说明：调用 matrix_keypad_mode_ctrl_ultracompact 键盘控制模块，完成扫描、消抖、译码和模式更新。
                 matrix_keypad_mode_ctrl_ultracompact #(
                     .SCAN_DIV               (COMPACT_KEYPAD_SCAN_DIV),
                     .USE_EXTERNAL_SCAN_TICK (USE_SHARED_KEYPAD_SCAN_TICK)
@@ -171,6 +179,7 @@ module board_demo_competition_dac8_top #(
                 );
             end
             else begin : gen_original_compact
+                // 例化说明：调用 matrix_keypad_mode_ctrl_compact 键盘控制模块，完成扫描、消抖、译码和模式更新。
                 matrix_keypad_mode_ctrl_compact #(
                     .SCAN_DIV               (COMPACT_KEYPAD_SCAN_DIV),
                     .USE_EXTERNAL_SCAN_TICK (USE_SHARED_KEYPAD_SCAN_TICK)
@@ -189,6 +198,7 @@ module board_demo_competition_dac8_top #(
             assign key_code_unused = 4'd0;
         end
         else begin : gen_full_keypad
+            // 例化说明：调用 matrix_keypad_mode_ctrl 键盘控制模块，完成扫描、消抖、译码和模式更新。
             matrix_keypad_mode_ctrl u_matrix_keypad_mode_ctrl (
                 .clk          (clk_sys_bufg),
                 .rst_n        (rst_n_int),
@@ -214,13 +224,11 @@ module board_demo_competition_dac8_top #(
     // 家族改变时先把音频数据通路保持复位，再切 BUFGMUX_CTRL，
     // 最后在新时钟域同步释放复位，防止跨采样率遗留滤波状态。
     //=========================================================
-    // The signed-off build already keeps pwr_rst_cnt free-running for the
-    // compact-keypad scan tick. Reuse its low ten bits as the 1024-cycle
-    // family-switch timebase instead of building a second wide counter.
-    // State 1 commits the new family on the next tick; states 2..4 keep the
-    // datapath muted/reset for exactly 3072 clocks after the clock switch.
-    // The non-shared parameter path retains an independent guard counter so
-    // legacy configurations where pwr_rst_cnt saturates remain functional.
+    // 签核构建已让pwr_rst_cnt自由运行，以提供紧凑键盘扫描节拍；这里复用
+    // 其低10位形成1024周期的采样率家族切换时基，避免再建一个宽计数器。
+    // 状态1在下一节拍提交新家族，状态2～4在切钟后准确保持复位/静音
+    // 3072个时钟。非共享参数分支仍保留独立保护计数器，使pwr_rst_cnt
+    // 饱和停止的历史配置仍然可用。
     wire       family_switch_busy;
     wire       family_active;
     wire       clk_audio_128x;
@@ -230,10 +238,9 @@ module board_demo_competition_dac8_top #(
 
     generate
         if (USE_SHARED_KEYPAD_SCAN_TICK != 0) begin : gen_shared_family_guard
-            // One-hot shift state replaces the former 3-bit incrementer plus
-            // state==1/state==4 comparisons.  The first tick commits the new
-            // family; three more ticks retain reset/mute before returning
-            // idle.  This trades one FF for a smaller control cone.
+        // 独热移位状态替代原3位加法器及state==1/state==4比较。首个节拍
+        // 提交新家族，之后3个节拍继续保持复位/静音，再返回空闲；多用1个
+        // FF换取更小的控制组合锥和更明确的时序行为。
             reg [3:0] family_switch_state = 4'd0;
             reg       family_active_r = 1'b0;
             wire      family_switch_tick;
@@ -294,6 +301,7 @@ module board_demo_competition_dac8_top #(
         end
     endgenerate
 
+    // 例化说明：调用 dual_family_audio_clock 双采样率族模块，完成时钟或测试数据的族别选择。
     dual_family_audio_clock u_dual_family_audio_clock (
         .clk_20m(clk_sys_bufg),
         .reset(~rst_n_int),
@@ -338,9 +346,8 @@ module board_demo_competition_dac8_top #(
         rst_audio_sync <= {rst_audio_sync[1:0], rst_request_sync[1]};
     end
 
-    // Keep the asynchronous assertion confined to the synchronizer above.
-    // This extra register changes only on an audio clock edge, so every
-    // FIR/CIC/DSP/BRAM control observes a purely synchronous reset source.
+    // 将异步断言限制在上方复位同步器内部；本级寄存器仅在音频时钟沿变化，
+    // 因而所有FIR/CIC/DSP/BRAM控制看到的都是纯同步复位源。
     reg rst_audio_datapath_n = 1'b0;
 
     always @(posedge clk_audio_128x) begin
@@ -364,6 +371,7 @@ module board_demo_competition_dac8_top #(
     wire       mode_audio_mute;
     wire       mode_ctrl_busy_unused;
 
+    // 例化说明：调用 nf_mode_cdc_handshake 全国赛签核子模块，完成正式数据通路中的存储、运算或控制任务。
     nf_mode_cdc_handshake u_nf_mode_cdc_handshake (
         .ctrl_clk    (clk_sys_bufg),
         .ctrl_rst_n  (rst_n_int),
@@ -378,10 +386,9 @@ module board_demo_competition_dac8_top #(
     (* ASYNC_REG = "TRUE" *) reg family_audio_meta = 1'b0;
     (* ASYNC_REG = "TRUE" *) reg family_audio_sync = 1'b0;
 
-    // Track the selected family while the datapath is held in reset.  The
-    // dual-rate ROM samples this value in its reset branch to choose address
-    // 0 (44.1 kHz) or 147 (48 kHz), so clearing this synchronizer with the
-    // datapath reset would make the first 48 kHz sample come from address 0.
+    // 数据通路处于复位时仍持续跟踪所选采样率家族。双速率ROM在复位分支
+    // 采样该值，以选择地址0（44.1 kHz）或147（48 kHz）；若该同步器也随
+    // 数据通路复位清零，48 kHz模式的首个样本就会错误地来自地址0。
     always @(posedge clk_audio_128x) begin
         family_audio_meta <= family_active;
         family_audio_sync <= family_audio_meta;
@@ -392,6 +399,7 @@ module board_demo_competition_dac8_top #(
     //=========================================================
     wire [1:0] mode_led_unused;
 
+    // 例化说明：调用 demo_interp_dac8_audio_pcm_common 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     demo_interp_dac8_audio_pcm_common #(
         .USE_PHASE7_FOLDED(1),
         .USE_PHASE7_LUTRAM_STAGE23(USE_PHASE7_LUTRAM_STAGE23),
@@ -459,6 +467,11 @@ endmodule
 //   SW8 = KC1 + KR3：44.1kHz，128x
 //
 // family_sel 为兼容原接口保留，当前板级顶层不再使用。
+//=============================================================
+//=============================================================
+// 2）模块名称：matrix_keypad_mode_ctrl
+// 功能说明：矩阵键盘控制器：完成行列扫描、消抖、按键译码与模式更新。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 module matrix_keypad_mode_ctrl #(
     parameter integer SCAN_DIV       = 20000,  // 20MHz 下每个 KR 扫描约 1ms

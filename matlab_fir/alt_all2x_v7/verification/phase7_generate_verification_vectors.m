@@ -22,6 +22,10 @@ function phase7_generate_verification_vectors(profile_name)
 % 修订记录     :
 %                2026-07-14：新增 Phase 7 补充验证向量生成器。
 %=============================================================
+% 1）主函数模块：phase7_generate_verification_vectors
+% 功能说明：运行规定工况的自动验证，汇总误差并给出通过或失败结论。
+% 输入、输出、定点规则和结果文件由下方参数及代码段具体定义。
+
 
     if nargin < 1 || isempty(profile_name)
         profile_name = 'daily';
@@ -100,6 +104,10 @@ function phase7_generate_verification_vectors(profile_name)
 end
 
 
+% 2）局部函数模块：write_case
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_case(vector_dir, case_name, result, data_w)
     write_signed_hex_mem(fullfile(vector_dir, ...
         [case_name '_input_24bit.mem']), result.input, data_w);
@@ -112,6 +120,10 @@ function write_case(vector_dir, case_name, result, data_w)
 end
 
 
+% 3）局部函数模块：total_saturation
+
+
+% 功能说明：执行与 RTL 一致的定点量化、舍入、移位和饱和处理。
 function count = total_saturation(result)
     count = result.stat.stage1.output_sat_count + ...
         result.stat.bridge1.output_sat_count + ...
@@ -122,6 +134,10 @@ function count = total_saturation(result)
 end
 
 
+% 4）局部函数模块：make_cic_directed_input
+
+
+% 功能说明：检查目标目录是否存在，并在缺失时创建，保证后续文件导出路径有效。
 function x = make_cic_directed_input(CFG)
     max_value = int64(2^(CFG.CIC_INPUT_W-1)-1);
     min_value = int64(-2^(CFG.CIC_INPUT_W-1));
@@ -137,6 +153,10 @@ function x = make_cic_directed_input(CFG)
 end
 
 
+% 5）局部函数模块：write_signed_hex_mem
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_signed_hex_mem(filename, data, data_w)
     digits = ceil(data_w/4);
     unsigned_data = mod(double(int64(data(:))), 2^data_w);
@@ -152,6 +172,10 @@ function write_signed_hex_mem(filename, data, data_w)
 end
 
 
+% 6）局部函数模块：write_generation_summary
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_generation_summary(filename, CFG, manifest, stat, trace)
     fid = fopen(filename, 'w');
     if fid < 0

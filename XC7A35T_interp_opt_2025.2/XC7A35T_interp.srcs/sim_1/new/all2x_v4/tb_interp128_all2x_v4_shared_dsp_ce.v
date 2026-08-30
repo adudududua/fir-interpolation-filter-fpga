@@ -17,10 +17,15 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-12
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-12：新增 V3/V4 分级并行回归测试平台。
+//=============================================================
+//=============================================================
+// 1）模块名称：tb_interp128_all2x_v4_shared_dsp_ce
+// 功能说明：仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module tb_interp128_all2x_v4_shared_dsp_ce;
@@ -94,6 +99,7 @@ module tb_interp128_all2x_v4_shared_dsp_ce;
     integer count_v4_rnd_s3;
     integer count_v4_rnd_full;
 
+    // 例化说明：调用 interp128_all2x_v3_strict_s1_bram_top_ce 插值链顶层，完成所选倍率的数据率提升与有效信号传递。
     interp128_all2x_v3_strict_s1_bram_top_ce u_v3_impulse (
         .clk(clk), .rst_n(rst_n),
         .ce2_out(ce2_out), .ce4_out(ce4_out), .ce8_out(ce8_out),
@@ -108,6 +114,7 @@ module tb_interp128_all2x_v4_shared_dsp_ce;
         .dbg_y64(), .dbg_y64_valid()
     );
 
+    // 例化说明：调用 interp128_all2x_v4_shared_dsp_top_ce 插值链顶层，完成所选倍率的数据率提升与有效信号传递。
     interp128_all2x_v4_shared_dsp_top_ce u_v4_impulse (
         .clk(clk), .rst_n(rst_n),
         .ce2_out(ce2_out), .ce4_out(ce4_out), .ce8_out(ce8_out),
@@ -122,6 +129,7 @@ module tb_interp128_all2x_v4_shared_dsp_ce;
         .dbg_y64(), .dbg_y64_valid()
     );
 
+    // 例化说明：调用 interp128_all2x_v3_strict_s1_bram_top_ce 插值链顶层，完成所选倍率的数据率提升与有效信号传递。
     interp128_all2x_v3_strict_s1_bram_top_ce u_v3_random (
         .clk(clk), .rst_n(rst_n),
         .ce2_out(ce2_out), .ce4_out(ce4_out), .ce8_out(ce8_out),
@@ -136,6 +144,7 @@ module tb_interp128_all2x_v4_shared_dsp_ce;
         .dbg_y64(), .dbg_y64_valid()
     );
 
+    // 例化说明：调用 interp128_all2x_v4_shared_dsp_top_ce 插值链顶层，完成所选倍率的数据率提升与有效信号传递。
     interp128_all2x_v4_shared_dsp_top_ce u_v4_random (
         .clk(clk), .rst_n(rst_n),
         .ce2_out(ce2_out), .ce4_out(ce4_out), .ce8_out(ce8_out),

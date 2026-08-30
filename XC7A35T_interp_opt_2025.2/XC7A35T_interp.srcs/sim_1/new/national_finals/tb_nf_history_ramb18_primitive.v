@@ -1,8 +1,26 @@
 `timescale 1ns / 1ps
 
+//=============================================================
+// 文件名       : tb_nf_history_ramb18_primitive.v
+// 模块名       : tb_nf_history_ramb18_primitive
+// 功能简述     : 仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 设计说明     : 本文件采用同步时序设计；复位、时钟使能、
+//                有效信号和定点位宽关系均在对应代码段说明。
+//                注释仅用于阐明实现，不参与综合结果。
+// 设计作者     : kafeizizi
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
+// 修订记录     : 2026-08-30：统一中文文件头、模块编号与结构说明。
+//=============================================================
+
 // Directly compares the two explicit RAMB18E1 history wrappers against their
 // behavioral models.  The test does not define SYNTHESIS globally: only the
 // candidate instances select the primitive branch.
+//=============================================================
+// 1）模块名称：tb_nf_history_ramb18_primitive
+// 功能说明：仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 工程版本：Vivado 2025.2。
+//=============================================================
 module tb_nf_history_ramb18_primitive;
     reg clk = 1'b0;
 
@@ -31,6 +49,7 @@ module tb_nf_history_ramb18_primitive;
 
     always #5 clk = ~clk;
 
+    // 例化说明：调用 nf_stage1_history_ramb18_sdp 全国赛签核子模块，完成正式数据通路中的存储、运算或控制任务。
     nf_stage1_history_ramb18_sdp #(
         .SIM_USE_PRIMITIVE(0)
     ) u_s1_behavioral (
@@ -42,6 +61,7 @@ module tb_nf_history_ramb18_primitive;
         .write_data(s1_write_data)
     );
 
+    // 例化说明：调用 nf_stage1_history_ramb18_sdp 全国赛签核子模块，完成正式数据通路中的存储、运算或控制任务。
     nf_stage1_history_ramb18_sdp #(
         .SIM_USE_PRIMITIVE(1)
     ) u_s1_primitive (
@@ -53,6 +73,7 @@ module tb_nf_history_ramb18_primitive;
         .write_data(s1_write_data)
     );
 
+    // 例化说明：调用 nf_stage23_history_ramb18_sdp 全国赛签核子模块，完成正式数据通路中的存储、运算或控制任务。
     nf_stage23_history_ramb18_sdp #(
         .SIM_USE_PRIMITIVE(0)
     ) u_s23_behavioral (
@@ -64,6 +85,7 @@ module tb_nf_history_ramb18_primitive;
         .write_data(s23_write_data)
     );
 
+    // 例化说明：调用 nf_stage23_history_ramb18_sdp 全国赛签核子模块，完成正式数据通路中的存储、运算或控制任务。
     nf_stage23_history_ramb18_sdp #(
         .SIM_USE_PRIMITIVE(1)
     ) u_s23_primitive (

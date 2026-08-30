@@ -1,3 +1,6 @@
+%% 1）主流程：v3_05_compare_stage1_bram_rtl
+% 功能说明：在相同输入下对齐 MATLAB 黄金模型与 RTL 输出，执行逐样本 bit-true 判定。
+
 clc; clear;
 
 %=============================================================
@@ -92,6 +95,10 @@ end
 fprintf('V3 Stage 1 BRAM 冲激与随机 PCM 对拍均为 0 LSB。\n');
 
 
+% 2）局部函数模块：compare_one
+
+
+% 功能说明：对齐参考数据与待测数据，计算逐样本误差并形成一致性判定。
 function result = compare_one(rtl_y, golden_y)
     rtl_first = find(rtl_y ~= 0, 1, 'first');
     golden_first = find(golden_y ~= 0, 1, 'first');
@@ -132,6 +139,10 @@ function result = compare_one(rtl_y, golden_y)
 end
 
 
+% 3）局部函数模块：read_signed_hex_mem
+
+
+% 功能说明：读取外部配置、RTL结果或数据文件，并转换为主流程使用的统一数据格式。
 function data = read_signed_hex_mem(filename, data_w)
     fid = fopen(filename, 'r');
     raw = textscan(fid, '%s');

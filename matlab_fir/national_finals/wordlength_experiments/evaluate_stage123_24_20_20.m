@@ -1,5 +1,18 @@
+%=============================================================
+% 文件名       : evaluate_stage123_24_20_20.m
+% 脚本名       : evaluate_stage123_24_20_20
+% 功能简述     : 完成本文件对应的 MATLAB 建模、计算分析、结果验证或文件导出任务。
+% 处理说明     : 本文件按“参数准备—核心计算—指标判定—结果导出”
+%                的顺序组织；各功能段和局部函数均有独立编号。
+% 开发工具     : MATLAB R2023a
+% 修订记录     : 2026-08-30：统一中文文件头、功能段编号和函数说明。
+%=============================================================
+
 % Evaluate the aggressive Stage1/Stage2/Stage3 = 24/20/20 candidate.
 % Reports are written only below national_finals/_work.
+
+%% 1）主流程：evaluate_stage123_24_20_20
+% 功能说明：完成本文件对应的 MATLAB 建模、计算分析、结果验证或文件导出任务。
 
 clearvars;
 clc;
@@ -184,6 +197,10 @@ fprintf('STAGE123_24_20_20_PASS: frequency 6/6, directed %d/%d.\n', ...
     nnz(case_table.PASS), height(case_table));
 
 
+% 2）局部函数模块：compare_vectors
+
+
+% 功能说明：对齐参考数据与待测数据，计算逐样本误差并形成一致性判定。
 function [snr_db, peak_delta] = compare_vectors(candidate, baseline)
     count = min(numel(candidate), numel(baseline));
     candidate = double(candidate(1:count));
@@ -202,6 +219,10 @@ function [snr_db, peak_delta] = compare_vectors(candidate, baseline)
 end
 
 
+% 3）局部函数模块：count_acc_overflow
+
+
+% 功能说明：封装 count_acc_overflow 对应的局部计算，供主流程复用并保持代码层次清晰。
 function count = count_acc_overflow(stat)
     count = stat.stage1.acc_overflow_count + ...
         stat.stage2.acc_overflow_count + ...
@@ -210,6 +231,10 @@ function count = count_acc_overflow(stat)
 end
 
 
+% 4）局部函数模块：count_saturation
+
+
+% 功能说明：执行与 RTL 一致的定点量化、舍入、移位和饱和处理。
 function count = count_saturation(stat)
     count = stat.stage1.output_sat_count + ...
         stat.bridge1.output_sat_count + ...
@@ -221,6 +246,10 @@ function count = count_saturation(stat)
 end
 
 
+% 5）局部函数模块：make_tone
+
+
+% 功能说明：封装 make_tone 对应的局部计算，供主流程复用并保持代码层次清晰。
 function x = make_tone(frequency_hz, level_dbfs, sample_count, fs_in)
     amplitude = (2^23-1)*10^(level_dbfs/20);
     n = 0:sample_count-1;
@@ -228,6 +257,10 @@ function x = make_tone(frequency_hz, level_dbfs, sample_count, fs_in)
 end
 
 
+% 6）局部函数模块：analyze_node
+
+
+% 功能说明：计算局部幅频、相位、纹波或阻带指标，并返回结构化验收结果。
 function metric = analyze_node(y, fs_out, fs_in, pass_low, pass_high, ...
         nfft, expected_dc_sum)
     y = y(:).';

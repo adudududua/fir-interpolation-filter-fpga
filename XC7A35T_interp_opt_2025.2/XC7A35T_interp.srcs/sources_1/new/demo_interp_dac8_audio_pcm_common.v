@@ -16,8 +16,8 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-06-20
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-06-21：新增音频 PCM 输入版本。
 //                2026-07-10：替换为 7 级全 2x 插值链路，新增
@@ -38,6 +38,11 @@
 //                            默认关闭，不改变稳定板级版本。
 //                2026-07-18：增加 CIC burst 计数器 DSP/LUT 选择参数。
 //                2026-07-18：增加 Stage2/3 交叉系数 BRAM 打包参数。
+//=============================================================
+//=============================================================
+// 1）模块名称：demo_interp_dac8_audio_pcm_common
+// 功能说明：板级数据通路：完成音频样本选择、插值模式控制及 DAC 数据格式转换。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module demo_interp_dac8_audio_pcm_common #(
@@ -146,11 +151,9 @@ module demo_interp_dac8_audio_pcm_common #(
             ce_cnt <= ce_cnt + 7'd1;
     end
 
-    // The national-finals path uses an ODDR and receives an atomic audio_mode
-    // while force_mute is asserted. Commit on the following falling edge so
-    // mode_state is settled before mute can be released at the next rising
-    // edge. The legacy combinational clock mux keeps its all-dividers-low
-    // switching rule.
+    // 全国赛路径使用ODDR，并在force_mute有效期间接收原子audio_mode；
+    // 下一下降沿提交mode_state，使其在随后上升沿解除静音前已稳定。
+    // 历史组合时钟MUX分支仍保持“所有分频输出均为低时才切换”的规则。
     always @(negedge clk_audio_128x) begin
         if (!rst_n)
             mode_state <= MODE_128X;
@@ -174,6 +177,7 @@ module demo_interp_dac8_audio_pcm_common #(
     generate
         if (USE_NATIONAL_FINALS_DATAPATH != 0) begin :
                 gen_dual_rate_test_tone
+            // 例化说明：调用 dual_rate_test_tone_rom_source 双采样率族模块，完成时钟或测试数据的族别选择。
             dual_rate_test_tone_rom_source #(
                 .MEM_FILE("nf_sine_15k_dual_rate_packed32_256.mem")
             ) u_dual_rate_test_tone_rom_source (
@@ -187,6 +191,7 @@ module demo_interp_dac8_audio_pcm_common #(
             );
         end
         else begin : gen_regional_test_tone
+            // 例化说明：调用 audio_pcm_rom_source 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
             audio_pcm_rom_source #(
                 .DATA_W   (24),
                 .ADDR_W   (8),
@@ -218,12 +223,10 @@ module demo_interp_dac8_audio_pcm_common #(
     wire               x_in_valid;
 
     assign x_in = audio_sample_w;
-    // In the national-finals path the ROM and every downstream history port
-    // are synchronously reset to zero. The first post-reset CE therefore
-    // accepts the same zero sample whether valid rises one clock later or is
-    // tied high. Making that signed-off invariant explicit lets Vivado remove
-    // the 24-bit input-zeroing mux in front of the Stage1 RAM. Keep the legacy
-    // one-cycle valid behavior for the regional fallback.
+    // 全国赛路径中，ROM及所有下游历史端口均同步复位为0，因此复位后首个CE
+    // 无论valid晚1拍拉高还是固定为高，接收的都是同一个零样本。显式利用
+    // 这一签核不变量，可让Vivado删除Stage1 RAM前24位输入清零MUX；区域赛
+    // 兼容分支仍保留原来延迟1拍的valid行为。
     assign x_in_valid = (USE_NATIONAL_FINALS_DATAPATH != 0) ?
                         1'b1 : x_in_valid_legacy;
 
@@ -265,6 +268,7 @@ module demo_interp_dac8_audio_pcm_common #(
 
     generate
         if (USE_PHASE7_FOLDED != 0) begin : gen_phase7_folded
+            // 例化说明：调用 interp128_all2x_v7_folded_fir_cic_top_ce 插值链顶层，完成所选倍率的数据率提升与有效信号传递。
             interp128_all2x_v7_folded_fir_cic_top_ce #(
                 .STAGE1_ACC_W(
                     (USE_NATIONAL_FINALS_DATAPATH != 0) ? 41 : 42),
@@ -324,6 +328,7 @@ module demo_interp_dac8_audio_pcm_common #(
             );
         end
         else begin : gen_phase6_fallback
+            // 例化说明：调用 interp128_all2x_v6_mixed_width_top_ce 插值链顶层，完成所选倍率的数据率提升与有效信号传递。
             interp128_all2x_v6_mixed_width_top_ce #(
                 .STAGE23_ACC_W (38)
             ) u_interp128_all2x_v6_mixed_width_top_ce (
@@ -439,9 +444,8 @@ module demo_interp_dac8_audio_pcm_common #(
     always @(negedge clk_audio_128x) begin
         if (!rst_n)
             dac_data_r <= 8'd128;
-        // In the ODDR path the atomic mode is committed on the intervening
-        // falling edge, before force_mute can deassert. The mismatch term is
-        // retained only for the legacy combinational clock-mux fallback.
+    // ODDR路径在force_mute可能解除前的中间下降沿提交原子模式；模式不一致
+    // 条件仅为历史组合时钟MUX兼容分支保留。
         else if (force_mute ||
                  ((USE_NATIONAL_FINALS_DATAPATH == 0) &&
                   (mode_state != mode_request)))
@@ -463,9 +467,8 @@ module demo_interp_dac8_audio_pcm_common #(
 
     generate
         if (USE_NATIONAL_FINALS_DATAPATH != 0) begin : gen_dac_clock_oddr
-            // SAME_EDGE captures both values on the 128x rising edge. Low-rate
-            // modes repeat the next divider value across both half cycles;
-            // 128x mode emits the canonical 1/0 forwarded-clock pattern.
+    // SAME_EDGE在128x上升沿同时锁存两相数据。低倍率模式在两个半周期重复
+    // 下一分频值；128x模式输出标准的1/0转发时钟模式。
             ODDR #(
                 .DDR_CLK_EDGE("SAME_EDGE"),
                 .INIT(1'b0),

@@ -13,6 +13,16 @@
 //                Clock Wizard 保存配置的约 +162 ppm 明显更准确。
 //                两路输出只消耗 MMCM/BUFG 时钟专用资源，不复制
 //                FIR、DSP 或数据 BRAM。
+// 设计作者     : kafeizizi
+// 创建日期     : 2026-08-16
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
+// 修订记录     : V2025.2 统一文件头并补充双采样率时钟配置说明。
+//=============================================================
+//=============================================================
+// 1）模块名称：dual_family_audio_clock
+// 功能说明：双采样率族时钟模块：在 44.1 kHz 与 48 kHz 时钟族之间安全切换。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module dual_family_audio_clock (
@@ -62,6 +72,7 @@ module dual_family_audio_clock (
     wire psdone_44k1_unused;
     wire psdone_48k_unused;
 
+    // 例化说明：调用 7 系列 MMCM 原语，完成音频采样率族所需的时钟合成和锁定检测。
     MMCME2_ADV #(
         .BANDWIDTH("OPTIMIZED"),
         .CLKOUT4_CASCADE("FALSE"),
@@ -112,6 +123,7 @@ module dual_family_audio_clock (
         .RST(reset)
     );
 
+    // 例化说明：调用 7 系列 MMCM 原语，完成音频采样率族所需的时钟合成和锁定检测。
     MMCME2_ADV #(
         .BANDWIDTH("OPTIMIZED"),
         .CLKOUT4_CASCADE("FALSE"),

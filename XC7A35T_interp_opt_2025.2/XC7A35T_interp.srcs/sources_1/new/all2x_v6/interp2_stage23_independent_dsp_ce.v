@@ -21,10 +21,15 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-13
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-13：新增 Phase 6 三 DSP Pareto 独立 MAC 核。
+//=============================================================
+//=============================================================
+// 1）模块名称：interp2_stage23_independent_dsp_ce
+// 功能说明：第二、三级 2 倍插值滤波器：复用或折叠运算资源完成连续插值。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module interp2_stage23_independent_dsp_ce #(
@@ -87,6 +92,7 @@ module interp2_stage23_independent_dsp_ce #(
     assign mac_busy_dbg = mac_active;
     assign mac_index_dbg = mac_index;
 
+    // 例化说明：调用 round_sat_q15_compact_to24 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     round_sat_q15_compact_to24 #(
         .IN_W  (ACC_W),
         .OUT_W (DATA_W)

@@ -1,3 +1,6 @@
+%% 1）主流程：phase8_02_optimize_cic2_halfband
+% 功能说明：执行参数搜索和 Pareto 筛选，在满足指标的前提下降低字长或资源开销。
+
 clc; clear; close all;
 
 %=============================================================
@@ -287,6 +290,10 @@ fprintf(['Phase 8 二阶 CIC 联合优化：%s\n' ...
     selected.metric.sym_err);
 
 
+% 2）局部函数模块：build_halfband7
+
+
+% 功能说明：封装 build_halfband7 对应的局部计算，供主流程复用并保持代码层次清晰。
 function h = build_halfband7(a_int, frac_w)
     scale = 2^frac_w;
     b_int = scale/2-a_int;
@@ -294,6 +301,10 @@ function h = build_halfband7(a_int, frac_w)
 end
 
 
+% 3）局部函数模块：build_common_response
+
+
+% 功能说明：计算局部幅频、相位、纹波或阻带指标，并返回结构化验收结果。
 function H = build_common_response(h_pre2, h_stage3, h_cic, ...
         frequency, fs_pre2, fs_stage3, fs_out)
     H_pre2 = response_at_frequency(h_pre2, frequency, fs_pre2);
@@ -303,6 +314,10 @@ function H = build_common_response(h_pre2, h_stage3, h_cic, ...
 end
 
 
+% 4）局部函数模块：tail_normalized_magnitude
+
+
+% 功能说明：封装 tail_normalized_magnitude 对应的局部计算，供主流程复用并保持代码层次清晰。
 function magnitude = tail_normalized_magnitude(h_hb4, h_hb5, h_cic, ...
         frequency, fs_hb4, fs_hb5, fs_out)
     H = response_at_frequency(h_hb4, frequency, fs_hb4).* ...
@@ -312,6 +327,10 @@ function magnitude = tail_normalized_magnitude(h_hb4, h_hb5, h_cic, ...
 end
 
 
+% 5）局部函数模块：response_at_frequency
+
+
+% 功能说明：计算局部幅频、相位、纹波或阻带指标，并返回结构化验收结果。
 function H = response_at_frequency(h, frequency, sample_rate)
     omega = 2*pi*frequency(:)/sample_rate;
     sample_index = 0:numel(h)-1;
@@ -319,6 +338,10 @@ function H = response_at_frequency(h, frequency, sample_rate)
 end
 
 
+% 6）局部函数模块：append_interp2_stage
+
+
+% 功能说明：封装 append_interp2_stage 对应的局部计算，供主流程复用并保持代码层次清晰。
 function h_total = append_interp2_stage(h_previous, h_stage)
     h_up = zeros(1, 2*numel(h_previous)-1);
     h_up(1:2:end) = h_previous;
@@ -326,6 +349,10 @@ function h_total = append_interp2_stage(h_previous, h_stage)
 end
 
 
+% 7）局部函数模块：design_folded_stage3
+
+
+% 功能说明：封装 design_folded_stage3 对应的局部计算，供主流程复用并保持代码层次清晰。
 function h = design_folded_stage3(tap_count, sample_rate, pass_edge, ...
         stop_edge, desired_fun, stop_weight)
     half_order = (tap_count-1)/2;
@@ -364,6 +391,10 @@ function h = design_folded_stage3(tap_count, sample_rate, pass_edge, ...
 end
 
 
+% 8）局部函数模块：anonymous_function_block
+
+
+% 功能说明：封装 anonymous_function_block 对应的局部计算，供主流程复用并保持代码层次清晰。
 function [coeff_int, h_quantized, fit_ok, required_w] = ...
         quantize_folded_stage3(h_float, frac_w, coeff_w)
     scale = int64(2^frac_w);
@@ -378,6 +409,10 @@ function [coeff_int, h_quantized, fit_ok, required_w] = ...
 end
 
 
+% 9）局部函数模块：write_summary
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_summary(filename, baseline_row, selected)
     fid = fopen(filename, 'w');
     if fid < 0
@@ -411,6 +446,10 @@ function write_summary(filename, baseline_row, selected)
 end
 
 
+% 10）局部函数模块：plot_response
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function plot_response(filename, metric, pass_edge, stop_edge)
     fig = figure('Color', 'w', 'Position', [100 100 1100 720]);
     color_main = [43 91 152]/255;

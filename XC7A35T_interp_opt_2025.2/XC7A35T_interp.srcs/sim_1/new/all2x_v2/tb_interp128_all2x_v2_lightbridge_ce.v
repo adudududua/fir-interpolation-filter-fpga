@@ -11,10 +11,15 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-11
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-11：新增 Phase 2 轻量桥接对拍平台。
+//=============================================================
+//=============================================================
+// 1）模块名称：tb_interp128_all2x_v2_lightbridge_ce
+// 功能说明：仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module tb_interp128_all2x_v2_lightbridge_ce;
@@ -44,6 +49,7 @@ module tb_interp128_all2x_v2_lightbridge_ce;
     integer valid_count;
     integer init_idx;
 
+    // 例化说明：调用 interp128_all2x_v2_lightbridge_top_ce 插值链顶层，完成所选倍率的数据率提升与有效信号传递。
     interp128_all2x_v2_lightbridge_top_ce #(
         .DATA_W                       (24),
         .FIRST_CANONICAL_STAGE        (4),

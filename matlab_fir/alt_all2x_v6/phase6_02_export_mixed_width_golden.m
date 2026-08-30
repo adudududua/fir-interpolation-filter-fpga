@@ -1,3 +1,6 @@
+%% 1）主流程：phase6_02_export_mixed_width_golden
+% 功能说明：生成 RTL/XSim 使用的输入激励、黄金输出和配套元数据文件。
+
 clc; clear;
 
 %=============================================================
@@ -107,6 +110,10 @@ fclose(fid);
 fprintf('Phase 6 混合字长冲激/随机 golden 已导出。\n');
 
 
+% 2）局部函数模块：simulate_profile_with_stages
+
+
+% 功能说明：封装 simulate_profile_with_stages 对应的局部计算，供主流程复用并保持代码层次清晰。
 function [stage_output_24, chain_stat] = simulate_profile_with_stages( ...
         x, stage_config, width_profile, final_data_w)
     y = int64(x(:).');
@@ -140,6 +147,10 @@ function [stage_output_24, chain_stat] = simulate_profile_with_stages( ...
 end
 
 
+% 3）局部函数模块：read_signed_hex_mem
+
+
+% 功能说明：读取外部配置、RTL结果或数据文件，并转换为主流程使用的统一数据格式。
 function data = read_signed_hex_mem(filename, data_w)
     fid = fopen(filename, 'r');
     if fid < 0
@@ -155,6 +166,10 @@ function data = read_signed_hex_mem(filename, data_w)
 end
 
 
+% 4）局部函数模块：write_signed_hex_mem
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_signed_hex_mem(filename, data, data_w)
     digits = ceil(data_w/4);
     unsigned_data = mod(double(int64(data(:))), 2^data_w);

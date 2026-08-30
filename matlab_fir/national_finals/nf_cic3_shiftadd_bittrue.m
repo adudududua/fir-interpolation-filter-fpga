@@ -1,4 +1,18 @@
 function [y, stat] = nf_cic3_shiftadd_bittrue(x, input_w, output_w)
+%=============================================================
+% 文件名       : nf_cic3_shiftadd_bittrue.m
+% 函数名       : nf_cic3_shiftadd_bittrue
+% 功能简述     : 建立三抽头移位加法 CIC 均衡器的逐位一致模型，并统计内部峰值与饱和次数。
+% 处理说明     : 本文件按“参数准备—核心计算—指标判定—结果导出”
+%                的顺序组织；各功能段和局部函数均有独立编号。
+% 开发工具     : MATLAB R2023a
+% 修订记录     : 2026-08-30：统一中文文件头、功能段编号和函数说明。
+%=============================================================
+% 1）主函数模块：nf_cic3_shiftadd_bittrue
+% 功能说明：建立三抽头移位加法 CIC 均衡器的逐位一致模型，并统计内部峰值与饱和次数。
+% 输入、输出、定点规则和结果文件由下方参数及代码段具体定义。
+
+
 %NF_CIC3_SHIFTADD_BITTRUE Bit-true model of the signed-off 3-tap equalizer.
 %   The signed input is not pre-clipped.  The internal expression is kept
 %   at input_w+3 bits and the output is saturated only at output_w.

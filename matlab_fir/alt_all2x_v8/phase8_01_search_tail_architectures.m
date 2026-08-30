@@ -1,3 +1,6 @@
+%% 1）主流程：phase8_01_search_tail_architectures
+% 功能说明：执行参数搜索和 Pareto 筛选，在满足指标的前提下降低字长或资源开销。
+
 clc; clear; close all;
 
 %=============================================================
@@ -270,6 +273,10 @@ disp(near_miss_table(:, {'ARCH', 'SEQUENCE', 'CIC_ORDER', ...
     'TOTAL_DSP_DEDICATED', 'PASS_ABS_MAX_DB', 'STOP_ATTN_DB'}));
 
 
+% 2）局部函数模块：anonymous_function_block
+
+
+% 功能说明：封装 anonymous_function_block 对应的局部计算，供主流程复用并保持代码层次清晰。
 function [h_tail, rate_total, hb_nonzero_half] = ...
         build_tail_ir(sequence, cic_order, best_config)
     token_list = split(string(sequence), '-');
@@ -300,6 +307,10 @@ function [h_tail, rate_total, hb_nonzero_half] = ...
 end
 
 
+% 3）局部函数模块：append_interp2_stage
+
+
+% 功能说明：封装 append_interp2_stage 对应的局部计算，供主流程复用并保持代码层次清晰。
 function h_total = append_interp2_stage(h_previous, h_stage)
     h_up = zeros(1, 2*numel(h_previous)-1);
     h_up(1:2:end) = h_previous;
@@ -307,6 +318,10 @@ function h_total = append_interp2_stage(h_previous, h_stage)
 end
 
 
+% 4）局部函数模块：design_folded_stage3
+
+
+% 功能说明：封装 design_folded_stage3 对应的局部计算，供主流程复用并保持代码层次清晰。
 function h = design_folded_stage3(tap_count, sample_rate, pass_edge, ...
         stop_edge, desired_fun, stop_weight)
     half_order = (tap_count-1)/2;
@@ -345,6 +360,10 @@ function h = design_folded_stage3(tap_count, sample_rate, pass_edge, ...
 end
 
 
+% 5）局部函数模块：anonymous_function_block
+
+
+% 功能说明：封装 anonymous_function_block 对应的局部计算，供主流程复用并保持代码层次清晰。
 function [coeff_int, h_quantized, fit_ok, required_w] = ...
         quantize_folded_stage3(h_float, frac_w, coeff_w)
     scale = int64(2^frac_w);
@@ -360,6 +379,10 @@ function [coeff_int, h_quantized, fit_ok, required_w] = ...
 end
 
 
+% 6）局部函数模块：write_summary
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_summary(filename, selected_table, near_miss_table)
     fid = fopen(filename, 'w');
     if fid < 0
@@ -407,6 +430,10 @@ function write_summary(filename, selected_table, near_miss_table)
 end
 
 
+% 7）局部函数模块：plot_result
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function plot_result(filename, selected_table)
     fig = figure('Color', 'w', 'Position', [100 100 1100 650]);
     ax = axes(fig);

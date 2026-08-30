@@ -1,7 +1,25 @@
 `timescale 1ns / 1ps
 
+//=============================================================
+// 文件名       : tb_stage1_single_bram_equiv.v
+// 模块名       : tb_stage1_single_bram_equiv
+// 功能简述     : 仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 设计说明     : 本文件采用同步时序设计；复位、时钟使能、
+//                有效信号和定点位宽关系均在对应代码段说明。
+//                注释仅用于阐明实现，不参与综合结果。
+// 设计作者     : kafeizizi
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
+// 修订记录     : 2026-08-30：统一中文文件头、模块编号与结构说明。
+//=============================================================
+
 // Direct bit-for-bit comparison between the signed-off dual-read Stage1 and
 // the P4-B single-RAMB18 serialized-read candidate.
+//=============================================================
+// 1）模块名称：tb_stage1_single_bram_equiv
+// 功能说明：仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 工程版本：Vivado 2025.2。
+//=============================================================
 module tb_stage1_single_bram_equiv;
     localparam integer TARGET_INPUTS = 640;
 
@@ -21,6 +39,7 @@ module tb_stage1_single_bram_equiv;
     wire signed [23:0] candidate_y;
     wire candidate_valid;
 
+    // 例化说明：调用 interp2_stage1_strict_halfband_bram_ce 插值子模块，完成对应级的数据展开、滤波或模式选择。
     interp2_stage1_strict_halfband_bram_ce #(
         .ACC_W(41)
     ) u_reference (
@@ -31,6 +50,7 @@ module tb_stage1_single_bram_equiv;
         .external_coeff_addr(), .external_coeff_data(16'sd0)
     );
 
+    // 例化说明：调用 interp2_stage1_single_bram_serial_ce 插值子模块，完成对应级的数据展开、滤波或模式选择。
     interp2_stage1_single_bram_serial_ce #(
         .ACC_W(41),
         .USE_DSP48_PREADDER(1)

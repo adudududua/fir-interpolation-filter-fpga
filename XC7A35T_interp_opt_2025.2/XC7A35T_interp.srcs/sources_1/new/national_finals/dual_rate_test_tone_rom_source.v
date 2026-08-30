@@ -11,6 +11,16 @@
 //
 //                两组序列打包在同一个 256x24 ROM，避免为了第二
 //                采样率额外消耗一块 RAMB18。
+// 设计作者     : kafeizizi
+// 创建日期     : 2026-08-16
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
+// 修订记录     : V2025.2 统一文件头并补充ROM打包及地址切换说明。
+//=============================================================
+//=============================================================
+// 1）模块名称：dual_rate_test_tone_rom_source
+// 功能说明：双采样率测试音源：按当前采样率族输出对应 ROM 波形样本。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module dual_rate_test_tone_rom_source #(
@@ -31,10 +41,10 @@ module dual_rate_test_tone_rom_source #(
     localparam [7:0] ADDR_48K_LAST   = 8'd162;
 
     (* rom_style = "block" *)
-    // The upper byte is generated offline together with the PCM payload:
-    //   [31:24] = next address, [23:0] = signed PCM sample.
-    // A single $readmemh pass is essential. Vivado 2018.3 does not reliably
-    // merge a second procedural initialization pass into an inferred BRAM.
+    // ROM高字节与PCM数据在离线脚本中一次生成：
+    //   [31:24]为下一地址，[23:0]为有符号PCM样本。
+    // 这里只执行一次$readmemh，确保Vivado能够稳定推断为单块BRAM，
+    // 避免多次过程化初始化导致ROM内容无法合并或退化为分布式逻辑。
     reg [31:0] pcm_rom [0:255];
     reg [7:0] rd_addr;
     reg [31:0] rom_word_q;
@@ -43,7 +53,7 @@ module dual_rate_test_tone_rom_source #(
         $readmemh(MEM_FILE, pcm_rom);
     end
 
-    // 保持纯同步读形式，便于 Vivado 2018.3 推断 RAMB18E1。
+    // 保持纯同步读形式，便于 Vivado 2025.2 推断 RAMB18E1。
     always @(posedge clk) begin
         rom_word_q <= pcm_rom[rd_addr];
     end

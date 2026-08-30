@@ -1,0 +1,889 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2025.2 (win64) Build 6299465 Fri Nov 14 19:35:11 GMT 2025
+| Date         : Sun Aug 16 20:43:48 2026
+| Host         : LAPTOP-476JT8H0 running 64-bit major release  (build 9200)
+| Command      : report_timing -delay_type min -max_paths 20 -nworst 1 -from [all_registers -clock [get_clocks core_clk_6m144]] -to [all_registers -clock [get_clocks core_clk_6m144]] -file D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/submit/finally/XC7A35T_interp_DSP3_LUT239_2025.2/tools/vivado_2025_2/core_ooc/results/20260816_204232/timing_internal_hold.rpt
+| Design       : interp128_all2x_v7_folded_fir_cic_top_ce
+| Device       : 7a35t-fgg484
+| Speed File   : -2  PRODUCTION 1.23 2018-06-13
+| Design State : Routed
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Timing Report
+
+Slack (MET) :             0.117ns  (arrival time - required time)
+  Source:                 gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/read_addr_reg[2]/C
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_nf_stage1_history_ramb18_sdp/gen_primitive.u_stage1_history_ramb18e1/ADDRARDADDR[7]
+                            (rising edge-triggered cell RAMB18E1 clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             core_clk_6m144
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (core_clk_6m144 rise@0.000ns - core_clk_6m144 rise@0.000ns)
+  Data Path Delay:        0.354ns  (logic 0.141ns (39.828%)  route 0.213ns (60.172%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.054ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.869ns
+    Source Clock Delay      (SCD):    0.561ns
+    Clock Pessimism Removal (CPR):    0.254ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.561     0.561    clk
+    SLICE_X49Y55         FDRE                                         r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/read_addr_reg[2]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X49Y55         FDRE (Prop_fdre_C_Q)         0.141     0.702 r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/read_addr_reg[2]/Q
+                         net (fo=5, routed)           0.213     0.915    gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/read_addr_reg[2]
+    RAMB18_X1Y22         RAMB18E1                                     r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_nf_stage1_history_ramb18_sdp/gen_primitive.u_stage1_history_ramb18e1/ADDRARDADDR[7]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.869     0.869    clk
+    RAMB18_X1Y22         RAMB18E1                                     r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_nf_stage1_history_ramb18_sdp/gen_primitive.u_stage1_history_ramb18e1/CLKARDCLK
+                         clock pessimism             -0.254     0.615    
+    RAMB18_X1Y22         RAMB18E1 (Hold_ramb18e1_CLKARDCLK_ADDRARDADDR[7])
+                                                      0.183     0.798    gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_nf_stage1_history_ramb18_sdp/gen_primitive.u_stage1_history_ramb18e1
+  -------------------------------------------------------------------
+                         required time                         -0.798    
+                         arrival time                           0.915    
+  -------------------------------------------------------------------
+                         slack                                  0.117    
+
+Slack (MET) :             0.119ns  (arrival time - required time)
+  Source:                 gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/read_addr_reg[3]/C
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_nf_stage1_history_ramb18_sdp/gen_primitive.u_stage1_history_ramb18e1/ADDRARDADDR[8]
+                            (rising edge-triggered cell RAMB18E1 clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             core_clk_6m144
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (core_clk_6m144 rise@0.000ns - core_clk_6m144 rise@0.000ns)
+  Data Path Delay:        0.356ns  (logic 0.141ns (39.643%)  route 0.215ns (60.357%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.054ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.869ns
+    Source Clock Delay      (SCD):    0.561ns
+    Clock Pessimism Removal (CPR):    0.254ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.561     0.561    clk
+    SLICE_X49Y55         FDRE                                         r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/read_addr_reg[3]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X49Y55         FDRE (Prop_fdre_C_Q)         0.141     0.702 r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/read_addr_reg[3]/Q
+                         net (fo=4, routed)           0.215     0.917    gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/read_addr_reg[3]
+    RAMB18_X1Y22         RAMB18E1                                     r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_nf_stage1_history_ramb18_sdp/gen_primitive.u_stage1_history_ramb18e1/ADDRARDADDR[8]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.869     0.869    clk
+    RAMB18_X1Y22         RAMB18E1                                     r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_nf_stage1_history_ramb18_sdp/gen_primitive.u_stage1_history_ramb18e1/CLKARDCLK
+                         clock pessimism             -0.254     0.615    
+    RAMB18_X1Y22         RAMB18E1 (Hold_ramb18e1_CLKARDCLK_ADDRARDADDR[8])
+                                                      0.183     0.798    gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_nf_stage1_history_ramb18_sdp/gen_primitive.u_stage1_history_ramb18e1
+  -------------------------------------------------------------------
+                         required time                         -0.798    
+                         arrival time                           0.917    
+  -------------------------------------------------------------------
+                         slack                                  0.119    
+
+Slack (MET) :             0.131ns  (arrival time - required time)
+  Source:                 gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/stage3_y_out_reg[11]/C
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[11]/D
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             core_clk_6m144
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (core_clk_6m144 rise@0.000ns - core_clk_6m144 rise@0.000ns)
+  Data Path Delay:        0.501ns  (logic 0.249ns (49.719%)  route 0.252ns (50.281%))
+  Logic Levels:           2  (CARRY4=1 LUT4=1)
+  Clock Path Skew:        0.265ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.826ns
+    Source Clock Delay      (SCD):    0.556ns
+    Clock Pessimism Removal (CPR):    0.005ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.556     0.556    clk
+    SLICE_X35Y57         FDRE                                         r  gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/stage3_y_out_reg[11]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X35Y57         FDRE (Prop_fdre_C_Q)         0.141     0.697 r  gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/stage3_y_out_reg[11]/Q
+                         net (fo=2, routed)           0.252     0.949    y8_w[11]
+    SLICE_X39Y58         LUT4 (Prop_lut4_I1_O)        0.045     0.994 r  interp128_all2x_LUT4_11/O
+                         net (fo=1, routed)           0.000     0.994    interp128_all2x_net_43
+    SLICE_X39Y58         CARRY4 (Prop_carry4_S[3]_O[3])
+                                                      0.063     1.057 r  comb_operand_fabric_reg[11]_i_1/O[3]
+                         net (fo=1, routed)           0.000     1.057    comb_operand_fabric_reg[11]_i_1_n_4
+    SLICE_X39Y58         FDRE                                         r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[11]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.826     0.826    clk
+    SLICE_X39Y58         FDRE                                         r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[11]/C
+                         clock pessimism             -0.005     0.821    
+    SLICE_X39Y58         FDRE (Hold_fdre_C_D)         0.105     0.926    gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[11]
+  -------------------------------------------------------------------
+                         required time                         -0.926    
+                         arrival time                           1.057    
+  -------------------------------------------------------------------
+                         slack                                  0.131    
+
+Slack (MET) :             0.132ns  (arrival time - required time)
+  Source:                 gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/stage3_y_out_reg[12]/C
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[12]/D
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             core_clk_6m144
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (core_clk_6m144 rise@0.000ns - core_clk_6m144 rise@0.000ns)
+  Data Path Delay:        0.502ns  (logic 0.256ns (50.983%)  route 0.246ns (49.017%))
+  Logic Levels:           2  (CARRY4=1 LUT4=1)
+  Clock Path Skew:        0.265ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.826ns
+    Source Clock Delay      (SCD):    0.556ns
+    Clock Pessimism Removal (CPR):    0.005ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.556     0.556    clk
+    SLICE_X35Y58         FDRE                                         r  gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/stage3_y_out_reg[12]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X35Y58         FDRE (Prop_fdre_C_Q)         0.141     0.697 r  gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/stage3_y_out_reg[12]/Q
+                         net (fo=2, routed)           0.246     0.943    y8_w[12]
+    SLICE_X39Y59         LUT4 (Prop_lut4_I1_O)        0.045     0.988 r  interp128_all2x_LUT4_12/O
+                         net (fo=1, routed)           0.000     0.988    interp128_all2x_net_44
+    SLICE_X39Y59         CARRY4 (Prop_carry4_S[0]_O[0])
+                                                      0.070     1.058 r  comb_operand_fabric_reg[15]_i_1/O[0]
+                         net (fo=1, routed)           0.000     1.058    comb_operand_fabric_reg[15]_i_1_n_7
+    SLICE_X39Y59         FDRE                                         r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[12]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.826     0.826    clk
+    SLICE_X39Y59         FDRE                                         r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[12]/C
+                         clock pessimism             -0.005     0.821    
+    SLICE_X39Y59         FDRE (Hold_fdre_C_D)         0.105     0.926    gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[12]
+  -------------------------------------------------------------------
+                         required time                         -0.926    
+                         arrival time                           1.058    
+  -------------------------------------------------------------------
+                         slack                                  0.132    
+
+Slack (MET) :             0.135ns  (arrival time - required time)
+  Source:                 gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/stage3_y_out_reg[2]/C
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[2]/D
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             core_clk_6m144
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (core_clk_6m144 rise@0.000ns - core_clk_6m144 rise@0.000ns)
+  Data Path Delay:        0.506ns  (logic 0.275ns (54.342%)  route 0.231ns (45.658%))
+  Logic Levels:           2  (CARRY4=1 LUT4=1)
+  Clock Path Skew:        0.266ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.827ns
+    Source Clock Delay      (SCD):    0.556ns
+    Clock Pessimism Removal (CPR):    0.005ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.556     0.556    clk
+    SLICE_X34Y57         FDRE                                         r  gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/stage3_y_out_reg[2]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X34Y57         FDRE (Prop_fdre_C_Q)         0.164     0.720 r  gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/stage3_y_out_reg[2]/Q
+                         net (fo=2, routed)           0.231     0.951    y8_w[2]
+    SLICE_X39Y56         LUT4 (Prop_lut4_I1_O)        0.045     0.996 r  interp128_all2x_LUT4_2/O
+                         net (fo=1, routed)           0.000     0.996    interp128_all2x_net_27
+    SLICE_X39Y56         CARRY4 (Prop_carry4_S[2]_O[2])
+                                                      0.066     1.062 r  comb_operand_fabric_reg[3]_i_1/O[2]
+                         net (fo=1, routed)           0.000     1.062    comb_operand_fabric_reg[3]_i_1_n_5
+    SLICE_X39Y56         FDRE                                         r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[2]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.827     0.827    clk
+    SLICE_X39Y56         FDRE                                         r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[2]/C
+                         clock pessimism             -0.005     0.822    
+    SLICE_X39Y56         FDRE (Hold_fdre_C_D)         0.105     0.927    gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[2]
+  -------------------------------------------------------------------
+                         required time                         -0.927    
+                         arrival time                           1.062    
+  -------------------------------------------------------------------
+                         slack                                  0.135    
+
+Slack (MET) :             0.137ns  (arrival time - required time)
+  Source:                 gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/stage3_y_out_reg[14]/C
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[14]/D
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             core_clk_6m144
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (core_clk_6m144 rise@0.000ns - core_clk_6m144 rise@0.000ns)
+  Data Path Delay:        0.507ns  (logic 0.252ns (49.708%)  route 0.255ns (50.292%))
+  Logic Levels:           2  (CARRY4=1 LUT4=1)
+  Clock Path Skew:        0.265ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.826ns
+    Source Clock Delay      (SCD):    0.556ns
+    Clock Pessimism Removal (CPR):    0.005ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.556     0.556    clk
+    SLICE_X35Y57         FDRE                                         r  gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/stage3_y_out_reg[14]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X35Y57         FDRE (Prop_fdre_C_Q)         0.141     0.697 r  gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/stage3_y_out_reg[14]/Q
+                         net (fo=2, routed)           0.255     0.952    y8_w[14]
+    SLICE_X39Y59         LUT4 (Prop_lut4_I1_O)        0.045     0.997 r  interp128_all2x_LUT4_14/O
+                         net (fo=1, routed)           0.000     0.997    interp128_all2x_net_48
+    SLICE_X39Y59         CARRY4 (Prop_carry4_S[2]_O[2])
+                                                      0.066     1.063 r  comb_operand_fabric_reg[15]_i_1/O[2]
+                         net (fo=1, routed)           0.000     1.063    comb_operand_fabric_reg[15]_i_1_n_5
+    SLICE_X39Y59         FDRE                                         r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[14]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.826     0.826    clk
+    SLICE_X39Y59         FDRE                                         r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[14]/C
+                         clock pessimism             -0.005     0.821    
+    SLICE_X39Y59         FDRE (Hold_fdre_C_D)         0.105     0.926    gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[14]
+  -------------------------------------------------------------------
+                         required time                         -0.926    
+                         arrival time                           1.063    
+  -------------------------------------------------------------------
+                         slack                                  0.137    
+
+Slack (MET) :             0.139ns  (arrival time - required time)
+  Source:                 gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/stage3_y_out_reg[9]/C
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[9]/D
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             core_clk_6m144
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (core_clk_6m144 rise@0.000ns - core_clk_6m144 rise@0.000ns)
+  Data Path Delay:        0.509ns  (logic 0.274ns (53.865%)  route 0.235ns (46.135%))
+  Logic Levels:           2  (CARRY4=1 LUT4=1)
+  Clock Path Skew:        0.265ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.826ns
+    Source Clock Delay      (SCD):    0.556ns
+    Clock Pessimism Removal (CPR):    0.005ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.556     0.556    clk
+    SLICE_X34Y57         FDRE                                         r  gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/stage3_y_out_reg[9]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X34Y57         FDRE (Prop_fdre_C_Q)         0.164     0.720 r  gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/stage3_y_out_reg[9]/Q
+                         net (fo=2, routed)           0.235     0.955    y8_w[9]
+    SLICE_X39Y58         LUT4 (Prop_lut4_I1_O)        0.045     1.000 r  interp128_all2x_LUT4_9/O
+                         net (fo=1, routed)           0.000     1.000    interp128_all2x_net_39
+    SLICE_X39Y58         CARRY4 (Prop_carry4_S[1]_O[1])
+                                                      0.065     1.065 r  comb_operand_fabric_reg[11]_i_1/O[1]
+                         net (fo=1, routed)           0.000     1.065    comb_operand_fabric_reg[11]_i_1_n_6
+    SLICE_X39Y58         FDRE                                         r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[9]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.826     0.826    clk
+    SLICE_X39Y58         FDRE                                         r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[9]/C
+                         clock pessimism             -0.005     0.821    
+    SLICE_X39Y58         FDRE (Hold_fdre_C_D)         0.105     0.926    gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[9]
+  -------------------------------------------------------------------
+                         required time                         -0.926    
+                         arrival time                           1.065    
+  -------------------------------------------------------------------
+                         slack                                  0.139    
+
+Slack (MET) :             0.141ns  (arrival time - required time)
+  Source:                 gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/read_addr_reg[4]/C
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_nf_stage1_history_ramb18_sdp/gen_primitive.u_stage1_history_ramb18e1/ADDRARDADDR[9]
+                            (rising edge-triggered cell RAMB18E1 clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             core_clk_6m144
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (core_clk_6m144 rise@0.000ns - core_clk_6m144 rise@0.000ns)
+  Data Path Delay:        0.377ns  (logic 0.141ns (37.360%)  route 0.236ns (62.640%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.054ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.869ns
+    Source Clock Delay      (SCD):    0.561ns
+    Clock Pessimism Removal (CPR):    0.254ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.561     0.561    clk
+    SLICE_X49Y56         FDRE                                         r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/read_addr_reg[4]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X49Y56         FDRE (Prop_fdre_C_Q)         0.141     0.702 r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/read_addr_reg[4]/Q
+                         net (fo=4, routed)           0.236     0.938    gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/read_addr_reg[4]
+    RAMB18_X1Y22         RAMB18E1                                     r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_nf_stage1_history_ramb18_sdp/gen_primitive.u_stage1_history_ramb18e1/ADDRARDADDR[9]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.869     0.869    clk
+    RAMB18_X1Y22         RAMB18E1                                     r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_nf_stage1_history_ramb18_sdp/gen_primitive.u_stage1_history_ramb18e1/CLKARDCLK
+                         clock pessimism             -0.254     0.615    
+    RAMB18_X1Y22         RAMB18E1 (Hold_ramb18e1_CLKARDCLK_ADDRARDADDR[9])
+                                                      0.183     0.798    gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_nf_stage1_history_ramb18_sdp/gen_primitive.u_stage1_history_ramb18e1
+  -------------------------------------------------------------------
+                         required time                         -0.798    
+                         arrival time                           0.938    
+  -------------------------------------------------------------------
+                         slack                                  0.141    
+
+Slack (MET) :             0.152ns  (arrival time - required time)
+  Source:                 gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/wr_ptr_reg[4]/C
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_nf_stage1_history_ramb18_sdp/gen_primitive.u_stage1_history_ramb18e1/ADDRBWRADDR[9]
+                            (rising edge-triggered cell RAMB18E1 clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             core_clk_6m144
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (core_clk_6m144 rise@0.000ns - core_clk_6m144 rise@0.000ns)
+  Data Path Delay:        0.389ns  (logic 0.141ns (36.225%)  route 0.248ns (63.775%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.055ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.870ns
+    Source Clock Delay      (SCD):    0.561ns
+    Clock Pessimism Removal (CPR):    0.254ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.561     0.561    clk
+    SLICE_X48Y54         FDRE                                         r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/wr_ptr_reg[4]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X48Y54         FDRE (Prop_fdre_C_Q)         0.141     0.702 r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/wr_ptr_reg[4]/Q
+                         net (fo=6, routed)           0.248     0.950    gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/wr_ptr_reg[4]
+    RAMB18_X1Y22         RAMB18E1                                     r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_nf_stage1_history_ramb18_sdp/gen_primitive.u_stage1_history_ramb18e1/ADDRBWRADDR[9]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.870     0.870    clk
+    RAMB18_X1Y22         RAMB18E1                                     r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_nf_stage1_history_ramb18_sdp/gen_primitive.u_stage1_history_ramb18e1/CLKBWRCLK
+                         clock pessimism             -0.254     0.616    
+    RAMB18_X1Y22         RAMB18E1 (Hold_ramb18e1_CLKBWRCLK_ADDRBWRADDR[9])
+                                                      0.183     0.799    gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_nf_stage1_history_ramb18_sdp/gen_primitive.u_stage1_history_ramb18e1
+  -------------------------------------------------------------------
+                         required time                         -0.799    
+                         arrival time                           0.950    
+  -------------------------------------------------------------------
+                         slack                                  0.152    
+
+Slack (MET) :             0.152ns  (arrival time - required time)
+  Source:                 gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/wr_ptr_reg[2]/C
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_nf_stage1_history_ramb18_sdp/gen_primitive.u_stage1_history_ramb18e1/ADDRBWRADDR[7]
+                            (rising edge-triggered cell RAMB18E1 clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             core_clk_6m144
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (core_clk_6m144 rise@0.000ns - core_clk_6m144 rise@0.000ns)
+  Data Path Delay:        0.390ns  (logic 0.141ns (36.138%)  route 0.249ns (63.862%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.055ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.870ns
+    Source Clock Delay      (SCD):    0.561ns
+    Clock Pessimism Removal (CPR):    0.254ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.561     0.561    clk
+    SLICE_X48Y54         FDRE                                         r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/wr_ptr_reg[2]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X48Y54         FDRE (Prop_fdre_C_Q)         0.141     0.702 r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/wr_ptr_reg[2]/Q
+                         net (fo=7, routed)           0.249     0.951    gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/wr_ptr_reg[2]
+    RAMB18_X1Y22         RAMB18E1                                     r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_nf_stage1_history_ramb18_sdp/gen_primitive.u_stage1_history_ramb18e1/ADDRBWRADDR[7]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.870     0.870    clk
+    RAMB18_X1Y22         RAMB18E1                                     r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_nf_stage1_history_ramb18_sdp/gen_primitive.u_stage1_history_ramb18e1/CLKBWRCLK
+                         clock pessimism             -0.254     0.616    
+    RAMB18_X1Y22         RAMB18E1 (Hold_ramb18e1_CLKBWRCLK_ADDRBWRADDR[7])
+                                                      0.183     0.799    gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_nf_stage1_history_ramb18_sdp/gen_primitive.u_stage1_history_ramb18e1
+  -------------------------------------------------------------------
+                         required time                         -0.799    
+                         arrival time                           0.951    
+  -------------------------------------------------------------------
+                         slack                                  0.152    
+
+Slack (MET) :             0.162ns  (arrival time - required time)
+  Source:                 gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_delay1_reg[7]/C
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_delay0_reg[7]/D
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             core_clk_6m144
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (core_clk_6m144 rise@0.000ns - core_clk_6m144 rise@0.000ns)
+  Data Path Delay:        0.201ns  (logic 0.148ns (73.524%)  route 0.053ns (26.476%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.016ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.827ns
+    Source Clock Delay      (SCD):    0.558ns
+    Clock Pessimism Removal (CPR):    0.253ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.558     0.558    clk
+    SLICE_X38Y56         FDRE                                         r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_delay1_reg[7]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X38Y56         FDRE (Prop_fdre_C_Q)         0.148     0.706 r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_delay1_reg[7]/Q
+                         net (fo=1, routed)           0.053     0.759    comb_delay1[7]
+    SLICE_X38Y56         FDRE                                         r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_delay0_reg[7]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.827     0.827    clk
+    SLICE_X38Y56         FDRE                                         r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_delay0_reg[7]/C
+                         clock pessimism             -0.253     0.574    
+    SLICE_X38Y56         FDRE (Hold_fdre_C_D)         0.023     0.597    gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_delay0_reg[7]
+  -------------------------------------------------------------------
+                         required time                         -0.597    
+                         arrival time                           0.759    
+  -------------------------------------------------------------------
+                         slack                                  0.162    
+
+Slack (MET) :             0.164ns  (arrival time - required time)
+  Source:                 gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_delay1_reg[14]/C
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_delay0_reg[14]/D
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             core_clk_6m144
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (core_clk_6m144 rise@0.000ns - core_clk_6m144 rise@0.000ns)
+  Data Path Delay:        0.203ns  (logic 0.148ns (72.867%)  route 0.055ns (27.133%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.016ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.826ns
+    Source Clock Delay      (SCD):    0.557ns
+    Clock Pessimism Removal (CPR):    0.253ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.557     0.557    clk
+    SLICE_X38Y59         FDRE                                         r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_delay1_reg[14]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X38Y59         FDRE (Prop_fdre_C_Q)         0.148     0.705 r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_delay1_reg[14]/Q
+                         net (fo=1, routed)           0.055     0.760    comb_delay1[14]
+    SLICE_X38Y59         FDRE                                         r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_delay0_reg[14]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.826     0.826    clk
+    SLICE_X38Y59         FDRE                                         r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_delay0_reg[14]/C
+                         clock pessimism             -0.253     0.573    
+    SLICE_X38Y59         FDRE (Hold_fdre_C_D)         0.023     0.596    gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_delay0_reg[14]
+  -------------------------------------------------------------------
+                         required time                         -0.596    
+                         arrival time                           0.760    
+  -------------------------------------------------------------------
+                         slack                                  0.164    
+
+Slack (MET) :             0.165ns  (arrival time - required time)
+  Source:                 gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/read_addr_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_nf_stage1_history_ramb18_sdp/gen_primitive.u_stage1_history_ramb18e1/ADDRARDADDR[5]
+                            (rising edge-triggered cell RAMB18E1 clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             core_clk_6m144
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (core_clk_6m144 rise@0.000ns - core_clk_6m144 rise@0.000ns)
+  Data Path Delay:        0.402ns  (logic 0.141ns (35.071%)  route 0.261ns (64.929%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.054ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.869ns
+    Source Clock Delay      (SCD):    0.561ns
+    Clock Pessimism Removal (CPR):    0.254ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.561     0.561    clk
+    SLICE_X48Y55         FDRE                                         r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/read_addr_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X48Y55         FDRE (Prop_fdre_C_Q)         0.141     0.702 r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/read_addr_reg[0]/Q
+                         net (fo=7, routed)           0.261     0.963    gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/read_addr_reg[0]
+    RAMB18_X1Y22         RAMB18E1                                     r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_nf_stage1_history_ramb18_sdp/gen_primitive.u_stage1_history_ramb18e1/ADDRARDADDR[5]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.869     0.869    clk
+    RAMB18_X1Y22         RAMB18E1                                     r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_nf_stage1_history_ramb18_sdp/gen_primitive.u_stage1_history_ramb18e1/CLKARDCLK
+                         clock pessimism             -0.254     0.615    
+    RAMB18_X1Y22         RAMB18E1 (Hold_ramb18e1_CLKARDCLK_ADDRARDADDR[5])
+                                                      0.183     0.798    gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_nf_stage1_history_ramb18_sdp/gen_primitive.u_stage1_history_ramb18e1
+  -------------------------------------------------------------------
+                         required time                         -0.798    
+                         arrival time                           0.963    
+  -------------------------------------------------------------------
+                         slack                                  0.165    
+
+Slack (MET) :             0.166ns  (arrival time - required time)
+  Source:                 gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/wr_ptr_reg[4]/C
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/history_full_reg/D
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             core_clk_6m144
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (core_clk_6m144 rise@0.000ns - core_clk_6m144 rise@0.000ns)
+  Data Path Delay:        0.273ns  (logic 0.186ns (68.203%)  route 0.087ns (31.797%))
+  Logic Levels:           1  (LUT6=1)
+  Clock Path Skew:        0.016ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.831ns
+    Source Clock Delay      (SCD):    0.561ns
+    Clock Pessimism Removal (CPR):    0.254ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.561     0.561    clk
+    SLICE_X48Y54         FDRE                                         r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/wr_ptr_reg[4]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X48Y54         FDRE (Prop_fdre_C_Q)         0.141     0.702 r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/wr_ptr_reg[4]/Q
+                         net (fo=6, routed)           0.087     0.789    gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/wr_ptr_reg[4]
+    SLICE_X49Y54         LUT6 (Prop_lut6_I2_O)        0.045     0.834 r  interp128_all2x_LUT6_14/O
+                         net (fo=1, routed)           0.000     0.834    history_full_i_1_n_0
+    SLICE_X49Y54         FDRE                                         r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/history_full_reg/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.831     0.831    clk
+    SLICE_X49Y54         FDRE                                         r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/history_full_reg/C
+                         clock pessimism             -0.254     0.577    
+    SLICE_X49Y54         FDRE (Hold_fdre_C_D)         0.091     0.668    gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/history_full_reg
+  -------------------------------------------------------------------
+                         required time                         -0.668    
+                         arrival time                           0.834    
+  -------------------------------------------------------------------
+                         slack                                  0.166    
+
+Slack (MET) :             0.167ns  (arrival time - required time)
+  Source:                 gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/y_out_valid_reg/C
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            u_bridge_2_to_4_quantized/pending_reg/D
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             core_clk_6m144
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (core_clk_6m144 rise@0.000ns - core_clk_6m144 rise@0.000ns)
+  Data Path Delay:        0.303ns  (logic 0.246ns (81.159%)  route 0.057ns (18.841%))
+  Logic Levels:           1  (LUT3=1)
+  Clock Path Skew:        0.016ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.826ns
+    Source Clock Delay      (SCD):    0.557ns
+    Clock Pessimism Removal (CPR):    0.253ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.557     0.557    clk
+    SLICE_X30Y59         FDRE                                         r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/y_out_valid_reg/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X30Y59         FDRE (Prop_fdre_C_Q)         0.148     0.705 r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/y_out_valid_reg/Q
+                         net (fo=1, routed)           0.057     0.762    dbg_y2_valid
+    SLICE_X30Y59         LUT3 (Prop_lut3_I0_O)        0.098     0.860 r  interp128_all2x_LUT3_28/O
+                         net (fo=1, routed)           0.000     0.860    pending_i_1__0_n_0
+    SLICE_X30Y59         FDRE                                         r  u_bridge_2_to_4_quantized/pending_reg/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.826     0.826    clk
+    SLICE_X30Y59         FDRE                                         r  u_bridge_2_to_4_quantized/pending_reg/C
+                         clock pessimism             -0.253     0.573    
+    SLICE_X30Y59         FDRE (Hold_fdre_C_D)         0.120     0.693    u_bridge_2_to_4_quantized/pending_reg
+  -------------------------------------------------------------------
+                         required time                         -0.693    
+                         arrival time                           0.860    
+  -------------------------------------------------------------------
+                         slack                                  0.167    
+
+Slack (MET) :             0.168ns  (arrival time - required time)
+  Source:                 gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/stage3_y_out_reg[2]/C
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[3]/D
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             core_clk_6m144
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (core_clk_6m144 rise@0.000ns - core_clk_6m144 rise@0.000ns)
+  Data Path Delay:        0.539ns  (logic 0.308ns (57.137%)  route 0.231ns (42.863%))
+  Logic Levels:           2  (CARRY4=1 LUT4=1)
+  Clock Path Skew:        0.266ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.827ns
+    Source Clock Delay      (SCD):    0.556ns
+    Clock Pessimism Removal (CPR):    0.005ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.556     0.556    clk
+    SLICE_X34Y57         FDRE                                         r  gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/stage3_y_out_reg[2]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X34Y57         FDRE (Prop_fdre_C_Q)         0.164     0.720 r  gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/stage3_y_out_reg[2]/Q
+                         net (fo=2, routed)           0.231     0.951    y8_w[2]
+    SLICE_X39Y56         LUT4 (Prop_lut4_I1_O)        0.045     0.996 r  interp128_all2x_LUT4_2/O
+                         net (fo=1, routed)           0.000     0.996    interp128_all2x_net_27
+    SLICE_X39Y56         CARRY4 (Prop_carry4_S[2]_O[3])
+                                                      0.099     1.095 r  comb_operand_fabric_reg[3]_i_1/O[3]
+                         net (fo=1, routed)           0.000     1.095    comb_operand_fabric_reg[3]_i_1_n_4
+    SLICE_X39Y56         FDRE                                         r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[3]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.827     0.827    clk
+    SLICE_X39Y56         FDRE                                         r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[3]/C
+                         clock pessimism             -0.005     0.822    
+    SLICE_X39Y56         FDRE (Hold_fdre_C_D)         0.105     0.927    gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[3]
+  -------------------------------------------------------------------
+                         required time                         -0.927    
+                         arrival time                           1.095    
+  -------------------------------------------------------------------
+                         slack                                  0.168    
+
+Slack (MET) :             0.168ns  (arrival time - required time)
+  Source:                 gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/stage3_y_out_reg[12]/C
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[13]/D
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             core_clk_6m144
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (core_clk_6m144 rise@0.000ns - core_clk_6m144 rise@0.000ns)
+  Data Path Delay:        0.538ns  (logic 0.292ns (54.262%)  route 0.246ns (45.738%))
+  Logic Levels:           2  (CARRY4=1 LUT4=1)
+  Clock Path Skew:        0.265ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.826ns
+    Source Clock Delay      (SCD):    0.556ns
+    Clock Pessimism Removal (CPR):    0.005ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.556     0.556    clk
+    SLICE_X35Y58         FDRE                                         r  gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/stage3_y_out_reg[12]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X35Y58         FDRE (Prop_fdre_C_Q)         0.141     0.697 r  gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/stage3_y_out_reg[12]/Q
+                         net (fo=2, routed)           0.246     0.943    y8_w[12]
+    SLICE_X39Y59         LUT4 (Prop_lut4_I1_O)        0.045     0.988 r  interp128_all2x_LUT4_12/O
+                         net (fo=1, routed)           0.000     0.988    interp128_all2x_net_44
+    SLICE_X39Y59         CARRY4 (Prop_carry4_S[0]_O[1])
+                                                      0.106     1.094 r  comb_operand_fabric_reg[15]_i_1/O[1]
+                         net (fo=1, routed)           0.000     1.094    comb_operand_fabric_reg[15]_i_1_n_6
+    SLICE_X39Y59         FDRE                                         r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[13]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.826     0.826    clk
+    SLICE_X39Y59         FDRE                                         r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[13]/C
+                         clock pessimism             -0.005     0.821    
+    SLICE_X39Y59         FDRE (Hold_fdre_C_D)         0.105     0.926    gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[13]
+  -------------------------------------------------------------------
+                         required time                         -0.926    
+                         arrival time                           1.094    
+  -------------------------------------------------------------------
+                         slack                                  0.168    
+
+Slack (MET) :             0.170ns  (arrival time - required time)
+  Source:                 gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/stage3_y_out_reg[14]/C
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[15]/D
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             core_clk_6m144
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (core_clk_6m144 rise@0.000ns - core_clk_6m144 rise@0.000ns)
+  Data Path Delay:        0.540ns  (logic 0.285ns (52.782%)  route 0.255ns (47.218%))
+  Logic Levels:           2  (CARRY4=1 LUT4=1)
+  Clock Path Skew:        0.265ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.826ns
+    Source Clock Delay      (SCD):    0.556ns
+    Clock Pessimism Removal (CPR):    0.005ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.556     0.556    clk
+    SLICE_X35Y57         FDRE                                         r  gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/stage3_y_out_reg[14]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X35Y57         FDRE (Prop_fdre_C_Q)         0.141     0.697 r  gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/stage3_y_out_reg[14]/Q
+                         net (fo=2, routed)           0.255     0.952    y8_w[14]
+    SLICE_X39Y59         LUT4 (Prop_lut4_I1_O)        0.045     0.997 r  interp128_all2x_LUT4_14/O
+                         net (fo=1, routed)           0.000     0.997    interp128_all2x_net_48
+    SLICE_X39Y59         CARRY4 (Prop_carry4_S[2]_O[3])
+                                                      0.099     1.096 r  comb_operand_fabric_reg[15]_i_1/O[3]
+                         net (fo=1, routed)           0.000     1.096    comb_operand_fabric_reg[15]_i_1_n_4
+    SLICE_X39Y59         FDRE                                         r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[15]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.826     0.826    clk
+    SLICE_X39Y59         FDRE                                         r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[15]/C
+                         clock pessimism             -0.005     0.821    
+    SLICE_X39Y59         FDRE (Hold_fdre_C_D)         0.105     0.926    gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_operand_fabric_reg[15]
+  -------------------------------------------------------------------
+                         required time                         -0.926    
+                         arrival time                           1.096    
+  -------------------------------------------------------------------
+                         slack                                  0.170    
+
+Slack (MET) :             0.171ns  (arrival time - required time)
+  Source:                 gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/delay_result_reg[10]/C
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/y_out_reg[10]/D
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             core_clk_6m144
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (core_clk_6m144 rise@0.000ns - core_clk_6m144 rise@0.000ns)
+  Data Path Delay:        0.278ns  (logic 0.186ns (66.799%)  route 0.092ns (33.201%))
+  Logic Levels:           1  (LUT3=1)
+  Clock Path Skew:        0.016ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.828ns
+    Source Clock Delay      (SCD):    0.558ns
+    Clock Pessimism Removal (CPR):    0.254ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.558     0.558    clk
+    SLICE_X29Y55         FDRE                                         r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/delay_result_reg[10]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X29Y55         FDRE (Prop_fdre_C_Q)         0.141     0.699 r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/delay_result_reg[10]/Q
+                         net (fo=1, routed)           0.092     0.791    delay_result[10]
+    SLICE_X28Y55         LUT3 (Prop_lut3_I2_O)        0.045     0.836 r  y_out[10]_i_1/O
+                         net (fo=1, routed)           0.000     0.836    y_out[10]_i_1_n_0
+    SLICE_X28Y55         FDRE                                         r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/y_out_reg[10]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.828     0.828    clk
+    SLICE_X28Y55         FDRE                                         r  gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/y_out_reg[10]/C
+                         clock pessimism             -0.254     0.574    
+    SLICE_X28Y55         FDRE (Hold_fdre_C_D)         0.091     0.665    gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/y_out_reg[10]
+  -------------------------------------------------------------------
+                         required time                         -0.665    
+                         arrival time                           0.836    
+  -------------------------------------------------------------------
+                         slack                                  0.171    
+
+Slack (MET) :             0.172ns  (arrival time - required time)
+  Source:                 gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_delay1_reg[21]/C
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Destination:            gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_delay0_reg[21]/D
+                            (rising edge-triggered cell FDRE clocked by core_clk_6m144  {rise@0.000ns fall@81.380ns period=162.760ns})
+  Path Group:             core_clk_6m144
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (core_clk_6m144 rise@0.000ns - core_clk_6m144 rise@0.000ns)
+  Data Path Delay:        0.254ns  (logic 0.141ns (55.477%)  route 0.113ns (44.523%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.016ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.826ns
+    Source Clock Delay      (SCD):    0.556ns
+    Clock Pessimism Removal (CPR):    0.254ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.556     0.556    clk
+    SLICE_X40Y61         FDRE                                         r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_delay1_reg[21]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X40Y61         FDRE (Prop_fdre_C_Q)         0.141     0.697 r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_delay1_reg[21]/Q
+                         net (fo=1, routed)           0.113     0.810    comb_delay1[21]
+    SLICE_X40Y61         FDRE                                         r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_delay0_reg[21]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock core_clk_6m144 rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=310, unset)          0.826     0.826    clk
+    SLICE_X40Y61         FDRE                                         r  gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_delay0_reg[21]/C
+                         clock pessimism             -0.254     0.572    
+    SLICE_X40Y61         FDRE (Hold_fdre_C_D)         0.066     0.638    gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/comb_delay0_reg[21]
+  -------------------------------------------------------------------
+                         required time                         -0.638    
+                         arrival time                           0.810    
+  -------------------------------------------------------------------
+                         slack                                  0.172    
+
+
+
+

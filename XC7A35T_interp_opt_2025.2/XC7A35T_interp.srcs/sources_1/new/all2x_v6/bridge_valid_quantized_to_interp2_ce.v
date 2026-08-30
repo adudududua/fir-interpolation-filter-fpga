@@ -15,10 +15,15 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-13
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-13：新增 Phase 6 级间缩位桥。
+//=============================================================
+//=============================================================
+// 1）模块名称：bridge_valid_quantized_to_interp2_ce
+// 功能说明：速率桥接模块：缓存上游样本并按下游时钟使能节拍提交插值事务。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module bridge_valid_quantized_to_interp2_ce #(
@@ -44,12 +49,12 @@ module bridge_valid_quantized_to_interp2_ce #(
 
     generate
         if (SHIFT_N == 0) begin : gen_identity_quantizer
-            // A same-Q-format boundary still needs the pending/phase
-            // handshake below, but it must not instantiate a degenerate
-            // rounder with an invalid negative part-select.
+    // 相同Q格式边界仍需要下方pending/phase握手，但不能例化会产生非法
+    // 负数位选范围的退化舍入器，因此该分支直接保持数值格式不变。
             assign out_data = in_data[OUT_W-1:0];
         end
         else begin : gen_rounding_quantizer
+            // 例化说明：调用 round_sat_shift_compact 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
             round_sat_shift_compact #(
                 .IN_W    (IN_W),
                 .OUT_W   (OUT_W),
@@ -62,9 +67,8 @@ module bridge_valid_quantized_to_interp2_ce #(
     endgenerate
 
     assign out_valid = pending;
-    // The folded Stage2/3 core already owns phase registers clocked by the
-    // same CE events. National-finals builds reuse those canonical states;
-    // legacy tops retain the self-contained mirror through the default.
+    // 折叠Stage2/3核心已拥有由同一CE事件驱动的相位寄存器。全国赛构建
+    // 复用这些规范相位状态；历史顶层通过默认参数保留自包含相位镜像。
     assign phase_for_consume = (USE_EXTERNAL_PHASE != 0) ?
         phase_current : phase_mirror;
     assign consume_now = ce_out_next &&

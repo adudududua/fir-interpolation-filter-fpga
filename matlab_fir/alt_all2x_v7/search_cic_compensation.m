@@ -1,3 +1,6 @@
+%% 1）主流程：search_cic_compensation
+% 功能说明：遍历 CIC 结构或补偿参数，筛选满足通带与阻带指标的候选方案。
+
 clc; clear; close all;
 
 %=============================================================
@@ -272,6 +275,10 @@ fprintf('====================================================\n');
 drawnow;
 
 
+% 2）局部函数模块：cic_normalized_magnitude
+
+
+% 功能说明：封装 cic_normalized_magnitude 对应的局部计算，供主流程复用并保持代码层次清晰。
 function magnitude = cic_normalized_magnitude(frequency_hz, ...
         input_rate_hz, rate_change, diff_delay, cic_order)
     frequency_hz = double(frequency_hz);
@@ -285,6 +292,10 @@ function magnitude = cic_normalized_magnitude(frequency_hz, ...
 end
 
 
+% 3）局部函数模块：design_symmetric_compensation
+
+
+% 功能说明：计算局部幅频、相位、纹波或阻带指标，并返回结构化验收结果。
 function h = design_symmetric_compensation(tap_count, sample_rate, ...
         pass_edge, stop_edge, desired_fun, stop_weight)
     if mod(tap_count, 2) ~= 1
@@ -332,6 +343,10 @@ function h = design_symmetric_compensation(tap_count, sample_rate, ...
 end
 
 
+% 4）局部函数模块：anonymous_function_block
+
+
+% 功能说明：封装 anonymous_function_block 对应的局部计算，供主流程复用并保持代码层次清晰。
 function [coeff_int, h_quantized, fit_ok, required_w] = ...
         quantize_compensation(h_float, frac_w, coeff_w)
     scale = 2^frac_w;
@@ -347,6 +362,10 @@ function [coeff_int, h_quantized, fit_ok, required_w] = ...
 end
 
 
+% 5）局部函数模块：evaluate_candidate
+
+
+% 功能说明：封装 evaluate_candidate 对应的局部计算，供主流程复用并保持代码层次清晰。
 function metric = evaluate_candidate(h_pre3, h_comp, h_cic, ...
         rate_change, output_rate, expected_gain, pass_low, pass_high, ...
         stop_begin, nfft)
@@ -373,6 +392,10 @@ function metric = evaluate_candidate(h_pre3, h_comp, h_cic, ...
 end
 
 
+% 6）局部函数模块：rebuild_candidate
+
+
+% 功能说明：封装 rebuild_candidate 对应的局部计算，供主流程复用并保持代码层次清晰。
 function [coeff_int, h_comp, h_cic, h_total] = rebuild_candidate( ...
         selected_row, h_pre3, fs_cic_in, rate_change, diff_delay, ...
         fs_out, pass_edge)
@@ -399,6 +422,10 @@ function [coeff_int, h_comp, h_cic, h_total] = rebuild_candidate( ...
 end
 
 
+% 7）局部函数模块：write_summary
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_summary(file_path, phase6_metric, result_table, ...
         selected_row, selected_metric, decision, pass_limit, stop_limit)
     fid = fopen(file_path, 'w');
@@ -440,6 +467,10 @@ function write_summary(file_path, phase6_metric, result_table, ...
 end
 
 
+% 8）局部函数模块：write_coefficients
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_coefficients(file_path, selected_row, coeff_int, h_comp)
     fid = fopen(file_path, 'w');
     if fid < 0
@@ -457,6 +488,10 @@ function write_coefficients(file_path, selected_row, coeff_int, h_comp)
 end
 
 
+% 9）局部函数模块：plot_selected
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function plot_selected(file_path, phase6_metric, selected_metric, ...
         h_comp, h_cic, selected_row, fs_cic_in, rate_change, ...
         diff_delay, pass_edge, stop_begin, pass_limit, stop_limit)
@@ -523,6 +558,10 @@ function plot_selected(file_path, phase6_metric, selected_metric, ...
 end
 
 
+% 10）局部函数模块：style_axes
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function style_axes(ax)
     grid(ax, 'on'); box(ax, 'on');
     ax.FontName = 'Microsoft YaHei';

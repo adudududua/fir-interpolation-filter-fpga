@@ -20,6 +20,9 @@
 %                  nf_shared_equalizer_response.png
 %=============================================================
 
+%% 1）主流程：nf_01_search_shared_cic_equalizer
+% 功能说明：遍历 CIC 结构或补偿参数，筛选满足通带与阻带指标的候选方案。
+
 clearvars;
 clc;
 
@@ -195,6 +198,10 @@ fprintf('TXT: %s\n', summary_path);
 fprintf('PNG: %s\n', figure_path);
 
 
+% 2）局部函数模块：upsample_ir
+
+
+% 功能说明：按指定插值倍率展开冲激响应并构造当前级或完整链路的等效响应。
 function h_up = upsample_ir(h, rate)
     h = h(:).';
     h_up = zeros(1, rate*(numel(h)-1)+1);
@@ -202,6 +209,10 @@ function h_up = upsample_ir(h, rate)
 end
 
 
+% 3）局部函数模块：analyze_node
+
+
+% 功能说明：计算局部幅频、相位、纹波或阻带指标，并返回结构化验收结果。
 function metric = analyze_node(h, fs_out, fs_in, ...
         pass_low, pass_high, nfft)
     [H, f] = freqz(h, 1, nfft, fs_out);
@@ -217,6 +228,10 @@ function metric = analyze_node(h, fs_out, fs_in, ...
 end
 
 
+% 4）局部函数模块：write_summary
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_summary(filename, selected, metric_table, ...
         pass_limit, stop_limit)
     fid = fopen(filename, 'w');
@@ -247,6 +262,10 @@ function write_summary(filename, selected, metric_table, ...
 end
 
 
+% 5）局部函数模块：plot_response
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function plot_response(filename, h4, h8, h128, fs_list, ...
         pass_edge, pass_limit, stop_limit, nfft)
     figure('Color', 'w', 'Position', [80 80 1420 780]);

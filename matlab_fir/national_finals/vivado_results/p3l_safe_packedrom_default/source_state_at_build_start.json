@@ -1,0 +1,8 @@
+{
+    "captured_utc":  "2026-08-03T14:42:33.2218802Z",
+    "branch":  "national-finals-p3l-safe-packedrom-395target",
+    "commit":  "977091537462c27557e83c8bcbfb55816c08ab13",
+    "source_worktree_dirty":  false,
+    "source_status_porcelain":  "",
+    "status_porcelain_all":  "?? matlab_fir/national_finals/vivado_results/p3l_safe_packedrom_default/source_state_at_build_start.json\n?? matlab_fir/national_finals/vivado_results/p3l_safe_packedrom_default/synthesis_sources.txt"
+}

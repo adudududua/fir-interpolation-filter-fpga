@@ -1,4 +1,14 @@
-%% Generate figures and compact CSV evidence for the innovation report.
+%=============================================================
+% 文件名       : generate_experiment_report_assets.m
+% 脚本名       : generate_experiment_report_assets
+% 功能简述     : 整理计算结果并导出后续 RTL、仿真或报告流程需要的技术文件。
+% 处理说明     : 本文件按“参数准备—核心计算—指标判定—结果导出”
+%                的顺序组织；各功能段和局部函数均有独立编号。
+% 开发工具     : MATLAB R2023a
+% 修订记录     : 2026-08-30：统一中文文件头、功能段编号和函数说明。
+%=============================================================
+
+%% 1）Generate figures and compact CSV evidence for the innovation report.
 % Raw Vivado/MATLAB/XSim outputs stay in national_finals/_work.  Only the
 % presentation assets written below are intended for the final report.
 
@@ -18,7 +28,7 @@ set(groot, 'defaultAxesFontSize', 9);
 colors = [0.35 0.50 0.66; 0.18 0.49 0.38; 0.70 0.30 0.30; ...
           0.55 0.39 0.63; 0.78 0.48 0.27];
 
-%% Experiment 1: compensation response ablation.
+%% 2）Experiment 1: compensation response ablation.
 resp = readtable(fullfile(work_root, 'experiment1', ...
     'experiment1_response_48k.csv'), 'VariableNamingRule', 'preserve');
 f = figure('Color', 'w', 'Position', [100 100 1320 560]);
@@ -52,7 +62,7 @@ sgtitle('Experiment 1 - Stage3/CIC compensation ablation');
 exportgraphics(f, fullfile(out_dir, 'exp1_compensation_ablation.png'), ...
     'Resolution', 180); close(f);
 
-%% Experiment 2: structural ablation from the genuine non-shared baseline.
+%% 3）Experiment 2: structural ablation from the genuine non-shared baseline.
 variant = ["Direct parallel 24-bit"; "Stage1 TDM, tail DSP"; ...
     "Stage1 TDM, tail LUT"; "Canonical tail"; ...
     "S2/S3 shared polyphase"; "Strict-HB BRAM history"; ...
@@ -84,7 +94,7 @@ legend({'DSP48E1','BRAM tile'},'Location','northeast','Box','off');
 exportgraphics(f, fullfile(out_dir, 'exp2_structural_ablation.png'), ...
     'Resolution', 180); close(f);
 
-%% Experiment 3: paired place/route recipes for two word-length points.
+%% 4）Experiment 3: paired place/route recipes for two word-length points.
 widths = ["24/22/20";"24/22/20";"24/22/20"; ...
           "24/20/20";"24/20/20";"24/20/20"];
 recipe_names = ["explore";"default";"extra_timing"; ...
@@ -120,7 +130,7 @@ sgtitle('Experiment 3 - paired P&R recipes for stage word length');
 exportgraphics(f, fullfile(out_dir, 'exp3_wordlength_pareto.png'), ...
     'Resolution', 180); close(f);
 
-%% Experiment 4a: OOC constraint-frequency scan.
+%% 5）Experiment 4a: OOC constraint-frequency scan.
 rows = [];
 for mode = [2 1 0]
     for period = [12 10 8]
@@ -153,7 +163,7 @@ legend({'4 DSP','3 DSP','2 DSP'},'Location','southwest','Box','off');
 exportgraphics(f, fullfile(out_dir, 'exp4_fmax_scan.png'), ...
     'Resolution', 180); close(f);
 
-%% Experiment 4b: activity-annotated power.
+%% 6）Experiment 4b: activity-annotated power.
 power_dirs = ["dsp4_218lut","dsp3_239lut","dsp2_268lut"];
 dsp_power = [4;3;2]; lut_power = [218;239;268];
 static_w = zeros(3,1); dynamic_w = zeros(3,1); confidence = strings(3,1);
@@ -183,7 +193,7 @@ end
 exportgraphics(f, fullfile(out_dir, 'exp4_saif_power.png'), ...
     'Resolution', 180); close(f);
 
-%% Experiment 5: same-tool OOC architecture comparison, when available.
+%% 7）Experiment 5: same-tool OOC architecture comparison, when available.
 cic = read_key_values(fullfile(work_root,'experiment5','ooc', ...
     'fir_cic_3dsp','core_ooc_summary.txt'));
 all2x_summary = fullfile(work_root,'experiment5','ooc','all2x_2dsp', ...
@@ -215,7 +225,7 @@ if exist(all2x_summary,'file')
         'Resolution', 180); close(f);
 end
 
-%% Experiment 6: exact N3 Hold architecture ablation.
+%% 8）Experiment 6: exact N3 Hold architecture ablation.
 hold_csv = fullfile(work_root,'experiment6','ooc','cic_hold_ooc.csv');
 if exist(hold_csv,'file')
     Thold = readtable(hold_csv,'TextType','string');
@@ -239,6 +249,9 @@ end
 
 fprintf('REPORT_ASSETS_GENERATED=%s\n', out_dir);
 
+% 9）局部函数模块：read_key_values
+
+% 功能说明：读取外部配置、RTL结果或数据文件，并转换为主流程使用的统一数据格式。
 function kv = read_key_values(path)
     text = fileread(path);
     lines = splitlines(string(text));

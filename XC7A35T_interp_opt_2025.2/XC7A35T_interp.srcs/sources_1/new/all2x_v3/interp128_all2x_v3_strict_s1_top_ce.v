@@ -19,10 +19,15 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-11
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-11：新增 V3 strict Stage 1 实验顶层。
+//=============================================================
+//=============================================================
+// 1）模块名称：interp128_all2x_v3_strict_s1_top_ce
+// 功能说明：128 倍插值顶层：级联多级 2 倍插值、CIC 与补偿级并管理模式旁路。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module interp128_all2x_v3_strict_s1_top_ce #(
@@ -59,6 +64,7 @@ module interp128_all2x_v3_strict_s1_top_ce #(
     output wire                         dbg_y64_valid
 );
 
+    // 例化说明：调用 interp128_all2x_v3_stage1_select_top_ce 插值链顶层，完成所选倍率的数据率提升与有效信号传递。
     interp128_all2x_v3_stage1_select_top_ce #(
         .DATA_W                      (DATA_W),
         .FIRST_CANONICAL_STAGE       (4),

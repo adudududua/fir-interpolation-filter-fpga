@@ -1,4 +1,17 @@
+%=============================================================
+% 文件名       : publish_release_218_config.m
+% 脚本名       : publish_release_218_config
+% 功能简述     : 整理计算结果并导出后续 RTL、仿真或报告流程需要的技术文件。
+% 处理说明     : 本文件按“参数准备—核心计算—指标判定—结果导出”
+%                的顺序组织；各功能段和局部函数均有独立编号。
+% 开发工具     : MATLAB R2023a
+% 修订记录     : 2026-08-30：统一中文文件头、功能段编号和函数说明。
+%=============================================================
+
 % Publish the board-verified 218-LUT configuration as machine-readable JSON.
+
+%% 1）主流程：publish_release_218_config
+% 功能说明：整理计算结果并导出后续 RTL、仿真或报告流程需要的技术文件。
 
 clearvars;
 script_dir = fileparts(mfilename('fullpath'));

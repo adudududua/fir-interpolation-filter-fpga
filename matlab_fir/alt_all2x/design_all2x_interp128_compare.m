@@ -46,7 +46,7 @@ clc; clear; close all;
 %                            保守逐级阻带入口，保证最终全阻带指标。
 %=============================================================
 
-%% 1) 基本设计目标参数
+%% 1）基本设计目标参数
 %=============================================================
 
 FS_IN_BASE = 44100;
@@ -108,7 +108,7 @@ fprintf('FRAC_W_LIST             = [%s]\n', num2str(FRAC_W_LIST));
 fprintf('PRUNE_THR_LIST          = [%s]\n', num2str(PRUNE_THR_LIST));
 fprintf('====================================================\n\n');
 
-%% 2) 逐级设计 7 个 2x FIR
+%% 2）逐级设计 7 个 2x FIR
 %=============================================================
 
 stage_result = struct([]);
@@ -182,7 +182,7 @@ for stage_idx = 1:NUM_STAGE
     export_stage_coefficients(script_dir, stage_result(stage_idx));
 end
 
-%% 3) 导出逐级搜索表
+%% 3）导出逐级搜索表
 %=============================================================
 
 stage_csv = fullfile(script_dir, 'all2x_stage_search_result.csv');
@@ -198,7 +198,7 @@ for i = 1:size(stage_search_table, 1)
 end
 fclose(fid);
 
-%% 4) 构造完整 128x 总冲激响应
+%% 4）构造完整 128x 总冲激响应
 %=============================================================
 
 h_total = stage_result(1).b(:).';
@@ -215,7 +215,7 @@ for stage_idx = 2:NUM_STAGE
             stage_idx, length(h_total));
 end
 
-%% 5) 检查完整 128x 链路
+%% 5）检查完整 128x 链路
 %=============================================================
 
 total_res = check_total_chain( ...
@@ -256,7 +256,7 @@ fprintf('总阻带衰减判定                 = %d\n', total_res.pass_stop);
 fprintf('总线性相位判定                 = %d\n', total_res.pass_linear);
 fprintf('总链路通过判定                 = %d\n', total_res.pass_all);
 
-%% 6) 导出汇总文件与总频响图
+%% 6）导出汇总文件与总频响图
 %=============================================================
 
 summary_path = fullfile(script_dir, 'all2x_interp128_summary.txt');
@@ -324,9 +324,11 @@ fprintf('3) %s\n', png_path);
 fprintf('4) stageXX_2x_coeff_*.txt\n\n');
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：设计单级 2x FIR
 % ============================================================
+% 7）局部函数模块：design_one_2x_stage
+% 功能说明：封装 design_one_2x_stage 对应的局部计算，供主流程复用并保持代码层次清晰。
 function [best, result_table] = design_one_2x_stage(stage_idx, Fs_in, Fs_out, ...
                                                     f_pass_low, f_pass_high, ...
                                                     f_stop_begin, ...
@@ -475,9 +477,11 @@ function [best, result_table] = design_one_2x_stage(stage_idx, Fs_in, Fs_out, ..
 end
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：检查单级 2x FIR
 % ============================================================
+% 8）局部函数模块：check_one_stage
+% 功能说明：检查局部约束和数值条件，在不满足要求时给出明确错误信息。
 function res = check_one_stage(b, Fs_out, f_pass_low, f_pass_high, f_stop_begin, ...
                                stop_attn_target_db, ripple_pm_target_db, ...
                                interp_gain, nfft)
@@ -540,9 +544,11 @@ function res = check_one_stage(b, Fs_out, f_pass_low, f_pass_high, f_stop_begin,
 end
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：检查完整 128x 总链路
 % ============================================================
+% 9）局部函数模块：check_total_chain
+% 功能说明：检查局部约束和数值条件，在不满足要求时给出明确错误信息。
 function res = check_total_chain(h_total, Fs_in, Fs_out, ...
                                  f_pass_low, f_pass_high, ...
                                  ripple_target_db, stop_target_db, ...
@@ -603,9 +609,11 @@ function res = check_total_chain(h_total, Fs_in, Fs_out, ...
 end
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：导出单级系数
 % ============================================================
+% 10）局部函数模块：export_stage_coefficients
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function export_stage_coefficients(script_dir, stage)
 
     prefix = sprintf('stage%02d_2x', stage.stage_idx);
@@ -632,9 +640,11 @@ function export_stage_coefficients(script_dir, stage)
 end
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：导出半系数 Verilog 赋值语句
 % ============================================================
+% 11）局部函数模块：export_half_coeff_for_verilog
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function export_half_coeff_for_verilog(filename, coeff_half_int, coeff_w, frac_w, order_n, prune_thr, title_str)
 
     fid = fopen(filename, 'w');
@@ -668,9 +678,11 @@ function export_half_coeff_for_verilog(filename, coeff_half_int, coeff_w, frac_w
 end
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：绘制完整 128x 总响应
 % ============================================================
+% 12）局部函数模块：plot_total_response
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function plot_total_response(h_total, total_res, Fs_in, Fs_out, ...
                              f_pass_low, f_pass_high, stop_target_db, ...
                              nfft, filename, ...
@@ -776,9 +788,11 @@ function plot_total_response(h_total, total_res, Fs_in, Fs_out, ...
 end
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：设置每两个主刻度之间 1 个辅刻度
 % ============================================================
+% 13）局部函数模块：set_mid_minor_ticks
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function set_mid_minor_ticks(ax)
     try
         ax.XMinorTick = 'on';
@@ -798,9 +812,11 @@ function set_mid_minor_ticks(ax)
 end
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：计算主刻度中点
 % ============================================================
+% 14）局部函数模块：midpoint_ticks
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function ticks_minor = midpoint_ticks(ticks_major, axis_lim)
     ticks_major = ticks_major(:).';
     ticks_major = ticks_major(ticks_major >= axis_lim(1) & ticks_major <= axis_lim(2));

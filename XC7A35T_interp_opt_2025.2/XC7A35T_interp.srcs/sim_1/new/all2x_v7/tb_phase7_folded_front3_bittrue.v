@@ -16,10 +16,15 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-13
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-13：新增 N=3/N=4 折叠 Stage3 位真对拍。
+//=============================================================
+//=============================================================
+// 1）模块名称：tb_phase7_folded_front3_bittrue
+// 功能说明：仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module tb_phase7_folded_front3_bittrue;
@@ -68,6 +73,7 @@ module tb_phase7_folded_front3_bittrue;
     wire signed [23:0] n4_random_y8;
     wire n4_random_y8_valid;
 
+    // 例化说明：调用 interp128_all2x_v7_folded_fir_cic_top_ce 插值链顶层，完成所选倍率的数据率提升与有效信号传递。
     interp128_all2x_v7_folded_fir_cic_top_ce #(
         .CIC_ORDER(3), .FINAL_PRUNE_LSB(0)
     ) u_n3_impulse (
@@ -83,6 +89,7 @@ module tb_phase7_folded_front3_bittrue;
         .dbg_y64(), .dbg_y64_valid()
     );
 
+    // 例化说明：调用 interp128_all2x_v7_folded_fir_cic_top_ce 插值链顶层，完成所选倍率的数据率提升与有效信号传递。
     interp128_all2x_v7_folded_fir_cic_top_ce #(
         .CIC_ORDER(4), .FINAL_PRUNE_LSB(7)
     ) u_n4_impulse (
@@ -98,6 +105,7 @@ module tb_phase7_folded_front3_bittrue;
         .dbg_y64(), .dbg_y64_valid()
     );
 
+    // 例化说明：调用 interp128_all2x_v7_folded_fir_cic_top_ce 插值链顶层，完成所选倍率的数据率提升与有效信号传递。
     interp128_all2x_v7_folded_fir_cic_top_ce #(
         .CIC_ORDER(3), .FINAL_PRUNE_LSB(0)
     ) u_n3_random (
@@ -113,6 +121,7 @@ module tb_phase7_folded_front3_bittrue;
         .dbg_y64(), .dbg_y64_valid()
     );
 
+    // 例化说明：调用 interp128_all2x_v7_folded_fir_cic_top_ce 插值链顶层，完成所选倍率的数据率提升与有效信号传递。
     interp128_all2x_v7_folded_fir_cic_top_ce #(
         .CIC_ORDER(4), .FINAL_PRUNE_LSB(7)
     ) u_n4_random (

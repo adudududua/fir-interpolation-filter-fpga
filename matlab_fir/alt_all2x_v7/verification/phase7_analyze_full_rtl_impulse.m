@@ -26,6 +26,10 @@ function result = phase7_analyze_full_rtl_impulse()
 % 修订记录     :
 %                2026-07-14：新增 RTL 完整冲激频率与相位验收。
 %=============================================================
+% 1）主函数模块：phase7_analyze_full_rtl_impulse
+% 功能说明：读取 RTL/XSim 冲激响应，恢复频率响应并计算通带、阻带和线性相位指标。
+% 输入、输出、定点规则和结果文件由下方参数及代码段具体定义。
+
 
     verify_dir = fileparts(mfilename('fullpath'));
     addpath(fullfile(verify_dir, 'config'));
@@ -156,6 +160,10 @@ function result = phase7_analyze_full_rtl_impulse()
 end
 
 
+% 2）局部函数模块：read_rtl_csv
+
+
+% 功能说明：读取外部配置、RTL结果或数据文件，并转换为主流程使用的统一数据格式。
 function data = read_rtl_csv(filename, expected_length)
     if ~exist(filename, 'file')
         error('缺少 RTL 冲激文件：%s', filename);
@@ -169,6 +177,10 @@ function data = read_rtl_csv(filename, expected_length)
 end
 
 
+% 3）局部函数模块：analyze_one_node
+
+
+% 功能说明：计算局部幅频、相位、纹波或阻带指标，并返回结构化验收结果。
 function metric = analyze_one_node(y, fs_hz, expected_gain, ...
         impulse_amplitude, CFG, nfft)
     h = double(y)/double(impulse_amplitude);
@@ -197,6 +209,10 @@ function metric = analyze_one_node(y, fs_hz, expected_gain, ...
 end
 
 
+% 4）局部函数模块：add_linear_phase_metric
+
+
+% 功能说明：计算局部幅频、相位、纹波或阻带指标，并返回结构化验收结果。
 function metric = add_linear_phase_metric(metric, y, fs_hz, CFG)
     pass_index = metric.f >= CFG.FPASS_LOW & ...
         metric.f <= CFG.FPASS_HIGH;
@@ -234,11 +250,19 @@ function metric = add_linear_phase_metric(metric, y, fs_hz, CFG)
 end
 
 
+% 5）局部函数模块：interpolate_response
+
+
+% 功能说明：计算局部幅频、相位、纹波或阻带指标，并返回结构化验收结果。
 function value_db = interpolate_response(metric, frequency_hz)
     value_db = interp1(metric.f, metric.H_db, frequency_hz, 'linear');
 end
 
 
+% 6）局部函数模块：write_summary
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_summary(filename, CFG, metric4, metric8, metric128, ...
         hard_pass_4x, hard_pass_128x, release_pass_128x)
     fid = fopen(filename, 'w');
@@ -287,6 +311,10 @@ function write_summary(filename, CFG, metric4, metric8, metric128, ...
 end
 
 
+% 7）局部函数模块：plot_frequency_result
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function plot_frequency_result(filename, CFG, metric4, metric8, metric128)
     color_blue = [0.20 0.39 0.63];
     color_purple = [0.28 0.15 0.49];
@@ -347,6 +375,10 @@ function plot_frequency_result(filename, CFG, metric4, metric8, metric128)
 end
 
 
+% 8）局部函数模块：plot_phase_result
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function plot_phase_result(filename, CFG, metric, y)
     color_purple = [0.28 0.15 0.49];
     color_green = [0.10 0.60 0.49];
@@ -372,6 +404,10 @@ function plot_phase_result(filename, CFG, metric, y)
 end
 
 
+% 9）局部函数模块：plot_fullband_acceptance
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function plot_fullband_acceptance(filename, CFG, metric, ...
         hard_pass, release_pass)
     color_blue = [0.20 0.39 0.63];
@@ -454,6 +490,10 @@ function plot_fullband_acceptance(filename, CFG, metric, ...
 end
 
 
+% 10）局部函数模块：compact_metric
+
+
+% 功能说明：计算局部幅频、相位、纹波或阻带指标，并返回结构化验收结果。
 function metric_out = compact_metric(metric_in)
     large_fields = {'h', 'H', 'f', 'H_db', 'phase_frequency', ...
         'phase_residual', 'group_delay_frequency', 'group_delay', ...
@@ -463,6 +503,10 @@ function metric_out = compact_metric(metric_in)
 end
 
 
+% 11）局部函数模块：style_axes
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function style_axes(ax)
     grid(ax, 'on'); box(ax, 'on');
     ax.FontName = 'Microsoft YaHei';
@@ -475,6 +519,10 @@ function style_axes(ax)
 end
 
 
+% 12）局部函数模块：ensure_directory
+
+
+% 功能说明：检查目标目录是否存在，并在缺失时创建，保证后续文件导出路径有效。
 function ensure_directory(path_value)
     if ~exist(path_value, 'dir')
         mkdir(path_value);

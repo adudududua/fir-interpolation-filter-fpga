@@ -25,6 +25,10 @@ function [y, stat, trace] = cic_interp16_bittrue( ...
 % 修订记录     :
 %                2026-07-13：新增 CIC 插值整数位真模型。
 %=============================================================
+% 1）主函数模块：cic_interp16_bittrue
+% 功能说明：模拟 CIC 插值器的梳状器、补零和积分器定点状态更新。
+% 输入、输出、定点规则和结果文件由下方参数及代码段具体定义。
+
 
     if nargin < 7 || isempty(prune_lsb)
         prune_lsb = zeros(1, 2*cic_order);
@@ -126,6 +130,10 @@ function [y, stat, trace] = cic_interp16_bittrue( ...
 end
 
 
+% 2）局部函数模块：align_lsb
+
+
+% 功能说明：对齐参考数据与待测数据，计算逐样本误差并形成一致性判定。
 function [aligned, changed_count] = align_lsb(data, shift_n, out_w)
     if shift_n < 0
         error('内部 LSB 对齐不允许恢复已丢弃的位。');
@@ -143,6 +151,10 @@ function [aligned, changed_count] = align_lsb(data, shift_n, out_w)
 end
 
 
+% 3）局部函数模块：wrap_signed
+
+
+% 功能说明：按给定位宽执行二进制补码回绕，并返回是否发生溢出回绕的标志。
 function [wrapped, wrap_count] = wrap_signed(value, word_w)
     if word_w < 2 || word_w > 52
         error('当前精确模运算仅支持 2～52bit。');

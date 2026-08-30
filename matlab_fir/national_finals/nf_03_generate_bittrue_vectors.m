@@ -3,6 +3,9 @@
 % 功能简述     : 生成全国赛完整 RTL 的冲激与固定随机 0 LSB golden。
 %=============================================================
 
+%% 1）主流程：nf_03_generate_bittrue_vectors
+% 功能说明：生成 RTL/XSim 使用的输入激励、黄金输出和配套元数据文件。
+
 clearvars;
 clc;
 
@@ -56,6 +59,10 @@ disp(manifest);
 fprintf('全国赛位真向量生成完成：%s\n', vector_dir);
 
 
+% 2）局部函数模块：write_summary_atomic
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_summary_atomic(filename, manifest)
     temporary = [filename '.tmp'];
     [fid, open_message] = fopen(temporary, 'w');
@@ -88,6 +95,10 @@ function write_summary_atomic(filename, manifest)
 end
 
 
+% 3）局部函数模块：write_case
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_case(vector_dir, case_name, result)
     write_signed_hex_mem(fullfile(vector_dir, ...
         [case_name '_input_24bit.mem']), result.input, 24);
@@ -100,6 +111,10 @@ function write_case(vector_dir, case_name, result)
 end
 
 
+% 4）局部函数模块：write_signed_hex_mem
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_signed_hex_mem(filename, data, data_w)
     digits = ceil(data_w/4);
     unsigned_data = mod(double(int64(data(:))), 2^data_w);

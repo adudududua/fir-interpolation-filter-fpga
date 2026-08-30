@@ -18,11 +18,16 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-04-24
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-04-24：初始版本。
 //                2026-06-23：加入后级 2x FIR 字长优化参数。
+//=============================================================
+//=============================================================
+// 1）模块名称：interp128_top_ce
+// 功能说明：128 倍插值顶层：级联多级 2 倍插值、CIC 与补偿级并管理模式旁路。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module interp128_top_ce #(
@@ -87,6 +92,7 @@ output wire                         dbg_y64_valid
 wire signed [23:0] y4_w;
 wire               y4_valid_w;
 
+// 例化说明：调用 interp4_top_symm_ce 插值子模块，完成对应级的数据展开、滤波或模式选择。
 interp4_top_symm_ce #(
     .DATA_W  (DATA_W),
     .COEFF_W (COEFF_W),
@@ -111,6 +117,7 @@ interp4_top_symm_ce #(
 wire signed [23:0] y4_to_8_data;
 wire               y4_to_8_valid;
 
+// 例化说明：调用 bridge_to_interp2_ce 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
 bridge_to_interp2_ce #(
     .DATA_W (24)
 ) u_bridge_4_to_8 (
@@ -129,6 +136,7 @@ bridge_to_interp2_ce #(
 wire signed [23:0] y8_w;
 wire               y8_valid_w;
 
+// 例化说明：调用 interp2_top_symm_ce 插值子模块，完成对应级的数据展开、滤波或模式选择。
 interp2_top_symm_ce #(
     .DATA_W  (DATA_W),
     .COEFF_W (COEFF_W_2X),
@@ -154,6 +162,7 @@ interp2_top_symm_ce #(
 wire signed [23:0] y8_to_16_data;
 wire               y8_to_16_valid;
 
+// 例化说明：调用 bridge_to_interp2_ce 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
 bridge_to_interp2_ce #(
     .DATA_W (24)
 ) u_bridge_8_to_16 (
@@ -172,6 +181,7 @@ bridge_to_interp2_ce #(
 wire signed [23:0] y16_w;
 wire               y16_valid_w;
 
+// 例化说明：调用 interp2_top_symm_ce 插值子模块，完成对应级的数据展开、滤波或模式选择。
 interp2_top_symm_ce #(
     .DATA_W  (DATA_W),
     .COEFF_W (COEFF_W_2X),
@@ -197,6 +207,7 @@ interp2_top_symm_ce #(
 wire signed [23:0] y16_to_32_data;
 wire               y16_to_32_valid;
 
+// 例化说明：调用 bridge_to_interp2_ce 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
 bridge_to_interp2_ce #(
     .DATA_W (24)
 ) u_bridge_16_to_32 (
@@ -215,6 +226,7 @@ bridge_to_interp2_ce #(
 wire signed [23:0] y32_w;
 wire               y32_valid_w;
 
+// 例化说明：调用 interp2_top_symm_ce 插值子模块，完成对应级的数据展开、滤波或模式选择。
 interp2_top_symm_ce #(
     .DATA_W  (DATA_W),
     .COEFF_W (COEFF_W_2X),
@@ -240,6 +252,7 @@ interp2_top_symm_ce #(
 wire signed [23:0] y32_to_64_data;
 wire               y32_to_64_valid;
 
+// 例化说明：调用 bridge_to_interp2_ce 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
 bridge_to_interp2_ce #(
     .DATA_W (24)
 ) u_bridge_32_to_64 (
@@ -258,6 +271,7 @@ bridge_to_interp2_ce #(
 wire signed [23:0] y64_w;
 wire               y64_valid_w;
 
+// 例化说明：调用 interp2_top_symm_ce 插值子模块，完成对应级的数据展开、滤波或模式选择。
 interp2_top_symm_ce #(
     .DATA_W  (DATA_W),
     .COEFF_W (COEFF_W_2X),
@@ -283,6 +297,7 @@ interp2_top_symm_ce #(
 wire signed [23:0] y64_to_128_data;
 wire               y64_to_128_valid;
 
+// 例化说明：调用 bridge_to_interp2_ce 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
 bridge_to_interp2_ce #(
     .DATA_W (24)
 ) u_bridge_64_to_128 (
@@ -301,6 +316,7 @@ bridge_to_interp2_ce #(
 wire signed [23:0] y128_w;
 wire               y128_valid_w;
 
+// 例化说明：调用 interp2_top_symm_ce 插值子模块，完成对应级的数据展开、滤波或模式选择。
 interp2_top_symm_ce #(
     .DATA_W  (DATA_W),
     .COEFF_W (COEFF_W_2X),

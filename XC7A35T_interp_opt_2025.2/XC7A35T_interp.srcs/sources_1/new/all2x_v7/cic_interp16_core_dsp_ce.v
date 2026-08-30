@@ -16,8 +16,8 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-18
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-18：新增 DSP48 优先映射候选。
 //                2026-07-18：禁止 5bit burst 计数器占用 DSP48E1，
@@ -25,6 +25,11 @@
 //=============================================================
 
 (* use_dsp = "yes" *)
+//=============================================================
+// 1）模块名称：cic_interp16_core_dsp_ce
+// 功能说明：16 倍 CIC 插值器：执行梳状差分、零值插入与积分累加。
+// 工程版本：Vivado 2025.2。
+//=============================================================
 module cic_interp16_core_dsp_ce #(
     parameter integer DATA_W = 20,
     parameter integer OUTPUT_W = DATA_W,
@@ -103,6 +108,7 @@ module cic_interp16_core_dsp_ce #(
             assign final_input_rounded = integrator_work;
         end
         else begin : gen_final_pruning
+            // 例化说明：调用 round_sat_shift_compact 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
             round_sat_shift_compact #(
                 .IN_W    (FULL_W),
                 .OUT_W   (FINAL_W),
@@ -114,6 +120,7 @@ module cic_interp16_core_dsp_ce #(
         end
     endgenerate
 
+    // 例化说明：调用 round_sat_shift_compact 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     round_sat_shift_compact #(
         .IN_W    (FINAL_W),
         .OUT_W   (OUTPUT_W),

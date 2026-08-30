@@ -24,8 +24,8 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-18
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-18：新增 Stage 2/3 LUTRAM 低 LUT 候选。
 //                2026-07-18：串行 MAC 调度改为 Stage 2 优先，保证
@@ -39,6 +39,11 @@
 //=============================================================
 
 `include "all2x_v2_coeff_pkg.vh"
+//=============================================================
+// 1）模块名称：interp2_stage23_lutram_cic_dsp_ce
+// 功能说明：第二、三级 2 倍插值滤波器：复用或折叠运算资源完成连续插值。
+// 工程版本：Vivado 2025.2。
+//=============================================================
 
 module interp2_stage23_lutram_cic_dsp_ce #(
     parameter integer DATA_W = 24,
@@ -92,9 +97,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     localparam integer PATTERN_SAT_SUPPORTED =
         ((STAGE2_DATA_W == 22 || STAGE2_DATA_W == 20) &&
          STAGE3_OUTPUT_W == 21);
-    // DSP48 MASK bit 1 means "ignore".  The 22/21 profile checks P[47:36];
-    // the 20/21 profile checks P[47:35], which simultaneously covers the
-    // Stage2 signed-20 sign extension and the Stage3 signed-21 extension.
+    // DSP48 MASK位为1表示忽略。22/21位配置检查P[47:36]；20/21位配置
+    // 检查P[47:35]，同时覆盖Stage2有符号20位和Stage3有符号21位扩展。
     localparam [47:0] SATURATION_PATTERN_MASK =
         (STAGE2_DATA_W == 20) ? 48'h0007FFFFFFFF :
                                48'h000FFFFFFFFF;
@@ -118,9 +122,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
 
     reg [MEM_ADDR_W-1:0] stage2_head;
     reg [MEM_ADDR_W-1:0] stage3_head;
-    // Head moves backwards from zero on every accepted history sample.  Its
-    // two's-complement magnitude is the fill depth until the short FIR
-    // history is full; only a sticky full flag is then required.
+    // 每接收一个历史样本，环形头指针从0向后递减；短FIR历史写满前，
+    // 其补码幅值即填充深度，写满后只需一个粘滞full标志。
     reg stage2_history_full;
     reg stage3_history_full;
 
@@ -244,10 +247,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
 
     assign stage2_write_addr = stage2_head - {{(MEM_ADDR_W-1){1'b0}}, 1'b1};
     assign stage3_write_addr = stage3_head - {{(MEM_ADDR_W-1){1'b0}}, 1'b1};
-    // The shared MAC can observe only one history bank at a time.  A single
-    // latched head therefore serves both banks during a job; while idle, the
-    // same address path prefetches index zero for the next priority-selected
-    // pending job.
+    // 共享MAC每次只能访问一个历史bank，因此一次任务期间用单个锁存头指针
+    // 服务所选bank；空闲时同一地址路径预取下一优先级任务的索引0。
     assign history_read_head = job_active ? job_history_head :
         (stage2_pending ? stage2_head : stage3_head);
     assign hist_index = job_mac_index[MEM_ADDR_W-1:0];
@@ -336,11 +337,9 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     assign stage2_lutram_raw = stage2_hist_mem[stage2_read_addr];
     assign stage3_lutram_raw = stage3_hist_mem[stage3_read_addr];
 
-    // Do not build a DATA_W-wide Fabric mux to replace unread BRAM history
-    // with zero.  Invalid startup taps instead disable the DSP48 P register,
-    // which is exactly equivalent to accumulating a zero product and leaves
-    // the running sum unchanged.  This also preserves arbitrary reset
-    // recovery without clearing the BRAM arrays.
+    // 不使用DATA_W位Fabric MUX把未读BRAM历史替换为0；启动期无效抽头改为
+    // 禁止DSP48 P寄存器，严格等价于累加零乘积并保持运行和不变。这样无需
+    // 清空BRAM数组，也能保证任意复位时刻后的恢复行为。
     assign stage2_mem = stage2_mem_raw;
     assign stage3_mem = stage3_mem_raw;
 
@@ -358,12 +357,10 @@ module interp2_stage23_lutram_cic_dsp_ce #(
         external_coeff_data :
         ((USE_PACKED_BRAM != 0) ? packed_coeff_raw :
          ((USE_BRAM_COEFF != 0) ? coeff_bram_raw : coeff_comb));
-    // PREG is synchronously cleared as a new job is accepted, then feeds the
-    // DSP48 ALU Z input on every MAC cycle.  After the final MAC, one otherwise
-    // idle cycle adds the exact signed Q15 rounding bias inside the same DSP:
-    // +16384 for non-negative sums and +16383 for negative sums.  A second
-    // spare cycle uses PATTERNDETECT to keep an in-range result or loads the
-    // exact signed limit through the C input when saturation is required.
+    // 接收新任务时同步清零PREG，之后每个MAC周期由它反馈DSP48 ALU的Z输入。
+    // 最后一次MAC后，利用一个空闲周期在同一DSP内加入精确有符号Q15偏置：
+    // 非负和加16384，负和加16383；第二个空闲周期用PATTERNDETECT保留范围内
+    // 结果，或在需要饱和时通过C输入装入精确有符号极限。
     assign dsp_p_reset = !rst_n ||
         (!job_active && !job_result_pending && !job_output_pending &&
          !job_saturation_pending &&
@@ -396,6 +393,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
 
     // 显式使用一颗 DSP48E1，避免综合器把乘法和累加拆成多颗 DSP。
     // MAC 周期用 M+P，提交周期用 P+C 加入符号相关舍入偏置。
+    // 例化说明：调用 DSP48E1 算术原语，完成乘法、加减或累加；各控制字定义当前流水拍的运算功能。
     DSP48E1 #(
         .A_INPUT("DIRECT"),
         .B_INPUT("DIRECT"),
@@ -477,10 +475,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     );
     assign mac_sum_comb = dsp_mac_full[ACC_W-1:0];
 
-    // The PREG value has already received the exact signed rounding bias.
-    // PATTERNDETECT serves both signed-22/signed-21 and the candidate
-    // signed-20/signed-21 profiles exactly.  Other legal parameterizations
-    // retain the generic Fabric comparison fallback.
+    // PREG已获得精确有符号舍入偏置；PATTERNDETECT可精确覆盖22/21位签核
+    // 配置及20/21位候选配置，其它合法参数组合保留通用Fabric比较分支。
     assign truncated_value = mac_sum_comb >>> FRAC_W;
 
     assign stage2_upper_is_sign_extension =
@@ -492,10 +488,8 @@ module interp2_stage23_lutram_cic_dsp_ce #(
     assign stage2_q15_rounded =
         truncated_value[STAGE2_DATA_W-1:0];
 
-    // The national-finals Stage3 coefficients are true Q15 values.  Their
-    // worst-case absolute branch sum no longer makes the former 35-bit
-    // direct slice safe, so the complete 38-bit view and exact signed
-    // saturation remain mandatory.
+    // 全国赛Stage3系数为真实Q15值，其最坏绝对支路和已不能保证原35位直接
+    // 切片安全，因此必须保留完整38位观察范围及精确有符号饱和。
     assign stage3_upper_is_sign_extension =
         PATTERN_SAT_SUPPORTED ?
         (mac_sum_comb[STAGE3_OUTPUT_W+FRAC_W-1] ?
@@ -667,6 +661,7 @@ module interp2_stage23_lutram_cic_dsp_ce #(
             assign stage3_mem_raw =
                 stage23_unified_bram_raw[STAGE3_DATA_W-1:0];
 
+            // 例化说明：调用 nf_stage23_history_ramb18_sdp 全国赛签核子模块，完成正式数据通路中的存储、运算或控制任务。
             nf_stage23_history_ramb18_sdp #(
                 .DATA_W(STAGE2_DATA_W),
                 .ADDR_W(MEM_ADDR_W+1)
@@ -679,11 +674,9 @@ module interp2_stage23_lutram_cic_dsp_ce #(
                 .write_data(unified_write_data)
             );
 
-            // Generic callers retain a one-entry collision queue.  The signed
-            // national-finals clock-enable schedule is stronger: ce4 and ce8
-            // are aligned powers of two, both phases reset to one, and every
-            // coincident CE therefore sees opposite write phases.  Enabling
-            // the assumption removes the otherwise unreachable 25-bit queue.
+    // 通用调用者保留一级碰撞队列。全国赛签核CE调度约束更强：ce4与ce8
+    // 是对齐的二次幂节拍，两相位复位为1，每次CE重合时写相位必然相反；
+    // 启用该假设可删除正常运行下不可达的25位队列。
             if (ASSUME_ALIGNED_POW2_CE == 0) begin : gen_write_queue
                 always @(posedge clk) begin
                     if (!rst_n) begin

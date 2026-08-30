@@ -1,3 +1,6 @@
+%% 1）主流程：phase7_07_plot_resource_comparison
+% 功能说明：读取指标数据并生成带中文标注的报告或答辩展示图。
+
 clc; clear; close all;
 
 %=============================================================
@@ -75,6 +78,10 @@ exportgraphics(gcf, fullfile(figure_dir, ...
     'phase7_resource_comparison.png'), 'Resolution', 180);
 
 
+% 2）局部函数模块：add_bar_labels
+
+
+% 功能说明：封装 add_bar_labels 对应的局部计算，供主流程复用并保持代码层次清晰。
 function add_bar_labels(bar_handle)
     for series_idx = 1:numel(bar_handle)
         x_value = bar_handle(series_idx).XEndPoints;
@@ -87,6 +94,10 @@ function add_bar_labels(bar_handle)
 end
 
 
+% 3）局部函数模块：style_axes
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function style_axes(axis_handle)
     axis_handle.FontName = 'Microsoft YaHei';
     axis_handle.FontSize = 11;

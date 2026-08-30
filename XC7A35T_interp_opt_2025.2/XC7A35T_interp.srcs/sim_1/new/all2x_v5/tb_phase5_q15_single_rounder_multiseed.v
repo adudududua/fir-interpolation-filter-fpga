@@ -21,10 +21,15 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-12
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-12：新增 Phase 5 多种子边界压力测试。
+//=============================================================
+//=============================================================
+// 1）模块名称：tb_phase5_q15_single_rounder_multiseed
+// 功能说明：仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module tb_phase5_q15_single_rounder_multiseed;
@@ -117,6 +122,7 @@ module tb_phase5_q15_single_rounder_multiseed;
         end
     endfunction
 
+    // 例化说明：调用 interp128_all2x_v3_strict_s1_bram_top_ce 插值链顶层，完成所选倍率的数据率提升与有效信号传递。
     interp128_all2x_v3_strict_s1_bram_top_ce u_reference (
         .clk(clk), .rst_n(rst_n),
         .ce2_out(ce2_out), .ce4_out(ce4_out), .ce8_out(ce8_out),
@@ -132,6 +138,7 @@ module tb_phase5_q15_single_rounder_multiseed;
         .dbg_y64(), .dbg_y64_valid()
     );
 
+    // 例化说明：调用 interp128_all2x_v4_shared_dsp_top_ce 插值链顶层，完成所选倍率的数据率提升与有效信号传递。
     interp128_all2x_v4_shared_dsp_top_ce #(
         .STAGE23_ACC_W (40)
     ) u_candidate (

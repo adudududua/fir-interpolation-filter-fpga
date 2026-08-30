@@ -23,19 +23,24 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-29
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
+// 修订记录     : V2025.2 统一文件头并补充串行梳状器结构说明。
 //=============================================================
 
 (* use_dsp = "yes" *)
+//=============================================================
+// 1）模块名称：cic_interp16_serial_comb_dsp_ce
+// 功能说明：16 倍 CIC 插值器：执行梳状差分、零值插入与积分累加。
+// 工程版本：Vivado 2025.2。
+//=============================================================
 module cic_interp16_serial_comb_dsp_ce #(
     parameter integer DATA_W = 20,
     parameter integer OUTPUT_W = DATA_W,
     parameter integer FINAL_PRUNE_LSB = 0,
     parameter integer BURST_COUNTER_USE_DSP = 0,
-    // The three high-rate integrators remain DSP-resident.  The low-rate
-    // serial comb has sixteen clocks per input and may use the LUT carry
-    // chain to save one DSP48E1 at a small LUT cost.
+    // 三级高速积分器固定映射到 DSP48E1；低速串行梳状器在相邻输入间
+    // 具有16个工作时钟，可选择 LUT 进位链，以少量 LUT 换取1个DSP节省。
     parameter integer COMB_USE_DSP = 0
 )(
     input  wire                         clk,
@@ -59,14 +64,11 @@ module cic_interp16_serial_comb_dsp_ce #(
     localparam integer OUTPUT_SHIFT =
         (CIC_ORDER-1)*RATE_LOG2 - FINAL_PRUNE_LSB;
 
-    // The kth finite difference grows by at most one bit. Keeping the
-    // low-rate comb state at 20/21/22/23 bits is mathematically lossless;
-    // only the high-rate integrators require the full 32-bit CIC width.
-    // Rotate the three low-rate histories during the three serial comb
-    // cycles.  The selected delay is then always comb_delay0, eliminating a
-    // COMB_W-bit 3:1 mux at the DSP input.  A uniform DATA_W+2 history width
-    // exactly covers the widest stored second difference and costs only
-    // three additional state bits versus the former 20/21/22-bit banks.
+    // 第k阶有限差分最多增长1位，因此低速梳状状态采用20/21/22/23位在
+    // 数学上无损，只有高速积分器需要完整32位CIC宽度。三级串行梳状周期
+    // 内轮转三组低速历史，使所选延迟始终位于comb_delay0，消除DSP输入端
+    // COMB_W位3:1 MUX。统一DATA_W+2历史宽度可覆盖最宽二阶差分，相比
+    // 原20/21/22位分级存储仅增加3个状态位。
     reg signed [COMB_DELAY_W-1:0] comb_delay0;
     reg signed [COMB_DELAY_W-1:0] comb_delay1;
     reg signed [COMB_DELAY_W-1:0] comb_delay2;
@@ -103,9 +105,8 @@ module cic_interp16_serial_comb_dsp_ce #(
         {{(COMB_W-COMB_DELAY_W){comb_delay0[COMB_DELAY_W-1]}},
          comb_delay0};
 
-    // Progressive widths are exact for the three finite differences.
-    // Keep both mappings explicit so synthesis reports, rather than an
-    // inference heuristic, decide the 5-DSP candidate's Stop/Go result.
+    // 三级有限差分采用逐级位宽且保持精确；显式保留两种DSP映射，让综合
+    // 报告而非推断启发式结果决定5-DSP候选是否进入下一阶段。
     generate
         if (COMB_USE_DSP != 0) begin : gen_comb_dsp
             (* use_dsp = "yes" *)
@@ -127,8 +128,8 @@ module cic_interp16_serial_comb_dsp_ce #(
                           (burst_pending || burst_remaining != 4'd0);
     assign first_output_event = ce_out && burst_pending &&
                                 burst_remaining == 4'd0;
-    // Once the third comb subtraction completes, comb_operand itself holds
-    // the burst sample. Reusing it avoids a duplicate FULL_W-bit register.
+    // 第三级梳状减法完成后comb_operand自身即保存突发样本，复用该寄存器
+    // 可避免再增加一个FULL_W位重复寄存器。
     assign high_rate_input = first_output_event ?
         {{(FULL_W-COMB_W){comb_operand[COMB_W-1]}}, comb_operand} :
                              {FULL_W{1'b0}};
@@ -147,6 +148,7 @@ module cic_interp16_serial_comb_dsp_ce #(
             assign final_input_rounded = integrator_work;
         end
         else begin : gen_final_pruning
+            // 例化说明：调用 round_sat_shift_compact 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
             round_sat_shift_compact #(
                 .IN_W    (FULL_W),
                 .OUT_W   (FINAL_W),
@@ -158,6 +160,7 @@ module cic_interp16_serial_comb_dsp_ce #(
         end
     endgenerate
 
+    // 例化说明：调用 round_sat_shift_compact 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     round_sat_shift_compact #(
         .IN_W    (FINAL_W),
         .OUT_W   (OUTPUT_W),
@@ -237,9 +240,8 @@ module cic_interp16_serial_comb_dsp_ce #(
         end
     end
 
-    // The two hidden intermediate integrators use synchronous reset so Vivado
-    // can absorb them into DSP48E1 internal registers.  The externally visible
-    // output and final CIC state retain asynchronous reset.
+    // 两个内部中间积分器使用同步复位，以便Vivado吸收到DSP48E1内部寄存器；
+    // 外部可见输出和最终CIC状态仍保留异步复位语义。
     always @(posedge clk) begin
         if (!rst_n) begin
             for (integrator_state_idx = 0;

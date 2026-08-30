@@ -1,3 +1,6 @@
+%% 1）主流程：v2_03_validate_canonical_bittrue
+% 功能说明：在相同输入下对齐 MATLAB 黄金模型与 RTL 输出，执行逐样本 bit-true 判定。
+
 clc; clear; close all;
 
 %=============================================================
@@ -126,6 +129,10 @@ end
 fprintf('canonical halfband7 五组候选的常规 bit-true 测试全部通过。\n');
 
 
+% 2）局部函数模块：make_sine
+
+
+% 功能说明：封装 make_sine 对应的局部计算，供主流程复用并保持代码层次清晰。
 function x = make_sine(freq_hz, dbfs, sample_count, Fs, data_w)
     amplitude = (2^(data_w - 1) - 1) * 10^(dbfs/20);
     n = 0:sample_count-1;
@@ -133,6 +140,10 @@ function x = make_sine(freq_hz, dbfs, sample_count, Fs, data_w)
 end
 
 
+% 3）局部函数模块：write_signed_hex_mem
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_signed_hex_mem(filename, data, data_w)
     digits = ceil(data_w / 4);
     unsigned_data = mod(double(int64(data(:))), 2^data_w);

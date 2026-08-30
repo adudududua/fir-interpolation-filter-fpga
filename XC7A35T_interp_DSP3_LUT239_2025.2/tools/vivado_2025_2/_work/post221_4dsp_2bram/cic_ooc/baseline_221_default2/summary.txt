@@ -1,0 +1,6 @@
+TOP=cic_interp16_n3_hold2_dsp_ce
+SLICE_LUTS=106
+FFS=119
+CARRY4=12
+DSP48E1=2
+RAMB18E1=0

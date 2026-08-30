@@ -29,7 +29,7 @@ clc; clear; close all;
 %                2026-07-10：新增 RTL 参数与随机 golden 向量导出脚本。
 %=============================================================
 
-%% 1) 路径与配置
+%% 1）路径与配置
 %=============================================================
 
 script_dir = fileparts(mfilename('fullpath'));
@@ -44,7 +44,7 @@ INPUT_LIMIT = 2^20;
 
 stage_config = load_all2x_stage_config(design_dir, DATA_W);
 
-%% 2) 生成 bit-true 输入与 golden 输出
+%% 2）生成 bit-true 输入与 golden 输出
 %=============================================================
 
 rng(RANDOM_SEED, 'twister');
@@ -59,7 +59,7 @@ if overflow_count ~= 0 || sat_count ~= 0
           overflow_count, sat_count);
 end
 
-%% 3) 导出参数和 .mem 文件
+%% 3）导出参数和 .mem 文件
 %=============================================================
 
 param_path = fullfile(script_dir, 'all2x_rtl_stage_params.vh');
@@ -95,9 +95,11 @@ fprintf('输出饱和        = %d\n', sat_count);
 fprintf('====================================================\n');
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：导出 24bit 二进制补码十六进制文件
 % ============================================================
+% 4）局部函数模块：export_hex_mem
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function export_hex_mem(filename, data, data_w)
     fid = fopen(filename, 'w');
     hex_digits = ceil(data_w / 4);
@@ -112,9 +114,11 @@ function export_hex_mem(filename, data, data_w)
 end
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：导出 Verilog 参数头文件
 % ============================================================
+% 5）局部函数模块：export_verilog_params
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function export_verilog_params(filename, stage_config)
     fid = fopen(filename, 'w');
 

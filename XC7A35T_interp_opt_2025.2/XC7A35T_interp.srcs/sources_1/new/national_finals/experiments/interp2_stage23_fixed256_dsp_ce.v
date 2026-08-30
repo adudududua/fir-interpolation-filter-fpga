@@ -1,8 +1,26 @@
 `timescale 1ns / 1ps
 
+//=============================================================
+// 文件名       : interp2_stage23_fixed256_dsp_ce.v
+// 模块名       : interp2_stage23_fixed256_dsp_ce
+// 功能简述     : 第二、三级 2 倍插值滤波器：复用或折叠运算资源完成连续插值。
+// 设计说明     : 本文件采用同步时序设计；复位、时钟使能、
+//                有效信号和定点位宽关系均在对应代码段说明。
+//                注释仅用于阐明实现，不参与综合结果。
+// 设计作者     : kafeizizi
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
+// 修订记录     : 2026-08-30：统一中文文件头、模块编号与结构说明。
+//=============================================================
+
 // Experimental Stage2/3 engine for a 256x system clock.  The doubled cycle
 // budget permits a simple issue/return pipeline and removes the tight 128x
 // prefetch scheduler while retaining one DSP48E1 and one history RAMB18E1.
+//=============================================================
+// 1）模块名称：interp2_stage23_fixed256_dsp_ce
+// 功能说明：第二、三级 2 倍插值滤波器：复用或折叠运算资源完成连续插值。
+// 工程版本：Vivado 2025.2。
+//=============================================================
 module interp2_stage23_fixed256_dsp_ce #(
     parameter integer FOLD_INPUT_QUANT = 0
 )(
@@ -91,6 +109,7 @@ module interp2_stage23_fixed256_dsp_ce #(
     };
     wire signed [21:0] history_read_data;
 
+    // 例化说明：调用 nf_stage23_history_ramb18_sdp 全国赛签核子模块，完成正式数据通路中的存储、运算或控制任务。
     nf_stage23_history_ramb18_sdp u_history (
         .clk(clk),
         .read_addr(history_read_addr),
@@ -140,6 +159,7 @@ module interp2_stage23_fixed256_dsp_ce #(
     wire dsp_ce = (state == ST_MAC && return_valid && return_mask) ||
         state == ST_ROUND || state == ST_QMAC;
 
+    // 例化说明：调用 DSP48E1 算术原语，完成乘法、加减或累加；各控制字定义当前流水拍的运算功能。
     DSP48E1 #(
         .A_INPUT("DIRECT"), .B_INPUT("DIRECT"),
         .USE_DPORT("TRUE"), .USE_MULT("MULTIPLY"),

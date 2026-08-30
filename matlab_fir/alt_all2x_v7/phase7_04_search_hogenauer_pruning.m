@@ -1,3 +1,6 @@
+%% 1）主流程：phase7_04_search_hogenauer_pruning
+% 功能说明：执行参数搜索和 Pareto 筛选，在满足指标的前提下降低字长或资源开销。
+
 clc; clear; close all;
 
 %=============================================================
@@ -309,6 +312,10 @@ else
 end
 
 
+% 2）局部函数模块：evaluate_profile
+
+
+% 功能说明：封装 evaluate_profile 对应的局部计算，供主流程复用并保持代码层次清晰。
 function [evaluation, output] = evaluate_profile( ...
         profile, compensated, baseline_result, impulse_amplitude, ...
         rate_change, cic_order, diff_delay, data_w, fs_in, fs_out, ...
@@ -356,6 +363,10 @@ function [evaluation, output] = evaluate_profile( ...
 end
 
 
+% 3）局部函数模块：trim_impulse
+
+
+% 功能说明：按指定插值倍率展开冲激响应并构造当前级或完整链路的等效响应。
 function segment = trim_impulse(data)
     nonzero = find(data ~= 0);
     if isempty(nonzero)
@@ -365,6 +376,10 @@ function segment = trim_impulse(data)
 end
 
 
+% 4）局部函数模块：delta_snr_db
+
+
+% 功能说明：封装 delta_snr_db 对应的局部计算，供主流程复用并保持代码层次清晰。
 function snr_db = delta_snr_db(candidate, reference)
     compare_count = min(numel(candidate), numel(reference));
     candidate = double(candidate(1:compare_count));
@@ -374,12 +389,20 @@ function snr_db = delta_snr_db(candidate, reference)
 end
 
 
+% 5）局部函数模块：profile_text
+
+
+% 功能说明：封装 profile_text 对应的局部计算，供主流程复用并保持代码层次清晰。
 function text_value = profile_text(profile)
     text_value = sprintf('%d-', profile);
     text_value(end) = [];
 end
 
 
+% 6）局部函数模块：measure_sinad_thd
+
+
+% 功能说明：封装 measure_sinad_thd 对应的局部计算，供主流程复用并保持代码层次清晰。
 function [sinad_db, thd_db] = measure_sinad_thd(y, tone_hz, sample_rate)
     y = double(y(:));
     first_idx = floor(numel(y)*0.25)+1;
@@ -404,6 +427,10 @@ function [sinad_db, thd_db] = measure_sinad_thd(y, tone_hz, sample_rate)
 end
 
 
+% 7）局部函数模块：write_signed_hex_mem
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_signed_hex_mem(filename, data, data_w)
     digits = ceil(data_w/4);
     unsigned_data = mod(double(int64(data(:))), 2^data_w);
@@ -419,6 +446,10 @@ function write_signed_hex_mem(filename, data, data_w)
 end
 
 
+% 8）局部函数模块：write_summary
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_summary(filename, selected_table)
     fid = fopen(filename, 'w');
     if fid < 0
@@ -450,6 +481,10 @@ function write_summary(filename, selected_table)
 end
 
 
+% 9）局部函数模块：plot_selected
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function plot_selected(filename, selected, selected_table)
     color_blue = [0.20 0.39 0.63];
     color_purple = [0.28 0.15 0.49];
@@ -506,6 +541,10 @@ function plot_selected(filename, selected, selected_table)
 end
 
 
+% 10）局部函数模块：style_axes
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function style_axes(ax)
     grid(ax, 'on'); box(ax, 'on');
     ax.FontName = 'Microsoft YaHei';

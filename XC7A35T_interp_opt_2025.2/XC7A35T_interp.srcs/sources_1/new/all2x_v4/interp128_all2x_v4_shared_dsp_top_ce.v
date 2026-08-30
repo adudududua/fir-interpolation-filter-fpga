@@ -17,10 +17,15 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-12
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-12：新增 V4 Stage 2/3 共享 DSP 顶层。
+//=============================================================
+//=============================================================
+// 1）模块名称：interp128_all2x_v4_shared_dsp_top_ce
+// 功能说明：128 倍插值顶层：级联多级 2 倍插值、CIC 与补偿级并管理模式旁路。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module interp128_all2x_v4_shared_dsp_top_ce #(
@@ -87,6 +92,7 @@ module interp128_all2x_v4_shared_dsp_top_ce #(
     wire signed [23:0] y128_w;
     wire               y128_valid_w;
 
+    // 例化说明：调用 interp2_stage1_strict_halfband_bram_ce 插值子模块，完成对应级的数据展开、滤波或模式选择。
     interp2_stage1_strict_halfband_bram_ce #(
         .DATA_W (DATA_W)
     ) u_interp2_stage1_strict_halfband_bram_ce (
@@ -102,6 +108,7 @@ module interp128_all2x_v4_shared_dsp_top_ce #(
         .fir_in_valid_dbg ()
     );
 
+    // 例化说明：调用 bridge_valid_only_to_interp2_ce 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     bridge_valid_only_to_interp2_ce #(
         .DATA_W (24)
     ) u_bridge_2_to_4 (
@@ -114,6 +121,7 @@ module interp128_all2x_v4_shared_dsp_top_ce #(
         .out_valid   (y2_to_4_valid)
     );
 
+    // 例化说明：调用 bridge_valid_only_to_interp2_ce 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     bridge_valid_only_to_interp2_ce #(
         .DATA_W (24)
     ) u_bridge_4_to_8 (
@@ -126,6 +134,7 @@ module interp128_all2x_v4_shared_dsp_top_ce #(
         .out_valid   (y4_to_8_valid)
     );
 
+    // 例化说明：调用 interp2_stage23_shared_dsp_ce 插值子模块，完成对应级的数据展开、滤波或模式选择。
     interp2_stage23_shared_dsp_ce #(
         .DATA_W  (DATA_W),
         .COEFF_W (16),
@@ -150,6 +159,7 @@ module interp128_all2x_v4_shared_dsp_top_ce #(
         .scheduler_mac_index_dbg ()
     );
 
+    // 例化说明：调用 bridge_valid_only_to_interp2_ce 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     bridge_valid_only_to_interp2_ce #(
         .DATA_W (24)
     ) u_bridge_8_to_16 (
@@ -162,6 +172,7 @@ module interp128_all2x_v4_shared_dsp_top_ce #(
         .out_valid   (y8_to_16_valid)
     );
 
+    // 例化说明：调用 interp2_all2x_v2_stage_select 插值子模块，完成对应级的数据展开、滤波或模式选择。
     interp2_all2x_v2_stage_select #(
         .USE_CANONICAL (1),
         .STAGE_ID      (4),
@@ -177,6 +188,7 @@ module interp128_all2x_v4_shared_dsp_top_ce #(
         .phase_dbg(), .fir_in_dbg(), .fir_in_valid_dbg()
     );
 
+    // 例化说明：调用 bridge_valid_only_to_interp2_ce 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     bridge_valid_only_to_interp2_ce #(
         .DATA_W (24)
     ) u_bridge_16_to_32 (
@@ -186,6 +198,7 @@ module interp128_all2x_v4_shared_dsp_top_ce #(
         .out_data(y16_to_32_data), .out_valid(y16_to_32_valid)
     );
 
+    // 例化说明：调用 interp2_all2x_v2_stage_select 插值子模块，完成对应级的数据展开、滤波或模式选择。
     interp2_all2x_v2_stage_select #(
         .USE_CANONICAL (1),
         .STAGE_ID      (5),
@@ -201,6 +214,7 @@ module interp128_all2x_v4_shared_dsp_top_ce #(
         .phase_dbg(), .fir_in_dbg(), .fir_in_valid_dbg()
     );
 
+    // 例化说明：调用 bridge_valid_only_to_interp2_ce 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     bridge_valid_only_to_interp2_ce #(
         .DATA_W (24)
     ) u_bridge_32_to_64 (
@@ -210,6 +224,7 @@ module interp128_all2x_v4_shared_dsp_top_ce #(
         .out_data(y32_to_64_data), .out_valid(y32_to_64_valid)
     );
 
+    // 例化说明：调用 interp2_all2x_v2_stage_select 插值子模块，完成对应级的数据展开、滤波或模式选择。
     interp2_all2x_v2_stage_select #(
         .USE_CANONICAL (1),
         .STAGE_ID      (6),
@@ -225,6 +240,7 @@ module interp128_all2x_v4_shared_dsp_top_ce #(
         .phase_dbg(), .fir_in_dbg(), .fir_in_valid_dbg()
     );
 
+    // 例化说明：调用 bridge_valid_only_to_interp2_ce 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     bridge_valid_only_to_interp2_ce #(
         .DATA_W (24)
     ) u_bridge_64_to_128 (
@@ -234,6 +250,7 @@ module interp128_all2x_v4_shared_dsp_top_ce #(
         .out_data(y64_to_128_data), .out_valid(y64_to_128_valid)
     );
 
+    // 例化说明：调用 interp2_all2x_v2_stage_select 插值子模块，完成对应级的数据展开、滤波或模式选择。
     interp2_all2x_v2_stage_select #(
         .USE_CANONICAL (1),
         .STAGE_ID      (7),

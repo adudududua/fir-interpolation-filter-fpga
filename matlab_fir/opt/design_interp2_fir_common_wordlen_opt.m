@@ -43,7 +43,7 @@ clc; clear; close all;
 %                2026-06-23：新增 2x FIR 字长优化与稀疏裁剪搜索版本。
 %=============================================================
 
-%% 1) 设计目标参数
+%% 1）设计目标参数
 %=============================================================
 
 % 字长优化候选参数
@@ -78,7 +78,7 @@ fprintf('FRAC_W_LIST = [%s]\n', num2str(FRAC_W_LIST));
 fprintf('PRUNE_THR_LIST = [%s]\n', num2str(PRUNE_THR_LIST));
 fprintf('====================================================\n\n');
 
-%% 2) 用 firpmord 估计初始阶数
+%% 2）用 firpmord 估计初始阶数
 %=============================================================
 
 [n_est, fo, ao, w] = firpmord([f_pass_high f_stop_begin], ...
@@ -93,7 +93,7 @@ end
 
 fprintf('firpmord 估计阶数 n_est = %d，对应 tap 数 = %d\n\n', n_est, n_est + 1);
 
-%% 3) 搜索满足指标的字长 / 裁剪组合
+%% 3）搜索满足指标的字长 / 裁剪组合
 %=============================================================
 
 Nfft = 131072;
@@ -241,7 +241,7 @@ if ~found
     error('未找到满足指标的 2x FIR 字长优化组合。请扩大 N_MAX 或减少裁剪阈值。');
 end
 
-%% 4) 打印最优结果并做详细检查
+%% 4）打印最优结果并做详细检查
 %=============================================================
 
 fprintf('\n================ 2x 字长优化搜索完成 ================\n');
@@ -275,7 +275,7 @@ res_3840 = check_one_mode_verbose(best_b, ...
                                   Nfft, ...
                                   '192k -> 384k');
 
-%% 5) 导出搜索表与最优系数
+%% 5）导出搜索表与最优系数
 %=============================================================
 
 % 5.1 搜索结果 CSV
@@ -331,7 +331,7 @@ fprintf(fid, 'Ripple_pm_db = %.8f\n', best_res_3840.ripple_pm_db);
 fprintf(fid, 'Stop_attn_db = %.8f\n', best_res_3840.stop_attn_db);
 fclose(fid);
 
-%% 6) 画最终频响图
+%% 6）画最终频响图
 %=============================================================
 
 plot_two_mode_response(best_b, ...
@@ -355,9 +355,11 @@ fprintf('    .ACC_W  待结合 RTL 累加器扫描，一般可先尝试 48\n');
 fprintf('    .FRAC_W (%d)\n', best_frac_w);
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：检查单个输出采样率模式
 % ============================================================
+% 7）局部函数模块：check_one_mode
+% 功能说明：检查局部约束和数值条件，在不满足要求时给出明确错误信息。
 function res = check_one_mode(b, Fs_out, f_pass_low, f_pass_high, stop_attn_target_db, ripple_pm_target_db, Nfft)
 
     Fs_in = Fs_out / 2;
@@ -392,9 +394,11 @@ function res = check_one_mode(b, Fs_out, f_pass_low, f_pass_high, stop_attn_targ
 end
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：详细打印单个模式检查结果
 % ============================================================
+% 8）局部函数模块：check_one_mode_verbose
+% 功能说明：检查局部约束和数值条件，在不满足要求时给出明确错误信息。
 function res = check_one_mode_verbose(b, Fs_out, f_pass_low, f_pass_high, stop_attn_target_db, ripple_pm_target_db, Nfft, mode_name)
 
     Fs_in = Fs_out / 2;
@@ -454,9 +458,11 @@ function res = check_one_mode_verbose(b, Fs_out, f_pass_low, f_pass_high, stop_a
 end
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：导出完整系数 Verilog 赋值语句
 % ============================================================
+% 9）局部函数模块：export_full_coeff_for_verilog
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function export_full_coeff_for_verilog(filename, coeff_int, coeff_w, frac_w, order_n, prune_thr, title_str)
 
     fid = fopen(filename, 'w');
@@ -489,9 +495,11 @@ function export_full_coeff_for_verilog(filename, coeff_int, coeff_w, frac_w, ord
 end
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：导出半系数 Verilog 赋值语句
 % ============================================================
+% 10）局部函数模块：export_half_coeff_for_verilog
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function export_half_coeff_for_verilog(filename, coeff_half_int, coeff_w, frac_w, order_n, prune_thr, title_str)
 
     fid = fopen(filename, 'w');
@@ -524,9 +532,11 @@ function export_half_coeff_for_verilog(filename, coeff_half_int, coeff_w, frac_w
 end
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：绘制两个输出模式频响对比
 % ============================================================
+% 11）局部函数模块：plot_two_mode_response
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function plot_two_mode_response(b, Fs1, Fs2, f_pass_high, filename)
 
     Nfft_plot = 65536;
@@ -581,6 +591,10 @@ function plot_two_mode_response(b, Fs1, Fs2, f_pass_high, filename)
 end
 
 
+% 12）局部函数模块：set_mid_minor_ticks
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function set_mid_minor_ticks(ax)
     try
         ax.XMinorTick = 'on';
@@ -600,6 +614,10 @@ function set_mid_minor_ticks(ax)
 end
 
 
+% 13）局部函数模块：midpoint_ticks
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function ticks_minor = midpoint_ticks(ticks_major, axis_lim)
     ticks_major = ticks_major(:).';
     ticks_major = ticks_major(ticks_major >= axis_lim(1) & ticks_major <= axis_lim(2));

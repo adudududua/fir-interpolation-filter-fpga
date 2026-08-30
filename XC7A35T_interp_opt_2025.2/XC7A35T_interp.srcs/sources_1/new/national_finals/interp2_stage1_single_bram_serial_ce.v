@@ -2,20 +2,40 @@
 
 `include "../all2x_v3/all2x_v3_stage1_coeff_pkg.vh"
 
-// Stage1 sequential-tap BRAM microengine.
+//=============================================================
+// 文件名       : interp2_stage1_single_bram_serial_ce.v
+// 模块名       : interp2_stage1_single_bram_serial_ce
+// 功能简述     : 第一级 2x 半带 FIR 的单 BRAM 串行抽头微引擎。
+//                模块把 26 个对称系数扩展为 52 个顺序系数，写入
+//                同一 RAMB18E1 的空闲地址，并按“最新到最旧”顺序
+//                每拍读取一个历史样本、完成一次精确乘加。
 //
-// The signed-off implementation read Lk/Rk pairs and used the DSP48E1
-// preadder.  This implementation expands the symmetric 26-coefficient table
-// to 52 entries in otherwise unused locations of the existing coefficient
-// RAMB18E1.  History is scanned newest-to-oldest and one exact product is
-// accumulated every clock.  Therefore
+//                  (Lk + Rk) * Ck = Lk*Ck + Rk*Ck
 //
-//   (Lk + Rk) * Ck == Lk * Ck + Rk * Ck
+//                两种写法在相同二进制补码模累加器中逐位等价。
+//                串行抽头方式删除左右地址元数据、第二套地址方程和
+//                DSP 预加器控制；中心抽头在扫描过程中同步捕获，
+//                不再需要额外的 BRAM 预取周期。
 //
-// in the same two's-complement modular accumulator, while the left/right
-// metadata, second address equation and preadder controls disappear.  The
-// center delay sample is captured during the same scan, so it no longer needs
-// a separate BRAM prefetch.
+// 当前默认配置：
+//                  数据宽度 24 bit，累加器 41 bit
+//                  历史深度 52，系数小数位 15
+//                  正式工程使用外部统一系数 BRAM
+//
+// 设计作者     : kafeizizi
+// 创建日期     : 2026-07-29
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
+// 修订记录     :
+//                2026-07-29：新增单 BRAM 顺序抽头 Stage1 实现。
+//                2026-08-16：补充中文算法、存储和时序说明。
+//=============================================================
+//=============================================================
+// 1）模块名称：interp2_stage1_single_bram_serial_ce
+// 功能说明：第一级 2 倍插值滤波器：处理最长抽头滤波并完成定点量化。
+// 工程版本：Vivado 2025.2。
+//=============================================================
+
 module interp2_stage1_single_bram_serial_ce #(
     parameter integer DATA_W      = 24,
     parameter integer COEFF_W     = `V3_S1_COEFF_W,
@@ -24,8 +44,8 @@ module interp2_stage1_single_bram_serial_ce #(
     parameter integer HISTORY_LEN = `V3_S1_HISTORY_LEN,
     parameter integer PAIR_COUNT  = `V3_S1_PAIR_COUNT,
     parameter integer DELAY_INDEX = `V3_S1_DELAY_INDEX,
-    // Retained for source compatibility.  Sequential-tap mode deliberately
-    // uses the multiplier directly rather than the DSP preadder.
+    // 保留该参数以兼容既有例化接口。顺序抽头模式有意直接使用乘法器，
+    // 不启用DSP预加器；参数仅用于保持源代码配置的一致性。
     parameter integer USE_DSP48_PREADDER = 0,
     parameter integer USE_EXTERNAL_COEFF_BRAM = 0
 )(
@@ -60,13 +80,12 @@ module interp2_stage1_single_bram_serial_ce #(
     reg history_full;
 
     reg phase_cnt;
-    // Kept as an observable schedule mirror for the reset/deadline
-    // regression.  Functional control uses issue_active and the tail flags.
+    // 保留mac_active作为复位/截止周期回归可观察的调度镜像；实际功能控制
+    // 使用issue_active及流水尾部标志，不依赖该观测状态。
     reg mac_active;
 `ifndef SYNTHESIS
-    // Fixed-latency schedule mirror used only by deadline assertions.  The
-    // hardware output path does not need a redundant ready state because all
-    // 52 reads plus the two DSP tail cycles finish before the next odd phase.
+    // 仅在仿真中保留固定延迟调度镜像，供截止周期断言使用。硬件输出路径
+    // 无需冗余ready状态，因为52次读取及2个DSP尾部周期必在下一奇相前结束。
     reg filter_ready;
 `endif
     reg scan_exhausted;
@@ -110,6 +129,9 @@ module interp2_stage1_single_bram_serial_ce #(
     assign fir_in_valid_dbg = ce_out && phase_cnt == 1'b0;
     assign external_coeff_addr = issue_index;
 
+    // Stage1历史样本存储：单块RAMB18E1简单双口包装器，读口服务串行MAC，
+    // 写口仅在偶相输入有效节拍更新环形历史。
+    // 例化说明：调用 nf_stage1_history_ramb18_sdp 全国赛签核子模块，完成正式数据通路中的存储、运算或控制任务。
     nf_stage1_history_ramb18_sdp #(
         .DATA_W(DATA_W),
         .ADDR_W(ADDR_W)
@@ -122,8 +144,8 @@ module interp2_stage1_single_bram_serial_ce #(
         .write_data(x_current)
     );
 
-    // Internal-table compatibility for standalone tests.  The board build
-    // constant-folds this path away and reads the expanded table from BRAM.
+    // 内部系数表仅用于独立测试兼容；板级正式构建会常量折叠该分支，并从
+    // 统一系数BRAM读取按MAC次序展开后的Stage1系数。
     assign mirrored_coeff_index =
         (read_coeff_index < PAIR_COUNT) ? read_coeff_index :
         (HISTORY_LEN-1-read_coeff_index);
@@ -189,6 +211,7 @@ module interp2_stage1_single_bram_serial_ce #(
         7'b0001100 :
         (filter_commit_pending ? 7'b0001110 : 7'b0100101);
 
+    // 例化说明：调用 DSP48E1 算术原语，完成乘法、加减或累加；各控制字定义当前流水拍的运算功能。
     DSP48E1 #(
         .A_INPUT("DIRECT"), .B_INPUT("DIRECT"),
         .USE_DPORT("FALSE"), .USE_MULT("MULTIPLY"),
@@ -236,8 +259,8 @@ module interp2_stage1_single_bram_serial_ce #(
          rounded_quotient[DATA_W-1:0] :
          (rounded_quotient[QUOT_W-1] ? OUT_MIN : OUT_MAX));
 
-    // Align the synchronous history and coefficient BRAM outputs with the
-    // mask and expanded coefficient index issued on the preceding cycle.
+    // 将同步历史RAM和系数BRAM的返回数据，与上一周期发出的有效掩码及
+    // 展开系数索引对齐，保证串行MAC消费的是同一抽头事务。
     always @(posedge clk) begin
         if (!rst_n) begin
             read_data_valid <= 1'b0;
@@ -291,13 +314,10 @@ module interp2_stage1_single_bram_serial_ce #(
             end
 
             if (read_data_valid) begin
-                // delay_result is reset to zero, and the center-tap history
-                // validity is monotonic until the next reset.  Keeping the
-                // previous value while this tap is invalid is therefore
-                // exactly equivalent to repeatedly writing zero during
-                // startup.  Once valid, every later center-tap read remains
-                // valid.  Expressing that invariant as a register enable
-                // removes the DATA_W-wide BRAM-data/zero input mux.
+                // delay_result复位为0，中心抽头历史有效性在下次复位前单调成立。
+                // 因而启动期抽头无效时保持旧值，与每拍重复写0严格等价；一旦
+                // 有效，后续中心抽头始终有效。使用寄存器使能表达该不变量，
+                // 可消除DATA_W位宽的“BRAM数据/零”输入MUX。
                 if (read_coeff_index == DELAY_INDEX && read_mask)
                     delay_result <= read_data;
 
@@ -307,13 +327,10 @@ module interp2_stage1_single_bram_serial_ce #(
                 end
             end
 
-            // After the first request, the address simply decrements.  Before
-            // the history is full, address zero marks the last initialized
-            // word; scan_exhausted masks all later wrapped addresses through
-            // DSP CEP rather than a DATA_W-wide Fabric mux.  issue_index is
-            // both the live coefficient-BRAM address and the issue counter;
-            // the return pipeline already retains the corresponding index,
-            // so a second schedule counter would be redundant.
+            // 首次请求后读地址逐拍递减。历史尚未写满时，地址0表示最后一个
+            // 已初始化字；随后回绕地址由scan_exhausted通过DSP CEP屏蔽，
+            // 避免使用DATA_W位宽Fabric MUX。issue_index同时承担系数BRAM
+            // 实时地址和发射计数器，返回流水已保存对应索引，无需第二计数器。
             if (issue_active) begin
                 read_issue_valid <= 1'b1;
                 read_addr <= read_addr - {{(ADDR_W-1){1'b0}}, 1'b1};
@@ -322,10 +339,9 @@ module interp2_stage1_single_bram_serial_ce #(
                 if (read_addr == {{(ADDR_W-1){1'b0}}, 1'b1})
                     scan_exhausted <= 1'b1;
 
-                // The address placed on the BRAM port at this edge is
-                // consumed by the existing return-valid pipeline.  Stop
-                // after advancing 50 -> 51 so address 51 is sampled once,
-                // matching the former next-index counter exactly.
+                // 本时钟沿送入BRAM端口的地址将由既有返回有效流水消费；
+                // 计数从50推进到51后停止，使地址51恰好采样一次，与原
+                // next-index计数器的抽头序列严格一致。
                 if (issue_index == HISTORY_LEN-2)
                     issue_active <= 1'b0;
                 issue_index <= issue_index +

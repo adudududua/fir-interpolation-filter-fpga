@@ -67,18 +67,11 @@ OOC核心包括三级2倍FIR、级间桥接与量化、16倍CIC、核心内部�
 
 ## 6. 证据与复现入口
 
-- 参数匹配OOC入口：
-  `submit/finally/images/work/resource_compare_218_239/run_matched_core_ooc_2025_2.tcl`；
-- 重复运行CSV：
-  `submit/finally/images/work/resource_compare_218_239/matched_ooc/evidence/matched_ooc_repeated_runs.csv`；
-- 包含报告SHA-256与边界时序限定的JSON：
-  `submit/finally/images/work/resource_compare_218_239/matched_ooc/evidence/matched_ooc_evidence.json`；
-- 两标签完整源码哈希：
-  `matched_ooc/lut218_source_sha256.txt`与`matched_ooc/lut239_source_sha256.txt`；
-- OOC物理归属明细：
-  `matched_ooc/analysis/module_resource_distribution.csv`；
-- 报告插图：
-  `submit/finally/images/generated/resource_compare_218_239/figure_218_239_matched_ooc_board_comparison.png`。
+- 218-LUT / 4-DSP 核心OOC签核：
+  [`XC7A35T_interp_LUTmin218_DSP4_2025.2/deliverables/active_218lut_4dsp/core_ooc_summary.txt`](../../../XC7A35T_interp_LUTmin218_DSP4_2025.2/deliverables/active_218lut_4dsp/core_ooc_summary.txt)；
+- 239-LUT / 3-DSP 核心OOC签核：
+  [`XC7A35T_interp_DSP3_LUT239_2025.2/deliverables/active_239lut_3dsp/core_ooc_summary.txt`](../../../XC7A35T_interp_DSP3_LUT239_2025.2/deliverables/active_239lut_3dsp/core_ooc_summary.txt)；
+- 两个独立板测工程中的 `tools/vivado_2025_2/core_ooc` 保存OOC构建入口及历史运行结果。
 
 本次工作仅新增隔离的OOC复核证据并更新文档，没有修改两个板测标签，也没有改变当前
 268-LUT/2-DSP生产RTL。

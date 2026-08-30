@@ -1,4 +1,17 @@
+%=============================================================
+% 文件名       : nf_07_release_v2_frequency_check.m
+% 脚本名       : nf_07_release_v2_frequency_check
+% 功能简述     : 完成本文件对应的 MATLAB 建模、计算分析、结果验证或文件导出任务。
+% 处理说明     : 本文件按“参数准备—核心计算—指标判定—结果导出”
+%                的顺序组织；各功能段和局部函数均有独立编号。
+% 开发工具     : MATLAB R2023a
+% 修订记录     : 2026-08-30：统一中文文件头、功能段编号和函数说明。
+%=============================================================
+
 % Release-v2 frequency and provenance acceptance using MATLAB base FFT.
+
+%% 1）主流程：nf_07_release_v2_frequency_check
+% 功能说明：完成本文件对应的 MATLAB 建模、计算分析、结果验证或文件导出任务。
 
 clearvars;
 clc;
@@ -144,6 +157,10 @@ fprintf('NF_RELEASE_V2_FREQUENCY_PASS: config=%s, hashes and 6 modes PASS.\n', .
     source_config.config_id);
 
 
+% 2）局部函数模块：analyze_node
+
+
+% 功能说明：计算局部幅频、相位、纹波或阻带指标，并返回结构化验收结果。
 function metric = analyze_node(y, fs_out, fs_in, pass_low, pass_high, ...
         nfft, expected_dc_sum)
     y = y(:).';
@@ -191,6 +208,10 @@ function metric = analyze_node(y, fs_out, fs_in, pass_low, pass_high, ...
 end
 
 
+% 3）局部函数模块：write_summary
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_summary(filename, data, config, vector_manifest)
     fid = fopen(filename, 'w');
     if fid < 0; error('Unable to create %s.', filename); end
@@ -224,6 +245,10 @@ function write_summary(filename, data, config, vector_manifest)
 end
 
 
+% 4）局部函数模块：verify_sha256_manifest
+
+
+% 功能说明：计算文件校验摘要或生成清单，保证实验输入与结果可追溯。
 function verify_sha256_manifest(manifest_path, repo_root)
     bytes = fileread(manifest_path);
     raw = fopen(manifest_path, 'rb');
@@ -244,6 +269,10 @@ function verify_sha256_manifest(manifest_path, repo_root)
 end
 
 
+% 5）局部函数模块：sha256_file
+
+
+% 功能说明：计算文件校验摘要或生成清单，保证实验输入与结果可追溯。
 function hash_value = sha256_file(filename)
     assert(exist(filename, 'file') == 2, 'Hashed file missing: %s.', filename);
     digest = java.security.MessageDigest.getInstance('SHA-256');
@@ -259,6 +288,10 @@ function hash_value = sha256_file(filename)
 end
 
 
+% 6）局部函数模块：read_signed_hex_mem
+
+
+% 功能说明：读取外部配置、RTL结果或数据文件，并转换为主流程使用的统一数据格式。
 function data = read_signed_hex_mem(filename, data_w)
     text_value = strtrim(fileread(filename));
     tokens = regexp(text_value, '\s+', 'split');

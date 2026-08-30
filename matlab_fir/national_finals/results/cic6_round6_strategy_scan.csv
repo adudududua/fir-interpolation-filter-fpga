@@ -1,5 +1,0 @@
-candidate,opt_directive,synth_lut,synth_ff,routed_lut,routed_ff,routed_slice,dsp,bram_tile,mmcm,wns_ns,whs_ns,power_w,result
-round5_lut_min,Default,459,464,440,464,191,6,3,2,46.046,0.127,0.271,LUT_MIN_BASELINE
-round6_ff_opt,Default,459,432,442,432,194,6,3,2,45.617,0.106,0.271,SELECTED_LOW_FF
-round6_ff_opt,AddRemap,459,432,442,432,194,6,3,2,45.617,0.106,0.271,NO_GAIN
-round6_ff_opt,ExploreArea,459,432,460,432,180,6,3,2,46.038,0.135,0.271,SLICE_PARETO_ONLY

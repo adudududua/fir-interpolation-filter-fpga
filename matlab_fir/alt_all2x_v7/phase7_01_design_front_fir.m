@@ -42,7 +42,7 @@ fprintf('Stage1: 44.1 kHz -> 88.2 kHz，105 taps 严格半带\n');
 fprintf('Stage2: 88.2 kHz -> 176.4 kHz，17 taps 等波纹 FIR\n');
 fprintf('========================================================\n\n');
 
-%% Stage1：严格半带设计与整数域校正
+%% 1）Stage1：严格半带设计与整数域校正
 stage1_order = 104;
 stage1_float = 2*firhalfband(stage1_order, ...
     F_PASS_HIGH/(FS_STAGE1/2));
@@ -51,7 +51,7 @@ stage1_h = double(stage1_coeff_int)/2^FRAC_W;
 stage1_metric = analyze_response(stage1_h, FS_STAGE1, 2, ...
     F_PASS_LOW, F_PASS_HIGH, F_STOP_STAGE1, NFFT);
 
-%% Stage2：按正式指标重新执行 Parks-McClellan 等波纹设计
+%% 2）Stage2：按正式指标重新执行 Parks-McClellan 等波纹设计
 stage2_order = 16;
 stage2_ripple_pm_db = 0.006;
 stage2_stop_db = 80;
@@ -66,7 +66,7 @@ stage2_h = double(stage2_coeff_int)/2^FRAC_W;
 stage2_metric = analyze_response(stage2_h, FS_STAGE2, 2, ...
     F_PASS_LOW, F_PASS_HIGH, F_STOP_STAGE2, NFFT);
 
-%% 与正式 RTL 配置使用的系数逐项核对
+%% 3）与正式 RTL 配置使用的系数逐项核对
 if ~exist(reference_path, 'file')
     error('缺少正式 FIR 配置：%s', reference_path);
 end
@@ -79,7 +79,7 @@ if ~stage1_match || ~stage2_match
     error('重新设计的 FIR 系数与正式 RTL 基准不一致。');
 end
 
-%% 构造前两级 4x 响应，作为进入折叠 Stage3 前的正式节点
+%% 4）构造前两级 4x 响应，作为进入折叠 Stage3 前的正式节点
 stage1_up = zeros(1, 2*numel(stage1_h)-1);
 stage1_up(1:2:end) = stage1_h;
 front4_h = conv(stage1_up, stage2_h);
@@ -146,6 +146,10 @@ fprintf('最终判定：PASS\n');
 fprintf('=======================================================\n');
 
 
+% 5）局部函数模块：quantize_strict_halfband
+
+
+% 功能说明：执行与 RTL 一致的定点量化、舍入、移位和饱和处理。
 function coeff_int = quantize_strict_halfband(b_float, frac_w)
     coeff_int = int64(round(b_float(:).'*2^frac_w));
     center_idx = (numel(coeff_int)+1)/2;
@@ -174,6 +178,10 @@ function coeff_int = quantize_strict_halfband(b_float, frac_w)
 end
 
 
+% 6）局部函数模块：analyze_response
+
+
+% 功能说明：计算局部幅频、相位、纹波或阻带指标，并返回结构化验收结果。
 function metric = analyze_response(h, fs_hz, expected_gain, ...
         pass_low, pass_high, stop_begin, nfft)
     [H, f] = freqz(h, 1, nfft, fs_hz);
@@ -189,6 +197,10 @@ function metric = analyze_response(h, fs_hz, expected_gain, ...
 end
 
 
+% 7）局部函数模块：required_signed_width
+
+
+% 功能说明：封装 required_signed_width 对应的局部计算，供主流程复用并保持代码层次清晰。
 function coeff_w = required_signed_width(coeff_int)
     coeff_w = 2;
     while max(coeff_int) > int64(2^(coeff_w-1)-1) || ...
@@ -198,6 +210,10 @@ function coeff_w = required_signed_width(coeff_int)
 end
 
 
+% 8）局部函数模块：write_summary
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_summary(filename, metric_table, stage1_coeff, stage2_coeff)
     fid = fopen(filename, 'w');
     if fid < 0; error('无法创建总结文件：%s', filename); end
@@ -222,6 +238,10 @@ function write_summary(filename, metric_table, stage1_coeff, stage2_coeff)
 end
 
 
+% 9）局部函数模块：plot_front_fir
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function plot_front_fir(filename, stage1, stage2, front4, ...
         pass_edge, stop1, stop2)
     color_blue = [0.20 0.39 0.63];
@@ -284,6 +304,10 @@ function plot_front_fir(filename, stage1, stage2, front4, ...
 end
 
 
+% 10）局部函数模块：style_axes
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function style_axes(ax)
     grid(ax, 'on'); box(ax, 'on');
     ax.FontName = 'Microsoft YaHei';

@@ -1,8 +1,0 @@
-# ILA captures and reproducible MATLAB outputs
-captures/*.csv
-results/*.mat
-results/*.csv
-results/*.txt
-results/selftest/
-figures/*.png
-figures/selftest/

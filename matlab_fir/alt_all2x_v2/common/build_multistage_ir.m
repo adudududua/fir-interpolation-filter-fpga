@@ -12,6 +12,10 @@ function h_total = build_multistage_ir(stage_config)
 % 修订记录     :
 %                2026-07-11：新增 V2 多级等效冲激响应构造函数。
 %=============================================================
+% 1）主函数模块：build_multistage_ir
+% 功能说明：按各级插值倍率展开并卷积冲激响应，构造完整多级系统响应。
+% 输入、输出、定点规则和结果文件由下方参数及代码段具体定义。
+
 
     if isempty(stage_config)
         error('stage_config 不能为空。');

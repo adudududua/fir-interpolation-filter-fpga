@@ -24,12 +24,17 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-18
-// 版本         : V2018.3
-// 开发工具     : Vivado Simulator
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-18：新增 Stage 2/3 资源候选等价性测试。
 //                2026-07-18：增加 BRAM 历史缓存候选选择宏。
 //                2026-07-18：增加交叉系数 BRAM 打包候选选择宏。
+//=============================================================
+//=============================================================
+// 1）模块名称：tb_stage23_lutram_dsp_equiv
+// 功能说明：仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module tb_stage23_lutram_dsp_equiv;
@@ -93,6 +98,7 @@ module tb_stage23_lutram_dsp_equiv;
     reg impulse_pending_stage2;
     reg impulse_pending_stage3;
 
+    // 例化说明：调用 interp2_stage23_folded_cic_dsp_ce 插值子模块，完成对应级的数据展开、滤波或模式选择。
     interp2_stage23_folded_cic_dsp_ce #(
         .DATA_W(24),
         .STAGE2_DATA_W(STAGE2_W),
@@ -120,6 +126,7 @@ module tb_stage23_lutram_dsp_equiv;
         .scheduler_mac_index_dbg()
     );
 
+    // 例化说明：调用 interp2_stage23_lutram_cic_dsp_ce 插值子模块，完成对应级的数据展开、滤波或模式选择。
     interp2_stage23_lutram_cic_dsp_ce #(
         .DATA_W(24),
         .STAGE2_DATA_W(STAGE2_W),

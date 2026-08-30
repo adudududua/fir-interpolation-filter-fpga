@@ -14,10 +14,15 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-13
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-13：新增紧凑级间缩位等价测试。
+//=============================================================
+//=============================================================
+// 1）模块名称：tb_round_sat_shift_compact
+// 功能说明：仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module tb_round_sat_shift_compact;
@@ -38,36 +43,42 @@ module tb_round_sat_shift_compact;
     integer test_index;
     integer random_state;
 
+    // 例化说明：调用 round_sat_q16_to24 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     round_sat_q16_to24 #(
         .IN_W(25), .OUT_W(22), .FRAC_W(2)
     ) u_ref_24_to_22 (
         .din_full(din24_ext), .dout_24(ref22)
     );
 
+    // 例化说明：调用 round_sat_shift_compact 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     round_sat_shift_compact #(
         .IN_W(24), .OUT_W(22), .SHIFT_N(2)
     ) u_dut_24_to_22 (
         .din(din24), .dout(dut22)
     );
 
+    // 例化说明：调用 round_sat_q16_to24 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     round_sat_q16_to24 #(
         .IN_W(23), .OUT_W(20), .FRAC_W(2)
     ) u_ref_22_to_20 (
         .din_full(din22_ext), .dout_24(ref20)
     );
 
+    // 例化说明：调用 round_sat_shift_compact 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     round_sat_shift_compact #(
         .IN_W(22), .OUT_W(20), .SHIFT_N(2)
     ) u_dut_22_to_20 (
         .din(din22), .dout(dut20)
     );
 
+    // 例化说明：调用 round_sat_q16_to24 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     round_sat_q16_to24 #(
         .IN_W(21), .OUT_W(18), .FRAC_W(2)
     ) u_ref_20_to_18 (
         .din_full(din20_ext), .dout_24(ref18)
     );
 
+    // 例化说明：调用 round_sat_shift_compact 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     round_sat_shift_compact #(
         .IN_W(20), .OUT_W(18), .SHIFT_N(2)
     ) u_dut_20_to_18 (

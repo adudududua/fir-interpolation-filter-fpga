@@ -22,12 +22,17 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-11
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-11：新增 Stage 1 strict-halfband BRAM 版本。
 //                2026-07-17：通用宽位偏置舍入改为紧凑余数进位结构，
 //                            保持可达累加范围内逐位等价并缩短进位链。
+//=============================================================
+//=============================================================
+// 1）模块名称：interp2_stage1_strict_halfband_bram_ce
+// 功能说明：第一级 2 倍插值滤波器：处理最长抽头滤波并完成定点量化。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module interp2_stage1_strict_halfband_bram_ce #(
@@ -56,10 +61,8 @@ module interp2_stage1_strict_halfband_bram_ce #(
     output wire signed [DATA_W-1:0]     fir_in_dbg,
     output wire                         fir_in_valid_dbg,
 
-    // Route-1 unified dual-DSP coefficient plane.  The address is issued in
-    // lock-step with the Stage1 sample-BRAM reads; the external dual-port
-    // coefficient BRAM therefore returns a coefficient aligned with
-    // read_data_a/read_data_b one clock later.
+    // Route-1统一双DSP系数平面：系数地址与Stage1样本BRAM读地址同步发出，
+    // 因而外部双口系数BRAM在下一拍返回与read_data_a/read_data_b对齐的系数。
     output wire [5:0]                   external_coeff_addr,
     input  wire signed [15:0]           external_coeff_data
 );
@@ -144,18 +147,17 @@ module interp2_stage1_strict_halfband_bram_ce #(
         (ce_out && phase_cnt == 1'b0);
     assign dsp_p_ce =
         (read_data_valid && !read_is_delay) || filter_commit_pending;
-    // Exact symmetric rounding is 16383 + 1 for a non-negative sum.
-    // Keeping C constant and using the DSP carry input avoids a sign-driven
-    // 48-bit constant selector.
+    // 精确对称舍入：非负累加和使用16383+1。保持C端常量并利用DSP进位输入，
+    // 可避免由符号位驱动的48位常量选择器。
     assign dsp_round_bias = 48'sd16383;
     assign dsp_round_carryin =
         filter_commit_pending && !mac_sum_comb[ACC_W-1];
     assign dsp_opmode = filter_commit_pending ?
         7'b0001110 : 7'b0100101;
 
-    // PREG holds both the running sum and the completed filter result.  The
-    // phase interval is hundreds of clocks, so one result-commit cycle is
-    // available after the final MAC without changing the output cadence.
+    // PREG同时保存运行累加和与已完成滤波结果。相位间隔有数百个时钟，
+    // 最后一次MAC之后可安排1拍结果提交而不改变输出节拍。
+    // 例化说明：调用 DSP48E1 算术原语，完成乘法、加减或累加；各控制字定义当前流水拍的运算功能。
     DSP48E1 #(
         .A_INPUT("DIRECT"),
         .B_INPUT("DIRECT"),
@@ -275,8 +277,8 @@ module interp2_stage1_strict_halfband_bram_ce #(
         end
     end
 
-    // The result-commit DSP cycle has already added the exact signed Q15
-    // rounding bias.  Saturation therefore needs no external carry chain.
+    // 结果提交DSP周期已加入精确的有符号Q15舍入偏置，因此饱和处理无需
+    // 额外的外部进位链。
     assign rounded_quotient = mac_sum_comb >>> FRAC_W;
     assign rounded_upper_is_sign_extension =
         rounded_quotient[QUOT_W-1:DATA_W] ==

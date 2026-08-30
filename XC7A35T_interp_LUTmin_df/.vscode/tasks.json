@@ -1,0 +1,28 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "安装上位机 Python 依赖",
+      "type": "shell",
+      "command": "C:/Users/Lenovo/miniconda3/python.exe",
+      "args": [
+        "-m",
+        "pip",
+        "install",
+        "-r",
+        "${workspaceFolder}/network_capture/host/requirements.txt"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "查看上位机中文帮助",
+      "type": "shell",
+      "command": "C:/Users/Lenovo/miniconda3/python.exe",
+      "args": [
+        "${workspaceFolder}/network_capture/host/dac24_capture.py",
+        "--help"
+      ],
+      "problemMatcher": []
+    }
+  ]
+}

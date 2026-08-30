@@ -11,6 +11,10 @@ function phase7_prepare_xsim_vectors()
 %                <Vivado工程>/phase7_verification_vectors/daily/*.mem
 %                <Vivado工程>/XC7A35T_interp.sim/sim_1/behav/xsim/*.mem
 %=============================================================
+% 1）主函数模块：phase7_prepare_xsim_vectors
+% 功能说明：生成 RTL/XSim 使用的输入激励、黄金输出和配套元数据文件。
+% 输入、输出、定点规则和结果文件由下方参数及代码段具体定义。
+
 
     verify_dir = fileparts(mfilename('fullpath'));
     display_dir = fileparts(fileparts(fileparts(verify_dir)));
@@ -83,6 +87,10 @@ function phase7_prepare_xsim_vectors()
 end
 
 
+% 2）局部函数模块：required_daily_files
+
+
+% 功能说明：封装 required_daily_files 对应的局部计算，供主流程复用并保持代码层次清晰。
 function names = required_daily_files()
     names = {'impulse_input_24bit.mem'; ...
         'impulse_y4_golden_24bit.mem'; ...
@@ -100,6 +108,10 @@ function names = required_daily_files()
 end
 
 
+% 3）局部函数模块：write_summary
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_summary(filename, vector_dir, archive_dir, xsim_dir, table_data)
     fid = fopen(filename, 'w');
     if fid < 0

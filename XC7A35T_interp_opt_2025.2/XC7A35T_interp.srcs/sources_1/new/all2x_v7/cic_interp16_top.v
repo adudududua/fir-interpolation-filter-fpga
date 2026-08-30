@@ -14,10 +14,15 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-13
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-13：新增 Phase 7 FIR-CIC 尾链顶层。
+//=============================================================
+//=============================================================
+// 1）模块名称：cic_interp16_top
+// 功能说明：16 倍 CIC 插值器：执行梳状差分、零值插入与积分累加。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module cic_interp16_top #(
@@ -39,6 +44,7 @@ module cic_interp16_top #(
     wire signed [DATA_W-1:0] compensated_data;
     wire compensated_valid;
 
+    // 例化说明：调用 cic_compensation_fir_ce CIC/补偿子模块，完成高倍率插值或通带下垂校正。
     cic_compensation_fir_ce #(
         .DATA_W   (DATA_W),
         .COEFF_W  (14),
@@ -55,6 +61,7 @@ module cic_interp16_top #(
         .busy_dbg   (compensation_busy_dbg)
     );
 
+    // 例化说明：调用 cic_interp16_core_ce CIC/补偿子模块，完成高倍率插值或通带下垂校正。
     cic_interp16_core_ce #(
         .DATA_W          (DATA_W),
         .CIC_ORDER       (CIC_ORDER),

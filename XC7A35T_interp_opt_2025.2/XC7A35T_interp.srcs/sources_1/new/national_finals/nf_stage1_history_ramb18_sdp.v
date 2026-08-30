@@ -1,9 +1,35 @@
 `timescale 1ns / 1ps
 
-// One physical RAMB18E1 stores the 64x24-bit Stage1 circular history.
-// The filter reads one history sample per clock and serializes each symmetric
-// pair across two clocks.  The current input bypasses the RAM for pair zero,
-// so a concurrent phase-zero write never creates a read/write ambiguity.
+//=============================================================
+// 文件名       : nf_stage1_history_ramb18_sdp.v
+// 模块名       : nf_stage1_history_ramb18_sdp
+// 功能简述     : Stage1 的 64×24 bit 单块 RAMB18E1 环形历史存储。
+//                端口 A 每拍同步读取一个历史样本，端口 B 在有效时
+//                写入最新样本，供串行对称抽头微引擎跨两拍读取一对
+//                历史数据。第 0 对的当前输入走旁路，因此相位 0
+//                同拍读写不会产生不确定的 BRAM 碰撞语义。
+//
+//                综合时固定实例化 RAMB18E1；行为仿真默认使用 reg
+//                数组，也可通过 SIM_USE_PRIMITIVE=1 验证原语映射。
+//
+// 当前默认配置：
+//                  DATA_W=24，ADDR_W=6，深度 64
+//                  RAM 模式：简单双口 SDP
+//
+// 设计作者     : kafeizizi
+// 创建日期     : 2026-07-29
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
+// 修订记录     :
+//                2026-07-29：新增 Stage1 单 RAMB18E1 历史包装器。
+//                2026-08-16：补充端口职责和仿真/综合分支说明。
+//=============================================================
+//=============================================================
+// 1）模块名称：nf_stage1_history_ramb18_sdp
+// 功能说明：历史样本存储器：使用 RAMB18E1 保存 FIR 抽头所需的延迟数据。
+// 工程版本：Vivado 2025.2。
+//=============================================================
+
 module nf_stage1_history_ramb18_sdp #(
     parameter integer DATA_W = 24,
     parameter integer ADDR_W = 6,
@@ -30,6 +56,9 @@ if (USE_PRIMITIVE != 0) begin : gen_primitive
     wire [15:0] dob;
     wire [1:0] dopb;
 
+    // 综合/原语验证分支：一个36位SDP字承载24位样本。端口A同步读，
+    // 端口B同步写；未用数据位固定为0，不依赖复位清空RAM内容。
+    // 例化说明：调用 RAMB18E1 双口块 RAM 原语，集中保存滤波系数或历史样本并提供同步读写。
     RAMB18E1 #(
         .RAM_MODE("SDP"),
         .READ_WIDTH_A(36),
@@ -68,6 +97,8 @@ if (USE_PRIMITIVE != 0) begin : gen_primitive
 
     assign read_data = {dob[7:0], doa};
 end else begin : gen_behavioral
+    // 纯RTL行为分支：保持与RAMB18E1一致的同步读、同步写时序，便于
+    // 不加载器件原语库时进行快速功能仿真。
     reg signed [DATA_W-1:0] memory [0:(1<<ADDR_W)-1];
     reg signed [DATA_W-1:0] read_data_q;
 

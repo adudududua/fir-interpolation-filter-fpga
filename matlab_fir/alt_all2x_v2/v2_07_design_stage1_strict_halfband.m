@@ -1,3 +1,6 @@
+%% 1）主流程：v2_07_design_stage1_strict_halfband
+% 功能说明：建立滤波器设计指标，搜索候选结构并评价幅频、相位和实现代价。
+
 clc; clear; close all;
 
 %=============================================================
@@ -376,6 +379,10 @@ fprintf('PNG : %s\n', fullfile(script_dir, ...
 fprintf('========================================================\n');
 
 
+% 2）局部函数模块：quantize_strict_halfband
+
+
+% 功能说明：执行与 RTL 一致的定点量化、舍入、移位和饱和处理。
 function coeff_int = quantize_strict_halfband(b_float, frac_w)
     coeff_int = int64(round(b_float(:).' * 2^frac_w));
     center_idx = (numel(coeff_int) + 1) / 2;
@@ -411,6 +418,10 @@ function coeff_int = quantize_strict_halfband(b_float, frac_w)
 end
 
 
+% 3）局部函数模块：quick_response
+
+
+% 功能说明：计算局部幅频、相位、纹波或阻带指标，并返回结构化验收结果。
 function res = quick_response(h, Fs, f_pass_low, f_pass_high, ...
                               f_stop_begin, expected_gain, nfft)
     [H, f] = freqz(h, 1, nfft, Fs);
@@ -423,6 +434,10 @@ function res = quick_response(h, Fs, f_pass_low, f_pass_high, ...
 end
 
 
+% 4）局部函数模块：required_signed_width
+
+
+% 功能说明：封装 required_signed_width 对应的局部计算，供主流程复用并保持代码层次清晰。
 function coeff_w = required_signed_width(coeff_int)
     coeff_w = 2;
     while max(coeff_int) > int64(2^(coeff_w-1)-1) || ...
@@ -432,6 +447,10 @@ function coeff_w = required_signed_width(coeff_int)
 end
 
 
+% 5）局部函数模块：estimate_acc_width
+
+
+% 功能说明：封装 estimate_acc_width 对应的局部计算，供主流程复用并保持代码层次清晰。
 function acc_w = estimate_acc_width(coeff_int, data_w)
     phase0 = coeff_int(1:2:end);
     phase1 = coeff_int(2:2:end);
@@ -442,6 +461,10 @@ function acc_w = estimate_acc_width(coeff_int, data_w)
 end
 
 
+% 6）局部函数模块：find_nondominated_rows
+
+
+% 功能说明：封装 find_nondominated_rows 对应的局部计算，供主流程复用并保持代码层次清晰。
 function pareto_idx = find_nondominated_rows(cost_matrix)
     row_count = size(cost_matrix, 1);
     keep = true(row_count, 1);

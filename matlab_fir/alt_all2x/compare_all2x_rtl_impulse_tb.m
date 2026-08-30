@@ -34,7 +34,7 @@ clc; clear; close all;
 %                            专用 Vivado 临时目录读取 RTL 输出。
 %=============================================================
 
-%% 1) 路径与参数
+%% 1）路径与参数
 %=============================================================
 
 script_dir = fileparts(mfilename('fullpath'));
@@ -73,7 +73,7 @@ if ~exist(rtl_csv, 'file')
     error('未找到 RTL 仿真输出 CSV：%s。请先运行 tb_interp128_all2x_top_ce。', rtl_csv);
 end
 
-%% 2) 读取 RTL 输出
+%% 2）读取 RTL 输出
 %=============================================================
 
 rtl_tbl = readtable(rtl_csv);
@@ -82,7 +82,7 @@ rtl_y = double(rtl_tbl.y_out(:)).';
 fprintf('RTL 输出样本数 = %d\n', length(rtl_y));
 fprintf('RTL 非零样本数 = %d\n', nnz(rtl_y));
 
-%% 3) 生成 MATLAB 固定点 golden
+%% 3）生成 MATLAB 固定点 golden
 %=============================================================
 
 golden_y = IMPULSE_AMP;
@@ -106,7 +106,7 @@ end
 fprintf('\nGolden 输出样本数 = %d\n', length(golden_y));
 fprintf('Golden 非零样本数 = %d\n', nnz(golden_y));
 
-%% 4) 自动搜索最佳延迟并对齐
+%% 4）自动搜索最佳延迟并对齐
 %=============================================================
 
 search_max = min(length(rtl_y) - length(golden_y), 20000);
@@ -153,7 +153,7 @@ else
     fprintf('结论：RTL 与 MATLAB fixed-point golden 尚未完全一致，请检查延迟、相位或舍入模型。\n');
 end
 
-%% 5) 导出 summary 与对比图
+%% 5）导出 summary 与对比图
 %=============================================================
 
 fid = fopen(summary_path, 'w');
@@ -203,9 +203,11 @@ fprintf('1) %s\n', summary_path);
 fprintf('2) %s\n\n', png_path);
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：RTL 等价四舍五入 + 24bit 饱和
 % ============================================================
+% 6）局部函数模块：round_sat_to_int
+% 功能说明：执行与 RTL 一致的定点量化、舍入、移位和饱和处理。
 function y = round_sat_to_int(x_full, frac_w, out_w)
 
     scale = 2^frac_w;

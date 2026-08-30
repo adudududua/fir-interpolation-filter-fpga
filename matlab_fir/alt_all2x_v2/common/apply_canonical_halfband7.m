@@ -15,6 +15,10 @@ function stage_config = apply_canonical_halfband7(stage_config, first_stage)
 % 修订记录     :
 %                2026-07-11：新增 V2 canonical halfband7 配置函数。
 %=============================================================
+% 1）主函数模块：apply_canonical_halfband7
+% 功能说明：把规范半带滤波器应用到输入序列并保持与 RTL 相同的定点规则。
+% 输入、输出、定点规则和结果文件由下方参数及代码段具体定义。
+
 
     if first_stage < 4 || first_stage > 8
         error('first_stage 必须位于 4～8，8 表示不替换。');

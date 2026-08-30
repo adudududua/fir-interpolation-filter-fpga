@@ -1,4 +1,18 @@
 function [y, stat, trace] = nf_cic_n3_hold2_bittrue(x, input_w, output_w)
+%=============================================================
+% 文件名       : nf_cic_n3_hold2_bittrue.m
+% 函数名       : nf_cic_n3_hold2_bittrue
+% 功能简述     : 建立 C2—16点保持—I2 的严格等价 CIC 定点模型，并统计积分器回绕与输出饱和。
+% 处理说明     : 本文件按“参数准备—核心计算—指标判定—结果导出”
+%                的顺序组织；各功能段和局部函数均有独立编号。
+% 开发工具     : MATLAB R2023a
+% 修订记录     : 2026-08-30：统一中文文件头、功能段编号和函数说明。
+%=============================================================
+% 1）主函数模块：nf_cic_n3_hold2_bittrue
+% 功能说明：建立 C2—16点保持—I2 的严格等价 CIC 定点模型，并统计积分器回绕与输出饱和。
+% 输入、输出、定点规则和结果文件由下方参数及代码段具体定义。
+
+
 %NF_CIC_N3_HOLD2_BITTRUE Exact model of C2 -> Hold16 -> I2.
 %   This is the signed-off N=3 interpolation identity.  The first and
 %   second integrator widths are the proven input_w+5 and input_w+8 bits.
@@ -74,6 +88,10 @@ function [y, stat, trace] = nf_cic_n3_hold2_bittrue(x, input_w, output_w)
 end
 
 
+% 2）局部函数模块：wrap_signed_local
+
+
+% 功能说明：按给定位宽执行二进制补码回绕，并返回是否发生溢出回绕的标志。
 function [wrapped, did_wrap] = wrap_signed_local(value, word_w)
     half_range = 2^(word_w-1);
     modulus = 2^word_w;

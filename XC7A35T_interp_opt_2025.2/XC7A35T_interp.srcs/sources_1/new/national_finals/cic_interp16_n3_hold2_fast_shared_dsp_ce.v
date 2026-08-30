@@ -1,5 +1,18 @@
 `timescale 1ns / 1ps
 
+//=============================================================
+// 文件名       : cic_interp16_n3_hold2_fast_shared_dsp_ce.v
+// 模块名       : cic_interp16_n3_hold2_fast_shared_dsp_ce
+// 功能简述     : 16 倍 CIC 插值器：执行梳状差分、零值插入与积分累加。
+// 设计说明     : 本文件采用同步时序设计；复位、时钟使能、
+//                有效信号和定点位宽关系均在对应代码段说明。
+//                注释仅用于阐明实现，不参与综合结果。
+// 设计作者     : kafeizizi
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
+// 修订记录     : 2026-08-30：统一中文文件头、模块编号与结构说明。
+//=============================================================
+
 // High-clock exact R=16, N=3 CIC rewrite.
 //
 // The mathematical transform is identical to cic_interp16_n3_hold2_dsp_ce:
@@ -11,6 +24,11 @@
 // allows one DSP48 adder to execute the two recursive integrators on adjacent
 // clocks.  A second DSP48 executes the two low-rate comb subtractions.  Thus
 // the CIC still uses two DSP blocks, but no wide fabric add/subtract data path.
+//=============================================================
+// 1）模块名称：cic_interp16_n3_hold2_fast_shared_dsp_ce
+// 功能说明：16 倍 CIC 插值器：执行梳状差分、零值插入与积分累加。
+// 工程版本：Vivado 2025.2。
+//=============================================================
 module cic_interp16_n3_hold2_fast_shared_dsp_ce #(
     parameter integer DATA_W = 21,
     parameter integer OUTPUT_W = 20,
@@ -95,6 +113,7 @@ module cic_interp16_n3_hold2_fast_shared_dsp_ce #(
     assign shared_integrator_sum =
         shared_integrator_a + shared_integrator_b;
 
+    // 例化说明：调用 round_sat_shift_compact 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     round_sat_shift_compact #(
         .IN_W    (FINAL_W),
         .OUT_W   (OUTPUT_W),

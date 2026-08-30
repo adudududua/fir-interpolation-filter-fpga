@@ -16,10 +16,15 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-12
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-12：新增四档 DAC 数据与时钟倍率验证。
+//=============================================================
+//=============================================================
+// 1）模块名称：tb_demo_interp_dac8_four_mode
+// 功能说明：仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module tb_demo_interp_dac8_four_mode;
@@ -41,6 +46,7 @@ module tb_demo_interp_dac8_four_mode;
     wire [7:0] dac_data;
     wire [1:0] mode_led;
 
+    // 例化说明：调用 demo_interp_dac8_audio_pcm_common 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     demo_interp_dac8_audio_pcm_common u_dut (
         .clk_audio_128x (clk),
         .rst_n          (rst_n),

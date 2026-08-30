@@ -1,8 +1,26 @@
 `timescale 1ns / 1ps
 
+//=============================================================
+// 文件名       : tb_dac_offset_binary_compact_equiv.v
+// 模块名       : tb_dac_offset_binary_compact_equiv
+// 功能简述     : 仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 设计说明     : 本文件采用同步时序设计；复位、时钟使能、
+//                有效信号和定点位宽关系均在对应代码段说明。
+//                注释仅用于阐明实现，不参与综合结果。
+// 设计作者     : kafeizizi
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
+// 修订记录     : 2026-08-30：统一中文文件头、模块编号与结构说明。
+//=============================================================
+
 // Exhaustively proves the signed8 -> offset-binary reduction used by the
 // board DAC path. The legacy arithmetic/saturation expression is retained
 // only in this testbench as an independent reference.
+//=============================================================
+// 1）模块名称：tb_dac_offset_binary_compact_equiv
+// 功能说明：仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 工程版本：Vivado 2025.2。
+//=============================================================
 module tb_dac_offset_binary_compact_equiv;
 
     reg signed [23:0] sample24;

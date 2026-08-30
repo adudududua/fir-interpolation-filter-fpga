@@ -1,4 +1,17 @@
+%=============================================================
+% 文件名       : nf_05_validate_release_v2_model.m
+% 脚本名       : nf_05_validate_release_v2_model
+% 功能简述     : 运行规定工况的自动验证，汇总误差并给出通过或失败结论。
+% 处理说明     : 本文件按“参数准备—核心计算—指标判定—结果导出”
+%                的顺序组织；各功能段和局部函数均有独立编号。
+% 开发工具     : MATLAB R2023a
+% 修订记录     : 2026-08-30：统一中文文件头、功能段编号和函数说明。
+%=============================================================
+
 % Validate the P0 release-v2 20->21-bit equalizer/CIC boundary.
+
+%% 1）主流程：nf_05_validate_release_v2_model
+% 功能说明：运行规定工况的自动验证，汇总误差并给出通过或失败结论。
 
 clearvars;
 clc;
@@ -92,6 +105,10 @@ fprintf(['P0 RELEASE-V2 MODEL PASS: max_abs=%d, legacy_sat=%d, ' ...
     numel(hold_output), nnz(case_pass), numel(case_pass));
 
 
+% 2）局部函数模块：read_signed_hex_mem
+
+
+% 功能说明：读取外部配置、RTL结果或数据文件，并转换为主流程使用的统一数据格式。
 function data = read_signed_hex_mem(filename, data_w)
     text_value = strtrim(fileread(filename));
     if isempty(text_value)

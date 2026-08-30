@@ -22,10 +22,15 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-11
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-11：新增 Stage 1 BRAM 循环缓冲单元测试。
+//=============================================================
+//=============================================================
+// 1）模块名称：tb_interp2_stage1_strict_halfband_bram_ce
+// 功能说明：仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module tb_interp2_stage1_strict_halfband_bram_ce;
@@ -64,6 +69,7 @@ module tb_interp2_stage1_strict_halfband_bram_ce;
 
     assign ce2_out = (ce_cnt[5:0] == 6'b000000);
 
+    // 例化说明：调用 interp2_stage1_strict_halfband_bram_ce 插值子模块，完成对应级的数据展开、滤波或模式选择。
     interp2_stage1_strict_halfband_bram_ce #(
         .ACC_W(DUT_ACC_W)
     ) dut_impulse (
@@ -79,6 +85,7 @@ module tb_interp2_stage1_strict_halfband_bram_ce;
         .fir_in_valid_dbg ()
     );
 
+    // 例化说明：调用 interp2_stage1_strict_halfband_bram_ce 插值子模块，完成对应级的数据展开、滤波或模式选择。
     interp2_stage1_strict_halfband_bram_ce #(
         .ACC_W(DUT_ACC_W)
     ) dut_random (

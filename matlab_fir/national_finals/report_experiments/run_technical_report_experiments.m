@@ -1,3 +1,13 @@
+%=============================================================
+% 文件名       : run_technical_report_experiments.m
+% 脚本名       : run_technical_report_experiments
+% 功能简述     : 统一调度相关实验步骤，检查依赖并生成报告、数据表和演示图。
+% 处理说明     : 本文件按“参数准备—核心计算—指标判定—结果导出”
+%                的顺序组织；各功能段和局部函数均有独立编号。
+% 开发工具     : MATLAB R2023a
+% 修订记录     : 2026-08-30：统一中文文件头、功能段编号和函数说明。
+%=============================================================
+
 % Technical-report supplementary experiments for the board-verified
 % 218-LUT, Stage1/2/3=24/20/20 release.
 %
@@ -41,7 +51,17 @@ addpath(bittrue_dir);
 addpath(fullfile(nf_dir, 'wordlength_experiments'));
 
 diary_path = fullfile(log_dir, 'matlab_execution.txt');
-if exist(diary_path, 'file'); delete(diary_path); end
+if exist(diary_path, 'file')
+    warning_state = warning('off', 'MATLAB:DELETE:Permission');
+    delete(diary_path);
+    warning(warning_state);
+end
+if exist(diary_path, 'file')
+    diary_path = fullfile(log_dir, sprintf('matlab_execution_%s.txt', ...
+        char(datetime('now', 'Format', 'yyyyMMdd_HHmmss_SSS'))));
+    fprintf(2, ['固定日志正在被占用，本次运行改用：%s\n' ...
+        '关闭占用旧日志的编辑器后，下次会恢复固定日志名。\n'], diary_path);
+end
 diary(diary_path);
 cleanup_diary = onCleanup(@() diary('off')); %#ok<NASGU>
 
@@ -51,7 +71,7 @@ assert(strcmp(cfg.config_id, 'NF-P3-STAGE123-24-20-20-CANDIDATE-R1'));
 fprintf('CONFIG_ID=%s\n', cfg.config_id);
 fprintf('EXPERIMENT_DIR=%s\n', experiment_dir);
 
-%% E0: environment and provenance
+%% 1）E0: environment and provenance
 [git_status, git_head] = system(sprintf('git -C "%s" rev-parse HEAD', repo_root));
 if git_status ~= 0; git_head = 'unavailable'; end
 [branch_status, git_branch] = system(sprintf( ...
@@ -80,7 +100,7 @@ env_value = { ...
     'user-confirmed functional board pass only; no instrument data'};
 environment_table = table(env_key, env_value, ...
     'VariableNames', {'KEY', 'VALUE'});
-writetable(environment_table, fullfile(processed_dir, ...
+write_csv_robust(environment_table, fullfile(processed_dir, ...
     'e0_environment_manifest.csv'));
 
 critical_rel = { ...
@@ -106,9 +126,9 @@ for index = 1:numel(critical_rel)
 end
 hash_table = table(critical_rel, critical_bytes, critical_sha256, ...
     'VariableNames', {'RELATIVE_PATH', 'BYTES', 'SHA256'});
-writetable(hash_table, fullfile(processed_dir, 'e0_sha256_manifest.csv'));
+write_csv_robust(hash_table, fullfile(processed_dir, 'e0_sha256_manifest.csv'));
 
-%% E1a: stable RTL-vector contract against the current bit-true model
+%% 2）E1a: stable RTL-vector contract against the current bit-true model
 rtl_rows = struct([]);
 rtl_row_index = 0;
 stable_cases = {'impulse', 'random_seed01'};
@@ -140,11 +160,11 @@ for case_index = 1:numel(stable_cases)
     end
 end
 rtl_table = struct2table(rtl_rows);
-writetable(rtl_table, fullfile(processed_dir, ...
+write_csv_robust(rtl_table, fullfile(processed_dir, ...
     'e1_fixed_rtl_vector_metrics.csv'));
 assert(all(rtl_table.PASS), 'Stable fixed/RTL vector contract failed.');
 
-%% E1b: floating arithmetic versus the current bit-true data path
+%% 3）E1b: floating arithmetic versus the current bit-true data path
 case_list = build_e1_cases();
 e1_rows = struct([]);
 e1_row_index = 0;
@@ -205,7 +225,7 @@ for case_index = 1:numel(case_list)
     end
 end
 e1_table = struct2table(e1_rows);
-writetable(e1_table, fullfile(processed_dir, ...
+write_csv_robust(e1_table, fullfile(processed_dir, ...
     'e1_float_fixed_case_metrics.csv'));
 
 fig = figure('Visible', 'off', 'Color', 'w', ...
@@ -232,7 +252,7 @@ save_report_figure(fig, figure_dir, report_asset_dir, ...
     'e1_float_fixed_sqnr.png');
 close(fig);
 
-%% E2: six-mode frequency, phase and group-delay evidence
+%% 4）E2: six-mode frequency, phase and group-delay evidence
 impulse_input = read_signed_hex_mem(fullfile(vector_dir, ...
     'impulse_input_24bit.mem'), 24);
 impulse_amplitude = double(impulse_input(1));
@@ -277,7 +297,7 @@ for fs_index = 1:2
     end
 end
 e2_table = struct2table(e2_rows);
-writetable(e2_table, fullfile(processed_dir, 'e2_mode_metrics.csv'));
+write_csv_robust(e2_table, fullfile(processed_dir, 'e2_mode_metrics.csv'));
 assert(all(e2_table.PASS), 'E2 six-mode acceptance failed.');
 
 fig = figure('Visible', 'off', 'Color', 'w', ...
@@ -328,7 +348,7 @@ save_report_figure(fig, figure_dir, report_asset_dir, ...
     'e2_six_mode_phase_residual.png');
 close(fig);
 
-%% E3: coherent fixed-point spectra and image rejection
+%% 5）E3: coherent fixed-point spectra and image rejection
 target_tones_hz = [997 10000 19000];
 nfft_e3 = 2^18;
 pre_input_count = 512;
@@ -394,7 +414,7 @@ for fs_index = 1:2
     end
 end
 e3_table = struct2table(e3_rows);
-writetable(e3_table, fullfile(processed_dir, ...
+write_csv_robust(e3_table, fullfile(processed_dir, ...
     'e3_spectrum_metrics.csv'));
 
 plot_spectrum_grid(e3_plot_997, fs_list, node_factors, ...
@@ -404,7 +424,7 @@ plot_spectrum_grid(e3_plot_19k, fs_list, node_factors, ...
     figure_dir, report_asset_dir, 'e3_19khz_six_mode_spectrum.png', ...
     'E3: coherent 19 kHz-class tone, six-mode digital spectrum');
 
-%% E4: archived same-tool architecture ablation and word-length Pareto
+%% 6）E4: archived same-tool architecture ablation and word-length Pareto
 version_id = {'292'; '276'; '258'; '249'; '239'; '234'; '221'; '218'};
 primary_change = { ...
     'Vivado 2025.2 migration baseline'; ...
@@ -429,7 +449,7 @@ e4_arch = table(version_id, primary_change, lut, ff, dsp, bram_tile, ...
     wns_ns, relation, board_status, 'VariableNames', ...
     {'VERSION_ID', 'PRIMARY_CHANGE', 'LUT', 'FF', 'DSP', 'BRAM_TILE', ...
      'WNS_NS', 'NUMERIC_RELATION', 'BOARD_STATUS'});
-writetable(e4_arch, fullfile(processed_dir, ...
+write_csv_robust(e4_arch, fullfile(processed_dir, ...
     'e4_architecture_ablation.csv'));
 
 word_length = {'24/22/20'; '24/20/20'};
@@ -443,7 +463,7 @@ e4_word = table(word_length, word_lut, word_ff, pass_abs_db, stop_db, ...
     rtl_relation, word_board, 'VariableNames', ...
     {'WORD_LENGTH', 'LUT', 'FF', 'WORST_PASS_ABS_DB', ...
      'WORST_STOP_DB', 'RTL_RELATION', 'BOARD_STATUS'});
-writetable(e4_word, fullfile(processed_dir, ...
+write_csv_robust(e4_word, fullfile(processed_dir, ...
     'e4_wordlength_pareto.csv'));
 
 fig = figure('Visible', 'off', 'Color', 'w', ...
@@ -478,7 +498,7 @@ save_report_figure(fig, figure_dir, report_asset_dir, ...
     'e4_architecture_wordlength_pareto.png');
 close(fig);
 
-%% Compact machine-readable summary
+%% 7）Compact machine-readable summary
 summary_key = { ...
     'config_id'; 'rtl_vector_cases_passed'; 'rtl_vector_cases_total'; ...
     'rtl_max_error_lsb'; 'e1_max_acc_overflow'; ...
@@ -522,7 +542,7 @@ summary_value = { ...
     num2str(overall_gate)};
 summary_table = table(summary_key, summary_value, ...
     'VariableNames', {'KEY', 'VALUE'});
-writetable(summary_table, fullfile(processed_dir, ...
+write_csv_robust(summary_table, fullfile(processed_dir, ...
     'experiment_summary.csv'));
 
 fprintf('E1_RTL_VECTOR_PASS=%d/%d max_error=%g LSB\n', ...
@@ -535,8 +555,14 @@ fprintf('E3_PASS=%d/%d worst_image=%.9f dBc\n', ...
     nnz(e3_table.PASS), height(e3_table), ...
     min(e3_table.WORST_IMAGE_REJECTION_DBC));
 fprintf('TECHNICAL_REPORT_SOFTWARE_GATE=%d\n', overall_gate);
+diary('off');
+clear cleanup_diary;
 
 
+% 8）局部函数模块：build_e1_cases
+
+
+% 功能说明：封装 build_e1_cases 对应的局部计算，供主流程复用并保持代码层次清晰。
 function cases = build_e1_cases()
     cases = struct('name', {}, 'fs_in', {}, 'x', {}, ...
         'analysis_input_start', {}, 'analysis_input_count', {}, ...
@@ -589,6 +615,10 @@ function cases = build_e1_cases()
 end
 
 
+% 9）局部函数模块：make_case
+
+
+% 功能说明：封装 make_case 对应的局部计算，供主流程复用并保持代码层次清晰。
 function result = make_case(name, fs_in, x, analysis_input_start, ...
         analysis_input_count, expected_boundary_case)
     result.name = name;
@@ -600,6 +630,10 @@ function result = make_case(name, fs_in, x, analysis_input_start, ...
 end
 
 
+% 10）局部函数模块：make_tone
+
+
+% 功能说明：封装 make_tone 对应的局部计算，供主流程复用并保持代码层次清晰。
 function x = make_tone(frequency_hz, level_dbfs, sample_count, fs_in)
     amplitude = (2^23-1)*10^(level_dbfs/20);
     n = 0:sample_count-1;
@@ -607,6 +641,10 @@ function x = make_tone(frequency_hz, level_dbfs, sample_count, fs_in)
 end
 
 
+% 11）局部函数模块：build_float_case
+
+
+% 功能说明：封装 build_float_case 对应的局部计算，供主流程复用并保持代码层次清晰。
 function result = build_float_case(x, cfg)
     x = double(x(:).');
     stage1 = interp2_float(x, cfg.stage1.coeff_int, ...
@@ -626,6 +664,10 @@ function result = build_float_case(x, cfg)
 end
 
 
+% 12）局部函数模块：interp2_float
+
+
+% 功能说明：封装 interp2_float 对应的局部计算，供主流程复用并保持代码层次清晰。
 function y = interp2_float(x, coeff_int, frac_w)
     coefficient = double(coeff_int(:).')/(2^frac_w);
     phase0 = coefficient(1:2:end);
@@ -638,6 +680,10 @@ function y = interp2_float(x, coeff_int, frac_w)
 end
 
 
+% 13）局部函数模块：cic_float
+
+
+% 功能说明：封装 cic_float 对应的局部计算，供主流程复用并保持代码层次清晰。
 function y = cic_float(x)
     low_data = [double(x(:).') zeros(1, 3)];
     for stage_index = 1:2
@@ -648,6 +694,10 @@ function y = cic_float(x)
 end
 
 
+% 14）局部函数模块：count_acc_overflow
+
+
+% 功能说明：封装 count_acc_overflow 对应的局部计算，供主流程复用并保持代码层次清晰。
 function count = count_acc_overflow(stat)
     count = stat.stage1.acc_overflow_count+ ...
         stat.stage2.acc_overflow_count+ ...
@@ -656,6 +706,10 @@ function count = count_acc_overflow(stat)
 end
 
 
+% 15）局部函数模块：count_saturation
+
+
+% 功能说明：执行与 RTL 一致的定点量化、舍入、移位和饱和处理。
 function count = count_saturation(stat)
     count = stat.stage1.output_sat_count+ ...
         stat.bridge1.output_sat_count+ ...
@@ -667,6 +721,10 @@ function count = count_saturation(stat)
 end
 
 
+% 16）局部函数模块：count_output_rails
+
+
+% 功能说明：封装 count_output_rails 对应的局部计算，供主流程复用并保持代码层次清晰。
 function count = count_output_rails(y)
     positive_rail = 2^23-16;
     negative_rail = -2^23;
@@ -674,6 +732,10 @@ function count = count_output_rails(y)
 end
 
 
+% 17）局部函数模块：analyze_impulse_response
+
+
+% 功能说明：计算局部幅频、相位、纹波或阻带指标，并返回结构化验收结果。
 function [metric, plot_data] = analyze_impulse_response(y, fs_out, fs_in, ...
         passband_hz, nfft, expected_dc_sum)
     y = double(y(:).');
@@ -732,6 +794,10 @@ function [metric, plot_data] = analyze_impulse_response(y, fs_out, fs_in, ...
 end
 
 
+% 18）局部函数模块：simulate_fixed_to_node
+
+
+% 功能说明：封装 simulate_fixed_to_node 对应的局部计算，供主流程复用并保持代码层次清晰。
 function [y, saturation] = simulate_fixed_to_node(x, factor, cfg)
     [stage1, stat1] = interp2_polyphase_bittrue(int64(x), ...
         cfg.stage1.coeff_int, cfg.stage1.frac_w, ...
@@ -769,6 +835,10 @@ function [y, saturation] = simulate_fixed_to_node(x, factor, cfg)
 end
 
 
+% 19）局部函数模块：analyze_coherent_spectrum
+
+
+% 功能说明：计算局部幅频、相位、纹波或阻带指标，并返回结构化验收结果。
 function [metric, plot_data] = analyze_coherent_spectrum(y, fs_out, ...
         fs_in, tone_hz, pass_high_hz)
     y = double(y(:).');
@@ -825,6 +895,10 @@ function [metric, plot_data] = analyze_coherent_spectrum(y, fs_out, ...
 end
 
 
+% 20）局部函数模块：plot_spectrum_grid
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function plot_spectrum_grid(plot_data, fs_list, factors, figure_dir, ...
         asset_dir, filename, title_text)
     fig = figure('Visible', 'off', 'Color', 'w', ...
@@ -853,13 +927,138 @@ function plot_spectrum_grid(plot_data, fs_list, factors, figure_dir, ...
 end
 
 
+% 21）局部函数模块：save_report_figure
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function save_report_figure(fig, figure_dir, asset_dir, filename)
     experiment_path = fullfile(figure_dir, filename);
-    exportgraphics(fig, experiment_path, 'Resolution', 180);
-    copyfile(experiment_path, fullfile(asset_dir, filename), 'f');
+    temporary_figure = [tempname(figure_dir) '.png'];
+    cleanup_figure = onCleanup( ...
+        @() delete_if_present(temporary_figure)); %#ok<NASGU>
+    exportgraphics(fig, temporary_figure, 'Resolution', 180);
+    experiment_path = publish_temporary_file(temporary_figure, ...
+        experiment_path, 'FIGURE');
+
+    temporary_asset = [tempname(asset_dir) '.png'];
+    cleanup_asset = onCleanup( ...
+        @() delete_if_present(temporary_asset)); %#ok<NASGU>
+    [copied, copy_message] = copyfile(experiment_path, temporary_asset, 'f');
+    if ~copied
+        error('ReportFigure:CopyFailed', ...
+            '无法准备报告图片临时文件：%s', copy_message);
+    end
+    publish_temporary_file(temporary_asset, ...
+        fullfile(asset_dir, filename), 'REPORT_ASSET');
 end
 
 
+% 22）局部函数模块：publish_temporary_file
+
+
+% 功能说明：封装 publish_temporary_file 对应的局部计算，供主流程复用并保持代码层次清晰。
+function actual_path = publish_temporary_file(temporary_path, target_path, kind)
+%PUBLISH_TEMPORARY_FILE Atomically replace a generated report artifact.
+    last_message = '';
+    for attempt = 1:10
+        [moved, last_message] = movefile(temporary_path, target_path, 'f');
+        if moved
+            actual_path = target_path;
+            return;
+        end
+        pause(0.5);
+    end
+
+    [output_dir, base_name, extension] = fileparts(target_path);
+    timestamp = char(datetime('now', 'Format', 'yyyyMMdd_HHmmss_SSS'));
+    fallback_path = fullfile(output_dir, ...
+        sprintf('%s_run_%s%s', base_name, timestamp, extension));
+    [moved, fallback_message] = movefile(temporary_path, fallback_path, 'f');
+    if ~moved
+        error('ReportArtifact:PublishFailed', ...
+            ['无法发布 %s。目标：%s；目标替换错误：%s；' ...
+             '备用写入错误：%s'], ...
+            kind, target_path, last_message, fallback_message);
+    end
+    warning('ReportArtifact:TargetBusy', ...
+        '%s 正被占用，已保存到备用文件：%s', kind, fallback_path);
+    fprintf('%s_WRITE_FALLBACK=%s\n', kind, fallback_path);
+    actual_path = fallback_path;
+end
+
+
+% 23）局部函数模块：write_csv_robust
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
+function actual_path = write_csv_robust(table_value, target_path)
+%WRITE_CSV_ROBUST Write a report CSV without aborting on a transient lock.
+% WPS/Excel preview may hold an existing CSV briefly on Windows. First try
+% the fixed report path; if that fails, write a complete temporary CSV and
+% retry its atomic replacement. A persistent lock uses a timestamped CSV
+% so the remaining MATLAB experiments can still finish.
+    output_dir = fileparts(target_path);
+    if ~exist(output_dir, 'dir'); mkdir(output_dir); end
+
+    try
+        writetable(table_value, target_path);
+        actual_path = target_path;
+        return;
+    catch first_error
+        fprintf(2, 'CSV_WRITE_RETRY=%s\n  %s\n', ...
+            target_path, first_error.message);
+    end
+
+    temporary_path = [tempname(output_dir) '.csv'];
+    cleanup_temporary = onCleanup( ...
+        @() delete_if_present(temporary_path)); %#ok<NASGU>
+    writetable(table_value, temporary_path);
+
+    last_message = '';
+    for attempt = 1:10
+        [moved, last_message] = movefile(temporary_path, target_path, 'f');
+        if moved
+            fprintf('CSV_WRITE_RECOVERED=%s\n', target_path);
+            actual_path = target_path;
+            return;
+        end
+        pause(0.5);
+    end
+
+    [~, base_name, extension] = fileparts(target_path);
+    timestamp = char(datetime('now', 'Format', 'yyyyMMdd_HHmmss_SSS'));
+    fallback_path = fullfile(output_dir, ...
+        sprintf('%s_run_%s%s', base_name, timestamp, extension));
+    [moved, fallback_message] = movefile(temporary_path, fallback_path, 'f');
+    if ~moved
+        error('ReportCsv:WriteFailed', ...
+            ['无法写入目标 CSV，也无法保留备用 CSV。目标：%s；' ...
+             '目标替换错误：%s；备用写入错误：%s'], ...
+            target_path, last_message, fallback_message);
+    end
+
+    warning('ReportCsv:TargetBusy', ...
+        ['目标 CSV 正被其他程序占用，结果已保存到备用文件：%s。' ...
+         '关闭 WPS/Excel 中打开的旧 CSV 后，下次运行会恢复固定文件名。'], ...
+        fallback_path);
+    fprintf('CSV_WRITE_FALLBACK=%s\n', fallback_path);
+    actual_path = fallback_path;
+end
+
+
+% 24）局部函数模块：delete_if_present
+
+
+% 功能说明：封装 delete_if_present 对应的局部计算，供主流程复用并保持代码层次清晰。
+function delete_if_present(filename)
+    if exist(filename, 'file'); delete(filename); end
+end
+
+
+% 25）局部函数模块：read_signed_hex_mem
+
+
+% 功能说明：读取外部配置、RTL结果或数据文件，并转换为主流程使用的统一数据格式。
 function data = read_signed_hex_mem(filename, data_w)
     text_value = strtrim(fileread(filename));
     tokens = regexp(text_value, '\r?\n|\s+', 'split');
@@ -871,6 +1070,10 @@ function data = read_signed_hex_mem(filename, data_w)
 end
 
 
+% 26）局部函数模块：sha256_file
+
+
+% 功能说明：计算文件校验摘要或生成清单，保证实验输入与结果可追溯。
 function hash_value = sha256_file(filename)
     digest = java.security.MessageDigest.getInstance('SHA-256');
     fid = fopen(filename, 'rb');

@@ -1,3 +1,6 @@
+%% 1）主流程：phase8_03_optimize_cic2_halfband11
+% 功能说明：执行参数搜索和 Pareto 筛选，在满足指标的前提下降低字长或资源开销。
+
 clc; clear; close all;
 
 %=============================================================
@@ -207,6 +210,10 @@ fprintf('HB4 coeff = '); fprintf('%d ', selected.h_hb4_int); fprintf('\n');
 fprintf('HB5 coeff = '); fprintf('%d ', selected.h_hb5_int); fprintf('\n');
 
 
+% 2）局部函数模块：quantize_strict_halfband11
+
+
+% 功能说明：执行与 RTL 一致的定点量化、舍入、移位和饱和处理。
 function coeff_int = quantize_strict_halfband11(h_float, frac_w)
     scale = int64(2^frac_w);
     coeff_int = int64(round(h_float(:).'*double(scale)));
@@ -227,6 +234,10 @@ function coeff_int = quantize_strict_halfband11(h_float, frac_w)
 end
 
 
+% 3）局部函数模块：response_at_frequency
+
+
+% 功能说明：计算局部幅频、相位、纹波或阻带指标，并返回结构化验收结果。
 function H = response_at_frequency(h, frequency, sample_rate)
     omega = 2*pi*frequency(:)/sample_rate;
     sample_index = 0:numel(h)-1;
@@ -234,6 +245,10 @@ function H = response_at_frequency(h, frequency, sample_rate)
 end
 
 
+% 4）局部函数模块：append_interp2_stage
+
+
+% 功能说明：封装 append_interp2_stage 对应的局部计算，供主流程复用并保持代码层次清晰。
 function h_total = append_interp2_stage(h_previous, h_stage)
     h_up = zeros(1, 2*numel(h_previous)-1);
     h_up(1:2:end) = h_previous;
@@ -241,6 +256,10 @@ function h_total = append_interp2_stage(h_previous, h_stage)
 end
 
 
+% 5）局部函数模块：write_summary
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_summary(filename, baseline, selected)
     fid = fopen(filename, 'w');
     if fid < 0
@@ -268,6 +287,10 @@ function write_summary(filename, baseline, selected)
 end
 
 
+% 6）局部函数模块：plot_response
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function plot_response(filename, metric, pass_edge, stop_edge)
     fig = figure('Color', 'w', 'Position', [100 100 1100 720]);
     color_main = [43 91 152]/255;

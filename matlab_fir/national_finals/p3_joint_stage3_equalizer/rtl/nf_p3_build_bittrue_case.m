@@ -1,4 +1,18 @@
 function result = nf_p3_build_bittrue_case(x)
+%=============================================================
+% 文件名       : nf_p3_build_bittrue_case.m
+% 函数名       : nf_p3_build_bittrue_case
+% 功能简述     : 按 RTL 舍入、饱和和流水规则建立逐位一致的定点行为模型。
+% 处理说明     : 本文件按“参数准备—核心计算—指标判定—结果导出”
+%                的顺序组织；各功能段和局部函数均有独立编号。
+% 开发工具     : MATLAB R2023a
+% 修订记录     : 2026-08-30：统一中文文件头、功能段编号和函数说明。
+%=============================================================
+% 1）主函数模块：nf_p3_build_bittrue_case
+% 功能说明：按 RTL 舍入、饱和和流水规则建立逐位一致的定点行为模型。
+% 输入、输出、定点规则和结果文件由下方参数及代码段具体定义。
+
+
 % Bit-true model for flat 4x/8x and compensated-Stage3 128x P3 RTL.
 
     script_dir = fileparts(mfilename('fullpath'));

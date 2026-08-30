@@ -23,7 +23,7 @@ clc; clear; close all;
 %                2026-07-10：新增随机 PCM RTL/golden 对拍脚本。
 %=============================================================
 
-%% 1) 路径与数据读取
+%% 1）路径与数据读取
 %=============================================================
 
 script_dir = fileparts(mfilename('fullpath'));
@@ -44,7 +44,7 @@ rtl_tbl = readtable(rtl_csv);
 rtl_y = double(rtl_tbl.y_out(:)).';
 golden_y = read_signed_hex_mem(golden_mem, 24);
 
-%% 2) 搜索延迟并逐点比较
+%% 2）搜索延迟并逐点比较
 %=============================================================
 
 search_max = min(numel(rtl_y) - numel(golden_y), 20000);
@@ -77,7 +77,7 @@ rms_error = sqrt(mean(error_value.^2));
 num_mismatch = nnz(error_value);
 pass_all = (max_abs_error == 0) && (num_mismatch == 0);
 
-%% 3) 导出结果
+%% 3）导出结果
 %=============================================================
 
 summary_path = fullfile(script_dir, 'all2x_rtl_random_compare_summary.txt');
@@ -136,9 +136,11 @@ if ~pass_all
 end
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：读取二进制补码十六进制 .mem
 % ============================================================
+% 4）局部函数模块：read_signed_hex_mem
+% 功能说明：读取外部配置、RTL结果或数据文件，并转换为主流程使用的统一数据格式。
 function data = read_signed_hex_mem(filename, data_w)
     fid = fopen(filename, 'r');
     raw = textscan(fid, '%s');

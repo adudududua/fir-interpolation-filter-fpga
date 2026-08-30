@@ -16,10 +16,15 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-13
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-13：新增 N=3/N=4 双候选 0 LSB 对拍。
+//=============================================================
+//=============================================================
+// 1）模块名称：tb_cic_interp16_top
+// 功能说明：仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module tb_cic_interp16_top;
@@ -67,6 +72,7 @@ module tb_cic_interp16_top;
 
     assign ce_out = rst_n && (ce_divider == 3'd0);
 
+    // 例化说明：调用 cic_interp16_top CIC/补偿子模块，完成高倍率插值或通带下垂校正。
     cic_interp16_top #(
         .DATA_W          (DATA_W),
         .CIC_ORDER       (3),
@@ -83,6 +89,7 @@ module tb_cic_interp16_top;
         .burst_remaining_dbg  ()
     );
 
+    // 例化说明：调用 cic_interp16_top CIC/补偿子模块，完成高倍率插值或通带下垂校正。
     cic_interp16_top #(
         .DATA_W          (DATA_W),
         .CIC_ORDER       (4),

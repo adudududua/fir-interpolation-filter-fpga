@@ -17,10 +17,15 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-18
-// 版本         : V2018.3
-// 开发工具     : Vivado Simulator
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-18：新增共享扫描与板级复位验证平台。
+//=============================================================
+//=============================================================
+// 1）模块名称：tb_board_phase7_shared_keypad_scan
+// 功能说明：仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module tb_board_phase7_shared_keypad_scan;
@@ -45,6 +50,7 @@ module tb_board_phase7_shared_keypad_scan;
     wire [7:0] dac_data;
     wire beep_io;
 
+    // 例化说明：调用 board_demo_competition_dac8_top 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     board_demo_competition_dac8_top #(
         .USE_PHASE7_LUTRAM_STAGE23(1),
         .USE_COMPACT_KEYPAD(1),
@@ -152,6 +158,11 @@ module tb_board_phase7_shared_keypad_scan;
     end
 
 endmodule
+//=============================================================
+// 2）模块名称：IBUF
+// 功能说明：仿真用输入缓冲原语模型。
+// 工程版本：Vivado 2025.2。
+//=============================================================
 
 module IBUF(
     input  wire I,
@@ -159,6 +170,11 @@ module IBUF(
 );
     assign O = I;
 endmodule
+//=============================================================
+// 3）模块名称：BUFG
+// 功能说明：仿真用全局时钟缓冲原语模型。
+// 工程版本：Vivado 2025.2。
+//=============================================================
 
 module BUFG(
     input  wire I,
@@ -166,6 +182,11 @@ module BUFG(
 );
     assign O = I;
 endmodule
+//=============================================================
+// 4）模块名称：clk_wiz_audio_44k1
+// 功能说明：仿真用时钟向导行为模型。
+// 工程版本：Vivado 2025.2。
+//=============================================================
 
 module clk_wiz_audio_44k1(
     output wire clk_out1,
@@ -179,6 +200,11 @@ module clk_wiz_audio_44k1(
     assign locked = ~reset;
     assign clkfb_out = clkfb_in;
 endmodule
+//=============================================================
+// 5）模块名称：dual_family_audio_clock
+// 功能说明：双采样率族时钟模块：在 44.1 kHz 与 48 kHz 时钟族之间安全切换。
+// 工程版本：Vivado 2025.2。
+//=============================================================
 
 module dual_family_audio_clock(
     input  wire clk_20m,
@@ -194,6 +220,11 @@ module dual_family_audio_clock(
     assign locked_44k1 = ~reset;
     assign locked_48k = ~reset;
 endmodule
+//=============================================================
+// 6）模块名称：demo_interp_dac8_audio_pcm_common
+// 功能说明：板级数据通路：完成音频样本选择、插值模式控制及 DAC 数据格式转换。
+// 工程版本：Vivado 2025.2。
+//=============================================================
 
 module demo_interp_dac8_audio_pcm_common #(
     parameter integer USE_PHASE7_FOLDED = 1,

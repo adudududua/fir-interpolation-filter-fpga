@@ -1,0 +1,8 @@
++====================+===================+=====================+
+| Launch Setup Clock | Launch Hold Clock | Pin                 |
++====================+===================+=====================+
+| clk_audio_128x_1   | clk_audio_128x    | count_128x_reg[3]/D |
+| clk_audio_128x_1   | clk_audio_128x    | count_128x_reg[1]/D |
+| clk_audio_128x_1   | clk_audio_128x    | count_128x_reg[2]/D |
+| clk_audio_128x_1   | clk_audio_128x    | count_128x_reg[0]/D |
++--------------------+-------------------+---------------------+

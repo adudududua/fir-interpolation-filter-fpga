@@ -20,6 +20,10 @@ function metric = analyze_cic_response(h_total, Fs_in, Fs_out, ...
 % 修订记录     :
 %                2026-07-13：新增 FIR-CIC 统一频响检查函数。
 %=============================================================
+% 1）主函数模块：analyze_cic_response
+% 功能说明：计算 CIC 插值器的幅频响应、通带下垂、镜像抑制和字长特性。
+% 输入、输出、定点规则和结果文件由下方参数及代码段具体定义。
+
 
     if nargin < 8
         error('analyze_cic_response 输入参数不足。');

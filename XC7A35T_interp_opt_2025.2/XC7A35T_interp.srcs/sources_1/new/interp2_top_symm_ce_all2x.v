@@ -20,11 +20,16 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-10
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-10：新增全 2x 单级 2 倍插值封装模块。
 //                2026-07-10：Stage 1 切换为单乘法器时分复用 MAC 核。
+//=============================================================
+//=============================================================
+// 1）模块名称：interp2_top_symm_ce_all2x
+// 功能说明：2 倍插值顶层：连接控制器、FIR 核心和输出握手接口。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module interp2_top_symm_ce_all2x #(
@@ -59,6 +64,7 @@ module interp2_top_symm_ce_all2x #(
 
     wire signed [DATA_W-1:0] sample_buf_w;
 
+    // 例化说明：调用 interp2_ctrl_ce 插值子模块，完成对应级的数据展开、滤波或模式选择。
     interp2_ctrl_ce u_interp2_ctrl_ce (
         .clk          (clk),
         .rst_n        (rst_n),
@@ -76,6 +82,7 @@ module interp2_top_symm_ce_all2x #(
 
     generate
         if (STAGE_ID == 1) begin : gen_stage1_single_mac
+            // 例化说明：调用 fir_core_symm_interp2_stage1_mac FIR 子模块，完成本级对称抽头乘加和定点输出。
             fir_core_symm_interp2_stage1_mac #(
                 .DATA_W  (DATA_W),
                 .COEFF_W (COEFF_W),
@@ -91,6 +98,7 @@ module interp2_top_symm_ce_all2x #(
             );
         end
         else begin : gen_parallel_fir
+            // 例化说明：调用 fir_core_symm_interp2_all2x FIR 子模块，完成本级对称抽头乘加和定点输出。
             fir_core_symm_interp2_all2x #(
                 .STAGE_ID (STAGE_ID),
                 .DATA_W   (DATA_W),
@@ -108,6 +116,7 @@ module interp2_top_symm_ce_all2x #(
         end
     endgenerate
 
+    // 例化说明：调用 round_sat_q16_to24 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     round_sat_q16_to24 #(
         .IN_W   (ACC_W),
         .OUT_W  (24),

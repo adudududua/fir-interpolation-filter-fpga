@@ -1,5 +1,23 @@
 `timescale 1ns / 1ps
 
+//=============================================================
+// 文件名       : tb_cic3_compensator_shiftadd_ce.v
+// 模块名       : tb_cic3_compensator_shiftadd_ce
+// 功能简述     : 仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 设计说明     : 本文件采用同步时序设计；复位、时钟使能、
+//                有效信号和定点位宽关系均在对应代码段说明。
+//                注释仅用于阐明实现，不参与综合结果。
+// 设计作者     : kafeizizi
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
+// 修订记录     : 2026-08-30：统一中文文件头、模块编号与结构说明。
+//=============================================================
+//=============================================================
+// 1）模块名称：tb_cic3_compensator_shiftadd_ce
+// 功能说明：仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 工程版本：Vivado 2025.2。
+//=============================================================
+
 module tb_cic3_compensator_shiftadd_ce;
 
     localparam integer DATA_W = 20;
@@ -25,6 +43,7 @@ module tb_cic3_compensator_shiftadd_ce;
     integer signed20_boundary_cross_count;
     integer legacy_clip_count;
 
+    // 例化说明：调用 cic3_compensator_shiftadd_ce 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     cic3_compensator_shiftadd_ce #(
         .DATA_W(DATA_W)
     ) u_dut (
@@ -36,6 +55,7 @@ module tb_cic3_compensator_shiftadd_ce;
         .y_out_valid(y_out_valid)
     );
 
+    // 例化说明：调用 cic3_compensator_shiftadd_ce 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     cic3_compensator_shiftadd_ce #(
         .DATA_W(DATA_W),
         .OUTPUT_W(DATA_W+1)

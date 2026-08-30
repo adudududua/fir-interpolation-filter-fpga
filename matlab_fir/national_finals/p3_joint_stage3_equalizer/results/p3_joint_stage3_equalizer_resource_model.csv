@@ -1,7 +1,0 @@
-ITEM,LUT_DELTA,FF_DELTA,EVIDENCE_OR_ASSUMPTION,PASS
-remove_equalizer,-46,-40,P4-D routed hierarchy,1
-dual_bank_address_and_mode,10,5,conservative bank-bit/mode snapshot budget,1
-18bit_coefficient_port,4,2,RAMB18 parity lanes feed existing DSP B[17:0],1
-signed21_stage3_output,1,1,retains the existing equalizer-to-CIC signed-21 boundary,1
-scheduler_constants,2,1,11 taps retain existing 4-bit counters,1
-net_total,-29,-31,conservative pre-RTL estimate,1

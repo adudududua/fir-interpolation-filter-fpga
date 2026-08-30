@@ -1,0 +1,77 @@
+CONFIG_ID=NF-P3-STAGE123-24-20-20-CANDIDATE-R1
+EXPERIMENT_DIR=D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\report_experiments\technical_report_218
+CSV_WRITE_RETRY=D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\report_experiments\technical_report_218\processed\e1_fixed_rtl_vector_metrics.csv
+  无法打开要写入的文件 'D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\report_experiments\technical_report_218\processed\e1_fixed_rtl_vector_metrics.csv':
+
+Invalid argument
+CSV_WRITE_RECOVERED=D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\report_experiments\technical_report_218\processed\e1_fixed_rtl_vector_metrics.csv
+E1 01/23: impulse_positive_fullscale
+E1 02/23: impulse_negative_fullscale
+E1 03/23: tone_997Hz_m1dBFS_Fs44100
+E1 04/23: tone_10000Hz_m1dBFS_Fs44100
+E1 05/23: tone_19000Hz_m1dBFS_Fs44100
+E1 06/23: tone_997Hz_m60dBFS_Fs44100
+E1 07/23: tone_997Hz_m90dBFS_Fs44100
+E1 08/23: tone_997Hz_m1dBFS_Fs48000
+E1 09/23: tone_10000Hz_m1dBFS_Fs48000
+E1 10/23: tone_19000Hz_m1dBFS_Fs48000
+E1 11/23: tone_997Hz_m60dBFS_Fs48000
+E1 12/23: tone_997Hz_m90dBFS_Fs48000
+E1 13/23: random_seed01
+E1 14/23: random_seed02
+E1 15/23: random_seed03
+E1 16/23: random_seed04
+E1 17/23: random_seed05
+E1 18/23: random_seed06
+E1 19/23: random_seed07
+E1 20/23: random_seed08
+E1 21/23: random_seed09
+E1 22/23: random_seed10
+E1 23/23: alternating_fullscale
+CSV_WRITE_RETRY=D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\report_experiments\technical_report_218\processed\e2_mode_metrics.csv
+  无法打开要写入的文件 'D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\report_experiments\technical_report_218\processed\e2_mode_metrics.csv':
+
+Invalid argument
+CSV_WRITE_RECOVERED=D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\report_experiments\technical_report_218\processed\e2_mode_metrics.csv
+E3 44.1 kHz 4x target=997 actual=997.256470 Hz image=84.368 dBc
+E3 44.1 kHz 4x target=10000 actual=10000.154114 Hz image=88.637 dBc
+E3 44.1 kHz 4x target=19000 actual=18999.687195 Hz image=80.848 dBc
+E3 44.1 kHz 8x target=997 actual=997.256470 Hz image=89.464 dBc
+E3 44.1 kHz 8x target=10000 actual=9999.481201 Hz image=86.425 dBc
+E3 44.1 kHz 8x target=19000 actual=19000.360107 Hz image=81.216 dBc
+E3 44.1 kHz 128x target=997 actual=990.527344 Hz image=89.302 dBc
+E3 44.1 kHz 128x target=10000 actual=9991.406250 Hz image=91.971 dBc
+E3 44.1 kHz 128x target=19000 actual=18992.285156 Hz image=74.546 dBc
+E3 48.0 kHz 4x target=997 actual=996.826172 Hz image=84.351 dBc
+E3 48.0 kHz 4x target=10000 actual=9999.755859 Hz image=85.496 dBc
+E3 48.0 kHz 4x target=19000 actual=18999.755859 Hz image=80.508 dBc
+E3 48.0 kHz 8x target=997 actual=997.558594 Hz image=88.138 dBc
+E3 48.0 kHz 8x target=10000 actual=10000.488281 Hz image=85.555 dBc
+E3 48.0 kHz 8x target=19000 actual=19000.488281 Hz image=81.008 dBc
+E3 48.0 kHz 128x target=997 actual=1007.812500 Hz image=88.232 dBc
+E3 48.0 kHz 128x target=10000 actual=10007.812500 Hz image=85.387 dBc
+E3 48.0 kHz 128x target=19000 actual=19007.812500 Hz image=76.850 dBc
+CSV_WRITE_RETRY=D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\report_experiments\technical_report_218\processed\e3_spectrum_metrics.csv
+  无法打开要写入的文件 'D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\report_experiments\technical_report_218\processed\e3_spectrum_metrics.csv':
+
+Invalid argument
+CSV_WRITE_RECOVERED=D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\report_experiments\technical_report_218\processed\e3_spectrum_metrics.csv
+CSV_WRITE_RETRY=D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\report_experiments\technical_report_218\processed\e4_architecture_ablation.csv
+  无法打开要写入的文件 'D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\report_experiments\technical_report_218\processed\e4_architecture_ablation.csv':
+
+Invalid argument
+CSV_WRITE_RECOVERED=D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\report_experiments\technical_report_218\processed\e4_architecture_ablation.csv
+CSV_WRITE_RETRY=D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\report_experiments\technical_report_218\processed\e4_wordlength_pareto.csv
+  无法打开要写入的文件 'D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\report_experiments\technical_report_218\processed\e4_wordlength_pareto.csv':
+
+Invalid argument
+CSV_WRITE_RECOVERED=D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\report_experiments\technical_report_218\processed\e4_wordlength_pareto.csv
+CSV_WRITE_RETRY=D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\report_experiments\technical_report_218\processed\experiment_summary.csv
+  无法打开要写入的文件 'D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\report_experiments\technical_report_218\processed\experiment_summary.csv':
+
+Invalid argument
+CSV_WRITE_RECOVERED=D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\report_experiments\technical_report_218\processed\experiment_summary.csv
+E1_RTL_VECTOR_PASS=6/6 max_error=0 LSB
+E2_PASS=6/6 worst_pass=0.007843853 dB worst_stop=72.355251899 dB
+E3_PASS=18/18 worst_image=74.545857287 dBc
+TECHNICAL_REPORT_SOFTWARE_GATE=1

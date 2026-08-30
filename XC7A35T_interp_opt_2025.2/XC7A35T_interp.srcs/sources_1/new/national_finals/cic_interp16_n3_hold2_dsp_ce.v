@@ -1,22 +1,44 @@
 `timescale 1ns / 1ps
 
-// Exact R=16, N=3 CIC interpolation rewrite:
+//=============================================================
+// 文件名       : cic_interp16_n3_hold2_dsp_ce.v
+// 模块名       : cic_interp16_n3_hold2_dsp_ce
+// 功能简述     : R=16、N=3 CIC 插值器的严格等价降阶实现。
+//                依据下式把一个低速梳状器/高速积分器对替换为
+//                长度 16 的保持响应：
 //
-//   comb^3 -> zero stuffing -> integrator^3
-//     == comb^2 -> hold each sample for 16 enables -> integrator^2
+//                  comb^3 -> 补零 -> integrator^3
+//                    等价于 comb^2 -> Hold16 -> integrator^2
 //
-// One low-rate comb/high-rate integrator pair is replaced by the exact
-// length-16 hold response.  The first integrator has the exact bound
-// 32*max|x| (DATA_W+5 bits); the second integrator is the non-negative
-// triangular interpolation kernel with DC gain 16^2 (DATA_W+8 bits).
-// These widths preserve the original right-shift-by-8 output exactly while
-// avoiding eleven unreachable state bits.  At the 4-DSP national-finals
-// point, the former first-integrator DSP is reassigned to the serial comb:
-// its P register holds comb_operand and its ALU performs both differences.
-// The first 26-bit integrator moves to CARRY4 while the final integrator
-// remains in DSP48, preserving the total DSP count but removing the wider
-// comb subtract/register-input network from Fabric.  Modes 1/0 keep the
-// historical one-DSP/zero-DSP Pareto mappings and therefore use a CARRY comb.
+//                第一级积分器精确上界为 32*max|x|，需要
+//                DATA_W+5 位；末级三角插值核直流增益为 16^2，
+//                需要 DATA_W+8 位。该位宽设计在保持右移 8 位
+//                输出逐位一致的同时，删除不可达的冗余状态位。
+//
+//                INTEGRATOR_DSP_MODE 用于选择 Pareto 实现点：
+//                  2：串行 comb 使用 DSP，末级积分器使用 DSP；
+//                  1：正式 239-LUT/3-DSP 板测配置；
+//                  0：偏向 LUT/CARRY4 的低 DSP 配置。
+//
+// 当前默认配置：
+//                  DATA_W=21，OUTPUT_W=20
+//                  R=16，M=1，N=3
+//                  INTEGRATOR_DSP_MODE=2（由上层正式配置覆盖为 1）
+//
+// 设计作者     : kafeizizi
+// 创建日期     : 2026-07-29
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
+// 修订记录     :
+//                2026-07-29：新增 N3 保持等价重写及多 DSP 映射。
+//                2026-08-16：统一正式工程中文文件头与结构说明。
+//=============================================================
+//=============================================================
+// 1）模块名称：cic_interp16_n3_hold2_dsp_ce
+// 功能说明：16 倍 CIC 插值器：执行梳状差分、零值插入与积分累加。
+// 工程版本：Vivado 2025.2。
+//=============================================================
+
 module cic_interp16_n3_hold2_dsp_ce #(
     parameter integer DATA_W = 21,
     parameter integer OUTPUT_W = 20,
@@ -46,9 +68,8 @@ module cic_interp16_n3_hold2_dsp_ce #(
     localparam integer OUTPUT_SHIFT =
         (CIC_ORDER-1)*RATE_LOG2 - FINAL_PRUNE_LSB;
 
-    // Rotate two uniformly sized histories.  At stage zero delay0 stores
-    // the previous input; after the rotation it stores the previous first
-    // difference for stage one.  No wide stage-select mux is required.
+    // 两级等宽历史寄存器采用轮转复用：第0级运算时delay0保存上一输入，
+    // 轮转后它又保存第1级所需的上一拍一阶差分，从而不需要宽位级选择MUX。
     reg signed [COMB_DELAY_W-1:0] comb_delay0;
     reg signed [COMB_DELAY_W-1:0] comb_delay1;
     wire signed [COMB_W-1:0] comb_operand;
@@ -57,8 +78,8 @@ module cic_interp16_n3_hold2_dsp_ce #(
     reg comb_active;
     reg signed [COMB_W-1:0] hold_sample;
 
-    // One hidden high-rate integrator plus the externally visible final
-    // integrator gives the two integrators required after the Hold16 block.
+    // 一个内部高速积分器与外部可见的末级积分器共同构成Hold16之后所需
+    // 的两级积分链；模块接口只暴露最终规范化后的有效输出。
     reg signed [FIRST_INT_W-1:0] integrator_state;
     reg signed [FINAL_W-1:0] final_integrator_state;
 
@@ -94,8 +115,8 @@ module cic_interp16_n3_hold2_dsp_ce #(
     assign comb_dsp_c =
         {{(48-COMB_W){x_comb_extended[COMB_W-1]}},
          x_comb_extended};
-    // x_in_valid loads C directly into P.  Each active comb cycle then
-    // evaluates P-A:B; ALUMODE=0011 is the DSP48E1 Z-X-Y operation.
+    // x_in_valid到来时先把C端数据直接装入P寄存器；随后每个梳状器工作拍
+    // 计算P-A:B，其中ALUMODE=0011对应DSP48E1的Z-X-Y减法模式。
     assign comb_dsp_opmode = x_in_valid ? 7'b0110000 : 7'b0100011;
     assign comb_dsp_alumode = x_in_valid ? 4'b0000 : 4'b0011;
 
@@ -103,6 +124,7 @@ module cic_interp16_n3_hold2_dsp_ce #(
         if (INTEGRATOR_DSP_MODE >= 2) begin : gen_comb_dsp_role_exchange
             assign comb_operand = comb_dsp_p[COMB_W-1:0];
 
+            // 例化说明：调用 DSP48E1 算术原语，完成乘法、加减或累加；各控制字定义当前流水拍的运算功能。
             DSP48E1 #(
                 .A_INPUT("DIRECT"),
                 .B_INPUT("DIRECT"),
@@ -149,9 +171,8 @@ module cic_interp16_n3_hold2_dsp_ce #(
                           (burst_pending || burst_remaining != 4'd0);
     assign first_output_event = ce_out && burst_pending &&
                                 burst_remaining == 4'd0;
-    // A new low-rate comb result is ready before the preceding 16-sample
-    // hold burst has finished.  Keep hold_sample as the active burst value
-    // and use comb_operand only on the first output of the next burst.
+    // 新的低速梳状结果会在上一组16点保持突发结束前提前就绪；hold_sample
+    // 始终保存当前突发值，仅在下一突发的首个输出点切入comb_operand。
     assign high_rate_input = first_output_event ?
         {{(FIRST_INT_W-COMB_W){comb_operand[COMB_W-1]}}, comb_operand} :
         {{(FIRST_INT_W-COMB_W){hold_sample[COMB_W-1]}}, hold_sample};
@@ -190,9 +211,8 @@ module cic_interp16_n3_hold2_dsp_ce #(
 
     assign burst_remaining_dbg = {1'b0, burst_remaining};
     assign pending_dbg = burst_pending;
-    // Once the second difference completes, comb_stage_index remains high
-    // for the legacy one-cycle alignment slot.  Reusing it as that state
-    // removes the separate align_pending flag without changing latency.
+    // 二阶差分完成后，comb_stage_index继续保持高电平一个旧版对齐周期；
+    // 复用该状态可删除独立align_pending标志，同时保持既有固定延迟不变。
     assign comb_busy_dbg = comb_active || comb_stage_index;
     assign burst_remaining_decrement = burst_remaining - 4'd1;
 
@@ -201,6 +221,7 @@ module cic_interp16_n3_hold2_dsp_ce #(
             assign final_input_rounded = integrator_next;
         end
         else begin : gen_final_pruning
+            // 例化说明：调用 round_sat_shift_compact 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
             round_sat_shift_compact #(
                 .IN_W    (FIRST_INT_W),
                 .OUT_W   (FINAL_W),
@@ -212,6 +233,7 @@ module cic_interp16_n3_hold2_dsp_ce #(
         end
     endgenerate
 
+    // 例化说明：调用 round_sat_shift_compact 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     round_sat_shift_compact #(
         .IN_W    (FINAL_W),
         .OUT_W   (OUTPUT_W),
@@ -261,8 +283,8 @@ module cic_interp16_n3_hold2_dsp_ce #(
                 end
             end
             else if (comb_stage_index) begin
-                // Preserve the legacy serial-comb fixed latency so the
-                // valid streams can still be compared cycle by cycle.
+                // 保留旧版串行梳状器的固定延迟，使下游积分链有效相位不变，
+                // 并允许新旧结构的valid数据流继续逐周期直接比较。
                 comb_stage_index <= 1'b0;
                 burst_pending <= 1'b1;
             end

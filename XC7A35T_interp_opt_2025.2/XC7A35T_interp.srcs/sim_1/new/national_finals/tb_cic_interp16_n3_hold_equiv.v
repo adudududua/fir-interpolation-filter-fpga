@@ -1,7 +1,25 @@
 `timescale 1ns / 1ps
 
+//=============================================================
+// 文件名       : tb_cic_interp16_n3_hold_equiv.v
+// 模块名       : tb_cic_interp16_n3_hold_equiv
+// 功能简述     : 仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 设计说明     : 本文件采用同步时序设计；复位、时钟使能、
+//                有效信号和定点位宽关系均在对应代码段说明。
+//                注释仅用于阐明实现，不参与综合结果。
+// 设计作者     : kafeizizi
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
+// 修订记录     : 2026-08-30：统一中文文件头、模块编号与结构说明。
+//=============================================================
+
 // Cycle-accurate comparison of the signed-off N3 serial-comb CIC and the
 // exact comb^2 -> Hold16 -> integrator^2 rewrite.
+//=============================================================
+// 1）模块名称：tb_cic_interp16_n3_hold_equiv
+// 功能说明：仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 工程版本：Vivado 2025.2。
+//=============================================================
 module tb_cic_interp16_n3_hold_equiv;
 
     localparam integer DATA_W = 21;
@@ -29,6 +47,7 @@ module tb_cic_interp16_n3_hold_equiv;
     integer mismatch_count;
     integer seed_index;
 
+    // 例化说明：调用 cic_interp16_serial_comb_dsp_ce CIC/补偿子模块，完成高倍率插值或通带下垂校正。
     cic_interp16_serial_comb_dsp_ce #(
         .DATA_W(DATA_W),
         .OUTPUT_W(OUTPUT_W),
@@ -48,6 +67,7 @@ module tb_cic_interp16_n3_hold_equiv;
         .comb_busy_dbg()
     );
 
+    // 例化说明：调用 cic_interp16_n3_hold2_dsp_ce CIC/补偿子模块，完成高倍率插值或通带下垂校正。
     cic_interp16_n3_hold2_dsp_ce #(
         .DATA_W(DATA_W),
         .OUTPUT_W(OUTPUT_W),
@@ -67,6 +87,7 @@ module tb_cic_interp16_n3_hold_equiv;
         .comb_busy_dbg()
     );
 
+    // 例化说明：调用 cic_interp16_n3_hold2_dsp_ce CIC/补偿子模块，完成高倍率插值或通带下垂校正。
     cic_interp16_n3_hold2_dsp_ce #(
         .DATA_W(DATA_W),
         .OUTPUT_W(OUTPUT_W),
@@ -86,6 +107,7 @@ module tb_cic_interp16_n3_hold_equiv;
         .comb_busy_dbg()
     );
 
+    // 例化说明：调用 cic_interp16_n3_hold2_dsp_ce CIC/补偿子模块，完成高倍率插值或通带下垂校正。
     cic_interp16_n3_hold2_dsp_ce #(
         .DATA_W(DATA_W),
         .OUTPUT_W(OUTPUT_W),

@@ -1,0 +1,18 @@
+DCP=D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_opt_2025.2/tools/vivado_2025_2/core_ooc/results/20260810_184031/core_post_route.dcp
+GROUP LUT FF CARRY4 DSP48E1 RAMB18E1 TOTAL_PRIMITIVES
+stage1 1 83 0 1 1 86
+stage23 12 75 1 1 1 90
+cic 0 196 13 3 1 213
+coeff 0 6 0 0 1 7
+top_all 281 281 32 4 3 604
+
+DSP_CELLS
+gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/u_stage23_dsp48e1
+gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_comb_dsp_role_exchange.u_cic_comb_dsp48e1
+gen_serial_cic_comb.u_cic_interp16_serial_comb_dsp_ce/gen_final_integrator_dsp.final_integrator_sum
+gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_stage1_dsp48e1
+
+RAMB18_CELLS
+gen_lutram_stage23.u_interp2_stage23_lutram_cic_dsp_ce/gen_unified_bram_history.u_nf_stage23_history_ramb18_sdp/gen_primitive.u_stage23_history_ramb18e1
+gen_single_bram_stage1.u_interp2_stage1_strict_halfband_bram_ce/u_nf_stage1_history_ramb18_sdp/gen_primitive.u_stage1_history_ramb18e1
+gen_unified_fir_coeff_bram.u_nf_unified_fir_coeff_bram/u_unified_coeff_ramb18e1

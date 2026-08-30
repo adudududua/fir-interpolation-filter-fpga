@@ -24,11 +24,16 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-14
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-14：新增无复位动态档位与时钟毛刺测试。
 //                2026-07-18：动态切换测试改用单读 LUTRAM 候选。
+//=============================================================
+//=============================================================
+// 1）模块名称：tb_phase7_mode_switch_dynamic
+// 功能说明：仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module tb_phase7_mode_switch_dynamic;
@@ -66,6 +71,7 @@ module tb_phase7_mode_switch_dynamic;
     time transition_width;
     reg have_last_transition;
 
+    // 例化说明：调用 demo_interp_dac8_audio_pcm_common 子模块，承担本级数据通路或控制链中的对应功能；参数和端口连接见下方。
     demo_interp_dac8_audio_pcm_common #(
         .USE_PHASE7_FOLDED(1),
         .USE_PHASE7_LUTRAM_STAGE23(1),

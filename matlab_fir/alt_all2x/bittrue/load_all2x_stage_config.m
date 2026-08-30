@@ -22,6 +22,10 @@ function stage_config = load_all2x_stage_config(design_dir, data_w)
 % 修订记录     :
 %                2026-07-10：新增全 2x 配置读取与位宽估算函数。
 %=============================================================
+% 1）主函数模块：load_all2x_stage_config
+% 功能说明：集中定义并返回正式配置、定点字长、滤波系数或验证门槛。
+% 输入、输出、定点规则和结果文件由下方参数及代码段具体定义。
+
 
     if nargin < 1 || isempty(design_dir)
         design_dir = fullfile(fileparts(mfilename('fullpath')), '..');
@@ -103,6 +107,10 @@ function stage_config = load_all2x_stage_config(design_dir, data_w)
 end
 
 
+% 2）局部函数模块：required_signed_width
+
+
+% 功能说明：封装 required_signed_width 对应的局部计算，供主流程复用并保持代码层次清晰。
 function coeff_w = required_signed_width(coeff_int)
     max_pos = max(coeff_int);
     min_neg = min(coeff_int);

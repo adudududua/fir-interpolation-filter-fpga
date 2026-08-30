@@ -1,7 +1,20 @@
+%=============================================================
+% 文件名       : p3_01_search_joint_stage3_equalizer.m
+% 脚本名       : p3_01_search_joint_stage3_equalizer
+% 功能简述     : 执行参数搜索和 Pareto 筛选，在满足指标的前提下降低字长或资源开销。
+% 处理说明     : 本文件按“参数准备—核心计算—指标判定—结果导出”
+%                的顺序组织；各功能段和局部函数均有独立编号。
+% 开发工具     : MATLAB R2023a
+% 修订记录     : 2026-08-30：统一中文文件头、功能段编号和函数说明。
+%=============================================================
+
 % P3 MATLAB-only gate: mode-specific Stage3/CIC compensation bank.
 % The official 4x/8x modes retain the signed-off flat Stage3.  Only the
 % 128x mode may select a second Q15/18-bit Stage3 bank and remove the
 % external three-tap equalizer.  No RTL is changed by this script.
+
+%% 1）主流程：p3_01_search_joint_stage3_equalizer
+% 功能说明：执行参数搜索和 Pareto 筛选，在满足指标的前提下降低字长或资源开销。
 
 clearvars;
 clc;
@@ -356,6 +369,10 @@ fprintf('P3_JOINT_STAGE3_EQUALIZER_MATLAB_GATE_PASS: %s, candidate=%s\n', ...
     CONFIG_ID, selected_name);
 
 
+% 2）局部函数模块：upsample_ir
+
+
+% 功能说明：按指定插值倍率展开冲激响应并构造当前级或完整链路的等效响应。
 function h_up = upsample_ir(h, rate)
     h = h(:).';
     h_up = zeros(1, rate*(numel(h)-1)+1);
@@ -363,6 +380,10 @@ function h_up = upsample_ir(h, rate)
 end
 
 
+% 3）局部函数模块：design_joint_stage3
+
+
+% 功能说明：封装 design_joint_stage3 对应的局部计算，供主流程复用并保持代码层次清晰。
 function h = design_joint_stage3(tap_count, stop_weight, h4, ...
         fs_list, pass_high)
     half_order = (tap_count-1)/2;
@@ -409,6 +430,10 @@ function h = design_joint_stage3(tap_count, stop_weight, h4, ...
 end
 
 
+% 4）局部函数模块：cic_normalized_magnitude
+
+
+% 功能说明：封装 cic_normalized_magnitude 对应的局部计算，供主流程复用并保持代码层次清晰。
 function magnitude = cic_normalized_magnitude(frequency_hz, ...
         input_rate_hz, rate_change, diff_delay, cic_order)
     numerator = sin(pi*frequency_hz*diff_delay/input_rate_hz);
@@ -421,6 +446,10 @@ function magnitude = cic_normalized_magnitude(frequency_hz, ...
 end
 
 
+% 5）局部函数模块：response_at
+
+
+% 功能说明：计算局部幅频、相位、纹波或阻带指标，并返回结构化验收结果。
 function response = response_at(h, frequency_hz, sample_rate_hz)
     sample_index = (0:numel(h)-1).';
     response = h(:).'*exp(-1i*2*pi/sample_rate_hz* ...
@@ -429,6 +458,10 @@ function response = response_at(h, frequency_hz, sample_rate_hz)
 end
 
 
+% 6）局部函数模块：signed_width
+
+
+% 功能说明：封装 signed_width 对应的局部计算，供主流程复用并保持代码层次清晰。
 function width = signed_width(max_abs_value)
     if max_abs_value == 0
         width = 1;
@@ -438,6 +471,10 @@ function width = signed_width(max_abs_value)
 end
 
 
+% 7）局部函数模块：evaluate_all_fs
+
+
+% 功能说明：封装 evaluate_all_fs 对应的局部计算，供主流程复用并保持代码层次清晰。
 function metrics = evaluate_all_fs(h, factor, fs_list, pass_low, ...
         pass_high, nfft)
     metrics = repmat(analyze_node(h, factor, fs_list(1), ...
@@ -449,6 +486,10 @@ function metrics = evaluate_all_fs(h, factor, fs_list, pass_low, ...
 end
 
 
+% 8）局部函数模块：analyze_node
+
+
+% 功能说明：计算局部幅频、相位、纹波或阻带指标，并返回结构化验收结果。
 function metric = analyze_node(h, factor, fs_in, pass_low, pass_high, ...
         nfft, refine_stop)
     h = double(h(:).');
@@ -493,6 +534,10 @@ function metric = analyze_node(h, factor, fs_in, pass_low, pass_high, ...
 end
 
 
+% 9）局部函数模块：run_bittrue_gate
+
+
+% 功能说明：封装 run_bittrue_gate 对应的局部计算，供主流程复用并保持代码层次清晰。
 function data = run_bittrue_gate(coeff_int, h128, cfg, fs_list, ...
         pass_low, pass_high, nfft)
     impulse = zeros(1, 256, 'int64');
@@ -619,6 +664,10 @@ function data = run_bittrue_gate(coeff_int, h128, cfg, fs_list, ...
 end
 
 
+% 10）局部函数模块：simulate_candidate
+
+
+% 功能说明：封装 simulate_candidate 对应的局部计算，供主流程复用并保持代码层次清晰。
 function [y128, stat] = simulate_candidate(x, coeff_int, cfg)
     [stage1, s1] = interp2_polyphase_bittrue(x, ...
         cfg.stage1.coeff_int, cfg.stage1.frac_w, ...
@@ -646,6 +695,10 @@ function [y128, stat] = simulate_candidate(x, coeff_int, cfg)
 end
 
 
+% 11）局部函数模块：simulate_baseline
+
+
+% 功能说明：封装 simulate_baseline 对应的局部计算，供主流程复用并保持代码层次清晰。
 function [y128, stat] = simulate_baseline(x, cfg)
     [stage1, s1] = interp2_polyphase_bittrue(x, ...
         cfg.stage1.coeff_int, cfg.stage1.frac_w, ...
@@ -670,6 +723,10 @@ function [y128, stat] = simulate_baseline(x, cfg)
 end
 
 
+% 12）局部函数模块：make_tone
+
+
+% 功能说明：封装 make_tone 对应的局部计算，供主流程复用并保持代码层次清晰。
 function x = make_tone(frequency_hz, level_dbfs, sample_count, fs_in)
     amplitude = (2^23-1)*10^(level_dbfs/20);
     n = 0:sample_count-1;
@@ -677,6 +734,10 @@ function x = make_tone(frequency_hz, level_dbfs, sample_count, fs_in)
 end
 
 
+% 13）局部函数模块：floating_reference
+
+
+% 功能说明：封装 floating_reference 对应的局部计算，供主流程复用并保持代码层次清晰。
 function reference = floating_reference(x, h128)
     x = double(x(:).');
     x_up = zeros(1, 128*(numel(x)-1)+1);
@@ -685,6 +746,10 @@ function reference = floating_reference(x, h128)
 end
 
 
+% 14）局部函数模块：analyze_scaled_node
+
+
+% 功能说明：计算局部幅频、相位、纹波或阻带指标，并返回结构化验收结果。
 function metric = analyze_scaled_node(y, fs_out, fs_in, pass_low, ...
         pass_high, nfft, expected_dc_sum)
     spectrum = fft(double(y(:).'), nfft);
@@ -698,6 +763,10 @@ function metric = analyze_scaled_node(y, fs_out, fs_in, pass_low, ...
 end
 
 
+% 15）局部函数模块：build_resource_model
+
+
+% 功能说明：封装 build_resource_model 对应的局部计算，供主流程复用并保持代码层次清晰。
 function table_out = build_resource_model(taps)
     item = {'remove_equalizer'; 'dual_bank_address_and_mode'; ...
         '18bit_coefficient_port'; 'signed21_stage3_output'; ...
@@ -718,6 +787,10 @@ function table_out = build_resource_model(taps)
 end
 
 
+% 16）局部函数模块：write_no_go_summary
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_no_go_summary(result_dir, config_id)
     fid = fopen(fullfile(result_dir, ...
         'p3_joint_stage3_equalizer_summary.txt'), 'w');
@@ -728,6 +801,10 @@ function write_no_go_summary(result_dir, config_id)
 end
 
 
+% 17）局部函数模块：write_summary_file
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_summary_file(result_dir, config_id, cfg, selected_name, ...
         selected_coeff, frac_w, coeff_w, candidate_table, ...
         selected_index, metric_table, bittrue_table, resource_table)
@@ -758,6 +835,10 @@ function write_summary_file(result_dir, config_id, cfg, selected_name, ...
 end
 
 
+% 18）局部函数模块：plot_responses
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function plot_responses(figure_dir, h128_baseline, selected_h128, ...
         fs_list, pass_high_hz)
     fig = figure('Visible', 'off', 'Color', 'w', ...
@@ -797,6 +878,10 @@ function plot_responses(figure_dir, h128_baseline, selected_h128, ...
 end
 
 
+% 19）局部函数模块：response_db
+
+
+% 功能说明：计算局部幅频、相位、纹波或阻带指标，并返回结构化验收结果。
 function [frequency, response_db_value] = response_db(h, fs_out, gain)
     nfft = 2^18;
     spectrum = fft(h, nfft);

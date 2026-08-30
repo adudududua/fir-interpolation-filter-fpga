@@ -1,3 +1,16 @@
+%=============================================================
+% 文件名       : run_experiment1_ablation.m
+% 脚本名       : run_experiment1_ablation
+% 功能简述     : 统一调度相关实验步骤，检查依赖并生成报告、数据表和演示图。
+% 处理说明     : 本文件按“参数准备—核心计算—指标判定—结果导出”
+%                的顺序组织；各功能段和局部函数均有独立编号。
+% 开发工具     : MATLAB R2023a
+% 修订记录     : 2026-08-30：统一中文文件头、功能段编号和函数说明。
+%=============================================================
+
+%% 1）主流程：run_experiment1_ablation
+% 功能说明：统一调度相关实验步骤，检查依赖并生成报告、数据表和演示图。
+
 clearvars;
 clc;
 
@@ -78,11 +91,17 @@ assert(~all(metric_table.PASS(strcmp(metric_table.ARCHITECTURE, ...
     'Negative control unexpectedly passed.');
 fprintf('EXPERIMENT1_ABLATION_PASS: compensated=4/4, negative_control=NO_GO\n');
 
+% 2）局部函数模块：upsample_ir_local
+
+% 功能说明：按指定插值倍率展开冲激响应并构造当前级或完整链路的等效响应。
 function output = upsample_ir_local(input, rate)
     output = zeros(1, (numel(input)-1)*rate+1);
     output(1:rate:end) = input;
 end
 
+% 3）局部函数模块：analyze_local
+
+% 功能说明：计算局部幅频、相位、纹波或阻带指标，并返回结构化验收结果。
 function metric = analyze_local(h, fs_in, nfft)
     fs_out = 128*fs_in;
     spectrum = fft(double(h(:).'), nfft);

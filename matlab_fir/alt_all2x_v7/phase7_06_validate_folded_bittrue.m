@@ -1,3 +1,6 @@
+%% 1）主流程：phase7_06_validate_folded_bittrue
+% 功能说明：在相同输入下对齐 MATLAB 黄金模型与 RTL 输出，执行逐样本 bit-true 判定。
+
 clc; clear; close all;
 
 %=============================================================
@@ -257,6 +260,10 @@ fprintf('PNG2: %s\n', acceptance_path);
 fprintf('==========================================================\n');
 
 
+% 2）局部函数模块：simulate_front3
+
+
+% 功能说明：封装 simulate_front3 对应的局部计算，供主流程复用并保持代码层次清晰。
 function [y, stat] = simulate_front3( ...
         x, stage_config, width_profile, final_data_w)
     y = int64(x(:).');
@@ -284,6 +291,10 @@ function [y, stat] = simulate_front3( ...
 end
 
 
+% 3）局部函数模块：floating_full_reference
+
+
+% 功能说明：封装 floating_full_reference 对应的局部计算，供主流程复用并保持代码层次清晰。
 function y_ref = floating_full_reference(x, h_total, rate_change)
     upsampled = zeros(1, rate_change*(numel(x)-1)+1);
     upsampled(1:rate_change:end) = double(x);
@@ -291,6 +302,10 @@ function y_ref = floating_full_reference(x, h_total, rate_change)
 end
 
 
+% 4）局部函数模块：trim_impulse
+
+
+% 功能说明：按指定插值倍率展开冲激响应并构造当前级或完整链路的等效响应。
 function segment = trim_impulse(data)
     nonzero = find(data ~= 0);
     if isempty(nonzero)
@@ -300,6 +315,10 @@ function segment = trim_impulse(data)
 end
 
 
+% 5）局部函数模块：delta_snr_db
+
+
+% 功能说明：封装 delta_snr_db 对应的局部计算，供主流程复用并保持代码层次清晰。
 function snr_db = delta_snr_db(candidate, reference)
     compare_count = min(numel(candidate), numel(reference));
     candidate = double(candidate(1:compare_count));
@@ -309,12 +328,20 @@ function snr_db = delta_snr_db(candidate, reference)
 end
 
 
+% 6）局部函数模块：profile_text
+
+
+% 功能说明：封装 profile_text 对应的局部计算，供主流程复用并保持代码层次清晰。
 function text_value = profile_text(profile)
     text_value = sprintf('%d-', profile);
     text_value(end) = [];
 end
 
 
+% 7）局部函数模块：measure_sinad_thd
+
+
+% 功能说明：封装 measure_sinad_thd 对应的局部计算，供主流程复用并保持代码层次清晰。
 function [sinad_db, thd_db] = measure_sinad_thd(y, tone_hz, sample_rate)
     y = double(y(:));
     first_idx = floor(numel(y)*0.25)+1;
@@ -339,6 +366,10 @@ function [sinad_db, thd_db] = measure_sinad_thd(y, tone_hz, sample_rate)
 end
 
 
+% 8）局部函数模块：make_sine
+
+
+% 功能说明：封装 make_sine 对应的局部计算，供主流程复用并保持代码层次清晰。
 function x = make_sine(freq_hz, dbfs, sample_count, sample_rate, data_w)
     amplitude = (2^(data_w-1)-1)*10^(dbfs/20);
     n = 0:sample_count-1;
@@ -346,6 +377,10 @@ function x = make_sine(freq_hz, dbfs, sample_count, sample_rate, data_w)
 end
 
 
+% 9）局部函数模块：read_signed_hex_mem
+
+
+% 功能说明：读取外部配置、RTL结果或数据文件，并转换为主流程使用的统一数据格式。
 function data = read_signed_hex_mem(filename, data_w)
     fid = fopen(filename, 'r');
     if fid < 0
@@ -360,6 +395,10 @@ function data = read_signed_hex_mem(filename, data_w)
 end
 
 
+% 10）局部函数模块：write_signed_hex_mem
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_signed_hex_mem(filename, data, data_w)
     digits = ceil(data_w/4);
     unsigned_data = mod(double(int64(data(:))), 2^data_w);
@@ -375,6 +414,10 @@ function write_signed_hex_mem(filename, data, data_w)
 end
 
 
+% 11）局部函数模块：write_summary
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_summary(filename, result_table)
     fid = fopen(filename, 'w');
     if fid < 0
@@ -403,6 +446,10 @@ function write_summary(filename, result_table)
 end
 
 
+% 12）局部函数模块：plot_result
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function plot_result(filename, candidate_result, result_table, ...
         pass_edge, stop_begin)
     color_blue = [0.20 0.39 0.63];
@@ -446,6 +493,10 @@ function plot_result(filename, candidate_result, result_table, ...
 end
 
 
+% 13）局部函数模块：plot_full_chain_acceptance
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function plot_full_chain_acceptance(filename, metric, result_row, ...
         fs_out, pass_edge, stop_begin)
     color_blue = [0.20 0.39 0.63];
@@ -524,6 +575,10 @@ function plot_full_chain_acceptance(filename, metric, result_row, ...
 end
 
 
+% 14）局部函数模块：style_axes
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function style_axes(ax)
     grid(ax, 'on'); box(ax, 'on');
     ax.FontName = 'Microsoft YaHei'; ax.FontSize = 11;

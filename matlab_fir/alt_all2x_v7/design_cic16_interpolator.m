@@ -22,6 +22,10 @@ function h_cic = design_cic16_interpolator(cic_order, rate_change, diff_delay)
 % 修订记录     :
 %                2026-07-13：新增标准 CIC 插值等效响应函数。
 %=============================================================
+% 1）主函数模块：design_cic16_interpolator
+% 功能说明：建立滤波器设计指标，搜索候选结构并评价幅频、相位和实现代价。
+% 输入、输出、定点规则和结果文件由下方参数及代码段具体定义。
+
 
     if cic_order < 1 || fix(cic_order) ~= cic_order
         error('cic_order 必须为正整数。');

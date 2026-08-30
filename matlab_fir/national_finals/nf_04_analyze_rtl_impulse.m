@@ -4,6 +4,9 @@
 %                44.1/48 kHz 下的 4x、8x、128x 频响与线性相位。
 %=============================================================
 
+%% 1）主流程：nf_04_analyze_rtl_impulse
+% 功能说明：读取 RTL/XSim 冲激响应，恢复频率响应并计算通带、阻带和线性相位指标。
+
 clearvars;
 clc;
 
@@ -134,6 +137,10 @@ if figure_written
 end
 
 
+% 2）局部函数模块：analyze_rtl_node
+
+
+% 功能说明：计算局部幅频、相位、纹波或阻带指标，并返回结构化验收结果。
 function metric = analyze_rtl_node(y, fs_out, fs_in, ...
         pass_low, pass_high, nfft, expected_dc_sum)
     y = double(y(:).');
@@ -163,6 +170,10 @@ function metric = analyze_rtl_node(y, fs_out, fs_in, ...
 end
 
 
+% 3）局部函数模块：write_summary
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_summary(filename, table_data, pass_limit, stop_limit, ...
         absolute_gain_limit, mode_gain_delta_limit)
     fid = fopen(filename, 'w');
@@ -197,6 +208,10 @@ function write_summary(filename, table_data, pass_limit, stop_limit, ...
 end
 
 
+% 4）局部函数模块：plot_metrics
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function plot_metrics(filename, metric_cell, fs_list, ...
         pass_high, pass_limit, stop_limit)
     figure('Visible', 'off', 'Color', 'w', ...

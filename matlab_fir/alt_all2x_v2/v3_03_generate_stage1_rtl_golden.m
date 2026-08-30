@@ -1,3 +1,6 @@
+%% 1）主流程：v3_03_generate_stage1_rtl_golden
+% 功能说明：整理计算结果并导出后续 RTL、仿真或报告流程需要的技术文件。
+
 clc; clear;
 
 %=============================================================
@@ -90,6 +93,10 @@ fclose(fid);
 fprintf('Stage 1 单元 golden 已生成。\n');
 
 
+% 2）局部函数模块：write_signed_hex_mem
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_signed_hex_mem(filename, data, data_w)
     digits = ceil(data_w / 4);
     unsigned_data = mod(double(int64(data(:))), 2^data_w);

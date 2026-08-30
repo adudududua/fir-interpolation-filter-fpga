@@ -23,10 +23,15 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-11
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-11：新增 V3 BRAM 完整七级对拍测试平台。
+//=============================================================
+//=============================================================
+// 1）模块名称：tb_interp128_all2x_v3_strict_s1_bram_ce
+// 功能说明：仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module tb_interp128_all2x_v3_strict_s1_bram_ce;
@@ -69,6 +74,7 @@ module tb_interp128_all2x_v3_strict_s1_bram_ce;
     assign ce4_out = (ce_cnt[4:0] == 5'b00000);
     assign ce2_out = (ce_cnt[5:0] == 6'b000000);
 
+    // 例化说明：调用 interp128_all2x_v3_strict_s1_bram_top_ce 插值链顶层，完成所选倍率的数据率提升与有效信号传递。
     interp128_all2x_v3_strict_s1_bram_top_ce dut_impulse (
         .clk(clk), .rst_n(rst_n),
         .ce2_out(ce2_out), .ce4_out(ce4_out), .ce8_out(ce8_out),
@@ -81,6 +87,7 @@ module tb_interp128_all2x_v3_strict_s1_bram_ce;
         .dbg_y32(), .dbg_y32_valid(), .dbg_y64(), .dbg_y64_valid()
     );
 
+    // 例化说明：调用 interp128_all2x_v3_strict_s1_bram_top_ce 插值链顶层，完成所选倍率的数据率提升与有效信号传递。
     interp128_all2x_v3_strict_s1_bram_top_ce dut_random (
         .clk(clk), .rst_n(rst_n),
         .ce2_out(ce2_out), .ce4_out(ce4_out), .ce8_out(ce8_out),

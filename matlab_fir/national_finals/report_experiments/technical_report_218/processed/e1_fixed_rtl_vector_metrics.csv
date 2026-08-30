@@ -1,7 +1,0 @@
-CASE_NAME,NODE,SAMPLE_COUNT,MISMATCH_COUNT,MAX_ERROR_LSB,PASS
-impulse,4x,1245,0,0,1
-impulse,8x,2499,0,0,1
-impulse,128x,40064,0,0,1
-random_seed01,4x,4317,0,0,1
-random_seed01,8x,8643,0,0,1
-random_seed01,128x,138368,0,0,1

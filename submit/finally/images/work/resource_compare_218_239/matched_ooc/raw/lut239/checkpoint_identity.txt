@@ -1,6 +1,0 @@
-CHECKPOINT=D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/submit/finally/images/work/resource_compare_218_239/matched_ooc/results/lut239_mode1/core_post_route.dcp
-PART=xc7a35tfgg484-2
-TOP=interp128_all2x_v7_folded_fir_cic_top_ce
-DESIGN_MODE=
-HIERARCHICAL_CELL_COUNT=0
-PRIMITIVE_CELL_COUNT=663

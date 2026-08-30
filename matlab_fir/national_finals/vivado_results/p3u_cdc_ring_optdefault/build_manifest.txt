@@ -1,0 +1,30 @@
+National-finals dual-rate board build
+Synthesis checkpoint: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/XC7A35T_interp_audio_pcm_wordlen_opt/XC7A35T_interp.runs/synth_1/board_demo_competition_dac8_top.dcp
+Part: xc7a35tfgg484-2
+Top: board_demo_competition_dac8_top
+Bitstream: D:/FpgaProject/XilinxProject/XC7A35T/fir_interpolation/matlab_fir/national_finals/vivado_results/p3u_cdc_ring_optdefault/national_finals_dual_rate_4x8x128x_areaopt.bit
+Routed setup slack: 45.413 ns
+Routed hold slack: 0.080 ns
+AD9708 output setup slack: 76.116 ns
+AD9708 output hold slack: 78.117 ns
+44.1-kHz family 128x clock: 5.644796 MHz (-0.64 ppm nominal)
+48-kHz family 128x clock: 6.144068 MHz (+11.03 ppm nominal)
+Bundled-data CDC: mode_shadow[1:0] has 50.000 ns relative bus-skew and absolute datapath-delay requirements; verify routed evidence in bus_skew_routed.rpt, mode_absolute_delay_routed.rpt, and exceptions_ignored_routed.rpt
+Architecture: 1-DSP Stage1 + 1-DSP shared Stage2/3 with mode-specific coefficient banks + exact N3 Hold CIC16 with 2 DSP integrator(s)
+P3 equalizer fold: the 128x compensation response is folded into Stage3; 4x/8x retain the flat Stage3 bank and the separate shift-add equalizer is not elaborated
+N3 Hold optimization: C^3 -> up16 -> I^3 is rewritten exactly as C^2 -> Hold16 -> I^2; proven 26-bit first and 29-bit final integrator widths replace the former conservative 33-bit states
+CIC mapping: two low-rate comb stages use LUT CARRY4; both high-rate integrators use DSP48E1
+Stage1 optimization: current L0 is written then read from the single RAMB18; DSP48E1 AREG retains each left operand and dynamic INMODE masks invalid A/D history; the stable write pointer derives the schedule base address instead of storing a second pointer; spare post-MAC cycles perform exact Q15 rounding, PATTERNDETECT/PATTERNBDETECT sign-extension checking, and direct DSP P-register clamp loading.  The A+D preadder, PREG MAC state, 41-bit bound, reset masking, and bit-exact saturation are preserved.
+Stage2/3 optimization: shared DSP48E1 PREG MAC state; spare post-MAC cycles perform exact Q15 rounding, PATTERNDETECT/PATTERNBDETECT sign-extension checking, and direct DSP P-register clamp loading, removing the fabric overflow comparator and wide saturation mux
+Stage3 correctness: true Q15 coefficients, complete 38-bit MAC view, and exact signed 20/21-bit saturation retained inside the shared DSP schedule
+History-state optimization: existing circular write heads derive startup fill depth; one sticky full flag per history plus one job snapshot replace the former wide fill counters while preserving reset masking and active-job isolation
+Synthesis directive: AreaOptimized_high
+Synthesis flatten hierarchy: full
+Synthesis resource sharing: on
+Stage1 DSP48 preadder: 1
+Requested CIC integrator DSP mode: 2
+Stage1 single-BRAM history mode: 1
+Stage2/3 unified-BRAM history mode: 1
+Implementation opt directive: Default
+Implementation place directive: Explore
+P3 joint Stage3 mode: 1

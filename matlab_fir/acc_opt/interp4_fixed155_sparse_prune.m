@@ -43,7 +43,7 @@ clc; clear; close all;
 %                2026-06-24：新增 4x FIR 固定 155 tap 小系数稀疏裁剪脚本。
 %=============================================================
 
-%% 1) 基本设计参数
+%% 1）基本设计参数
 %=============================================================
 
 % 固定 4x FIR 参数
@@ -91,7 +91,7 @@ fprintf('阻带衰减目标：%.1f dB\n', stop_attn_target_db);
 fprintf('PRUNE_THR_LIST = [%s]\n', num2str(PRUNE_THR_LIST));
 fprintf('====================================================\n\n');
 
-%% 2) 重新生成原始 155 tap 4x FIR，并做 Q16 量化
+%% 2）重新生成原始 155 tap 4x FIR，并做 Q16 量化
 %=============================================================
 
 % 使用最苛刻模式设计 155 tap 等波纹 FIR。
@@ -121,7 +121,7 @@ half_taps_base = (NTAPS - 1) / 2;
 coeff_half_base = coeff_int_base(1:half_taps_base+1);
 fprintf('原始半系数非零个数：%d / %d\n\n', nnz(coeff_half_base), length(coeff_half_base));
 
-%% 3) 先检查未裁剪 baseline 是否满足两种模式
+%% 3）先检查未裁剪 baseline 是否满足两种模式
 %=============================================================
 
 fprintf('================ 未裁剪 baseline 检查 ================\n');
@@ -145,7 +145,7 @@ if ~base_ok_all
     warning('固定 155 tap 的 baseline 未同时满足两种模式指标。请确认当前 4x RTL 使用的是否正是这组系数。');
 end
 
-%% 4) 搜索可接受的最大裁剪阈值
+%% 4）搜索可接受的最大裁剪阈值
 %=============================================================
 
 % 结果表列：
@@ -226,7 +226,7 @@ if ~best_found
     error('没有找到满足指标的裁剪阈值。理论上 prune_thr=0 应该满足，请检查设计参数。');
 end
 
-%% 5) 打印最终最优裁剪结果
+%% 5）打印最终最优裁剪结果
 %=============================================================
 
 fprintf('\n================ 4x 固定 155 tap 稀疏裁剪完成 ================\n');
@@ -259,7 +259,7 @@ final_res_1920 = check_one_mode_verbose(best_b, ...
                                         Nfft, ...
                                         '48k -> 192k');
 
-%% 6) 导出搜索结果与最优系数
+%% 6）导出搜索结果与最优系数
 %=============================================================
 
 % 6.1 搜索结果表
@@ -307,7 +307,7 @@ fprintf(fid, 'Ripple_pm_db = %.8f\n', final_res_1920.ripple_pm_db);
 fprintf(fid, 'Stop_attn_db = %.8f\n', final_res_1920.stop_attn_db);
 fclose(fid);
 
-%% 7) 绘制频响对比图
+%% 7）绘制频响对比图
 %=============================================================
 
 plot_response_compare(b_q_base, ...
@@ -331,9 +331,11 @@ fprintf('则可用 interp4_fixed155_sparse_coeff_half_for_verilog.txt\n');
 fprintf('替换 fir_core_symm.v 中 4x FIR 的 coeff_half 初始化内容。\n');
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：检查单个输出模式
 % ============================================================
+% 8）局部函数模块：check_one_mode
+% 功能说明：检查局部约束和数值条件，在不满足要求时给出明确错误信息。
 function res = check_one_mode(b, Fs_out, f_pass_low, f_pass_high, stop_attn_target_db, ripple_pm_target_db, Nfft)
 
     Fs_in = Fs_out / 4;
@@ -374,9 +376,11 @@ function res = check_one_mode(b, Fs_out, f_pass_low, f_pass_high, stop_attn_targ
 end
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：详细打印检查结果
 % ============================================================
+% 9）局部函数模块：check_one_mode_verbose
+% 功能说明：检查局部约束和数值条件，在不满足要求时给出明确错误信息。
 function res = check_one_mode_verbose(b, Fs_out, f_pass_low, f_pass_high, stop_attn_target_db, ripple_pm_target_db, Nfft, mode_name)
 
     Fs_in = Fs_out / 4;
@@ -436,9 +440,11 @@ function res = check_one_mode_verbose(b, Fs_out, f_pass_low, f_pass_high, stop_a
 end
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：导出半系数 Verilog 赋值语句
 % ============================================================
+% 10）局部函数模块：export_half_coeff_for_verilog
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function export_half_coeff_for_verilog(filename, coeff_half_int, coeff_w, frac_w, order_n, prune_thr, title_str)
 
     fid = fopen(filename, 'w');
@@ -471,9 +477,11 @@ function export_half_coeff_for_verilog(filename, coeff_half_int, coeff_w, frac_w
 end
 
 
-%% ============================================================
+%=============================================================
 % 本地函数：绘制 baseline 与 sparse 频响对比
 % ============================================================
+% 11）局部函数模块：plot_response_compare
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function plot_response_compare(b_base, b_sparse, Fs1, Fs2, f_pass_high, filename)
 
     Nfft_plot = 65536;
@@ -554,6 +562,10 @@ function plot_response_compare(b_base, b_sparse, Fs1, Fs2, f_pass_high, filename
 end
 
 
+% 12）局部函数模块：set_mid_minor_ticks
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function set_mid_minor_ticks(ax)
     try
         ax.XMinorTick = 'on';
@@ -573,6 +585,10 @@ function set_mid_minor_ticks(ax)
 end
 
 
+% 13）局部函数模块：midpoint_ticks
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function ticks_minor = midpoint_ticks(ticks_major, axis_lim)
     ticks_major = ticks_major(:).';
     ticks_major = ticks_major(ticks_major >= axis_lim(1) & ticks_major <= axis_lim(2));

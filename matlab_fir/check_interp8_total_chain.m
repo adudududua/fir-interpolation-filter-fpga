@@ -1,6 +1,16 @@
+%=============================================================
+% 文件名       : check_interp8_total_chain.m
+% 脚本名       : check_interp8_total_chain
+% 功能简述     : 构造完整插值链并计算关键频响、相位或定点误差指标。
+% 处理说明     : 本文件按“参数准备—核心计算—指标判定—结果导出”
+%                的顺序组织；各功能段和局部函数均有独立编号。
+% 开发工具     : MATLAB R2023a
+% 修订记录     : 2026-08-30：统一中文文件头、功能段编号和函数说明。
+%=============================================================
+
 clc; clear; close all;
 
-%% ============================================================
+%=============================================================
 % check_interp8_total_chain.m
 %
 % 作用：
@@ -24,9 +34,9 @@ clc; clear; close all;
 % 说明：
 % 这里先检查“线性级联后的总频响”。
 % 对于你后续要实现的 RTL 两级级联结构，这是最关键的系统级验收。
-%% ============================================================
+%=============================================================
 
-%% 1) 读取 4x 与 2x 系数（Q16 定点整数）
+%% 1）读取 4x 与 2x 系数（Q16 定点整数）
 coeff4_int = readmatrix('acc_opt/interp4_fixed155_sparse_coeff_decimal.txt');
 coeff2_int = readmatrix('opt/interp2_coeff_decimal_wordlen_opt.txt');
 
@@ -43,7 +53,7 @@ b2 = coeff2_int / 2^FRAC_W2;
 fprintf('4x FIR 长度 = %d tap\n', length(b4));
 fprintf('2x FIR 长度 = %d tap\n', length(b2));
 
-%% 2) 构造总链路的冲激响应
+%% 2）构造总链路的冲激响应
 %
 % 注意：
 % 不能直接用 upsample(b4,2)，因为那样会在最后多补一个 0，
@@ -64,7 +74,7 @@ h_total = conv(h4_up2, b2);
 fprintf('上采样后的 4x 冲激响应长度 = %d tap\n', length(h4_up2));
 fprintf('整体 8x 链路冲激响应长度 = %d tap\n', length(h_total));
 
-%% 3) 先做一个基本一致性检查
+%% 3）先做一个基本一致性检查
 sym_err = max(abs(h_total - fliplr(h_total)));
 fprintf('整体冲激响应最大对称误差 = %.12g\n', sym_err);
 
@@ -74,7 +84,7 @@ else
     fprintf('警告：整体冲激响应不完全对称，请检查级联逻辑。\n\n');
 end
 
-%% 4) 对两种最终输出模式分别检查
+%% 4）对两种最终输出模式分别检查
 Fs_out_list = [352800, 384000];
 Nfft = 131072;
 
@@ -191,7 +201,7 @@ for idx = 1:length(Fs_out_list)
     xline(f_pass_high, '--r', '20 kHz');
 end
 
-%% 5) 汇总打印
+%% 5）汇总打印
 fprintf('\n\n===================== 整体 8x 汇总结果 =====================\n');
 fprintf('   Fs_in      Fs_out      Ripple_pp      Ripple_±      StopAttn      GD_mean      GD_pp      Pass   Stop   Linear\n');
 

@@ -18,6 +18,10 @@ function [y, stage_stat] = simulate_all2x_bittrue(x, stage_config)
 % 修订记录     :
 %                2026-07-10：新增完整全 2x bit-true 链路模型。
 %=============================================================
+% 1）主函数模块：simulate_all2x_bittrue
+% 功能说明：按 RTL 舍入、饱和和流水规则建立逐位一致的定点行为模型。
+% 输入、输出、定点规则和结果文件由下方参数及代码段具体定义。
+
 
     y = int64(x(:).');
     stage_stat = [];

@@ -1,15 +1,38 @@
 `timescale 1ns / 1ps
 
-// National-finals route-1 unified coefficient plane.
+//=============================================================
+// 文件名       : nf_unified_fir_coeff_bram.v
+// 模块名       : nf_unified_fir_coeff_bram
+// 功能简述     : 全国赛 Route-1 正式配置的统一 FIR 系数平面。
+//                单个 RAMB18E1 同时服务两条 FIR DSP 通道：
 //
-// One physical RAMB18E1 services both FIR DSP lanes:
-//   port A, addresses 128..179: expanded Stage1 sequential coefficients;
-//   port B, addresses   0..63: Stage2 + flat Stage3 coefficients;
-//   port B, addresses 96..127: P3 compensated Stage3 coefficients.
+//                  端口 A 地址 128～179：Stage1 顺序展开系数；
+//                  端口 B 地址   0～63 ：Stage2 与平坦 Stage3；
+//                  端口 B 地址  96～127：P3 补偿 Stage3 系数。
 //
-// Port B exposes the complete signed-18 RAMB18 word.  Bits 15:0 use the
-// normal data plane and bits 17:16 use the parity plane, allowing the P3
-// center coefficient 35584 without another BRAM or a LUT decoder.
+//                端口 B 输出完整有符号 18 bit RAM 字。低 16 位
+//                使用普通数据面，高 2 位使用 parity 面，因此能够
+//                保存中心系数 35584，无需增加第二块 BRAM 或 LUT
+//                译码器。INIT/INITP 常量与 MATLAB 固化系数对应。
+//
+// 当前默认配置：
+//                  存储原语：RAMB18E1，真双口 TDP
+//                  Stage1 系数 16 bit，Stage2/3 系数 18 bit
+//
+// 设计作者     : kafeizizi
+// 创建日期     : 2026-07-29
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
+// 修订记录     :
+//                2026-07-29：合并三级 FIR 系数到统一 RAMB18E1。
+//                2026-08-16：补充地址分区、parity 位和系数来源说明。
+//=============================================================
+//=============================================================
+// 1）模块名称：nf_unified_fir_coeff_bram
+// 功能说明：系数存储器：集中保存多级 FIR 的定点系数并提供同步读接口。
+// 工程版本：Vivado 2025.2。
+//=============================================================
+
 module nf_unified_fir_coeff_bram (
     input  wire                         clk,
     input  wire [5:0]                   stage1_addr,
@@ -24,6 +47,9 @@ module nf_unified_fir_coeff_bram (
     wire [15:0] dob;
     wire [1:0] dopb;
 
+    // 综合分支：直接例化RAMB18E1并固化INIT/INITP，端口A读取Stage1，
+    // 端口B读取Stage2/3；高2位系数通过parity面保存完整符号位。
+    // 例化说明：调用 RAMB18E1 双口块 RAM 原语，集中保存滤波系数或历史样本并提供同步读写。
     RAMB18E1 #(
         .RAM_MODE("TDP"),
         .READ_WIDTH_A(18),
@@ -75,6 +101,8 @@ module nf_unified_fir_coeff_bram (
     assign stage1_coeff = doa;
     assign stage23_coeff = {dopb, dob};
 `else
+    // 仿真分支：使用统一18位行为数组表达同一物理地址平面，避免功能
+    // 回归依赖器件原语库，同时逐项保留签核系数的精确补码数值。
     reg signed [17:0] coeff_mem [0:255];
     reg signed [15:0] stage1_coeff_q;
     reg signed [17:0] stage23_coeff_q;
@@ -103,9 +131,8 @@ module nf_unified_fir_coeff_bram (
         coeff_mem[22] = 16'sd1233;
         coeff_mem[23] = -16'sd203;
 
-        // Stage3 is represented consistently as signed Q15.  Each
-        // polyphase branch sums to approximately one, so the complete
-        // interpolation filter has DC gain two before zero insertion.
+        // Stage3统一采用有符号Q15表示。每条多相支路的系数和约为1，
+        // 因而在考虑零插入之前，完整二倍插值滤波器的直流增益为2。
         coeff_mem[32] = 16'sd404;
         coeff_mem[33] = -16'sd3272;
         coeff_mem[34] = 16'sd19250;
@@ -146,9 +173,8 @@ module nf_unified_fir_coeff_bram (
         coeff_mem[88] = -16'sd6876;
         coeff_mem[89] = 16'sd20836;
 
-        // P3 compensated Stage3, Q15/signed-18.  The two polyphase
-        // sequences are expanded in MAC order, matching the existing
-        // one-cycle coefficient prefetch contract.
+        // P3补偿Stage3使用Q15/有符号18位；两条多相序列按MAC消费顺序展开，
+        // 与现有“提前一拍读取系数”的流水契约严格一致。
         coeff_mem[96]  = 18'sd561;
         coeff_mem[97]  = -18'sd4232;
         coeff_mem[98]  = 18'sd20046;
@@ -162,7 +188,7 @@ module nf_unified_fir_coeff_bram (
         coeff_mem[115] = -18'sd1554;
         coeff_mem[116] = 18'sd137;
 
-        // Expanded Stage1 scan order: C0..C25,C25..C0.
+        // Stage1展开扫描顺序：C0～C25，再按C25～C0镜像返回。
         coeff_mem[128] = -16'sd5;
         coeff_mem[129] = 16'sd7;
         coeff_mem[130] = -16'sd12;

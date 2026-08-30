@@ -1,3 +1,6 @@
+%% 1）主流程：phase7_05_search_folded_stage3
+% 功能说明：执行参数搜索和 Pareto 筛选，在满足指标的前提下降低字长或资源开销。
+
 clc; clear; close all;
 
 %=============================================================
@@ -229,6 +232,10 @@ fprintf('========================================================\n');
 drawnow;
 
 
+% 2）局部函数模块：append_interp2_stage
+
+
+% 功能说明：封装 append_interp2_stage 对应的局部计算，供主流程复用并保持代码层次清晰。
 function h_total = append_interp2_stage(h_previous, h_stage)
     h_up = zeros(1, 2*numel(h_previous)-1);
     h_up(1:2:end) = h_previous;
@@ -236,6 +243,10 @@ function h_total = append_interp2_stage(h_previous, h_stage)
 end
 
 
+% 3）局部函数模块：cic_normalized_magnitude
+
+
+% 功能说明：封装 cic_normalized_magnitude 对应的局部计算，供主流程复用并保持代码层次清晰。
 function magnitude = cic_normalized_magnitude(frequency_hz, ...
         input_rate_hz, rate_change, diff_delay, cic_order)
     numerator = sin(pi*frequency_hz*diff_delay/input_rate_hz);
@@ -248,6 +259,10 @@ function magnitude = cic_normalized_magnitude(frequency_hz, ...
 end
 
 
+% 4）局部函数模块：design_folded_stage3
+
+
+% 功能说明：封装 design_folded_stage3 对应的局部计算，供主流程复用并保持代码层次清晰。
 function h = design_folded_stage3(tap_count, sample_rate, pass_edge, ...
         stop_edge, desired_fun, stop_weight)
     half_order = (tap_count-1)/2;
@@ -286,6 +301,10 @@ function h = design_folded_stage3(tap_count, sample_rate, pass_edge, ...
 end
 
 
+% 5）局部函数模块：anonymous_function_block
+
+
+% 功能说明：封装 anonymous_function_block 对应的局部计算，供主流程复用并保持代码层次清晰。
 function [coeff_int, h_quantized, fit_ok, required_w] = ...
         quantize_folded_stage3(h_float, frac_w, coeff_w)
     scale = int64(2^frac_w);
@@ -301,6 +320,10 @@ function [coeff_int, h_quantized, fit_ok, required_w] = ...
 end
 
 
+% 6）局部函数模块：write_summary
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_summary(filename, pareto)
     fid = fopen(filename, 'w');
     if fid < 0
@@ -328,6 +351,10 @@ function write_summary(filename, pareto)
 end
 
 
+% 7）局部函数模块：plot_pareto
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function plot_pareto(filename, pareto, pass_edge, stop_begin)
     color_blue = [0.20 0.39 0.63];
     color_purple = [0.28 0.15 0.49];
@@ -368,6 +395,10 @@ function plot_pareto(filename, pareto, pass_edge, stop_begin)
 end
 
 
+% 8）局部函数模块：style_axes
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function style_axes(ax)
     grid(ax, 'on'); box(ax, 'on');
     ax.FontName = 'Microsoft YaHei';

@@ -1,3 +1,6 @@
+%% 1）主流程：search_cic_order
+% 功能说明：遍历 CIC 结构或补偿参数，筛选满足通带与阻带指标的候选方案。
+
 clc; clear; close all;
 
 %=============================================================
@@ -164,6 +167,10 @@ fprintf('PNG : %s\n', fullfile(figure_dir, 'cic_order_search.png'));
 fprintf('====================================================\n');
 
 
+% 2）局部函数模块：cic_passband_magnitude
+
+
+% 功能说明：封装 cic_passband_magnitude 对应的局部计算，供主流程复用并保持代码层次清晰。
 function magnitude = cic_passband_magnitude(frequency_hz, ...
         input_rate_hz, rate_change, diff_delay, cic_order)
     numerator = sin(pi*frequency_hz*diff_delay/input_rate_hz);
@@ -178,6 +185,10 @@ function magnitude = cic_passband_magnitude(frequency_hz, ...
 end
 
 
+% 3）局部函数模块：plot_order_search
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function plot_order_search(file_path, metric_list, result_table, ...
         pass_edge, stop_begin)
     colors = [0.20 0.39 0.63; 0.10 0.60 0.49; 0.28 0.15 0.49];
@@ -234,6 +245,10 @@ function plot_order_search(file_path, metric_list, result_table, ...
 end
 
 
+% 4）局部函数模块：style_axes
+
+
+% 功能说明：生成或美化结果图，统一中文标签、刻度、线型和版面布局。
 function style_axes(ax)
     grid(ax, 'on'); box(ax, 'on');
     ax.FontName = 'Microsoft YaHei';

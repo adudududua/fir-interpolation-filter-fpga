@@ -1,5 +1,18 @@
+%=============================================================
+% 文件名       : nf_04_generate_release_vectors.m
+% 脚本名       : nf_04_generate_release_vectors
+% 功能简述     : 生成 RTL/XSim 使用的输入激励、黄金输出和配套元数据文件。
+% 处理说明     : 本文件按“参数准备—核心计算—指标判定—结果导出”
+%                的顺序组织；各功能段和局部函数均有独立编号。
+% 开发工具     : MATLAB R2023a
+% 修订记录     : 2026-08-30：统一中文文件头、功能段编号和函数说明。
+%=============================================================
+
 % Generate the release-scale bit-true vectors used by the P4-D RTL gate.
 % Outputs are reproducible working data and remain under ignored _work/.
+
+%% 1）主流程：nf_04_generate_release_vectors
+% 功能说明：生成 RTL/XSim 使用的输入激励、黄金输出和配套元数据文件。
 
 clearvars;
 clc;
@@ -96,6 +109,10 @@ disp(manifest);
 fprintf('NF_RELEASE_VECTORS_PASS: %s\n', vector_dir);
 
 
+% 2）局部函数模块：anonymous_function_block
+
+
+% 功能说明：封装 anonymous_function_block 对应的局部计算，供主流程复用并保持代码层次清晰。
 function [name, config_id, input_count, y4_count, y8_count, y128_count, ...
         equalizer_sat, equalizer_peak, equalizer_exceeds20, ...
         cic_i1_peak, cic_i2_peak, cic_i1_wrap, cic_i2_wrap, ...
@@ -117,6 +134,10 @@ function [name, config_id, input_count, y4_count, y8_count, y128_count, ...
 end
 
 
+% 3）局部函数模块：write_case
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_case(vector_dir, case_name, result)
     write_signed_hex_mem(fullfile(vector_dir, ...
         [case_name '_input_24bit.mem']), result.input, 24);
@@ -129,6 +150,10 @@ function write_case(vector_dir, case_name, result)
 end
 
 
+% 4）局部函数模块：write_signed_hex_mem
+
+
+% 功能说明：把计算指标、系数或总结内容写入指定技术文件，供复核和报告引用。
 function write_signed_hex_mem(filename, data, data_w)
     digits = ceil(data_w/4);
     unsigned_data = mod(double(int64(data(:))), 2^data_w);

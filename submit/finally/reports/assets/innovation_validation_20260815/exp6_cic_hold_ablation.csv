@@ -1,3 +1,0 @@
-Architecture,UseN3HoldEquiv,LUT,FF,DSP,RAMB18,WNS_ns,WHS_ns,DRC_Errors,EvidenceSummary
-Legacy C3-up16-I3,0,188,280,5,3,150.563,0.082,0,D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\_work\innovation_validation_20260815\experiment6\ooc\legacy_n3_no_hold\core_ooc_summary.txt
-C2-Hold16-I2,1,190,279,4,3,150.943,0.069,0,D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\XC7A35T_interp_opt_2025.2\tools\vivado_2025_2\results\20260811_190839\core_ooc_summary.txt

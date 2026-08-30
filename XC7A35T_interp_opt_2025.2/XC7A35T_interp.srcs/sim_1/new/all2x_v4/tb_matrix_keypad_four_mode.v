@@ -16,10 +16,15 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-12
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-12：新增四档矩阵按键映射验证。
+//=============================================================
+//=============================================================
+// 1）模块名称：tb_matrix_keypad_four_mode
+// 功能说明：仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module tb_matrix_keypad_four_mode;
@@ -39,6 +44,7 @@ module tb_matrix_keypad_four_mode;
     integer row_index;
     integer column_index;
 
+    // 例化说明：调用 matrix_keypad_mode_ctrl 键盘控制模块，完成扫描、消抖、译码和模式更新。
     matrix_keypad_mode_ctrl #(
         .SCAN_DIV       (4),
         .DEBOUNCE_SCANS (1)

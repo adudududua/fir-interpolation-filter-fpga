@@ -9,10 +9,15 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-11
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-11：新增 V2 单级结构选择封装。
+//=============================================================
+//=============================================================
+// 1）模块名称：interp2_all2x_v2_stage_select
+// 功能说明：插值级选择器：根据倍率模式选择旁路或滤波后的数据与有效信号。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module interp2_all2x_v2_stage_select #(
@@ -38,6 +43,7 @@ module interp2_all2x_v2_stage_select #(
 
     generate
         if (USE_CANONICAL != 0) begin : gen_canonical
+            // 例化说明：调用 interp2_halfband7_shiftadd_ce 插值子模块，完成对应级的数据展开、滤波或模式选择。
             interp2_halfband7_shiftadd_ce #(
                 .DATA_W (DATA_W)
             ) u_interp2_halfband7_shiftadd_ce (
@@ -55,6 +61,7 @@ module interp2_all2x_v2_stage_select #(
             assign fir_in_valid_dbg = ce_out;
         end
         else begin : gen_stable
+            // 例化说明：调用 interp2_top_symm_ce_all2x 插值子模块，完成对应级的数据展开、滤波或模式选择。
             interp2_top_symm_ce_all2x #(
                 .STAGE_ID (STAGE_ID),
                 .DATA_W   (DATA_W),

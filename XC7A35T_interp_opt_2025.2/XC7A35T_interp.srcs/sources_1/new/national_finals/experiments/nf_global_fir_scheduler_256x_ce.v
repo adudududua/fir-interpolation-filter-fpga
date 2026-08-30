@@ -1,9 +1,27 @@
 `timescale 1ns / 1ps
 
+//=============================================================
+// 文件名       : nf_global_fir_scheduler_256x_ce.v
+// 模块名       : nf_global_fir_scheduler_256x_ce
+// 功能简述     : 全局 FIR 调度器：在共享运算资源上安排各级乘加任务。
+// 设计说明     : 本文件采用同步时序设计；复位、时钟使能、
+//                有效信号和定点位宽关系均在对应代码段说明。
+//                注释仅用于阐明实现，不参与综合结果。
+// 设计作者     : kafeizizi
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
+// 修订记录     : 2026-08-30：统一中文文件头、模块编号与结构说明。
+//=============================================================
+
 // Experimental 256x-clock FIR scheduler.  One DSP48E1 executes the Stage1,
 // Stage2 and Stage3 MAC streams.  Short Stage2/3 jobs may pre-empt the long
 // Stage1 scan; the Stage1 P value is saved and restored around the short job.
 // The signed-off coefficient and history RAMB18 blocks are retained.
+//=============================================================
+// 1）模块名称：nf_global_fir_scheduler_256x_ce
+// 功能说明：全局 FIR 调度器：在共享运算资源上安排各级乘加任务。
+// 工程版本：Vivado 2025.2。
+//=============================================================
 module nf_global_fir_scheduler_256x_ce (
     input  wire                    clk,
     input  wire                    rst_n,
@@ -141,6 +159,7 @@ module nf_global_fir_scheduler_256x_ce (
     wire signed [21:0] s23_write_data = s2_write_event ? s2_x_current :
         {{2{s3_x_current[19]}}, s3_x_current};
 
+    // 例化说明：调用 nf_stage1_history_ramb18_sdp 全国赛签核子模块，完成正式数据通路中的存储、运算或控制任务。
     nf_stage1_history_ramb18_sdp u_s1_history (
         .clk(clk),
         .read_addr(s1_read_addr),
@@ -150,6 +169,7 @@ module nf_global_fir_scheduler_256x_ce (
         .write_data(s1_x_current)
     );
 
+    // 例化说明：调用 nf_stage23_history_ramb18_sdp 全国赛签核子模块，完成正式数据通路中的存储、运算或控制任务。
     nf_stage23_history_ramb18_sdp u_s23_history (
         .clk(clk),
         .read_addr(s23_read_addr),
@@ -222,6 +242,7 @@ module nf_global_fir_scheduler_256x_ce (
         state == ST_S1_ROUND || state == ST_SHORT_ROUND;
     wire dsp_reset = !rst_n || launch_short || launch_s1;
 
+    // 例化说明：调用 DSP48E1 算术原语，完成乘法、加减或累加；各控制字定义当前流水拍的运算功能。
     DSP48E1 #(
         .A_INPUT("DIRECT"), .B_INPUT("DIRECT"),
         .USE_DPORT("FALSE"), .USE_MULT("MULTIPLY"),

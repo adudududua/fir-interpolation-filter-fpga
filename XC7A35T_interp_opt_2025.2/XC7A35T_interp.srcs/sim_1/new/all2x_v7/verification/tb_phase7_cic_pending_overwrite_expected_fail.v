@@ -19,10 +19,15 @@
 //
 // 设计作者     : kafeizizi
 // 创建日期     : 2026-07-14
-// 版本         : V2018.3
-// 开发工具     : Vivado
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
 // 修订记录     :
 //                2026-07-14：新增 CIC pending overwrite 负向测试。
+//=============================================================
+//=============================================================
+// 1）模块名称：tb_phase7_cic_pending_overwrite_expected_fail
+// 功能说明：仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 工程版本：Vivado 2025.2。
 //=============================================================
 
 module tb_phase7_cic_pending_overwrite_expected_fail;
@@ -35,6 +40,7 @@ module tb_phase7_cic_pending_overwrite_expected_fail;
     wire signed [19:0] y_out;
     wire y_out_valid;
 
+    // 例化说明：调用 cic_interp16_core_ce CIC/补偿子模块，完成高倍率插值或通带下垂校正。
     cic_interp16_core_ce #(
         .DATA_W          (20),
         .CIC_ORDER       (3),

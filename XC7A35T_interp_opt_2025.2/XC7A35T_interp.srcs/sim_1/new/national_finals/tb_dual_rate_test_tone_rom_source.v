@@ -1,5 +1,23 @@
 `timescale 1ns / 1ps
 
+//=============================================================
+// 文件名       : tb_dual_rate_test_tone_rom_source.v
+// 模块名       : tb_dual_rate_test_tone_rom_source
+// 功能简述     : 仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 设计说明     : 本文件采用同步时序设计；复位、时钟使能、
+//                有效信号和定点位宽关系均在对应代码段说明。
+//                注释仅用于阐明实现，不参与综合结果。
+// 设计作者     : kafeizizi
+// 版本         : V2025.2
+// 开发工具     : Vivado 2025.2
+// 修订记录     : 2026-08-30：统一中文文件头、模块编号与结构说明。
+//=============================================================
+//=============================================================
+// 1）模块名称：tb_dual_rate_test_tone_rom_source
+// 功能说明：仿真测试平台：产生激励、监视被测模块输出并执行自动判定。
+// 工程版本：Vivado 2025.2。
+//=============================================================
+
 module tb_dual_rate_test_tone_rom_source;
 
     reg clk;
@@ -14,6 +32,7 @@ module tb_dual_rate_test_tone_rom_source;
     integer expected_addr;
     integer sample_index;
 
+    // 例化说明：调用 dual_rate_test_tone_rom_source 双采样率族模块，完成时钟或测试数据的族别选择。
     dual_rate_test_tone_rom_source u_dut (
         .clk             (clk),
         .rst_n           (rst_n),

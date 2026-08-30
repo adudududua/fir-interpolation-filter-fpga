@@ -1,47 +1,116 @@
 CONFIG_ID=NF-P3-STAGE123-24-20-20-CANDIDATE-R1
 EXPERIMENT_DIR=D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\report_experiments\technical_report_218
-E1 01/23: impulse_positive_fullscale
-E1 02/23: impulse_negative_fullscale
-E1 03/23: tone_997Hz_m1dBFS_Fs44100
-E1 04/23: tone_10000Hz_m1dBFS_Fs44100
-E1 05/23: tone_19000Hz_m1dBFS_Fs44100
-E1 06/23: tone_997Hz_m60dBFS_Fs44100
-E1 07/23: tone_997Hz_m90dBFS_Fs44100
-E1 08/23: tone_997Hz_m1dBFS_Fs48000
-E1 09/23: tone_10000Hz_m1dBFS_Fs48000
-E1 10/23: tone_19000Hz_m1dBFS_Fs48000
-E1 11/23: tone_997Hz_m60dBFS_Fs48000
-E1 12/23: tone_997Hz_m90dBFS_Fs48000
-E1 13/23: random_seed01
-E1 14/23: random_seed02
-E1 15/23: random_seed03
-E1 16/23: random_seed04
-E1 17/23: random_seed05
-E1 18/23: random_seed06
-E1 19/23: random_seed07
-E1 20/23: random_seed08
-E1 21/23: random_seed09
-E1 22/23: random_seed10
-E1 23/23: alternating_fullscale
-E3 44.1 kHz 4x target=997 actual=997.256470 Hz image=84.368 dBc
-E3 44.1 kHz 4x target=10000 actual=10000.154114 Hz image=88.637 dBc
-E3 44.1 kHz 4x target=19000 actual=18999.687195 Hz image=80.848 dBc
-E3 44.1 kHz 8x target=997 actual=997.256470 Hz image=89.464 dBc
-E3 44.1 kHz 8x target=10000 actual=9999.481201 Hz image=86.425 dBc
-E3 44.1 kHz 8x target=19000 actual=19000.360107 Hz image=81.216 dBc
-E3 44.1 kHz 128x target=997 actual=990.527344 Hz image=89.302 dBc
-E3 44.1 kHz 128x target=10000 actual=9991.406250 Hz image=91.971 dBc
-E3 44.1 kHz 128x target=19000 actual=18992.285156 Hz image=74.546 dBc
-E3 48.0 kHz 4x target=997 actual=996.826172 Hz image=84.351 dBc
-E3 48.0 kHz 4x target=10000 actual=9999.755859 Hz image=85.496 dBc
-E3 48.0 kHz 4x target=19000 actual=18999.755859 Hz image=80.508 dBc
-E3 48.0 kHz 8x target=997 actual=997.558594 Hz image=88.138 dBc
-E3 48.0 kHz 8x target=10000 actual=10000.488281 Hz image=85.555 dBc
-E3 48.0 kHz 8x target=19000 actual=19000.488281 Hz image=81.008 dBc
-E3 48.0 kHz 128x target=997 actual=1007.812500 Hz image=88.232 dBc
-E3 48.0 kHz 128x target=10000 actual=10007.812500 Hz image=85.387 dBc
-E3 48.0 kHz 128x target=19000 actual=19007.812500 Hz image=76.850 dBc
-E1_RTL_VECTOR_PASS=6/6 max_error=0 LSB
-E2_PASS=6/6 worst_pass=0.007843853 dB worst_stop=72.355251899 dB
-E3_PASS=18/18 worst_image=74.545857287 dBc
-TECHNICAL_REPORT_SOFTWARE_GATE=1
+{错误使用 <a href="matlab:matlab.internal.language.introspective.errorDocCallback('run_technical_report_experiments')" style="font-weight:bold">run_technical_report_experiments</a>
+无法打开要写入的文件
+'D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\report_experiments\technical_report_218\processed\e1_fixed_rtl_vector_metrics.csv':
+
+Invalid argument
+} 
+RUN_ME_FIRST
+
+============================================================
+高阶数字插值滤波器 MATLAB 建模演示包已就绪
+============================================================
+推荐：完整综合演示
+  run(fullfile(package_root, 'RUN_FULL_DEMO.m'));
+
+算法设计：共享 FIR-CIC 均衡器搜索
+  run(fullfile(package_root, '03_algorithm_design', 'nf_01_search_shared_cic_equalizer.m'));
+
+RTL 联合验证：XSim 冲激响应 MATLAB 验收
+  run(fullfile(package_root, '04_rtl_crosscheck', 'nf_04_analyze_rtl_impulse.m'));
+
+预生成图表：D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\submit\finally\matlab_fir\05_demo_results
+详细说明：D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\submit\finally\matlab_fir\README.md
+
+RUN_ME_FIRST
+
+============================================================
+高阶数字插值滤波器 MATLAB 建模演示包已就绪
+============================================================
+推荐：完整综合演示
+  run(fullfile(package_root, 'RUN_FULL_DEMO.m'));
+
+算法设计：共享 FIR-CIC 均衡器搜索
+  run(fullfile(package_root, '03_algorithm_design', 'nf_01_search_shared_cic_equalizer.m'));
+
+RTL 联合验证：XSim 冲激响应 MATLAB 验收
+  run(fullfile(package_root, '04_rtl_crosscheck', 'nf_04_analyze_rtl_impulse.m'));
+
+预生成图表：D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\submit\finally\matlab_fir\05_demo_results
+详细说明：D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\submit\finally\matlab_fir\README.md
+
+RUN_ME_FIRST
+
+============================================================
+高阶数字插值滤波器 MATLAB 建模演示包已就绪
+============================================================
+推荐：完整综合演示
+  run(fullfile(package_root, 'RUN_FULL_DEMO.m'));
+
+算法设计：共享 FIR-CIC 均衡器搜索
+  run(fullfile(package_root, '03_algorithm_design', 'nf_01_search_shared_cic_equalizer.m'));
+
+RTL 联合验证：XSim 冲激响应 MATLAB 验收
+  run(fullfile(package_root, '04_rtl_crosscheck', 'nf_04_analyze_rtl_impulse.m'));
+
+预生成图表：D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\submit\finally\matlab_fir\05_demo_results
+详细说明：D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\submit\finally\matlab_fir\README.md
+
+RUN_ME_FIRST
+
+============================================================
+高阶数字插值滤波器 MATLAB 建模演示包已就绪
+============================================================
+推荐：完整综合演示
+  run(fullfile(package_root, 'RUN_FULL_DEMO.m'));
+
+算法设计：共享 FIR-CIC 均衡器搜索
+  run(fullfile(package_root, '03_algorithm_design', 'nf_01_search_shared_cic_equalizer.m'));
+
+RTL 联合验证：XSim 冲激响应 MATLAB 验收
+  run(fullfile(package_root, '04_rtl_crosscheck', 'nf_04_analyze_rtl_impulse.m'));
+
+预生成图表：D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\submit\finally\matlab_fir\05_demo_results
+详细说明：D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\submit\finally\matlab_fir\README.md
+
+RUN_ME_FIRST
+
+============================================================
+高阶数字插值滤波器 MATLAB 建模演示包已就绪
+============================================================
+推荐：完整综合演示
+  run(fullfile(package_root, 'RUN_FULL_DEMO.m'));
+
+算法设计：共享 FIR-CIC 均衡器搜索
+  run(fullfile(package_root, '03_algorithm_design', 'nf_01_search_shared_cic_equalizer.m'));
+
+RTL 联合验证：XSim 冲激响应 MATLAB 验收
+  run(fullfile(package_root, '04_rtl_crosscheck', 'nf_04_analyze_rtl_impulse.m'));
+
+预生成图表：D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\submit\finally\matlab_fir\05_demo_results
+详细说明：D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\submit\finally\matlab_fir\README.md
+
+RUN_FULL_DEMO
+[警告: 执行 'onCleanup' 类析构函数时，捕获到以下错误:
+在 D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\matlab_fir\national_finals\report_experiments\run_technical_report_experiments.m 中找不到函数
+@()diary('off')。
+
+出错 <a href="matlab:matlab.internal.language.introspective.errorDocCallback('onCleanup/delete', 'E:\app\MATLAB\R2023a\toolbox\matlab\general\onCleanup.m', 25)" style="font-weight:bold">onCleanup/delete</a> (<a href="matlab: opentoline('E:\app\MATLAB\R2023a\toolbox\matlab\general\onCleanup.m',25,0)">第 25 行</a>)
+            obj.task();
+
+出错 <a href="matlab:matlab.internal.language.introspective.errorDocCallback('clearvars', 'E:\app\MATLAB\R2023a\toolbox\matlab\general\clearvars.m', 79)" style="font-weight:bold">clearvars</a> (<a href="matlab: opentoline('E:\app\MATLAB\R2023a\toolbox\matlab\general\clearvars.m',79,0)">第 79 行</a>)
+    evalin('caller', clearExpr);
+
+出错 <a href="matlab:matlab.internal.language.introspective.errorDocCallback('run_technical_report_experiments', 'D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\submit\finally\matlab_fir\01_one_click_demo\run_technical_report_experiments.m', 43)" style="font-weight:bold">run_technical_report_experiments</a> (<a href="matlab: opentoline('D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\submit\finally\matlab_fir\01_one_click_demo\run_technical_report_experiments.m',43,0)">第 43 行</a>)
+clearvars;
+
+出错 <a href="matlab:matlab.internal.language.introspective.errorDocCallback('run', 'E:\app\MATLAB\R2023a\toolbox\matlab\lang\run.m', 91)" style="font-weight:bold">run</a> (<a href="matlab: opentoline('E:\app\MATLAB\R2023a\toolbox\matlab\lang\run.m',91,0)">第 91 行</a>)
+evalin('caller', strcat(script, ';'));
+
+出错 <a href="matlab:matlab.internal.language.introspective.errorDocCallback('RUN_FULL_DEMO', 'D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\submit\finally\matlab_fir\RUN_FULL_DEMO.m', 35)" style="font-weight:bold">RUN_FULL_DEMO</a> (<a href="matlab: opentoline('D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\submit\finally\matlab_fir\RUN_FULL_DEMO.m',35,0)">第 35 行</a>)
+run(runner);] 
+[> 位置：<a href="matlab:matlab.internal.language.introspective.errorDocCallback('clearvars', 'E:\app\MATLAB\R2023a\toolbox\matlab\general\clearvars.m', 79)" style="font-weight:bold">clearvars</a> (<a href="matlab: opentoline('E:\app\MATLAB\R2023a\toolbox\matlab\general\clearvars.m',79,0)">第 79 行</a>)
+位置: <a href="matlab:matlab.internal.language.introspective.errorDocCallback('run_technical_report_experiments', 'D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\submit\finally\matlab_fir\01_one_click_demo\run_technical_report_experiments.m', 43)" style="font-weight:bold">run_technical_report_experiments</a> (<a href="matlab: opentoline('D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\submit\finally\matlab_fir\01_one_click_demo\run_technical_report_experiments.m',43,0)">第 43 行</a>)
+位置: <a href="matlab:matlab.internal.language.introspective.errorDocCallback('run', 'E:\app\MATLAB\R2023a\toolbox\matlab\lang\run.m', 91)" style="font-weight:bold">run</a> (<a href="matlab: opentoline('E:\app\MATLAB\R2023a\toolbox\matlab\lang\run.m',91,0)">第 91 行</a>)
+位置: <a href="matlab:matlab.internal.language.introspective.errorDocCallback('RUN_FULL_DEMO', 'D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\submit\finally\matlab_fir\RUN_FULL_DEMO.m', 35)" style="font-weight:bold">RUN_FULL_DEMO</a> (<a href="matlab: opentoline('D:\FpgaProject\XilinxProject\XC7A35T\fir_interpolation\submit\finally\matlab_fir\RUN_FULL_DEMO.m',35,0)">第 35 行</a>)] 
