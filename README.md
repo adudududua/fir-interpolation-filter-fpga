@@ -536,3 +536,11 @@ python .\network_capture\host\gui_app.py
 UDP回传的是AD9708截位前的24-bit数字节点，可验证RTL、上传事务和数字频响；它不能代替DAC、模拟重建滤波器或功放输出端的示波器/频谱仪测量。
 
 ---
+
+<div align="center">
+
+🌸 本项目由 **kafeizizi** 和 **zipengzhaojingzi** 共同完成，历时接近2个月，合作愉快~ 🌸
+
+🐾 **2026-08-30** 🐾
+
+</div>
